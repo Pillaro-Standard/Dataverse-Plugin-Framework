@@ -13,15 +13,15 @@ It introduces a task-based execution model with explicit validation and executio
 - strict separation of concerns
 - fully testable plugin logic
 - long-term maintainability at scale
-  
+
 The framework is designed for real-world production environments and long-term solution sustainability.
 
 
 ## AI-Ready Standard
 
-The architecture is intentionally structured to be understandable by both developers and AI-driven tools and agents.
+The framework is part of the Pillaro delivery standards, designed to support the entire development lifecycle.
 
-The architecture is intentionally structured to be understandable not only by developers, but also by AI-driven tools and agents.
+The architecture is intentionally structured to be understandable by both developers and AI-driven tools and agents.
 
 Key principles:
 
@@ -37,6 +37,7 @@ This enables:
 
 In future scenarios, tasks can be implemented by specialized AI agents based on analysis outputs.
 
+---
 
 ### AI Feedback Loop
 
@@ -87,14 +88,15 @@ Each plugin is composed of independent tasks:
 - explicit validation
 - isolated execution
 - explicitly testable units (one task = one testable component)
-  
+
 ---
 
 ### Validation Model
 
-- fluent validation per task
-- fail-fast behavior
-- predictable error handling
+- fluent validation defined per task with clear and explicit rules
+- fail-fast validation that prevents execution of invalid tasks while allowing the pipeline to continue
+- consistent handling of validation and execution errors with clear and traceable outcomes
+- automatic logging of validation failures with detailed reasons
 
 ---
 
@@ -104,7 +106,7 @@ Each plugin is composed of independent tasks:
 - dynamically affects plugin behavior
 - no redeployment required
 - cached for performance optimization
-  
+
 ---
 
 ### Autonumbering
@@ -130,7 +132,7 @@ The framework also provides a logging console that allows tasks to write structu
 - logs include relevant input and context data
 - enables step-by-step tracing of task execution
 
-This significantly simplifies debugging and in most cases eliminates the need for complex plugin debugging.
+This significantly simplifies debugging and, in most cases, eliminates the need for complex plugin debugging.
 
 This makes it possible to:
 
@@ -159,17 +161,17 @@ This allows reliable validation of real-world behavior in a controlled environme
 
 ## Architecture (Simplified)
 
-The framework extends the standard Dataverse plugin model with a structured execution pipeline.
+The framework extends the standard Dataverse plugin SDK with a structured execution pipeline.
 
 Each plugin is composed of independent tasks that follow a consistent lifecycle:
 
-```
+~~~
 Plugin
-↓
+  ↓
 Task
-├─ Validation
-└─ Execution
-```
+  ├─ Validation
+  └─ Execution
+~~~
 
 ---
 
@@ -208,7 +210,7 @@ Validation is executed before any business logic.
 - ensures all required conditions are met
 - prevents invalid state from reaching execution
 - prevents execution of the current task if validation fails, while allowing the pipeline to continue processing remaining tasks
-  
+
 ---
 
 ### Execution
@@ -259,14 +261,38 @@ Configuration is loaded dynamically from Dataverse.
 - allows safe runtime adjustments of logic
 
 
+## Getting Started
+
+> 🚧 TODO  
+> Detailed setup and usage guide will be added soon.
+
+
+
+## Repository Structure
+
+~~~
+/src        → framework source code
+/tests      → test projects
+/examples   → sample implementations
+/docs       → documentation
+~~~
+
+
+## Current Status
+
+- preparing for first public release
+- documentation in progress
+
 ## Key Principles
 
-- strict separation of validation and execution
-- task-based modular design
-- deterministic and predictable behavior
+- clear separation between validating conditions and executing business logic
+- small, focused units of functionality with a single responsibility
+- predictable and deterministic behavior in every execution
 - explicit and transparent execution flow
-- built-in testability of all functional units
-- integrated diagnostic logging with full execution traceability
-- AI-ready architecture with structured and machine-readable behavior
-- DevOps and ALM ready with automated test execution before artifact generation
-- full compatibility with standard Dataverse APIs
+- consistent structure across all plugins and tasks
+- design focused on long-term maintainability and scalability
+
+
+## License
+
+See `LICENSE` file.
