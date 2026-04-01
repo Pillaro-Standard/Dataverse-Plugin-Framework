@@ -20,12 +20,12 @@ public class LogFilterService
         foreach (var filter in filters)
         {
             if (filter.Entity == null && (filter.TaskNames == null || !filter.TaskNames.Any()))
-                throw new ArgumentNullException($"Log filter has to have filled at least one of the fields: {nameof(filter.Entity)}, {nameof(filter.TaskNames)}.");
+                throw new InvalidOperationException($"Log filter must define at least one of these fields: {nameof(filter.Entity)}, {nameof(filter.TaskNames)}.");
 
             IEnumerable<Log> logAdd = allLogs.Select(item => (Log)item.Clone()).ToList();
 
             if (filter.Entity != null)
-                logAdd = logAdd.Where(x => x.Entity?.ToLower() == filter.Entity.ToLower());
+                logAdd = logAdd.Where(x => string.Equals(x.Entity, filter.Entity, StringComparison.OrdinalIgnoreCase));
 
             if (filter.TaskNames != null && filter.TaskNames.Any())
                 logAdd = logAdd.Where(x => x.TaskName != null && filter.TaskNames.Contains(x.TaskName));

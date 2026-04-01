@@ -177,7 +177,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\CachingProviderBase.cs" />
     <Compile Include="Caching\CacheProvider.cs" />
     <Compile Include="Data\DataServiceProvider.cs" />
     <Compile Include="Data\IDataService.cs" />

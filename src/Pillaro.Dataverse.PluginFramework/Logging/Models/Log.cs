@@ -4,6 +4,7 @@ using Pillaro.Dataverse.PluginFramework.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging.Models;
 
@@ -25,8 +26,7 @@ public class Log
     public string CorrelationId { get; }
     public string Name { get; }
     public string Detail { get; set; }
-    public DateTime CreateDateUtc => DateTime.UtcNow;
-    /// <summary>   The sort date UTC. </summary>
+    public DateTime CreateDateUtc { get; } = DateTime.UtcNow;
     public string SortDateUtc => CreateDateUtc.ToString("yyyy-MM-ddTHH:mm:ss.ffff", CultureInfo.InvariantCulture);
     public string EntityId { get; set; }
     public IList<LogDetail> LogDetails { get; set; }
@@ -66,25 +66,31 @@ public class Log
     {
         return
             $@"****************{Name}****************
-                    Entity Id: {EntityId}
-                    Detail: {Detail} 
-                    Severity: {LogSeverity}
-                    Task: {TaskName}
-                    Start: {StartUtc}
-                    Elapsed Time in ms:{ElapsedTimeInMs}
-                    Status: {Status}
-                    Entity: {Entity}
-                    Stage: {Stage}
-                    Depth: {Depth}
-                    User: {User.Id}
-                    Initiating User: {InitiatingUser}
-                    Mode: {Mode}
-                    Correlation Id: {CorrelationId}
-                    Message: {Message}";
+             Entity Id: {EntityId}
+             Detail: {Detail} 
+             Severity: {LogSeverity}
+             Task: {TaskName}
+             Start: {StartUtc}
+             Elapsed Time in ms:{ElapsedTimeInMs}
+             Status: {Status}
+             Entity: {Entity}
+             Stage: {Stage}
+             Depth: {Depth}
+             User: {User?.Id}
+             Initiating User: {InitiatingUser.Id}
+             Mode: {Mode}
+             Correlation Id: {CorrelationId}
+             Message: {Message}";
     }
 
     public object Clone()
     {
-        return this.MemberwiseClone();
+        var clone = (Log)MemberwiseClone();
+
+        clone.LogDetails = LogDetails?
+            .Select(x => x == null ? null : new LogDetail(x.Name, x.Detail))
+            .ToList();
+
+        return clone;
     }
 }
