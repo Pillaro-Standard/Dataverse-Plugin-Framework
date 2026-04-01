@@ -1,28 +1,144 @@
-BSD 3-Clause License
+Pillaro Community License (PCL) v1.0
+Copyright (c) 2026 Pillaro
 
-Copyright (c) 2026, Pillaro Standard
+---
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+1. Definitions
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+"Software" means the Pillaro Dataverse Plugin Framework, including its source code, binaries, and related documentation.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+"User" means any individual or legal entity exercising permissions granted by this License.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
+"Derivative Work" means any modification, extension, adaptation, or combination of the Software with other code.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"Service Offering" means a commercial activity where the Software is used as a supporting component of a broader solution and does not represent the primary or substantial value of what is being sold.
+
+"Commercial Product" means any software product, platform, framework, toolkit, or service offered for sale, licensing, subscription, or other monetization, where the Software is exposed, reused, or constitutes a primary or substantial part of the value delivered.
+
+---
+
+2. Grant of Rights
+
+Subject to the terms of this License, permission is hereby granted, free of charge, to any User to:
+
+* use the Software for any purpose
+* modify the Software
+* create Derivative Works
+* distribute the Software or Derivative Works
+
+These rights are granted on a non-exclusive, worldwide, royalty-free basis.
+
+---
+
+3. Permitted Commercial Use
+
+The Software may be used as part of Service Offerings, including but not limited to:
+
+* implementation and delivery of solutions
+* consulting and advisory services
+* managed services
+* internal enterprise applications
+
+Charging fees for such Service Offerings is explicitly permitted.
+
+For clarity, the Software may be included in delivered solutions, provided it is not itself sold, licensed, or marketed as a standalone or primary product.
+
+---
+
+4. Restrictions
+
+The following activities are strictly prohibited:
+
+a) Selling, licensing, sublicensing, or otherwise monetizing the Software or any Derivative Work as a standalone offering or as a Commercial Product.
+
+b) Packaging, bundling, embedding, or exposing the Software in a way where it represents a primary or substantial part of the value of a paid offering, including but not limited to developer frameworks, reusable platforms, toolkits, accelerators, or similar solutions.
+
+c) Providing the Software or any Derivative Work as a hosted, managed, or SaaS offering where access to the Software itself constitutes a primary or significant part of the commercial value.
+
+d) Rebranding, renaming, or presenting the Software or any Derivative Work as an independent or proprietary framework, platform, or product.
+
+e) Misrepresenting authorship, origin, or ownership of the Software or any Derivative Work.
+
+f) Removing, altering, or obscuring any copyright, license, or attribution notices.
+
+---
+
+5. Attribution
+
+Any distribution or commercial use of the Software or Derivative Works must include clear and visible attribution to Pillaro.
+
+The following statement must be included:
+
+"This solution is built using Pillaro Dataverse Plugin Framework."
+
+This attribution must appear in at least one of the following:
+
+* customer-facing documentation
+* technical or architectural documentation
+* publicly accessible description of the solution (if available)
+
+The attribution must not be hidden, removed, or misrepresented.
+
+---
+
+6. Customer Transparency
+
+If the Software is used as part of a delivered commercial solution, the User must ensure that the customer is informed that the solution includes this Software.
+
+This requirement may be fulfilled through delivery documentation, technical specifications, or equivalent materials.
+
+---
+
+7. Redistribution
+
+Redistribution of the Software or Derivative Works, in source or binary form, including via public repositories or package managers, is permitted provided that:
+
+* this License is included in full
+* all copyright notices are preserved
+* any modifications are clearly documented
+
+Redistribution must not violate Section 4 (Restrictions).
+
+---
+
+8. Trademark and Branding
+
+This License does not grant any rights to use the names "Pillaro" or "Pillaro Dataverse Plugin Framework" for:
+
+* product naming
+* branding
+* marketing or promotional purposes
+
+Any such use requires explicit prior written permission from Pillaro.
+
+---
+
+9. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+---
+
+10. Limitation of Liability
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT, OR OTHERWISE, ARISING FROM OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+11. Termination and Cure
+
+If the User fails to comply with this License, the rights granted under this License are suspended.
+
+The User may restore these rights by remedying the violation within 30 days of receiving notice of the violation.
+
+If the violation is not remedied within this period, the rights granted under this License are permanently terminated.
+
+---
+
+12. Reference (Non-Binding)
+
+Users are encouraged, but not required, to reference Pillaro as the underlying framework provider in case studies, presentations, or public materials. This clause is non-binding and does not create a legal obligation.
+
+---
+
+END OF TERMS
