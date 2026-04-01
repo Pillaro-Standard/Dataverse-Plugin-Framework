@@ -74,19 +74,31 @@ public abstract class PluginBase : IPlugin
                         taskContext.TaskOrder++;
 
                         object[] taskArgs = [serviceProvider, taskContext];
-                        task = Activator.CreateInstance(o.TaskType, taskArgs) as ITask;
 
-                        if (task == null)
+                        object instance;
+                        try
+                        {
+                            instance = Activator.CreateInstance(o.TaskType, taskArgs);
+                        }
+                        catch (MissingMethodException ex)
+                        {
+                            throw new InvalidOperationException(
+                                $"Registered task '{o.TaskType.FullName}' must define a constructor accepting IServiceProvider and TaskContext.",
+                                ex);
+                        }
+
+                        if (instance is not ITask task)
+                        {
                             throw new InvalidOperationException($"Registered task '{o.TaskType.FullName}' does not implement '{nameof(ITask)}'.");
+                        }
 
                         var taskLog = task.GetTaskLog();
 
-                        // Enrich task log with parameters/images
                         EnrichLogWithParametersAndImages(taskLog, taskContext.PluginExecutionContext);
 
                         taskContext.AddLog(taskLog);
 
-                        task?.Execute();
+                        task.Execute();
                     });
                 }
                 catch
