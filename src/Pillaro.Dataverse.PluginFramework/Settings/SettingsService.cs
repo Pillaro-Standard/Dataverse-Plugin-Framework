@@ -23,7 +23,7 @@ public class SettingsService
 
     public string GetTextValue(string key)
     {
-        var val = CacheProvider.GetItem(key);
+        var val = CacheProvider.GetItem<string>(key);
         if (val == null)
         {
             val = GetTextValue(_organizationService, key);
@@ -38,7 +38,7 @@ public class SettingsService
 
     public string GetJsonValue(string key, bool throwException = true)
     {
-        var val = CacheProvider.GetItem(key);
+        var val = CacheProvider.GetItem<string>(key);
         if (val == null)
         {
             val = GetJsonValue(_organizationService, key);
@@ -65,7 +65,7 @@ public class SettingsService
 
     public int GetIntegerValue(string key)
     {
-        var val = (int?)CacheProvider.GetItem(key);
+        var val = CacheProvider.GetItem<int?>(key);
         if (val == null)
         {
             val = GetIntegerValue(_organizationService, key);
@@ -77,7 +77,7 @@ public class SettingsService
 
     public bool GetBoolValue(string key)
     {
-        var val = (bool?)CacheProvider.GetItem(key);
+        var val = CacheProvider.GetItem<bool?>(key);
         if (val == null)
         {
 
@@ -90,7 +90,7 @@ public class SettingsService
 
     public decimal GetDecimalValue(string key)
     {
-        var val = (decimal?)CacheProvider.GetItem(key);
+        var val = CacheProvider.GetItem<decimal?>(key);
         if (val == null)
         {
             val = GetDecimalValue(_organizationService, key);
@@ -102,7 +102,7 @@ public class SettingsService
 
     public DateTime GetDateTimeValue(string key)
     {
-        DateTime? val = (DateTime?)CacheProvider.GetItem(key);
+        DateTime? val = CacheProvider.GetItem<DateTime?>(key);
         if (val == null)
         {
             val = GetDateTimeValue(_organizationService, key);

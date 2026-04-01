@@ -66,7 +66,7 @@ public abstract class PluginBase : IPlugin
                 taskContext.CountOfTasks = entityAction.Count;
                 taskContext.Version = GetSolutionVersion();
 
-                ITask task = null;
+                object instance;
                 try
                 {
                     entityAction.ForEach(o =>
@@ -74,8 +74,7 @@ public abstract class PluginBase : IPlugin
                         taskContext.TaskOrder++;
 
                         object[] taskArgs = [serviceProvider, taskContext];
-
-                        object instance;
+                        
                         try
                         {
                             instance = Activator.CreateInstance(o.TaskType, taskArgs);

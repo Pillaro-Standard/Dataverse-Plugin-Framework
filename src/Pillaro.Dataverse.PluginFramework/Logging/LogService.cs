@@ -41,14 +41,8 @@ public class LogService
 
     public LogService(IPluginExecutionContext pluginExecutionContext, IOrganizationService systemOrganizationService, ITracingService tracingService, int cacheNoEntityTimeInSeconds = 180)
     {
-        if (pluginExecutionContext == null)
-            throw new ArgumentNullException(nameof(pluginExecutionContext));
-
-        if (systemOrganizationService == null)
-            throw new ArgumentNullException(nameof(systemOrganizationService));
-
-        _executionContext = new LogExecutionContext(pluginExecutionContext);
-        _systemOrganizationService = systemOrganizationService;
+        _executionContext = new LogExecutionContext(pluginExecutionContext ?? throw new ArgumentNullException(nameof(pluginExecutionContext)));
+        _systemOrganizationService = systemOrganizationService ?? throw new ArgumentNullException(nameof(systemOrganizationService));
         _tracingService = tracingService;
         _settingService = new SettingsService(systemOrganizationService);
         _filterLogService = new LogFilterService();
@@ -275,7 +269,7 @@ public class LogService
 
     private bool ExistEntity(string logicalName)
     {
-        var val = CacheProvider.GetItem(LogEntityExistsCacheKey);
+        var val = CacheProvider.GetItem<object>(LogEntityExistsCacheKey);
         if (val != null)
             return (bool)val;
 

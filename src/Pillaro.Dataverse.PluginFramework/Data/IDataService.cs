@@ -30,7 +30,7 @@ public interface IDataService
 
     IReadOnlyDictionary<Guid, IReadOnlyCollection<OrganizationRequest>> GetAllRequests();
 
-    IEnumerable<ExecuteMultipleResponse> ExecuteMultipleRequest(Guid key, ExecuteMultipleSettings? settings = null);
+    IEnumerable<ExecuteMultipleResponse> ExecuteMultipleRequest(Guid key, ExecuteMultipleSettings settings = null);
 
     #endregion
 

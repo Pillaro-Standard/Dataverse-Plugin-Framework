@@ -415,9 +415,9 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_NullExpressions_ThrowArgumentNullException()
     {
-        Expression<Func<Account, bool>> predicate = null;
-        Expression<Func<Account, string>> orderBy = null;
-        Expression<Func<Account, string>> selector = null;
+        Expression<Func<Account, bool>>? predicate = null;
+        Expression<Func<Account, string>>? orderBy = null;
+        Expression<Func<Account, string>>? selector = null;
 
         Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().Where(predicate));
         Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().OrderBy(orderBy));

@@ -21,14 +21,14 @@ internal sealed class TestDataService : DataService, ITestDataService
     public TestDataService(IDataverseConnectionService connectionService, ILifetimeScope lifetimeScope)
         : base(connectionService.GetOrganizationService())
     {
-        _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
+        ArgumentNullException.ThrowIfNull(lifetimeScope);
+        _lifetimeScope = lifetimeScope;
         _mediator = lifetimeScope.Resolve<IMediator>();
     }
 
     public Guid CreateTestEntity(Entity entity, bool byPassPlugins = false)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         if (!byPassPlugins)
         {
@@ -52,8 +52,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     public async Task<Entity> CreateAndReturnTestEntity(Entity entity, CancellationToken cancellation = default)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var created = await _mediator.Send(new CreateEntityAndReturn(entity), cancellation);
         _entitiesToDelete.Push(created.ToEntityReference());
@@ -70,15 +69,14 @@ internal sealed class TestDataService : DataService, ITestDataService
         return _mediator.Send(new GetAsyncProcesses(entityId, dateFrom, dateTo), cancellation);
     }
 
-    public TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository
+    public new TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository
     {
         return _lifetimeScope.Resolve<TTestDataRepository>();
     }
 
     public void AddTestEntityToDelete(EntityReference entity)
     {
-        if (entity == null)
-            throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         _entitiesToDelete.Push(entity);
     }
@@ -108,8 +106,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     public void AddCleanUpDeleteHandler(ICleanupDeleteHandler handler)
     {
-        if (handler == null)
-            throw new ArgumentNullException(nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler);
 
         if (!_cleanupHandlers.TryAdd(handler.EntityLogicalName, handler))
         {
@@ -119,8 +116,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     public void AddCleanUpDeleteHandlers(IEnumerable<ICleanupDeleteHandler> handlers)
     {
-        if (handlers == null)
-            throw new ArgumentNullException(nameof(handlers));
+        ArgumentNullException.ThrowIfNull(handlers);
 
         foreach (var handler in handlers)
         {
