@@ -28,9 +28,9 @@ public class SettingsService
         {
             val = GetTextValue(_organizationService, key);
             if (string.IsNullOrWhiteSpace(val?.ToString()))
-                throw new Exception($"SettingService=> Key:'{key}' value si null or empty");
+                throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
 
-            CacheProvider.AddItem(key, val, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
+            CacheProvider.AddItem(key, val, DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
         }
 
         return val.ToString();
@@ -44,11 +44,11 @@ public class SettingsService
             val = GetJsonValue(_organizationService, key);
 
             if (string.IsNullOrEmpty(val?.ToString()) && throwException)
-                throw new Exception($"SettingService=> Key:'{key}' value si null or empty");
+                throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
 
             val ??= string.Empty;
 
-            CacheProvider.AddItem(key, val, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
+            CacheProvider.AddItem(key, val, DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
         }
 
         return val.ToString();
@@ -57,7 +57,7 @@ public class SettingsService
     public TModel GetModel<TModel>(string key, bool throwException = true) where TModel : class
     {
         var json = GetJsonValue(key, throwException);
-        if (json != String.Empty)
+        if (!string.IsNullOrEmpty(json))
             return JsonConvert.DeserializeObject<TModel>(json);
 
         return default;
@@ -69,7 +69,7 @@ public class SettingsService
         if (val == null)
         {
             val = GetIntegerValue(_organizationService, key);
-            CacheProvider.AddItem(key, val, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
+            CacheProvider.AddItem(key, val, DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
         }
 
         return val.Value;
@@ -77,13 +77,12 @@ public class SettingsService
 
     public bool GetBoolValue(string key)
     {
-
         var val = (bool?)CacheProvider.GetItem(key);
         if (val == null)
         {
 
             val = GetBoolValue(_organizationService, key);
-            CacheProvider.AddItem(key, val, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
+            CacheProvider.AddItem(key, val, DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
         }
 
         return val.Value;
@@ -95,7 +94,7 @@ public class SettingsService
         if (val == null)
         {
             val = GetDecimalValue(_organizationService, key);
-            CacheProvider.AddItem(key, val, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
+            CacheProvider.AddItem(key, val, DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
         }
 
         return val.Value;
@@ -107,7 +106,7 @@ public class SettingsService
         if (val == null)
         {
             val = GetDateTimeValue(_organizationService, key);
-            CacheProvider.AddItem(key, val, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
+            CacheProvider.AddItem(key, val, DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(CacheTimeInSeconds)));
         }
 
         return val.Value;
@@ -175,6 +174,7 @@ public class SettingsService
         if (entityCollection?.Entities == null || !entityCollection.Entities.Any())
             return null;
 
+        // pl_key is enforced as unique at the database level, so at most one record is expected here.
         return entityCollection.Entities.First();
     }
 
@@ -183,7 +183,7 @@ public class SettingsService
     {
         var entity = GetEntityByKey(service, key);
         if (entity == null)
-            throw new Exception($"SettingService=> Key:'{key}' value is null");
+            throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
 
         var type = typeof(T);
         var typeCode = Type.GetTypeCode(type);
@@ -193,21 +193,21 @@ public class SettingsService
             case TypeCode.Int32:
                 {
                     if (!entity.Attributes.Contains("pl_int"))
-                        throw new Exception($"SettingService=> Key:'{key}' int value is null");
+                        throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
                     return (T)entity.Attributes["pl_int"];
                 }
 
             case TypeCode.Decimal:
                 {
                     if (!entity.Attributes.Contains("pl_decimal"))
-                        throw new Exception($"SettingService=> Key:'{key}' decimal value is null");
+                        throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
                     return (T)entity.Attributes["pl_decimal"];
                 }
 
             case TypeCode.Boolean:
                 {
                     if (!entity.Attributes.Contains("pl_bool"))
-                        throw new Exception($"SettingService=> Key:'{key}' bool value is null");
+                        throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
                     var bv = Convert.ToBoolean(((OptionSetValue)entity.Attributes["pl_bool"]).Value);
                     return (T)(object)bv;
                 }
@@ -215,16 +215,10 @@ public class SettingsService
             case TypeCode.DateTime:
                 {
                     if (!entity.Attributes.Contains("pl_date"))
-                        throw new Exception($"SettingService=> Key:'{key}' date value is null");
+                        throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
                     return (T)entity.Attributes["pl_date"];
                 }
 
-            case TypeCode.String:
-                {
-                    if (!entity.Attributes.Contains("pl_text"))
-                        throw new Exception($"SettingService=> Key:'{key}' text value is null");
-                    return (T)entity.Attributes["pl_text"];
-                }
             default:
                 throw new ArgumentOutOfRangeException(nameof(typeCode), $"{nameof(typeCode)} is outside of valid range, Key: {key} , T: {type}");
         }
