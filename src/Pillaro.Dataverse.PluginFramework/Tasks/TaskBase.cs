@@ -69,15 +69,15 @@ public abstract class TaskBase<TEntity> : ITask
     public void Execute()
     {
         var wholeTimer = Stopwatch.StartNew();
-        var message = new StringBuilder();
+        var detailBuilder = new StringBuilder();
 
         try
         {
-            AppendExecutionHeader(message);
+            AppendExecutionHeader(detailBuilder);
 
-            Validate(message);
+            Validate(detailBuilder);
 
-            ExecuteInternal(message);
+            ExecuteInternal(detailBuilder);
 
             Log.Status = TaskStatus.Success;
         }
@@ -85,33 +85,33 @@ public abstract class TaskBase<TEntity> : ITask
         {
             Log.Status = TaskStatus.Success;
             Log.LogSeverity = LogSeverity.Info;
-            message.AppendLine(ex.ToString());
+            detailBuilder.AppendLine(ex.ToString());
             throw;
         }
         catch (InvalidPluginExecutionException ex)
         {
             Log.Status = TaskStatus.Error;
             Log.LogSeverity = LogSeverity.Error;
-            message.AppendLine("Microsoft.Xrm.Sdk.InvalidPluginExecutionException: " + ex.Message);
+            detailBuilder.AppendLine(ex.ToString());
 
             if (ex.InnerException != null)
-                message.AppendLine(ex.InnerException.ToString());
+                detailBuilder.AppendLine(ex.InnerException.ToString());
 
-            message.AppendLine(ex.StackTrace);
+            detailBuilder.AppendLine(ex.StackTrace);
             throw;
         }
         catch (Exception ex)
         {
             Log.Status = TaskStatus.Error;
             Log.LogSeverity = LogSeverity.Error;
-            message.AppendLine(ex.ToString());
+            detailBuilder.AppendLine(ex.ToString());
             throw;
         }
         finally
         {
             wholeTimer.Stop();
             Log.ElapsedTimeInMs = wholeTimer.Elapsed.TotalMilliseconds;
-            Log.Detail = BuildLogDetail(message.ToString(), ExecutionMessage);
+            Log.Detail = BuildLogDetail(detailBuilder.ToString(), ExecutionMessage);
         }
     }
 
@@ -124,9 +124,9 @@ public abstract class TaskBase<TEntity> : ITask
 
     protected abstract void DoExecute();
 
-    protected virtual List<string> GetMessagesForContextEntity()
+    protected virtual IReadOnlyCollection<string> GetMessagesForContextEntity()
     {
-        return new List<string> { "Create", "Update" };
+        return ["Create", "Update"];
     }
 
     protected virtual TEntity GetContextEntity(TaskContext taskContext, Log log)
@@ -145,12 +145,12 @@ public abstract class TaskBase<TEntity> : ITask
 
     protected bool HasPreImage(string name = DefaultImageName)
     {
-        return HasImage(TaskContext.PluginExecutionContext != null ? TaskContext.PluginExecutionContext.PreEntityImages : null, name);
+        return HasImage(TaskContext.PluginExecutionContext.PreEntityImages, name);
     }
 
     protected bool HasPostImage(string name = DefaultImageName)
     {
-        return HasImage(TaskContext.PluginExecutionContext != null ? TaskContext.PluginExecutionContext.PostEntityImages : null, name);
+        return HasImage(TaskContext.PluginExecutionContext.PostEntityImages, name);
     }
 
     protected TEntity GetPreImage(string name = DefaultImageName, bool throwException = true)
@@ -320,6 +320,9 @@ public abstract class TaskBase<TEntity> : ITask
 
     private static string BuildLogDetail(string message, string executionMessage)
     {
+        if (string.IsNullOrWhiteSpace(executionMessage))
+            return message;
+
         return message
                + Environment.NewLine
                + "###Execution Message####"
