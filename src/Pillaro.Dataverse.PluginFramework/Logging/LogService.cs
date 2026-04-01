@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.ServiceModel;
+using System.Text;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging;
 
@@ -24,7 +25,7 @@ public class LogService
     private readonly LogFilterService _filterLogService;
     private readonly DataService _dataService;
 
-    private static readonly string CacheKey = "LogServiceExistLogEntity";
+    private static readonly string LogEntityExistsCacheKey = "LogService:EntityExists:pl_log";
     public const string MinimalSeverityLevelKey = "MinimalSeverityLevel";
     public const string LogFilterKey = "Pillaro.LogFilter";
 
@@ -36,43 +37,38 @@ public class LogService
     public delegate void SaveLogsEventHandler(object sender, BeforeSaveLogsEventArgs e);
     public event SaveLogsEventHandler BeforeSaveLogs = delegate { };
 
-    public readonly int CacheNoEntityTimeInSeconds;
-
+    protected int CacheNoEntityTimeInSeconds { get; }
 
     public LogService(IPluginExecutionContext pluginExecutionContext, IOrganizationService systemOrganizationService, ITracingService tracingService, int cacheNoEntityTimeInSeconds = 180)
     {
         if (pluginExecutionContext == null)
-            throw new ArgumentException(nameof(pluginExecutionContext));
+            throw new ArgumentNullException(nameof(pluginExecutionContext));
 
         if (systemOrganizationService == null)
-            throw new ArgumentException(nameof(systemOrganizationService));
+            throw new ArgumentNullException(nameof(systemOrganizationService));
 
         _executionContext = new LogExecutionContext(pluginExecutionContext);
-
         _systemOrganizationService = systemOrganizationService;
         _tracingService = tracingService;
         _settingService = new SettingsService(systemOrganizationService);
         _filterLogService = new LogFilterService();
         _dataService = new DataService(systemOrganizationService);
-
         CacheNoEntityTimeInSeconds = cacheNoEntityTimeInSeconds;
     }
 
     public void Fatal(string name, Exception ex)
     {
-        var message = string.Empty;
-
-        var innerException = ex;
-        do
+        var sb = new StringBuilder();
+        var current = ex;
+        while (current != null)
         {
-            message += Environment.NewLine + innerException;
-            innerException = innerException.InnerException;
+            sb.AppendLine().Append(current);
+            current = current.InnerException;
         }
-        while (innerException != null);
 
-
-        SaveLog(new Log(LogSeverity.Fatal, _executionContext, name, message));
+        SaveLog(new Log(LogSeverity.Fatal, _executionContext, name, sb.ToString()));
     }
+
     public void Fatal(Exception ex)
     {
         Fatal(ex.Message, ex);
@@ -80,119 +76,71 @@ public class LogService
 
     public void Debug(string name, string detail, IList<LogDetail> logDetails = null)
     {
-        SaveLog(new Log(LogSeverity.Debug, _executionContext, name, detail)
-        {
-            LogDetails = logDetails
-        });
+        SaveLog(new Log(LogSeverity.Debug, _executionContext, name, detail) { LogDetails = logDetails });
     }
+
     public void Debug(string detail, IList<LogDetail> logDetails = null)
     {
-        var name = "N/A";
-        try
-        {
-            var frame = new System.Diagnostics.StackTrace(1, false).GetFrame(0);
-            if (frame?.GetMethod() != null)
-                name = frame.GetMethod().Name;
-        }
-        catch (Exception ex)
-        {
-            Fatal(ex);
-        }
-
-        Debug(name, detail, logDetails);
+        Debug(GetCallerName(), detail, logDetails);
     }
 
     public void Info(string name, string detail, IList<LogDetail> logDetails = null)
     {
-        SaveLog(new Log(LogSeverity.Info, _executionContext, name, detail)
-        {
-            LogDetails = logDetails
-        });
+        SaveLog(new Log(LogSeverity.Info, _executionContext, name, detail) { LogDetails = logDetails });
     }
+
     public void Info(string detail, IList<LogDetail> logDetails = null)
     {
-        var name = "N/A";
-        try
-        {
-            var frame = new System.Diagnostics.StackTrace(1, false).GetFrame(0);
-            if (frame?.GetMethod() != null)
-                name = frame.GetMethod().Name;
-        }
-        catch (Exception ex)
-        {
-            Fatal(ex);
-        }
-        Info(name, detail, logDetails);
+        Info(GetCallerName(), detail, logDetails);
     }
 
     public void Warning(string name, string detail, IList<LogDetail> logDetails = null)
     {
-        var log = new Log(LogSeverity.Warning, _executionContext, name, detail)
-        {
-            LogDetails = logDetails
-        };
-        SaveLog(log);
+        SaveLog(new Log(LogSeverity.Warning, _executionContext, name, detail) { LogDetails = logDetails });
     }
+
     public void Warning(string detail, IList<LogDetail> logDetails = null)
     {
-        var name = "N/A";
-        try
-        {
-            var frame = new System.Diagnostics.StackTrace(1, false).GetFrame(0);
-            if (frame?.GetMethod() != null)
-                name = frame.GetMethod().Name;
-        }
-        catch (Exception ex)
-        {
-            Fatal(ex);
-        }
-        Warning(name, detail, logDetails);
+        Warning(GetCallerName(), detail, logDetails);
     }
 
     public void Error(string name, string detail, IList<LogDetail> logDetails = null)
     {
-        var log = new Log(LogSeverity.Error, _executionContext, name, detail)
-        {
-            LogDetails = logDetails
-        };
-        SaveLog(log);
+        SaveLog(new Log(LogSeverity.Error, _executionContext, name, detail) { LogDetails = logDetails });
     }
+
     public void Error(string detail, IList<LogDetail> logDetails = null)
     {
-        var name = "N/A";
-        try
-        {
-            var frame = new System.Diagnostics.StackTrace(1, false).GetFrame(0);
-            if (frame?.GetMethod() != null)
-                name = frame.GetMethod().Name;
-        }
-        catch (Exception ex)
-        {
-            Fatal(ex);
-        }
-        Error(name, detail, logDetails);
+        Error(GetCallerName(), detail, logDetails);
     }
 
     public virtual void SaveLogs(IEnumerable<Log> logs)
     {
-        BeforeSaveLogs(this, new BeforeSaveLogsEventArgs { Logs = logs });
+        var logList = logs?.ToList();
 
-        if (!(logs?.Any() ?? false))
+        BeforeSaveLogs(this, new BeforeSaveLogsEventArgs
+        {
+            Logs = logList
+        });
+
+        if (!(logList?.Any() ?? false))
             return;
 
-        foreach (var log in logs)
-        {
+        foreach (var log in logList)
             _tracingService?.Trace(log?.ToString());
-        }
 
-        var validLogs = logs.Where(o => IsValidForSave(o.LogSeverity));
+        var validLogs = logList.Where(o => IsValidForSave(o.LogSeverity));
 
         var filters = _settingService.GetModel<List<LogFilterModel>>(LogFilterKey, false);
-        validLogs = validLogs.Union(_filterLogService.GetFilteredLogs(filters, logs.ToList()), new LogEqualityComparer());
+        validLogs = validLogs.Union(
+            _filterLogService.GetFilteredLogs(filters, logList),
+            new LogEqualityComparer());
 
-        var validLogEntities = validLogs.ToList().Select(GetLogEntity);
+        var validLogEntities = validLogs
+            .ToList()
+            .Select(GetLogEntity);
 
-        var multipleRequest = new ExecuteMultipleRequest()
+        var multipleRequest = new ExecuteMultipleRequest
         {
             Settings = new ExecuteMultipleSettings
             {
@@ -214,10 +162,12 @@ public class LogService
 
         if (response.IsFaulted)
         {
-            var falut = response.Responses
-                .Where(o => o.Fault != null).Select(o => o.Fault).First();
+            var fault = response.Responses
+                .Where(o => o.Fault != null)
+                .Select(o => o.Fault)
+                .First();
 
-            throw new FaultException<OrganizationServiceFault>(falut);
+            throw new FaultException<OrganizationServiceFault>(fault);
         }
     }
 
@@ -233,17 +183,14 @@ public class LogService
             if (!IsValidForSave(log.LogSeverity))
                 return;
 
-            /* Write to trace */
             _tracingService?.Trace(log.ToString());
 
             var logEntity = GetLogEntity(log);
-
             var outsideTransaction = _dataService.CreateOutsideTransaction(logEntity);
             if (outsideTransaction == null)
                 throw new Exception("OutsideTransaction response is null");
 
             logEntity.Id = outsideTransaction.Value;
-
         }
         catch (Exception ex)
         {
@@ -271,6 +218,7 @@ public class LogService
             ["pl_task"] = log.TaskName,
             ["pl_entityid"] = log.EntityId,
         };
+
         if (log.Mode != null)
             logEntity["pl_mode"] = new OptionSetValue((int)log.Mode);
 
@@ -280,29 +228,24 @@ public class LogService
         if (log.Status != null)
             logEntity["pl_taskstatus"] = new OptionSetValue((int)log.Status);
 
-
-        var logDetaislCol = new EntityCollection();
+        var logDetailsCol = new EntityCollection();
 
         foreach (var logDetail in log.LogDetails ?? [])
         {
             if (logDetail == null)
                 continue;
 
-            var detail = new Entity("pl_logdetail")
+            logDetailsCol.Entities.Add(new Entity("pl_logdetail")
             {
                 ["pl_detail"] = logDetail.Detail,
                 ["pl_name"] = logDetail.Name,
-            };
-
-            logDetaislCol.Entities.Add(detail);
+            });
         }
 
-        logEntity.RelatedEntities.Add(new KeyValuePair<Relationship, EntityCollection>(new Relationship("pl_pl_log_pl_logdetail_LogId"), logDetaislCol));
+        logEntity.RelatedEntities.Add(new KeyValuePair<Relationship, EntityCollection>(new Relationship("pl_pl_log_pl_logdetail_LogId"), logDetailsCol));
 
         return logEntity;
     }
-
-
 
     public bool IsValidForSave(LogSeverity severity)
     {
@@ -310,42 +253,44 @@ public class LogService
             return false;
 
         var minimalSeverityLevel = _settingService.GetIntegerValue(MinimalSeverityLevelKey);
-        if ((int)severity < minimalSeverityLevel)
-            return false;
+        return (int)severity >= minimalSeverityLevel;
+    }
 
-        return true;
+    private string GetCallerName()
+    {
+        try
+        {
+            // skipFrames=2: skip GetCallerName + the calling wrapper (e.g. Debug/Info/Warning/Error)
+            var frame = new System.Diagnostics.StackTrace(2, false).GetFrame(0);
+            if (frame?.GetMethod() != null)
+                return frame.GetMethod().Name;
+        }
+        catch (Exception ex)
+        {
+            Fatal(ex);
+        }
+
+        return "N/A";
     }
 
     private bool ExistEntity(string logicalName)
     {
-        var val = CacheProvider.GetItem(CacheKey);
+        var val = CacheProvider.GetItem(LogEntityExistsCacheKey);
         if (val != null)
-        {
-            if ((bool)val)
-                _tracingService?.Trace($"{FrameworkConstants.ProductName} is licensed. Information is returned from cache. Cache will be reset in {CacheNoEntityTimeInSeconds}s period.");
-            else
-                _tracingService?.Trace($"{FrameworkConstants.ProductName} is in Light version. Information is returned from cache. Cache will be reset in {CacheNoEntityTimeInSeconds}s period.");
-
             return (bool)val;
-        }
+
+        var expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheNoEntityTimeInSeconds));
 
         try
         {
-            // If the entity does not exist, the organization service throws — used intentionally for license detection.
-            var entMetDataRes = _systemOrganizationService.Execute(new RetrieveEntityRequest
-            {
-                LogicalName = logicalName,
-                EntityFilters = EntityFilters.All
-            });
-
-            CacheProvider.AddItem(CacheKey, true, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheNoEntityTimeInSeconds)));
-            _tracingService?.Trace($"{FrameworkConstants.ProductName} is licensed. Value is returned from Request.");
+            _systemOrganizationService.Execute(new RetrieveEntityRequest { LogicalName = logicalName, EntityFilters = EntityFilters.Entity });
+            CacheProvider.AddItem(LogEntityExistsCacheKey, true, expiration);
             return true;
         }
         catch
         {
-            CacheProvider.AddItem(CacheKey, false, DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheNoEntityTimeInSeconds)));
-            _tracingService?.Trace($"{FrameworkConstants.ProductName} is in Light version. Value is returned from Request.");
+            CacheProvider.AddItem(LogEntityExistsCacheKey, false, expiration);
+            _tracingService?.Trace($"Entity '{logicalName}' does not exist. Logging to Dataverse is disabled for {CacheNoEntityTimeInSeconds}s.");
             return false;
         }
     }
