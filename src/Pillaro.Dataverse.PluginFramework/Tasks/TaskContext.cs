@@ -27,19 +27,17 @@ public class TaskContext
 
     public string Message { get; }
 
-    public string SolutionName { get; }
-
     public Dictionary<string, object> UnsecureConfig { get; }
 
     public Dictionary<string, object> SecureConfig { get; }
 
-    public string Version { get; set; }
+    public string Version { get; set; } = "Unknown";
 
     public int CountOfTasks { get; set; }
     public int TaskOrder { get; set; }
 
     private readonly Dictionary<string, Entity> _entitiesToUpdate = [];
-    private IList<Log> _logs = [];
+    private readonly IList<Log> _logs = [];
     private readonly Dictionary<string, object> _items = [];
 
     public TaskContext(string unsecuredConfig, string securedConfig, IPluginExecutionContext pluginExecutionContext)
@@ -107,12 +105,19 @@ public class TaskContext
 
     public void AddItem(string key, object value)
     {
-        _items.Add(key, value);
+        _items[key] = value;
     }
 
     public T GetItem<T>(string key)
     {
-        return (T)_items[key];
+        if (!_items.TryGetValue(key, out var value))
+            throw new KeyNotFoundException($"Item with key '{key}' was not found.");
+
+        if (value is not T typedValue)
+            throw new InvalidCastException(
+                $"Item with key '{key}' is of type '{value?.GetType().FullName}', not '{typeof(T).FullName}'.");
+
+        return typedValue;
     }
 
     public bool ExistsItem(string key)
@@ -164,38 +169,6 @@ public class TaskContext
         return new Entity(entityName) { Id = id };
     }
 
-    public Log SaveEntityToUpdate(IOrganizationService organizationService, TaskContext taskContext)
-    {
-        if (organizationService == null)
-            throw new ArgumentNullException(nameof(organizationService));
-
-        if (taskContext == null)
-            throw new ArgumentNullException(nameof(taskContext));
-
-        if (!_entitiesToUpdate.Any())
-            return null;
-
-        Log log = new(LogSeverity.Debug, new LogExecutionContext(taskContext.PluginExecutionContext), "SaveEntityToUpdate")
-        {
-            StartUtc = DateTime.UtcNow,
-            LogDetails = []
-        };
-
-        foreach (var entity in _entitiesToUpdate.Values)
-        {
-            if (!entity.Attributes.Any())
-                continue;
-
-            log.LogDetails.Add(
-                new LogDetail(
-                    $"Entity to update : '{entity.LogicalName}:{entity.Id}'",
-                    JsonConvert.SerializeObject(entity)));
-
-            organizationService.Update(entity);
-        }
-
-        return log;
-    }
 
     public void AddLog(Log log)
     {
