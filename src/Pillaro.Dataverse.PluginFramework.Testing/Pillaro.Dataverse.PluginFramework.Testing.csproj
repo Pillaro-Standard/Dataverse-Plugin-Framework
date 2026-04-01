@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageId>Pillaro.Dataverse.PluginFramework.Test</PackageId>
+		<IsPackable>true</IsPackable>
+		<Version>1.0.2</Version>
+		<Authors>Ján Mucha</Authors>
+		<Company>Pillaro s.r.o.</Company>
+		<Description></Description>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>
+			
+		</PackageReleaseNotes>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Title>Pillaro Dataverse Plugin Framework Test</Title>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\Debug\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<DocumentationFile>bin\Debug\Pillaro.Dataverse.PluginFramework.Test.xml</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>pdbonly</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>bin\Release\</OutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<DocumentationFile>bin\Release\Pillaro.Dataverse.PluginFramework.Test.xml</DocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Cache\**" />
+	  <EmbeddedResource Remove="Cache\**" />
+	  <None Remove="Cache\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Domain\Interfaces\ISettingsService.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Remove="C:\Users\janmu\.nuget\packages\microsoft.testplatform.testhost\17.14.1\build\net8.0\x64\testhost.dll" />
+	  <Content Remove="C:\Users\janmu\.nuget\packages\microsoft.testplatform.testhost\17.14.1\build\net8.0\x64\testhost.exe" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="C:\Users\janmu\.nuget\packages\xunit.runner.visualstudio\2.8.2\build\net6.0\xunit.runner.reporters.netcoreapp10.dll" />
+	  <None Remove="C:\Users\janmu\.nuget\packages\xunit.runner.visualstudio\2.8.2\build\net6.0\xunit.runner.utility.netcoreapp10.dll" />
+	  <None Remove="C:\Users\janmu\.nuget\packages\xunit.runner.visualstudio\2.8.2\build\net6.0\xunit.runner.visualstudio.testadapter.dll" />
+	  <None Remove="C:\Users\janmu\.nuget\packages\xunit.runner.visualstudio\3.1.4\build\net8.0\xunit.abstractions.dll" />
+	  <None Remove="C:\Users\janmu\.nuget\packages\xunit.runner.visualstudio\3.1.4\build\net8.0\xunit.runner.visualstudio.testadapter.dll" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="8.0.0"></PackageReference>
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="AutoMapper" Version="16.1.1" />
+		<PackageReference Include="AutoMapper.Contrib.Autofac.DependencyInjection" Version="7.2.0" />
+		<PackageReference Include="FluentAssertions" Version="6.12.0" />
+		<PackageReference Include="MediatR" Version="12.2.0" />
+		<PackageReference Include="MediatR.Extensions.Autofac.DependencyInjection" Version="12.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+		<PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.0.39" />
+		<PackageReference Include="System.Formats.Asn1" Version="6.0.1" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.3" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+		<PackageReference Include="xunit" Version="2.*" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Domain\Models\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Pillaro.Dataverse.PluginFramework\Pillaro.Dataverse.PluginFramework.csproj" />
+	</ItemGroup>
+
+</Project>

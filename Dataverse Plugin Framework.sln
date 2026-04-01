@@ -1,0 +1,97 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{5EFA32AF-CD69-45AF-AC93-E5FF3543BB39}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution Items", "{E659AC04-397B-4D2A-8DFD-3DF9CBA24537}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		LICENSE = LICENSE
+		NuGet.config = NuGet.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{25FE1426-88F6-47E1-B942-DCAAC521C232}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2A3DE48C-3D1C-4174-89A5-2BC0B10F6D38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Examples.Logic", "examples\Pillaro.Dataverse.PluginFramework.Examples.Logic\Pillaro.Dataverse.PluginFramework.Examples.Logic.csproj", "{0E336EE9-1B5A-48C0-A8A7-6B52CCA40A96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Examples.Plugins", "examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\Pillaro.Dataverse.PluginFramework.Examples.Plugins.csproj", "{4D1B5947-59FF-4DF1-879E-8F8427AE2F89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Examples.Tests", "examples\Pillaro.Dataverse.PluginFramework.Examples.Tests\Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj", "{B0E9E90A-7700-B9BD-891F-C577C2C8F81E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Tests", "tests\Pillaro.Dataverse.PluginFramework.Tests\Pillaro.Dataverse.PluginFramework.Tests.csproj", "{E5F6B72A-E3A9-0308-45BC-8C0AAE50E064}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen", "tests\Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen\Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen.csproj", "{8FBB3C43-FA2F-47A8-8F34-0E6415683ED2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework", "src\Pillaro.Dataverse.PluginFramework\Pillaro.Dataverse.PluginFramework.csproj", "{CA838E06-B380-412D-AA9D-1F5564575747}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Plugins", "src\Pillaro.Dataverse.PluginFramework.Plugins\Pillaro.Dataverse.PluginFramework.Plugins.csproj", "{E40050E2-6E44-4775-B723-E9B0AA9013DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Testing", "src\Pillaro.Dataverse.PluginFramework.Testing\Pillaro.Dataverse.PluginFramework.Testing.csproj", "{7B421594-81D0-E65B-3733-217F5B90AC68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AE8F22ED-AC80-4C78-A94B-091FB7B070A3}"
+	ProjectSection(SolutionItems) = preProject
+		docs\index.md = docs\index.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E336EE9-1B5A-48C0-A8A7-6B52CCA40A96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E336EE9-1B5A-48C0-A8A7-6B52CCA40A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E336EE9-1B5A-48C0-A8A7-6B52CCA40A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E336EE9-1B5A-48C0-A8A7-6B52CCA40A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D1B5947-59FF-4DF1-879E-8F8427AE2F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D1B5947-59FF-4DF1-879E-8F8427AE2F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D1B5947-59FF-4DF1-879E-8F8427AE2F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D1B5947-59FF-4DF1-879E-8F8427AE2F89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0E9E90A-7700-B9BD-891F-C577C2C8F81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0E9E90A-7700-B9BD-891F-C577C2C8F81E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0E9E90A-7700-B9BD-891F-C577C2C8F81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0E9E90A-7700-B9BD-891F-C577C2C8F81E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5F6B72A-E3A9-0308-45BC-8C0AAE50E064}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5F6B72A-E3A9-0308-45BC-8C0AAE50E064}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F6B72A-E3A9-0308-45BC-8C0AAE50E064}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5F6B72A-E3A9-0308-45BC-8C0AAE50E064}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FBB3C43-FA2F-47A8-8F34-0E6415683ED2}.Debug|Any CPU.ActiveCfg = v4.6.2|Any CPU
+		{8FBB3C43-FA2F-47A8-8F34-0E6415683ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA838E06-B380-412D-AA9D-1F5564575747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA838E06-B380-412D-AA9D-1F5564575747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA838E06-B380-412D-AA9D-1F5564575747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA838E06-B380-412D-AA9D-1F5564575747}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E40050E2-6E44-4775-B723-E9B0AA9013DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E40050E2-6E44-4775-B723-E9B0AA9013DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E40050E2-6E44-4775-B723-E9B0AA9013DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E40050E2-6E44-4775-B723-E9B0AA9013DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B421594-81D0-E65B-3733-217F5B90AC68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B421594-81D0-E65B-3733-217F5B90AC68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B421594-81D0-E65B-3733-217F5B90AC68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B421594-81D0-E65B-3733-217F5B90AC68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0E336EE9-1B5A-48C0-A8A7-6B52CCA40A96} = {5EFA32AF-CD69-45AF-AC93-E5FF3543BB39}
+		{4D1B5947-59FF-4DF1-879E-8F8427AE2F89} = {5EFA32AF-CD69-45AF-AC93-E5FF3543BB39}
+		{B0E9E90A-7700-B9BD-891F-C577C2C8F81E} = {5EFA32AF-CD69-45AF-AC93-E5FF3543BB39}
+		{E5F6B72A-E3A9-0308-45BC-8C0AAE50E064} = {2A3DE48C-3D1C-4174-89A5-2BC0B10F6D38}
+		{8FBB3C43-FA2F-47A8-8F34-0E6415683ED2} = {2A3DE48C-3D1C-4174-89A5-2BC0B10F6D38}
+		{CA838E06-B380-412D-AA9D-1F5564575747} = {25FE1426-88F6-47E1-B942-DCAAC521C232}
+		{E40050E2-6E44-4775-B723-E9B0AA9013DA} = {25FE1426-88F6-47E1-B942-DCAAC521C232}
+		{7B421594-81D0-E65B-3733-217F5B90AC68} = {25FE1426-88F6-47E1-B942-DCAAC521C232}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}
+	EndGlobalSection
+	GlobalSection(CRMSolutionProperties) = preSolution
+		        	SolutionIsBoundToCRM = True
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,23 @@
+{
+  "plugins": [
+    {
+      "profile": "default,debug",
+      "solution": "PillaroFramework",
+      "assemblypath": "bin\\Debug",
+      "excludePluginSteps": false
+    }
+  ],
+  "earlyboundtypes": [
+    {
+      "entities": "pl_autonumbering",
+      "actions": "pl_AutoNumbering_GetNewNumber",
+      "generateOptionsetEnums": true,
+      "generateGlobalOptionsets": true,
+      "generateStateEnums": true,
+      "filename": "EarlyBoundTypes.cs",
+      "classNamespace": "Pillaro.Dataverse.PluginFramework.Plugins",
+      "serviceContextName": "ServiceContext",
+      "oneTypePerFile": false
+    }
+  ]
+}

@@ -1,272 +1,278 @@
-# Pillaro Dataverse Plugin Framework
+﻿# Pillaro Dataverse Plugin Framework
 
-Open-source AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
+> A structured, task-based approach for building predictable, testable, and maintainable Dataverse plugins in C#.
 
-
-## Overview
-
-Pillaro Framework provides a structured and production-proven approach to developing Dataverse plugins using C#.
-
-It introduces a task-based execution model with explicit validation and execution phases, enabling:
-
-- predictable and deterministic behavior
-- strict separation of concerns
-- fully testable plugin logic
-- long-term maintainability at scale
-
-The framework is designed for real-world production environments and long-term solution sustainability.
-
-
-## AI-Ready Standard
-
-The framework is part of the Pillaro delivery standards, designed to support the entire development lifecycle.
-
-The architecture is intentionally structured to be understandable by both developers and AI-driven tools and agents.
-
-Key principles:
-
-- functionality is decomposed into clearly defined tasks
-- tasks can be identified already during the analysis phase
-- each task represents a predictable and isolated unit of behavior
-
-This enables:
-
-- direct mapping between analysis and implementation
-- scalable development using AI-assisted workflows
-- consistent structure across projects
-
-In future scenarios, tasks can be implemented by specialized AI agents based on analysis outputs.
+[![License: PCL v1.0](https://img.shields.io/badge/License-PCL%20v1.0-blue.svg)](#license)
+[![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)](#current-status)
 
 ---
 
-### AI Feedback Loop
+## Table of Contents
 
-Diagnostic logging and testing provide structured feedback for automated systems.
+- [Overview](#overview)
+- [What Problem It Solves](#what-problem-it-solves)
+- [Architecture](#architecture)
+- [Key Features](#key-features)
+- [Getting Started](#getting-started)
+- [Examples](#examples)
+- [When to Use](#when-to-use)
+- [Repository Structure](#repository-structure)
+- [AI-Ready Structure](#ai-ready-structure)
+- [Current Status](#current-status)
+- [License](#license)
 
-- logs contain detailed execution flow and context data
-- programmatic tests validate real behavior in the environment
-- failures include enough information to identify root causes
+---
 
-This allows:
+## Overview
+> This project uses a community license that allows commercial use in services but restricts resale as a standalone product.
 
-- more accurate issue detection
-- better automated code suggestions
-- iterative improvement of solutions
+Pillaro Framework provides a consistent way to design and implement Dataverse plugins using a **task-based execution model**.
 
-The long-term goal is to support semi-autonomous or autonomous development workflows, where:
+Each piece of business logic is split into small, focused units called **tasks** with a clear lifecycle:
 
-- AI systems generate and refine implementations
-- developers focus on architecture, validation, and review
+1. **Validation** — can this task run?
+2. **Execution** — do the work.
 
+This structure makes plugins predictable, testable, and easier to maintain over time.
+
+---
+
+## Documentation
+
+Detailed documentation, including setup guides and architecture explanations, is available in the [docs](./docs) section.
+
+---
 
 ## What Problem It Solves
 
 Standard plugin development often leads to:
 
-- large, hard-to-maintain classes
-- mixed validation and execution logic
-- multiple responsibilities in a single class
-- lack of testability
-- duplicated patterns across projects
+| Problem | Framework Solution |
+|---|---|
+| Large classes with mixed responsibilities | Each piece of functionality = one task |
+| Validation and execution logic combined | Validation is strictly separated from execution |
+| Duplicated patterns across projects | Consistent structure enforced by base classes |
+| Difficult testing and debugging | Built-in logging; tasks are independently testable |
 
-This framework introduces a consistent structure:
+### Example Scenarios
 
-- each functionality = single task
-- validation is separated from execution
-- behavior is deterministic and explicit
-- built-in testing support
-- built-in diagnostic logging
+- **Updating related records after a change**
+  → validation checks conditions, execution updates records
 
+- **Complex business rules on create/update**
+  → each rule is implemented as a separate task instead of one large plugin
 
-## Key Features
-
-### Task-Based Architecture
-
-Each plugin is composed of independent tasks:
-
-- single responsibility
-- explicit validation
-- isolated execution
-- explicitly testable units (one task = one testable component)
+- **Owner change validation with multiple rules**
+  → each rule is a fluent validator, ordered from cheapest to most expensive
 
 ---
-
-### Validation Model
-
-- fluent validation defined per task with clear and explicit rules
-- fail-fast validation that prevents execution of invalid tasks while allowing the pipeline to continue
-- consistent handling of validation and execution errors with clear and traceable outcomes
-- automatic logging of validation failures with detailed reasons
-
----
-
-### Runtime Configuration
-
-- configuration stored in Dataverse entity
-- dynamically affects plugin behavior
-- no redeployment required
-- cached for performance optimization
-
----
-
-### Autonumbering
-
-- configurable sequences
-- parent-based numbering
-- concurrency-safe generation
-
----
-
-### Diagnostic Logging
-
-Logging is integrated into the execution pipeline.
-
-- tracks full execution flow across plugins and tasks
-- records detailed diagnostic information
-- measures execution time
-- tracks execution depth
-
-The framework also provides a logging console that allows tasks to write structured runtime messages.
-
-- logs clearly show which code was executed
-- logs include relevant input and context data
-- enables step-by-step tracing of task execution
-
-This significantly simplifies debugging and, in most cases, eliminates the need for complex plugin debugging.
-
-This makes it possible to:
-
-- understand what triggered each operation
-- identify performance bottlenecks
-- detect excessive plugin nesting
-
----
-
-### Testing Support
-
-The framework includes a built-in testing foundation designed for functional testing.
-
-- tests are executed against a real Dataverse environment
-- verifies full plugin behavior, not just isolated units
-- ensures plugins work together correctly and do not interfere with each other
-
-The testing infrastructure:
-
-- automatically creates required test data
-- ensures isolation between test runs
-- cleans up all data after execution
-
-This allows reliable validation of real-world behavior in a controlled environment.
-
 
 ## Architecture (Simplified)
 
-The framework extends the standard Dataverse plugin SDK with a structured execution pipeline.
-
-Each plugin is composed of independent tasks that follow a consistent lifecycle:
-
-~~~
+```
 Plugin
   ↓
 Task
   ├─ Validation
   └─ Execution
+```
+
+### Plugin
+
+The entry point registered with Dataverse. It:
+
+- Receives the execution context
+- Matches registered tasks to the current event (stage, message, entity, mode)
+- Executes matching tasks in order
+- Handles logging and pipeline flow
+
+### Task
+
+A single unit of business logic. Each task:
+
+- Has one responsibility
+- Defines fluent validation rules in `AddValidations()`
+- Contains execution logic in `DoExecute()`
+- Is independently testable
+
+### Validation
+
+- Runs **before** execution
+- Uses a fluent API to chain validators in a specific order
+- Can **skip** the task (`WithBreakValidation`) or **throw** an error (`ThrowWithError`)
+- Allows other tasks to continue even if one task's validation fails
+
+### Execution
+
+- Runs **only** if all validations pass
+- Contains **only** business logic — no guard checks or validation
+- Produces predictable, traceable results
+
+---
+
+## Key Features
+
+### 🧩 Task-Based Architecture
+
+Each plugin is composed of independent tasks registered via `RegisterTask<T>()`.
+
+- Keeps business logic small and focused
+- Makes code easier to understand and maintain
+- Allows testing logic in isolation
+
+### ✅ Fluent Validation Model
+
+Each task defines its own validation rules through a fluent API with enforced ordering:
+
+1. Context filters (`WithMode`, `WithStage`, `WithMessage`)
+2. Entity scope (`ForEntity` / `ForEntities`)
+3. Image requirements (`HasPreImage` / `HasPostImage`)
+4. Attribute presence (`EntityWithAtLeastOneAttribute` / `EntityWithAllAttributes`)
+5. Custom validations (`WithValidation`)
+6. Flow control (`WithBreakValidation`, `ThrowWithWarning`, `ThrowWithError`)
+
+### ⚙️ Runtime Configuration
+
+Configuration is stored in Dataverse and loaded at runtime.
+
+- Change behavior without redeploying plugins
+- Supports environment-specific settings
+- Avoids hardcoded values
+
+### 🔢 Autonumbering
+
+Supports configurable number sequences.
+
+- Consistent numbering across records
+- Supports parent-based numbering
+- Safe for concurrent operations
+
+### 📋 Diagnostic Logging
+
+Logging is built into the execution pipeline — every task produces a structured log automatically.
+
+- Shows exactly what happened during execution
+- Tracks execution flow, timing, and depth
+- Includes input/output parameters and entity images
+
+### 🧪 Testing Support
+
+Provides a foundation for testing against a real Dataverse environment.
+
+- Validates real behavior, not just isolated code
+- Ensures plugins work together correctly
+- Reduces risk in production deployments
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+* **.NET Framework 4.6.2** (required by Dataverse plugin sandbox)
+* Dataverse / Dynamics 365 environment
+* Visual Studio
+* Plugin must be deployed as a single assembly
+
+### Quick Start
+
+1. Create a Class Library project targeting .NET Framework 4.6.2
+2. Add a reference to the framework via NuGet
+3. Enable assembly signing for the plugin project
+4. Create your solution-specific `PluginBase`
+5. Create plugin classes and register tasks
+6. Implement validation and execution logic in tasks
+7. Configure the build to produce a single deployable assembly
+8. Build and register the plugin assembly in Dataverse
+
+Detailed setup, signing, packaging, and deployment guidance will be provided in the [docs](./docs) section.
+
+---
+
+## Examples
+
+### PluginBase (one per solution)
+
+Register your solution-wide plugin configuration and common tasks.
+
+~~~csharp
+public class MyPluginBase : PluginBase
+{
+    protected override void Configure(IPluginConfiguration config)
+    {
+        // solution-level tasks
+        config.AddTask<SetSolutionNameTask>();
+    }
+}
+~~~
+
+### Plugin (one per entity)
+
+Inherit from `PluginBase` and register plugin-specific tasks.
+
+~~~csharp
+public class AccountCreatePlugin : MyPluginBase
+{
+    protected override void Configure(IPluginConfiguration config)
+    {
+        base.Configure(config); // call base implementation
+
+        config.AddTask<SetAccountNameTask>();
+    }
+}
+~~~
+
+### Task
+
+Define validation and execution logic for a specific task.
+
+~~~csharp
+public class SetAccountNameTask : PluginTask
+{
+    public override void AddValidations()
+    {
+        Rule.For("Target")
+            .MustExist()
+            .WithMessage("Target entity is required");
+
+        Rule.ForEntity("account")
+            .Attribute("name")
+            .MustBeEmpty()
+            .WithMessage("Name must not be set");
+    }
+
+    public override void Execute()
+    {
+        var account = Context.Target.ToEntity<Account>();
+
+        account.Name = "New Account";
+
+        Service.Update(account);
+    }
+}
 ~~~
 
 ---
 
-### Plugin Layer
+## When to Use
 
-The plugin acts as an entry point and orchestrates execution.
+| 🚀 Highest Added Value | ⚖️ Lower Added Value (but still applicable) |
+|---|---|
+| Solution contains multiple plugins or integration points | Solution contains one or a few simple plugins |
+| Long-term evolution and feature growth are expected | No significant future development is expected |
+| Business logic is growing or expected to grow in complexity | Logic is simple (e.g., single operation, basic update) |
+| You need reliable, repeatable automated testing | Testing is not a key requirement |
+| You want consistent structure across projects and teams | Project is small, isolated, without need for shared standards |
+| Maintainability and scalability are important | Short-term or one-off solution |
+| You need structured logging for debugging and observability during development | Basic or minimal logging is sufficient |
+| You need the ability to adjust or toggle behavior at runtime without a new release | Behavior is static and does not need to change without deployment |
 
-Responsibilities:
+### Summary
+The framework can be used in any scenario — its core purpose is to structure the solution and prepare it for future growth while enabling fast development start.
 
-- receives Dataverse execution context
-- initializes framework services
-- executes registered tasks in a defined order
-- manages execution pipeline and flow
-- handles logging and diagnostics
-
----
-
-### Task Layer
-
-Tasks represent isolated units of functionality.
-
-Each task:
-
-- has a single responsibility
-- is independently testable
-- follows a consistent lifecycle (validation → execution)
-- operates within a controlled execution context
+The difference lies in the level of value it brings in a given context.
 
 ---
-
-### Validation
-
-Validation is executed before any business logic.
-
-- implemented using a fluent validation model
-- ensures all required conditions are met
-- prevents invalid state from reaching execution
-- prevents execution of the current task if validation fails, while allowing the pipeline to continue processing remaining tasks
-
----
-
-### Execution
-
-Execution contains the actual business logic.
-
-- runs only if validation passes
-- operates on validated and prepared data
-- produces deterministic and predictable results
-- does not contain validation logic
-
----
-
-### Logging and Diagnostics
-
-Logging is integrated into the execution pipeline.
-
-- tracks full execution flow across plugins and tasks
-- records detailed diagnostic information
-- measures execution time
-- tracks execution depth
-
-The framework provides a logging console for tasks:
-
-- allows writing structured runtime messages
-- clearly shows which code was executed
-- includes relevant input and context data
-- enables step-by-step tracing of execution
-
-This significantly simplifies debugging and, in most cases, eliminates the need for complex plugin debugging.
-
-This makes it possible to:
-
-- understand what triggered each operation
-- identify performance bottlenecks
-- detect excessive plugin nesting
-
----
-
-### Runtime Configuration
-
-Configuration is loaded dynamically from Dataverse.
-
-- affects behavior without redeployment
-- shared across plugins and tasks
-- enables environment-specific behavior
-- cached to ensure minimal performance impact
-- allows safe runtime adjustments of logic
-
-
-## Getting Started
-
-> 🚧 TODO  
-> Detailed setup and usage guide will be added soon.
-
-
 
 ## Repository Structure
 
@@ -277,22 +283,59 @@ Configuration is loaded dynamically from Dataverse.
 /docs       → documentation
 ~~~
 
+---
+
+## AI-Ready Structure
+
+The framework enforces a consistent and predictable structure, making the codebase easier to analyze and reason about — both for developers and automated tools.
+
+- Functionality is split into clearly defined tasks
+- Each task has explicit validation and execution phases
+- Behavior is deterministic and traceable
+- Patterns are uniform across all plugins
+
+This enables:
+
+- **Automated code generation** — AI tools can reliably produce new tasks and plugins
+- **Consistent structure** — every project follows the same conventions
+- **Analysis and mapping** — straightforward correlation between requirements and implementation
+
+---
 
 ## Current Status
 
-- preparing for first public release
-- documentation in progress
+- 🟡 Preparing for first public release
+- 📝 Documentation in progress
+
+---
 
 ## Key Principles
 
-- clear separation between validating conditions and executing business logic
-- small, focused units of functionality with a single responsibility
-- predictable and deterministic behavior in every execution
-- explicit and transparent execution flow
-- consistent structure across all plugins and tasks
-- design focused on long-term maintainability and scalability
+| Principle | Description |
+|---|---|
+| **Separate validation from execution** | `AddValidations()` and `DoExecute()` are always distinct |
+| **Keep logic small and focused** | One task = one responsibility |
+| **Ensure predictable behavior** | Fluent validators execute in defined order |
+| **Make execution flow explicit** | Logging is automatic; every step is traceable |
+| **Maintain consistency** | All plugins follow the same base pattern |
 
+---
 
 ## License
 
-See `LICENSE` file.
+This project is licensed under the **Pillaro Community License (PCL) v1.0**.
+
+| | |
+|---|---|
+| ✅ Use the framework in your projects and commercial solutions | ❌ Sell the framework as a product |
+| ✅ Modify it and build on top of it | ❌ Rebrand it or present it as your own framework |
+| ✅ Charge for implementation and services | ❌ Package it as a paid toolkit, platform, or SaaS where it is the main value |
+
+If you use the framework in a delivered solution, you must include:
+
+> "This solution is built using Pillaro Dataverse Plugin Framework."
+
+This framework is open for use, extension, and contribution,
+but is not licensed as a permissive open-source project and is not intended for resale as a standalone or competing product.
+
+See the full license in the [LICENSE](LICENSE) file.

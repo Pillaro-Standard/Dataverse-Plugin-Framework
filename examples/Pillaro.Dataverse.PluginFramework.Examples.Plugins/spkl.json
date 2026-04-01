@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    {
+      "solution": "PillaroPluginsExamples",
+      "profile": "default,release",
+      "assemblypath": "bin\\Release"
+    },
+    {
+      "solution": "PillaroPluginsExamples",
+      "profile": "debug",
+      "assemblypath": "bin\\Debug"
+    }
+  ]
+}

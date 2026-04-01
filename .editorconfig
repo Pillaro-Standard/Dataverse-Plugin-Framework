@@ -1,0 +1,18 @@
+﻿[*.cs]
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
+# CS0436: Type conflicts with imported type
+dotnet_diagnostic.CS0436.severity = none
+
+# CS8766: Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
+dotnet_diagnostic.CS8766.severity = none
+
+# CS8603: Possible null reference return.
+dotnet_diagnostic.CS8603.severity = none
+
+[**/*EarlyBound*.cs]
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.CS8981.severity = none
+dotnet_diagnostic.CS0436.severity = none

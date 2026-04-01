@@ -1,0 +1,15 @@
+{
+  "earlyboundtypes": [
+    {
+      "entities": "pl_autonumbering,contact,account,opportunity,customeraddress",
+      "actions": "pl_AutoNumbering_GetNewNumber",
+      "generateOptionsetEnums": true,
+      "generateStateEnums": true,
+      "generateGlobalOptionsets": false,
+      "fileName": "EarlyBoundTypes.cs",
+      "oneTypePerFile": false,
+      "classNamespace": "Pillaro.Dataverse.PluginFramework.Tests",
+      "serviceContextName": "ServiceContext"
+    }
+  ]
+}
