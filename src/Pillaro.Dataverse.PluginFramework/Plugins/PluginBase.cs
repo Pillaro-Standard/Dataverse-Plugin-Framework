@@ -18,13 +18,10 @@ public abstract class PluginBase : IPlugin
     private readonly string _secureConfig;
     private readonly string _unsecureConfig;
 
-    public delegate void RegisterServiceHandler(object sender);
-
     public PluginBase(string unsecureConfig, string secureConfig)
     {
         _secureConfig = secureConfig;
         _unsecureConfig = unsecureConfig;
-        _registeredEvents = [];
     }
 
     public void Execute(IServiceProvider serviceProvider)
@@ -35,8 +32,7 @@ public abstract class PluginBase : IPlugin
         var tracingService = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
         try
         {
-            var stop = new Stopwatch();
-            stop.Start();
+            var stop = Stopwatch.StartNew();
 
             var execContext = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
             if (execContext == null)
@@ -81,7 +77,7 @@ public abstract class PluginBase : IPlugin
                         task = Activator.CreateInstance(o.TaskType, taskArgs) as ITask;
 
                         if (task == null)
-                            throw new ArgumentException($"Task must implemented interface nameof(ITaskBase)");
+                            throw new InvalidOperationException($"Registered task '{o.TaskType.FullName}' does not implement '{nameof(ITask)}'.");
 
                         var taskLog = task.GetTaskLog();
 
@@ -142,7 +138,7 @@ public abstract class PluginBase : IPlugin
                 if (logData)
                     logService.Error($"{GetSolutionVersion()} - Execute Exception: " + ex);
 
-                throw new Exception(ex.Message, ex);
+                throw;
             }
         }
         catch (Exception ex)
@@ -187,7 +183,7 @@ public abstract class PluginBase : IPlugin
         {
             foreach (var item in ctx.PostEntityImages)
             {
-                log.LogDetails.Add(new LogDetail($"PostEntityImage - {item.Key}", item.Value));
+                log.LogDetails.Add(new LogDetail($"PostEntityImages - {item.Key}", item.Value));
             }
         }
     }
@@ -255,13 +251,10 @@ public abstract class PluginBase : IPlugin
 
     #endregion
 
-    public ReadOnlyCollection<PluginRegistration> GetAllRegisteredEvents()
+    protected ReadOnlyCollection<PluginRegistration> GetAllRegisteredEvents()
     {
         return _registeredEvents.AsReadOnly();
     }
 
-    public virtual string GetSolutionVersion()
-    {
-        return "NotImplemented";
-    }
+    public virtual string GetSolutionVersion() => "Unknown";
 }

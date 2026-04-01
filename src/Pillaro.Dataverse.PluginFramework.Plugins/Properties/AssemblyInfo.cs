@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Pillaro.Dataverse.PluginFramework.Plugins")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Framework for building structured, task-based Microsoft Dataverse plugins.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Pillaro s.r.o")]
 [assembly: AssemblyProduct("Pillaro.Dataverse.PluginFramework.Plugins")]
