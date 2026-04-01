@@ -5,11 +5,11 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins;
 
 public class PluginRegistration
 {
-    public PluginStage Stage { get; private set; }
-    public string MessageName { get; private set; }
-    public string EntityName { get; private set; }
-    public PluginMode[] Modes { get; private set; }
-    public Type TaskType { get; private set; }
+    public PluginStage Stage { get; }
+    public string MessageName { get; }
+    public string EntityName { get; }
+    public PluginMode[] Modes { get; }
+    public Type TaskType { get; }
 
     public PluginRegistration(
         PluginStage stage,
@@ -21,7 +21,7 @@ public class PluginRegistration
         Stage = stage;
         MessageName = messageName;
         EntityName = entityName;
-        Modes = modes ?? new PluginMode[0];
+        Modes = modes ?? [];
         TaskType = taskType;
     }
 
