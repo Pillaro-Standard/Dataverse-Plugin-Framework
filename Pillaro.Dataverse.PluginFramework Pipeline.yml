@@ -22,7 +22,7 @@ parameters:
 
 variables:
   configuration: Release
-  slnPath: Pillaro.Dataverse.PluginFramework.sln
+  slnPath: Dataverse Plugin Framework.sln
   nuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
 jobs:
@@ -72,9 +72,9 @@ jobs:
 
       # --- Pack ---
       - script: >
-          nuget pack $(nuspecPath)
+          nuget pack "$(nuspecPath)"
           -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
-          -OutputDirectory $(Build.ArtifactStagingDirectory)
+          -OutputDirectory "$(Build.ArtifactStagingDirectory)"
           -NonInteractive
         displayName: Pack NuGet package
 
