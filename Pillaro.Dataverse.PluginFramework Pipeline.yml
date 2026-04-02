@@ -67,7 +67,7 @@ jobs:
         inputs:
           solution: $(slnPath)
           configuration: $(configuration)
-          platform: AnyCPU
+          platform: Any CPU
           msbuildArgs: /t:Rebuild /v:minimal /m
 
       # --- Pack ---
