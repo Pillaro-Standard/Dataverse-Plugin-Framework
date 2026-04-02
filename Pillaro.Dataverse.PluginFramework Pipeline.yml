@@ -23,7 +23,6 @@ parameters:
 variables:
   configuration: Release
   projectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
-  projectDirectory: src/Pillaro.Dataverse.PluginFramework
   nuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
 jobs:
@@ -65,19 +64,20 @@ jobs:
       - task: NuGetToolInstaller@1
         displayName: Setup NuGet
 
-      - task: NuGetCommand@2
-        displayName: NuGet Restore framework project
+      - task: MSBuild@1
+        displayName: Restore framework project
         inputs:
-          command: restore
-          restoreSolution: $(projectPath)
-          solutionDirectory: $(Build.SourcesDirectory)
+          solution: $(projectPath)
+          msbuildArchitecture: x64
+          configuration: $(configuration)
+          msbuildArguments: /t:Restore /p:RestorePackagesConfig=true /v:minimal
 
       - task: VSBuild@1
         displayName: Build framework project
         inputs:
           solution: $(projectPath)
           configuration: $(configuration)
-          msbuildArgs: /t:Rebuild /v:minimal /m
+          msbuildArgs: /t:Rebuild /p:RestorePackagesConfig=true /v:minimal /m
 
       - script: >
           nuget pack "$(nuspecPath)"
