@@ -22,7 +22,7 @@ parameters:
 
 variables:
   configuration: Release
-  slnPath: Dataverse Plugin Framework.sln
+  projectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
   nuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
 jobs:
@@ -34,7 +34,6 @@ jobs:
     steps:
       - checkout: self
 
-      # --- Resolve version from tag, input, or default ---
       - task: PowerShell@2
         displayName: Determine version
         inputs:
@@ -51,26 +50,33 @@ jobs:
             Write-Host "Package version: $ver"
             Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$ver"
 
-      # --- Toolchain setup ---
+      - task: PowerShell@2
+        displayName: Stamp FrameworkVersion
+        inputs:
+          targetType: inline
+          script: |
+            $file = "$(Build.SourcesDirectory)/src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs"
+            $content = Get-Content $file -Raw
+            $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
+            Set-Content $file -Value $updated -NoNewline
+            Write-Host "Stamped FrameworkVersion = `"$(PACKAGE_VERSION)`""
+
       - task: NuGetToolInstaller@1
         displayName: Setup NuGet
 
-      # --- Restore & Build ---
       - task: NuGetCommand@2
         displayName: NuGet Restore
         inputs:
           command: restore
-          restoreSolution: $(slnPath)
+          restoreSolution: $(projectPath)
 
       - task: VSBuild@1
-        displayName: Build solution
+        displayName: Build framework project
         inputs:
-          solution: $(slnPath)
+          solution: $(projectPath)
           configuration: $(configuration)
-          platform: Any CPU
           msbuildArgs: /t:Rebuild /v:minimal /m
 
-      # --- Pack ---
       - script: >
           nuget pack "$(nuspecPath)"
           -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
@@ -78,7 +84,6 @@ jobs:
           -NonInteractive
         displayName: Pack NuGet package
 
-      # --- Publish artifact for release pipeline ---
       - task: PublishPipelineArtifact@1
         displayName: Upload NuGet artifact
         inputs:
