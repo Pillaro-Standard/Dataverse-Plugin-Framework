@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Pillaro.Dataverse.PluginFramework")]
 [assembly: AssemblyDescription("A task-based framework for building structured Microsoft Dataverse plugins.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Pillaro s.r.o")]
+[assembly: AssemblyCompany("Pillaro Labs s.r.o.")]
 [assembly: AssemblyProduct("Pillaro.Dataverse.PluginFramework")]
-[assembly: AssemblyCopyright("Copyright © 2026 Pillaro s.r.o")]
+[assembly: AssemblyCopyright("Copyright © 2026 Pillaro Labs s.r.o.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

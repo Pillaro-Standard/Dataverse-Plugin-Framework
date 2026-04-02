@@ -7,8 +7,9 @@
 		<PackageId>Pillaro.Dataverse.PluginFramework.Testing</PackageId>
 		<IsPackable>true</IsPackable>
 		<Version>1.0.2</Version>
-		<Authors>Pillaro</Authors>
-		<Company>Pillaro s.r.o.</Company>
+		<authors>Pillaro Labs s.r.o.</authors>
+		<owners>Pillaro Labs s.r.o.</owners>
+		<copyright>Copyright © 2026 Pillaro Labs s.r.o.</copyright>
 		<Description>Testing support package for integration and end-to-end testing of solutions built with Pillaro Dataverse Plugin Framework.</Description>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

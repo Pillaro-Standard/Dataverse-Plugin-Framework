@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Pillaro.Dataverse.PluginFramework.Examples.Logic")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Pillaro s.r.o")]
+[assembly: AssemblyCompany("Pillaro Labs s.r.o.")]
 [assembly: AssemblyProduct("Pillaro.Dataverse.PluginFramework.Examples.Logic")]
-[assembly: AssemblyCopyright("Copyright ©  2026")]
+[assembly: AssemblyCopyright("Copyright © 2026 Pillaro Labs s.r.o.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
