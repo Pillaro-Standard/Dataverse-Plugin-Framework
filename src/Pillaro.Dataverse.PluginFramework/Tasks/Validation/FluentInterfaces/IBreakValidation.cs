@@ -3,7 +3,7 @@
 namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 
 /// <summary>
-/// Custom data validation. Runs only in case that all previous validation was sucessfull
+/// Custom data validation. Runs only in case that all previous validations were successful.
 /// </summary>
 public interface IBreakValidation : ICompleteValidation
 {

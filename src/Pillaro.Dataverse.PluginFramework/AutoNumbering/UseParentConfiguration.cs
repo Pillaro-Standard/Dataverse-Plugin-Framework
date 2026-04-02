@@ -1,7 +1,10 @@
 ﻿namespace Pillaro.Dataverse.PluginFramework.AutoNumbering;
 
-enum UseParentConfiguration
+/// <summary>
+/// Indicates whether a child auto-numbering configuration inherits its format from the parent.
+/// </summary>
+internal enum UseParentConfiguration
 {
-    Ano = 1,
-    Ne = 2,
+    Yes = 1,
+    No = 2,
 }

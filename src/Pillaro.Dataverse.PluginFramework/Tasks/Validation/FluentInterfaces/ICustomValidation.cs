@@ -1,8 +1,6 @@
-﻿using Pillaro.Dataverse.PluginFramework.Tasks;
-using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
-using System;
+﻿using System;
 
-namespace Pillaro.Dataverse.PluginFramework.Plugins.Validation.FluentInterfaces;
+namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 
 /// <summary>
 /// Custom validation. Use for validations WITHOUT performance impact

@@ -1,5 +1,4 @@
-﻿using Pillaro.Dataverse.PluginFramework.Plugins.Validation.Validators.Interfaces;
-using Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
+﻿using Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 

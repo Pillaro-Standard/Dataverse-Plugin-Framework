@@ -28,7 +28,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Opportunity
 
             
             // Random score 0-100, seeded by Guid for variability
-            Random rnd = new Random(Guid.NewGuid().GetHashCode());
+            Random rnd = new(Guid.NewGuid().GetHashCode());
             var newScore = rnd.Next(0, 101);
 
             if (currentScore.HasValue && newScore == currentScore.Value)

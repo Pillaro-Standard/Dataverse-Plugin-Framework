@@ -16,14 +16,14 @@ using System.Text;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging;
 
-public class LogService
+public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganizationService systemOrganizationService, ITracingService tracingService, int cacheNoEntityTimeInSeconds = 180)
 {
-    private readonly ITracingService _tracingService;
-    private readonly IOrganizationService _systemOrganizationService;
-    private readonly LogExecutionContext _executionContext;
-    private readonly SettingsService _settingService;
-    private readonly LogFilterService _filterLogService;
-    private readonly DataService _dataService;
+    private readonly ITracingService _tracingService = tracingService;
+    private readonly IOrganizationService _systemOrganizationService = systemOrganizationService ?? throw new ArgumentNullException(nameof(systemOrganizationService));
+    private readonly LogExecutionContext _executionContext = new(pluginExecutionContext ?? throw new ArgumentNullException(nameof(pluginExecutionContext)));
+    private readonly SettingsService _settingService = new(systemOrganizationService);
+    private readonly LogFilterService _filterLogService = new();
+    private readonly DataService _dataService = new(systemOrganizationService);
 
     private static readonly string LogEntityExistsCacheKey = "LogService:EntityExists:pl_log";
     public const string MinimalSeverityLevelKey = "MinimalSeverityLevel";
@@ -37,18 +37,7 @@ public class LogService
     public delegate void SaveLogsEventHandler(object sender, BeforeSaveLogsEventArgs e);
     public event SaveLogsEventHandler BeforeSaveLogs = delegate { };
 
-    protected int CacheNoEntityTimeInSeconds { get; }
-
-    public LogService(IPluginExecutionContext pluginExecutionContext, IOrganizationService systemOrganizationService, ITracingService tracingService, int cacheNoEntityTimeInSeconds = 180)
-    {
-        _executionContext = new LogExecutionContext(pluginExecutionContext ?? throw new ArgumentNullException(nameof(pluginExecutionContext)));
-        _systemOrganizationService = systemOrganizationService ?? throw new ArgumentNullException(nameof(systemOrganizationService));
-        _tracingService = tracingService;
-        _settingService = new SettingsService(systemOrganizationService);
-        _filterLogService = new LogFilterService();
-        _dataService = new DataService(systemOrganizationService);
-        CacheNoEntityTimeInSeconds = cacheNoEntityTimeInSeconds;
-    }
+    protected int CacheNoEntityTimeInSeconds { get; } = cacheNoEntityTimeInSeconds;
 
     public void Fatal(string name, Exception ex)
     {
@@ -180,11 +169,8 @@ public class LogService
             _tracingService?.Trace(log.ToString());
 
             var logEntity = GetLogEntity(log);
-            var outsideTransaction = _dataService.CreateOutsideTransaction(logEntity);
-            if (outsideTransaction == null)
-                throw new Exception("OutsideTransaction response is null");
-
-            logEntity.Id = outsideTransaction.Value;
+            var outsideTransaction = _dataService.CreateOutsideTransaction(logEntity) ?? throw new Exception("OutsideTransaction response is null");
+            logEntity.Id = outsideTransaction;
         }
         catch (Exception ex)
         {

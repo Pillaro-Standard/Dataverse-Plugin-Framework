@@ -54,8 +54,10 @@ internal class DataverseConnectionServiceFactory : IDataverseConnectionService
 
     private ServiceClient CreateCallerClient(Guid callerId)
     {
-        var client = new ServiceClient(_connectionString);
-        client.CallerId = callerId;
+        var client = new ServiceClient(_connectionString)
+        {
+            CallerId = callerId
+        };
         return client;
     }
 

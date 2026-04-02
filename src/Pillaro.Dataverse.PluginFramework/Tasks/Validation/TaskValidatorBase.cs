@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
-using Pillaro.Dataverse.PluginFramework.Plugins.Validation.FluentInterfaces;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators;
 using System;
 
@@ -39,13 +38,13 @@ internal class TaskValidatorBase : IBasicModeValidation, IBasicStageValidation,
 
     public IBasicImageValidation ForEntity(string entityName)
     {
-        ValidatorProcessor.AddValidatorHandler(new EntityValidator(new[] { entityName }));
+        ValidatorProcessor.AddValidatorHandler(new EntityValidator([entityName]));
         return this;
     }
 
     public IBasicPrimaryEntityValidation WithMessage(string message)
     {
-        ValidatorProcessor.AddValidatorHandler(new MessageValidator(new[] { message }));
+        ValidatorProcessor.AddValidatorHandler(new MessageValidator([message]));
         return this;
     }
 

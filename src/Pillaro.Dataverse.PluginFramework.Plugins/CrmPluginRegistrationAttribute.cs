@@ -74,6 +74,7 @@ public class CrmPluginRegistrationAttribute : Attribute
     /// <param name="friendlyName">Friendly name</param>
     /// <param name="description">Description</param>
     /// <param name="groupName">Group Name</param>
+    /// <param name="isolationModel">Isolation Mode</param>
     public CrmPluginRegistrationAttribute(
         string name,
         string friendlyName,

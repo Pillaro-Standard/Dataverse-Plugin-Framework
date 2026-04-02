@@ -181,10 +181,7 @@ public class SettingsService
     private static T GetValue<T>(IOrganizationService service, string key)
         where T : struct
     {
-        var entity = GetEntityByKey(service, key);
-        if (entity == null)
-            throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
-
+        var entity = GetEntityByKey(service, key) ?? throw new Exception($"SettingsService => Key '{key}' value is null or empty.");
         var type = typeof(T);
         var typeCode = Type.GetTypeCode(type);
 

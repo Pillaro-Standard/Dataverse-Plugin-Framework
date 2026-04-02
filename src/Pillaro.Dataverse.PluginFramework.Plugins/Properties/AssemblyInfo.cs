@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Pillaro s.r.o")]
 [assembly: AssemblyProduct("Pillaro.Dataverse.PluginFramework.Plugins")]
-[assembly: AssemblyCopyright("Copyright ©  2026")]
+[assembly: AssemblyCopyright("Copyright © 2026 Pillaro s.r.o")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

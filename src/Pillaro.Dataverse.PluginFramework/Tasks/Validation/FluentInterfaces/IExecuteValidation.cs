@@ -8,7 +8,7 @@ namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 internal interface IExecuteValidation
 {
     /// <summary>
-    /// Executes all registered validadions
+    /// Executes all registered validations
     /// </summary>
     bool IsValid();
 

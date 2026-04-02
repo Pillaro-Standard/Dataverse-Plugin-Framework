@@ -16,9 +16,6 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -213,6 +210,9 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <DocumentationFile>bin\Debug\Pillaro.Dataverse.PluginFramework.Plugins.xml</DocumentationFile>
+  </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>REM ============================================================
 REM Post-build merge script for Dataverse plugin projects

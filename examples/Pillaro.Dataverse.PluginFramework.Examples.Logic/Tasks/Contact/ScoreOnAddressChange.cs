@@ -49,7 +49,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
             }
 
             // "random" score (0-100)
-            Random rnd = new Random(Guid.NewGuid().GetHashCode());
+            Random rnd = new(Guid.NewGuid().GetHashCode());
             var newScore = rnd.Next(0, 101);
 
             if (currentScore.HasValue && newScore == currentScore.Value)

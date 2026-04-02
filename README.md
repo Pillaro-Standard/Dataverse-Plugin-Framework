@@ -1,6 +1,6 @@
 ﻿# Pillaro Dataverse Plugin Framework
 
-> A structured, task-based approach for building predictable, testable, and maintainable Dataverse plugins in C#.
+> A source-available framework providing a structured, task-based approach for building predictable, testable, and maintainable Microsoft Dataverse plugins in C#.
 
 [![License: PCL v1.0](https://img.shields.io/badge/License-PCL%20v1.0-blue.svg)](#license)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)](#current-status)

@@ -291,10 +291,7 @@ public abstract class TaskBase<TEntity> : ITask
     private static TService GetRequiredService<TService>(IServiceProvider serviceProvider)
         where TService : class
     {
-        var service = serviceProvider.GetService(typeof(TService)) as TService;
-        if (service == null)
-            throw new ArgumentNullException(typeof(TService).Name);
-
+        var service = serviceProvider.GetService(typeof(TService)) as TService ?? throw new ArgumentNullException(typeof(TService).Name);
         return service;
     }
 

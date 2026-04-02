@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging.Models;
 
-public class Log
+public class Log : ICloneable
 {
     public Guid LogId { get; } = Guid.NewGuid();
     public LogSeverity LogSeverity { get; set; }

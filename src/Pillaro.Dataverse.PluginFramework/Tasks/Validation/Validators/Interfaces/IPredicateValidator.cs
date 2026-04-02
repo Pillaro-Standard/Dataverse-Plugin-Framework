@@ -1,7 +1,4 @@
-﻿
-using Pillaro.Dataverse.PluginFramework.Tasks;
-
-namespace Pillaro.Dataverse.PluginFramework.Plugins.Validation.Validators.Interfaces;
+﻿namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
 
 internal interface IPredicateValidator : IValidator
 {

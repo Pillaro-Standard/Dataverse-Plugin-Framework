@@ -99,6 +99,7 @@ How to prepare, sign, and deploy plugin assemblies.
 | Document | Description |
 |---|---|
 | [Packaging and Deployment](./packaging-and-deployment.md) | Signing, assembly structure, and deployment process |
+| [Versioning](./versioning.md) | Versioning strategy and release model |
 
 ---
 

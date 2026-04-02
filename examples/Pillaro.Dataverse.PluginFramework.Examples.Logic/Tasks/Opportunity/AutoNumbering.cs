@@ -24,7 +24,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Opportunity
 
         protected override void DoExecute()
         {
-            AutoNumberingService autonumService = new AutoNumberingService(OrganizationServiceProvider.Admin);
+            AutoNumberingService autonumService = new(OrganizationServiceProvider.Admin);
             var response = autonumService.GetTransactionAutoNumber(TaskContext.PrimaryEntityName, ContextEntity.Id, null, null);
 
             AddLogMessageLine($"AutoNumbering response: {response.Number}");

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
-using Pillaro.Dataverse.PluginFramework.Plugins.Validation.Validators.Interfaces;
+using Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -8,18 +8,12 @@ namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators;
 /// <summary>
 /// Entity attributes validation with condition
 /// </summary>
-internal class EntityAttributesWithConditionValidator : IPredicateValidator
+internal class EntityAttributesWithConditionValidator(IEnumerable<string> attributes, Entity entity, bool containsAll, Func<TaskContext, bool> predicate) : IPredicateValidator
 {
-    private readonly Func<TaskContext, bool> _predicate;
-    private readonly EntityAttributesValidator _entityAttributesValidator;
+    private readonly Func<TaskContext, bool> _predicate = predicate;
+    private readonly EntityAttributesValidator _entityAttributesValidator = new(entity, attributes, containsAll);
     private bool _predicateResult;
     private bool? _attrValidation;
-
-    public EntityAttributesWithConditionValidator(IEnumerable<string> attributes, Entity entity, bool containsAll, Func<TaskContext, bool> predicate)
-    {
-        _predicate = predicate;
-        _entityAttributesValidator = new EntityAttributesValidator(entity, attributes, containsAll);
-    }
 
     public string GetName => nameof(EntityAttributesWithConditionValidator);
     public bool Validate(TaskContext taskContext)

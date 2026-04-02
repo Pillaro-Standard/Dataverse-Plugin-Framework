@@ -8,16 +8,14 @@ using System.Text.RegularExpressions;
 
 namespace Pillaro.Dataverse.PluginFramework.AutoNumbering;
 
-public class AutoNumberingService
+/// <summary>
+/// Generates auto-numbered identifiers for Dataverse entity records based on configurable format strings,
+/// optional parent lookups, date tokens, dynamic field substitution, and grouping values.
+/// </summary>
+public class AutoNumberingService(IOrganizationService organizationService, int retryAttempts = 5)
 {
-    private readonly IOrganizationService _organizationService;
-    private readonly int _retryAttempts;
-
-    public AutoNumberingService(IOrganizationService organizationService, int retryAttempts = 5)
-    {
-        _organizationService = organizationService;
-        _retryAttempts = retryAttempts;
-    }
+    private readonly IOrganizationService _organizationService = organizationService;
+    private readonly int _retryAttempts = retryAttempts;
 
     public virtual string GetAutoNumber(string entityName, Guid entityId, Guid? parentEntityId)
     {
@@ -77,14 +75,10 @@ public class AutoNumberingService
 
         var autoNumName = "pl_autonumbering";
 
-        // Find the primary configuration for the given entity  
-        var primaryAutoNum = dataService.LoadRecord(autoNumName, new string[] { "pl_entityname", "pl_parentautonumberingid", "pl_parentlookupid" }, new object[] { entityName, null, null });
+        // Find the primary configuration for the given entity
+        var primaryAutoNum = dataService.LoadRecord(autoNumName, ["pl_entityname", "pl_parentautonumberingid", "pl_parentlookupid"], [entityName, null, null]) ?? throw new InvalidPluginExecutionException($"Primary autonumbering configuration does not exist for entity '{entityName}'.");
 
-
-        if (primaryAutoNum == null)
-            throw new InvalidPluginExecutionException($"Primary autonumbering configuration does not exist for entity '{entityName}'.");
-
-        //currentAutoNum - odkud se bere aktualni cislo
+        // Determines where the current sequence number comes from
         var currentAutoNum = primaryAutoNum;
 
         if (primaryAutoNum.Contains("pl_parentlookupattribute") && primaryAutoNum["pl_parentlookupattribute"] != null)
@@ -92,37 +86,35 @@ public class AutoNumberingService
             if (parentEntityId == null)
                 throw new InvalidPluginExecutionException($"Attribute '{primaryAutoNum["pl_parentlookupattribute"]}' is required for entity '{entityName}'.");
 
-            //parentEntityId = parentEntityId.Replace("{", "").Replace("}", "").ToLower();
-
-            currentAutoNum = dataService.LoadRecord(autoNumName, new string[] { "pl_entityname", "pl_parentlookupid" }, new object[] { entityName, parentEntityId });
+            currentAutoNum = dataService.LoadRecord(autoNumName, ["pl_entityname", "pl_parentlookupid"], [entityName, parentEntityId]);
             if (currentAutoNum == null)
             {
-                //pokud neni pro dane parent entity id jeste konfigurace, tak ji vytvorime
+                // If no configuration exists for this parent entity yet, create one
                 currentAutoNum = new Entity(autoNumName);
                 currentAutoNum["pl_entityname"] = entityName;
                 currentAutoNum["pl_parentlookupid"] = parentEntityId;
                 currentAutoNum["pl_number"] = 0;
                 currentAutoNum["pl_parentautonumberingid"] = primaryAutoNum.ToEntityReference();
-                currentAutoNum["pl_useparentconfiguration"] = new OptionSetValue((int)UseParentConfiguration.Ano);
+                currentAutoNum["pl_useparentconfiguration"] = new OptionSetValue((int)UseParentConfiguration.Yes);
 
                 currentAutoNum.Id = _organizationService.Create(currentAutoNum);
 
                 currentAutoNum = _organizationService.Retrieve(autoNumName, currentAutoNum.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
             }
         }
-        //existuje hodnota, pres kterou se to ma seskupovat, napr. rok
+        // A grouping value exists (e.g. year) that separates numbering sequences
         else if (!string.IsNullOrEmpty(groupingValue))
         {
-            currentAutoNum = dataService.LoadRecord(autoNumName, new string[] { "pl_entityname", "pl_groupingvalue" }, new object[] { entityName, groupingValue });
+            currentAutoNum = dataService.LoadRecord(autoNumName, ["pl_entityname", "pl_groupingvalue"], [entityName, groupingValue]);
             if (currentAutoNum == null)
             {
-                //pokud neni pro dane parent entity id jeste konfigurace, tak ji vytvorime
+                // If no configuration exists for this grouping value yet, create one
                 currentAutoNum = new Entity(autoNumName);
                 currentAutoNum["pl_entityname"] = entityName;
                 currentAutoNum["pl_groupingvalue"] = groupingValue;
                 currentAutoNum["pl_number"] = 0;
                 currentAutoNum["pl_parentautonumberingid"] = primaryAutoNum.ToEntityReference();
-                currentAutoNum["pl_useparentconfiguration"] = new OptionSetValue((int)UseParentConfiguration.Ano);
+                currentAutoNum["pl_useparentconfiguration"] = new OptionSetValue((int)UseParentConfiguration.Yes);
 
                 currentAutoNum.Id = _organizationService.Create(currentAutoNum);
 
@@ -130,20 +122,20 @@ public class AutoNumberingService
             }
         }
 
-        //aktualni cislo
+        // Current sequence number
         var currentNumber = 0;
         if (currentAutoNum.Contains("pl_number") && currentAutoNum["pl_number"] != null)
             currentNumber = (int)currentAutoNum["pl_number"];
         currentNumber++;
 
-        //zjisti se, odkud se bude brat konfigurace
-        var configAutoNum = (currentAutoNum.Contains("pl_useparentconfiguration") && currentAutoNum["pl_useparentconfiguration"] != null && ((OptionSetValue)currentAutoNum["pl_useparentconfiguration"]).Value == (int)UseParentConfiguration.Ano ?
+        // Determine which configuration record to use for format settings
+        var configAutoNum = (currentAutoNum.Contains("pl_useparentconfiguration") && currentAutoNum["pl_useparentconfiguration"] != null && ((OptionSetValue)currentAutoNum["pl_useparentconfiguration"]).Value == (int)UseParentConfiguration.Yes ?
                                 primaryAutoNum : currentAutoNum);
 
         var digitCount = (configAutoNum.Contains("pl_digitcount") && configAutoNum["pl_digitcount"] != null ? (int)configAutoNum["pl_digitcount"] : 0);
         var number = Regex.Replace(configAutoNum["pl_formatstring"].ToString(), "{NUM}", currentNumber.ToString().PadLeft(digitCount, '0'), RegexOptions.IgnoreCase);
 
-        //aktualizace datumovych poli
+        // Replace date tokens
         if (number.IndexOf("{date1}", StringComparison.OrdinalIgnoreCase) >= 0)
             number = Regex.Replace(number, "{date1}", DateTime.Now.ToString(configAutoNum["pl_dateformat1"].ToString()), RegexOptions.IgnoreCase);
 
@@ -156,18 +148,14 @@ public class AutoNumberingService
         if (number.IndexOf("{grouping}", StringComparison.OrdinalIgnoreCase) >= 0)
             number = Regex.Replace(number, "{grouping}", groupingValue, RegexOptions.IgnoreCase);
 
-        //aktualizace atributu
+        // Replace dynamic entity attribute tokens
         var attribs = GetDynamicFields(number);
         if (attribs.Length > 0)
         {
-            var entity = _organizationService.Retrieve(entityName, entityId, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
-
-            if (entity == null)
-                throw new InvalidPluginExecutionException("Formát automatického čísla obsahuje atributy z entity. Záznam musí být uložený.");
-
+            var entity = _organizationService.Retrieve(entityName, entityId, new Microsoft.Xrm.Sdk.Query.ColumnSet(true)) ?? throw new InvalidPluginExecutionException("Auto-number format contains entity attributes. The record must be saved first.");
             foreach (var item in attribs)
             {
-                //dany atribut je v aktualnim zaznamu
+                // Resolve the attribute value from the current record
                 var attrib = item;
                 var attribValue = entity[attrib.ToLower()].ToString();
                 var dateFormat = string.Empty;
@@ -181,7 +169,7 @@ public class AutoNumberingService
                 if (dateFormat != string.Empty)
                     attribValue = ((DateTime)entity[attrib.ToLower()]).ToString(GetDateFormatString(dateFormat, configAutoNum));
 
-                if (item.Contains(".")) //jde o nadrizenou entitu
+                if (item.Contains(".")) // Refers to a parent entity lookup
                 {
                     var parentEntityLookup = item.Split('.')[0];
                     var parentEntityAttrib = item.Split('.')[1];
@@ -193,11 +181,7 @@ public class AutoNumberingService
                         parentEntityAttrib = parentEntityAttrib.Split(':')[0];
                     }
 
-                    EntityReference parentEntityLookuAttribute = (EntityReference)entity[parentEntityLookup.ToLower()];
-
-                    if (parentEntityLookuAttribute == null)
-                        throw new InvalidPluginExecutionException($"Attribut {parentEntityLookup} není vyplněný! Nelze generovat automatické číslo.");
-
+                    EntityReference parentEntityLookuAttribute = (EntityReference)entity[parentEntityLookup.ToLower()] ?? throw new InvalidPluginExecutionException($"Attribute '{parentEntityLookup}' is not populated. Cannot generate auto-number.");
                     var parentEntity = _organizationService.Retrieve(parentEntityLookuAttribute.LogicalName, parentEntityLookuAttribute.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(parentEntityAttrib.ToLower()));
                     attribValue = parentEntity[parentEntityAttrib.ToLower()].ToString();
 
@@ -210,8 +194,10 @@ public class AutoNumberingService
         }
 
 
-        Entity updateEntity = new("pl_autonumbering");
-        updateEntity.Id = currentAutoNum.Id;
+        Entity updateEntity = new("pl_autonumbering")
+        {
+            Id = currentAutoNum.Id
+        };
         updateEntity["pl_number"] = currentNumber;
         updateEntity.RowVersion = currentAutoNum.RowVersion;
 
@@ -232,15 +218,14 @@ public class AutoNumberingService
     public string[] GetDynamicFields(string format)
     {
         var pattern = "(?<={).+?(?=})";
-        List<string> items = [];
+        var items = new List<string>();
         var cols = Regex.Matches(format, pattern);
         foreach (Match item in cols)
         {
             items.Add(item.Groups[0].Value);
         }
 
-        return items.ToArray();
-
+        return [.. items];
     }
 
     private string GetDateFormatString(string dateFormat, Entity autoNumbering)

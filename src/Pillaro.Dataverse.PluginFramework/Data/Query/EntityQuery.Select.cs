@@ -67,7 +67,7 @@ public class EntityQuery<TEntity, TObject> where TEntity : Entity
 
     /// <summary>1-based pageNumber</summary>
     public EntityQuery<TEntity, TObject> Page(int pageNumber, int pageSize)
-        => new EntityQuery<TEntity, TObject>(_ctxFactory, _state.WithPage(pageNumber, pageSize), _selector);
+        => new(_ctxFactory, _state.WithPage(pageNumber, pageSize), _selector);
 
     public List<TObject> ToList()
     {
