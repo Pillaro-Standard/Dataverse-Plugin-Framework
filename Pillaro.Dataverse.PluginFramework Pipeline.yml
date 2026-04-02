@@ -23,7 +23,6 @@ parameters:
 variables:
   configuration: Release
   projectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
-  solutionDir: '$(Build.SourcesDirectory)\'
   nuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
 jobs:
@@ -74,7 +73,7 @@ jobs:
             /restore
             /t:Rebuild
             /p:RestorePackagesConfig=true
-            /p:SolutionDir="$(solutionDir)"
+            /p:SolutionDir=$(Build.SourcesDirectory)\
             /v:minimal
             /m
 
