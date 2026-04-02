@@ -1,0 +1,31 @@
+﻿REM ============================================================
+REM Post-build merge script for Dataverse plugin projects
+REM ============================================================
+REM Purpose:
+REM - merge plugin assembly with its dependencies into a single DLL
+REM - required for Dataverse plugin deployment
+REM
+REM How to use:
+REM - replace {LOGIC_ASSEMBLY} with your actual logic project output
+REM   example: Pillaro.Plugins.Examples.Logic.dll
+REM
+REM Notes:
+REM - all assemblies must exist in $(TargetDir)
+REM - keep Logic assembly at the END of the merge list
+REM - update dependencies when adding/removing references
+REM ============================================================
+
+rename "$(TargetDir)$(TargetFileName)" "ForMerge$(TargetFileName)"
+
+"$(ProjectDir)Tools\ILMerge\ILMerge.exe" ^
+ /keyfile:"$(ProjectDir)key.snk" ^
+ /target:library ^
+ /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" ^
+ /out:"$(TargetDir)$(TargetFileName)" ^
+ "$(TargetDir)ForMerge$(TargetFileName)" ^
+ "$(TargetDir)Pillaro.Dataverse.PluginFramework.dll" ^
+ "$(TargetDir)Newtonsoft.Json.dll" ^
+ "$(TargetDir){LOGIC_ASSEMBLY}"
+
+del "$(TargetDir)ForMerge$(TargetFileName)"
+del "$(TargetDir){LOGIC_ASSEMBLY}"

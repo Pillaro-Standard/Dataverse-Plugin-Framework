@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution Items", "{E659AC04-397B-4D2A-8DFD-3DF9CBA24537}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		LICENSE = LICENSE
 		NuGet.config = NuGet.config
 		Pillaro.Dataverse.PluginFramework Pipeline.yml = Pillaro.Dataverse.PluginFramework Pipeline.yml

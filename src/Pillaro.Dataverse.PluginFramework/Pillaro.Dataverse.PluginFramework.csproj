@@ -166,6 +166,10 @@
     <None Include="Tools\PluginPackaging\Pillaro.Dataverse.PluginFramework.nuspec" />
     <None Include="Tools\ILMerge\README.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Tools\ILMerge\ILMerge.exe" />
+    <Content Include="Tools\ILMerge\PostBuildAction.txt" />
+    <Content Include="Tools\ILMerge\System.Compiler.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
