@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		.editorconfig = .editorconfig
 		LICENSE = LICENSE
 		NuGet.config = NuGet.config
+		Pillaro.Dataverse.PluginFramework Pipeline.yml = Pillaro.Dataverse.PluginFramework Pipeline.yml
 		README.md = README.md
 	EndProjectSection
 EndProject

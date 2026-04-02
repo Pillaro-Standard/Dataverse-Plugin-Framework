@@ -1,0 +1,80 @@
+name: Build & Package
+
+on:
+  push:
+    branches: [main, release/*]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (e.g. 1.0.0)'
+        required: false
+        default: '1.0.0'
+
+env:
+  CONFIGURATION: Release
+  NUSPEC_PATH: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+
+jobs:
+  build:
+    name: Build & Pack NuGet
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # --- Resolve version from tag, input, or default ---
+      - name: Determine version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.ref }}" -match "^refs/tags/v(.+)$") {
+            $ver = $Matches[1]
+          } elseif ("${{ github.event.inputs.version }}" -ne "") {
+            $ver = "${{ github.event.inputs.version }}"
+          } else {
+            $ver = "1.0.0-ci.${{ github.run_number }}"
+          }
+          Write-Host "Package version: $ver"
+          "PACKAGE_VERSION=$ver" | Out-File -Append $env:GITHUB_ENV
+
+      # --- Toolchain setup ---
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      # --- Restore & Build ---
+      - name: NuGet Restore
+        run: nuget restore
+
+      - name: Build solution
+        run: >
+          msbuild
+          /p:Configuration=${{ env.CONFIGURATION }}
+          /p:Platform="Any CPU"
+          /t:Rebuild
+          /v:minimal
+          /m
+
+      # --- Pack ---
+      - name: Pack NuGet package
+        run: >
+          nuget pack ${{ env.NUSPEC_PATH }}
+          -Properties "configuration=${{ env.CONFIGURATION }};version=${{ env.PACKAGE_VERSION }}"
+          -Version ${{ env.PACKAGE_VERSION }}
+          -OutputDirectory ${{ github.workspace }}/artifacts
+          -NonInteractive
+
+      # --- Publish artifact for release pipeline ---
+      - name: Upload NuGet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts/*.nupkg
+          if-no-files-found: error
+          retention-days: 90

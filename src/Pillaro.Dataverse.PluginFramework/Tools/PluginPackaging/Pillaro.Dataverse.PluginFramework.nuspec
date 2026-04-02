@@ -2,7 +2,7 @@
 <package>
 	<metadata>
 		<id>Pillaro.Dataverse.PluginFramework</id>
-		<version>1.0.0</version>
+		<version>$version$</version>
 		<authors>Pillaro Labs s.r.o.</authors>
 		<owners>Pillaro Labs s.r.o.</owners>
 		<copyright>Copyright © 2026 Pillaro Labs s.r.o.</copyright>
@@ -36,11 +36,11 @@
 
 	<files>
 		<file src="..\..\..\..\LICENSE" target="LICENSE" />
-		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.dll" target="lib\net462" />
-		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
-		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net462" />
-		<file src="bin\$configuration$\Tools\ILMerge\ILMerge.exe" target="Content/Tools" />
-		<file src="bin\$configuration$\Tools\ILMerge\System.Compiler.dll" target="Content/Tools" />
-		<file src="bin\$configuration$\PostBuildAction.txt" target="Content/CrmTools" />
+		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.dll" target="lib\net462" />
+		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
+		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net462" />
+		<file src="..\..\bin\$configuration$\Tools\ILMerge\ILMerge.exe" target="Content\Tools" />
+		<file src="..\..\bin\$configuration$\Tools\ILMerge\System.Compiler.dll" target="Content\Tools" />
+		<file src="..\..\bin\$configuration$\Tools\ILMerge\PostBuildAction.txt" target="Content\CrmTools" />
 	</files>
 </package>
