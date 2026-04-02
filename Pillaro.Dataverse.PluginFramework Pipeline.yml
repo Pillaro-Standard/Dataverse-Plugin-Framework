@@ -1,80 +1,86 @@
 name: Build & Package
 
-on:
-  push:
-    branches: [main, release/*]
-    tags: ['v*']
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Package version (e.g. 1.0.0)'
-        required: false
-        default: '1.0.0'
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+  tags:
+    include:
+      - v*
 
-env:
-  CONFIGURATION: Release
-  NUSPEC_PATH: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+pr:
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: version
+    displayName: 'Package version (e.g. 1.0.0)'
+    type: string
+    default: '1.0.0'
+
+variables:
+  configuration: Release
+  slnPath: Pillaro.Dataverse.PluginFramework.sln
+  nuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
 jobs:
-  build:
-    name: Build & Pack NuGet
-    runs-on: windows-latest
+  - job: Build
+    displayName: Build & Pack NuGet
+    pool:
+      vmImage: windows-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - checkout: self
 
       # --- Resolve version from tag, input, or default ---
-      - name: Determine version
-        id: version
-        shell: pwsh
-        run: |
-          if ("${{ github.ref }}" -match "^refs/tags/v(.+)$") {
-            $ver = $Matches[1]
-          } elseif ("${{ github.event.inputs.version }}" -ne "") {
-            $ver = "${{ github.event.inputs.version }}"
-          } else {
-            $ver = "1.0.0-ci.${{ github.run_number }}"
-          }
-          Write-Host "Package version: $ver"
-          "PACKAGE_VERSION=$ver" | Out-File -Append $env:GITHUB_ENV
+      - task: PowerShell@2
+        displayName: Determine version
+        inputs:
+          targetType: inline
+          script: |
+            $ref = "$(Build.SourceBranch)"
+            if ($ref -match "^refs/tags/v(.+)$") {
+              $ver = $Matches[1]
+            } elseif ("$(Build.Reason)" -eq "Manual" -and "${{ parameters.version }}" -ne "") {
+              $ver = "${{ parameters.version }}"
+            } else {
+              $ver = "1.0.0-ci.$(Build.BuildId)"
+            }
+            Write-Host "Package version: $ver"
+            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$ver"
 
       # --- Toolchain setup ---
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@v2
+      - task: NuGetToolInstaller@1
+        displayName: Setup NuGet
 
       # --- Restore & Build ---
-      - name: NuGet Restore
-        run: nuget restore
+      - task: NuGetCommand@2
+        displayName: NuGet Restore
+        inputs:
+          command: restore
+          restoreSolution: $(slnPath)
 
-      - name: Build solution
-        run: >
-          msbuild
-          /p:Configuration=${{ env.CONFIGURATION }}
-          /p:Platform="Any CPU"
-          /t:Rebuild
-          /v:minimal
-          /m
+      - task: VSBuild@1
+        displayName: Build solution
+        inputs:
+          solution: $(slnPath)
+          configuration: $(configuration)
+          platform: AnyCPU
+          msbuildArgs: /t:Rebuild /v:minimal /m
 
       # --- Pack ---
-      - name: Pack NuGet package
-        run: >
-          nuget pack ${{ env.NUSPEC_PATH }}
-          -Properties "configuration=${{ env.CONFIGURATION }};version=${{ env.PACKAGE_VERSION }}"
-          -Version ${{ env.PACKAGE_VERSION }}
-          -OutputDirectory ${{ github.workspace }}/artifacts
+      - script: >
+          nuget pack $(nuspecPath)
+          -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
+          -OutputDirectory $(Build.ArtifactStagingDirectory)
           -NonInteractive
+        displayName: Pack NuGet package
 
       # --- Publish artifact for release pipeline ---
-      - name: Upload NuGet artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nuget-package
-          path: artifacts/*.nupkg
-          if-no-files-found: error
-          retention-days: 90
+      - task: PublishPipelineArtifact@1
+        displayName: Upload NuGet artifact
+        inputs:
+          targetPath: $(Build.ArtifactStagingDirectory)
+          artifact: nuget-package
