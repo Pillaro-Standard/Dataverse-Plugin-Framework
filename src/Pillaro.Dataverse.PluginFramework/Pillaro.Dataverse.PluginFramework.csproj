@@ -167,9 +167,15 @@
     <None Include="Tools\ILMerge\README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Tools\ILMerge\ILMerge.exe" />
-    <Content Include="Tools\ILMerge\PostBuildAction.txt" />
-    <Content Include="Tools\ILMerge\System.Compiler.dll" />
+    <Content Include="Tools\ILMerge\ILMerge.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\ILMerge\PostBuildAction.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\ILMerge\System.Compiler.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
