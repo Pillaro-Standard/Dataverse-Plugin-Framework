@@ -246,10 +246,13 @@ jobs:
             --configuration $(configuration)
             --no-restore
             /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
             /p:AssemblyVersion=$(ASSEMBLY_VERSION)
             /p:FileVersion=$(FILE_VERSION)
             /p:InformationalVersion=$(INFORMATIONAL_VERSION)
             /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
+
 
       - script: >
           nuget pack "$(frameworkNuspecPath)"
@@ -269,8 +272,11 @@ jobs:
           arguments: >
             --configuration $(configuration)
             --output $(Build.ArtifactStagingDirectory)
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
             /p:PackageReleaseNotes="$(TESTING_RELEASE_NOTES)"
             /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
 
       - task: PublishPipelineArtifact@1
         displayName: Upload NuGet artifacts
