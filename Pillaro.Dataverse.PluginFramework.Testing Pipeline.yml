@@ -15,21 +15,32 @@ pr:
       - main
 
 parameters:
-  - name: version
-    displayName: 'Package version (e.g. 1.0.0)'
+  - name: baseVersion
+    displayName: 'Base version (e.g. 1.0.0)'
     type: string
     default: '1.0.0'
+
+  - name: packageType
+    displayName: 'Package type'
+    type: string
+    default: 'ci'
+    values:
+      - ci
+      - preview
+      - rc
+      - release
 
 variables:
   configuration: Release
   testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
   frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
+  testingAssemblyInfoPath: src/Pillaro.Dataverse.PluginFramework.Testing/Properties/AssemblyInfo.cs
 
 jobs:
   - job: Build
     displayName: Build & Pack NuGet
     pool:
-      vmImage: windows-latest          # required for .NET Framework 4.6.2 dependency
+      vmImage: windows-latest
 
     steps:
       - checkout: self
@@ -44,20 +55,105 @@ jobs:
         displayName: Setup NuGet
 
       - task: PowerShell@2
-        displayName: Determine version
+        displayName: Determine package and assembly versions
         inputs:
           targetType: inline
           script: |
             $ref = "$(Build.SourceBranch)"
-            if ($ref -match "^refs/tags/v(.+)$") {
-              $ver = $Matches[1]
-            } elseif ("$(Build.Reason)" -eq "Manual" -and "${{ parameters.version }}" -ne "") {
-              $ver = "${{ parameters.version }}"
-            } else {
-              $ver = "1.0.0-ci.$(Build.BuildId)"
+            $baseVersion = "${{ parameters.baseVersion }}"
+            $packageType = "${{ parameters.packageType }}"
+            $buildId = [int]"$(Build.BuildId)"
+
+            if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+              throw "baseVersion must be in format Major.Minor.Patch, e.g. 1.0.0"
             }
-            Write-Host "Package version: $ver"
-            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$ver"
+
+            $parts = $baseVersion.Split('.')
+            $major = [int]$parts[0]
+            $minor = [int]$parts[1]
+            $patch = [int]$parts[2]
+
+            if ($ref -match "^refs/tags/v(.+)$") {
+              $packageVersion = $Matches[1]
+
+              if ($packageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
+                throw "Tag version '$packageVersion' is not valid."
+              }
+
+              $assemblyVersion = "$major.$minor.$patch.0"
+              $fileVersion = "$major.$minor.$patch.0"
+              $informationalVersion = $packageVersion
+
+              Write-Host "Version taken from git tag: $packageVersion"
+            }
+            else {
+              switch ($packageType) {
+                "ci" {
+                  $packageVersion = "$baseVersion-ci.$buildId"
+                }
+                "preview" {
+                  $packageVersion = "$baseVersion-preview.$buildId"
+                }
+                "rc" {
+                  $packageVersion = "$baseVersion-rc.$buildId"
+                }
+                "release" {
+                  $packageVersion = $baseVersion
+                }
+                default {
+                  throw "Unsupported packageType '$packageType'. Allowed values: ci, preview, rc, release."
+                }
+              }
+
+              $assemblyVersion = "$major.$minor.$patch.0"
+              $fileVersion = "$major.$minor.$patch.$buildId"
+              $informationalVersion = $packageVersion
+
+              Write-Host "Generated package version: $packageVersion"
+            }
+
+            Write-Host "AssemblyVersion: $assemblyVersion"
+            Write-Host "FileVersion: $fileVersion"
+            Write-Host "InformationalVersion: $informationalVersion"
+
+            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$packageVersion"
+            Write-Host "##vso[task.setvariable variable=ASSEMBLY_VERSION]$assemblyVersion"
+            Write-Host "##vso[task.setvariable variable=FILE_VERSION]$fileVersion"
+            Write-Host "##vso[task.setvariable variable=INFORMATIONAL_VERSION]$informationalVersion"
+
+      - task: PowerShell@2
+        displayName: Patch Testing AssemblyInfo.cs versions
+        inputs:
+          targetType: inline
+          script: |
+            $file = "$(Build.SourcesDirectory)/$(testingAssemblyInfoPath)"
+
+            if (-not (Test-Path $file)) {
+              throw "AssemblyInfo.cs not found: $file"
+            }
+
+            $content = Get-Content $file -Raw
+
+            $content = $content -replace 'AssemblyVersion\(".*?"\)', 'AssemblyVersion("$(ASSEMBLY_VERSION)")'
+
+            if ($content -match 'AssemblyFileVersion') {
+              $content = $content -replace 'AssemblyFileVersion\(".*?"\)', 'AssemblyFileVersion("$(FILE_VERSION)")'
+            } else {
+              $content += "`r`n[assembly: AssemblyFileVersion(""$(FILE_VERSION)"")]"
+            }
+
+            if ($content -match 'AssemblyInformationalVersion') {
+              $content = $content -replace 'AssemblyInformationalVersion\(".*?"\)', 'AssemblyInformationalVersion("$(INFORMATIONAL_VERSION)")'
+            } else {
+              $content += "`r`n[assembly: AssemblyInformationalVersion(""$(INFORMATIONAL_VERSION)"")]"
+            }
+
+            Set-Content $file -Value $content -NoNewline
+
+            Write-Host "Patched AssemblyInfo.cs:"
+            Write-Host "  AssemblyVersion=$(ASSEMBLY_VERSION)"
+            Write-Host "  FileVersion=$(FILE_VERSION)"
+            Write-Host "  InformationalVersion=$(INFORMATIONAL_VERSION)"
 
       - task: VSBuild@1
         displayName: Build .NET Framework dependency
@@ -69,6 +165,10 @@ jobs:
             /t:Rebuild
             /p:RestorePackagesConfig=true
             /p:SolutionDir=$(Build.SourcesDirectory)\
+            /p:Version=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
             /v:minimal
             /m
 
@@ -79,7 +179,7 @@ jobs:
           projects: $(testingProjectPath)
 
       - task: DotNetCoreCLI@2
-        displayName: Build & Pack Testing project
+        displayName: Build Testing project
         inputs:
           command: build
           projects: $(testingProjectPath)
@@ -87,7 +187,21 @@ jobs:
             --configuration $(configuration)
             --no-restore
             /p:Version=$(PACKAGE_VERSION)
-            /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+
+      - task: DotNetCoreCLI@2
+        displayName: Pack Testing project
+        inputs:
+          command: pack
+          packagesToPack: $(testingProjectPath)
+          nobuild: true
+          versioningScheme: byEnvVar
+          versionEnvVar: PACKAGE_VERSION
+          arguments: >
+            --configuration $(configuration)
+            --output $(Build.ArtifactStagingDirectory)
 
       - task: PublishPipelineArtifact@1
         displayName: Upload NuGet artifact
