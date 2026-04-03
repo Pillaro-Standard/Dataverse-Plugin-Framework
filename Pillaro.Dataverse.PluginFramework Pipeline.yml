@@ -45,42 +45,71 @@ jobs:
       - checkout: self
 
       - task: PowerShell@2
-        displayName: Determine version
+        displayName: Determine package and assembly versions
         inputs:
           targetType: inline
           script: |
             $ref = "$(Build.SourceBranch)"
             $baseVersion = "${{ parameters.baseVersion }}"
             $packageType = "${{ parameters.packageType }}"
-            $buildId = "$(Build.BuildId)"
+            $buildId = [int]"$(Build.BuildId)"
+
+            if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+              throw "baseVersion must be in format Major.Minor.Patch, e.g. 1.0.0"
+            }
+
+            $parts = $baseVersion.Split('.')
+            $major = [int]$parts[0]
+            $minor = [int]$parts[1]
+            $patch = [int]$parts[2]
 
             if ($ref -match "^refs/tags/v(.+)$") {
-              $ver = $Matches[1]
-              Write-Host "Version taken from git tag: $ver"
+              $packageVersion = $Matches[1]
+
+              if ($packageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
+                throw "Tag version '$packageVersion' is not valid."
+              }
+
+              $assemblyVersion = "$major.$minor.$patch.0"
+              $fileVersion = "$major.$minor.$patch.0"
+              $informationalVersion = $packageVersion
+
+              Write-Host "Version taken from git tag: $packageVersion"
             }
             else {
               switch ($packageType) {
                 "ci" {
-                  $ver = "$baseVersion-ci.$buildId"
+                  $packageVersion = "$baseVersion-ci.$buildId"
                 }
                 "preview" {
-                  $ver = "$baseVersion-preview.$buildId"
+                  $packageVersion = "$baseVersion-preview.$buildId"
                 }
                 "rc" {
-                  $ver = "$baseVersion-rc.$buildId"
+                  $packageVersion = "$baseVersion-rc.$buildId"
                 }
                 "release" {
-                  $ver = $baseVersion
+                  $packageVersion = $baseVersion
                 }
                 default {
                   throw "Unsupported packageType '$packageType'. Allowed values: ci, preview, rc, release."
                 }
               }
 
-              Write-Host "Version generated from packageType '$packageType': $ver"
+              $assemblyVersion = "$major.$minor.$patch.0"
+              $fileVersion = "$major.$minor.$patch.$buildId"
+              $informationalVersion = $packageVersion
+
+              Write-Host "Generated package version: $packageVersion"
             }
 
-            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$ver"
+            Write-Host "AssemblyVersion: $assemblyVersion"
+            Write-Host "FileVersion: $fileVersion"
+            Write-Host "InformationalVersion: $informationalVersion"
+
+            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$packageVersion"
+            Write-Host "##vso[task.setvariable variable=ASSEMBLY_VERSION]$assemblyVersion"
+            Write-Host "##vso[task.setvariable variable=FILE_VERSION]$fileVersion"
+            Write-Host "##vso[task.setvariable variable=INFORMATIONAL_VERSION]$informationalVersion"
 
       - task: PowerShell@2
         displayName: Stamp FrameworkVersion
@@ -106,6 +135,10 @@ jobs:
             /t:Rebuild
             /p:RestorePackagesConfig=true
             /p:SolutionDir=$(Build.SourcesDirectory)\
+            /p:Version=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
             /v:minimal
             /m
 
