@@ -38,7 +38,6 @@
 		<file src="..\..\..\..\LICENSE" target="LICENSE" />
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.dll" target="lib\net462" />
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
-		<!--<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net462" />-->
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\ILMerge.exe" target="Content\Tools" />
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\System.Compiler.dll" target="Content\Tools" />
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\PostBuildAction.txt" target="Content\CrmTools" />
