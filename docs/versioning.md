@@ -30,6 +30,8 @@ Examples:
 - [Branch-Based Versioning](#branch-based-versioning)
 - [Package Version Alignment](#package-version-alignment)
 - [Version Source](#version-source)
+- [Release Notes](#release-notes)
+- [Version Semantics](#version-semantics)
 - [Pre-release Labels](#pre-release-labels)
 - [Release Flow](#release-flow)
 - [Notes](#notes)
@@ -181,6 +183,55 @@ The pipeline is responsible for:
 
 ---
 
+---
+
+## Release Notes
+
+Release notes are maintained in the central [CHANGELOG.md](../CHANGELOG.md) file.
+
+Each version contains **separate sections per package**.
+
+Example changelog structure:
+
+    ## 1.0.0-rc
+
+    ### Pillaro.Dataverse.PluginFramework
+    - Core framework changes
+
+    ### Pillaro.Dataverse.PluginFramework.Testing
+    - Testing-specific changes
+
+During the build process:
+
+* each package receives only its relevant section
+* NuGet metadata is populated automatically from the changelog
+
+---
+
+## Version Semantics
+
+The version number represents a **release of the entire framework ecosystem**, not just a single package.
+
+This means:
+
+* all packages share the same version
+* not all packages must change in every release
+
+Example:
+
+    1.0.1
+
+* Framework → no changes
+* Testing → bug fix
+
+This approach ensures:
+
+* compatibility across packages
+* simplified dependency management
+* predictable upgrades
+
+---
+
 ## Pre-release Labels
 
 | Label     | Purpose                                    |
@@ -208,3 +259,5 @@ Typical release flow:
 * Stable releases are always published from `main`
 * Prerelease versions are intended for testing and early adoption
 * Feature builds are not part of the public release cycle
+* Release notes are stored in [CHANGELOG.md](../CHANGELOG.md)
+* Each package includes only its own relevant changes

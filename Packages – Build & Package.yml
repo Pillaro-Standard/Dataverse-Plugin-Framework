@@ -1,0 +1,279 @@
+name: Packages – Build & Package
+
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+  tags:
+    include:
+      - v*
+
+pr:
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: baseVersion
+    displayName: 'Base version (e.g. 1.0.0)'
+    type: string
+    default: '1.0.0'
+
+  - name: packageType
+    displayName: 'Package type'
+    type: string
+    default: 'ci'
+    values:
+      - ci
+      - preview
+      - rc
+      - release
+
+variables:
+  configuration: Release
+
+  frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
+  frameworkAssemblyInfoPath: src/Pillaro.Dataverse.PluginFramework/Properties/AssemblyInfo.cs
+  frameworkConstantsPath: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
+  frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+
+  testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
+
+  changelogPath: CHANGELOG.md
+
+jobs:
+  - job: Build
+    displayName: Build & Pack Packages
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 0
+
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: '10.x'
+
+      - task: NuGetToolInstaller@1
+        displayName: Setup NuGet
+
+      - task: PowerShell@2
+        displayName: Determine package and assembly versions
+        inputs:
+          targetType: inline
+          script: |
+            $ref = "$(Build.SourceBranch)"
+            $baseVersion = "${{ parameters.baseVersion }}"
+            $packageType = "${{ parameters.packageType }}"
+            $buildId = [int]"$(Build.BuildId)"
+
+            if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+              throw "baseVersion must be in format Major.Minor.Patch, e.g. 1.0.0"
+            }
+
+            $parts = $baseVersion.Split('.')
+            $major = [int]$parts[0]
+            $minor = [int]$parts[1]
+            $patch = [int]$parts[2]
+
+            if ($ref -match "^refs/tags/v(.+)$") {
+              $packageVersion = $Matches[1]
+
+              if ($packageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
+                throw "Tag version '$packageVersion' is not valid."
+              }
+
+              $assemblyVersion = "$major.$minor.$patch.0"
+              $fileVersion = "$major.$minor.$patch.0"
+              $informationalVersion = $packageVersion
+            }
+            else {
+              switch ($packageType) {
+                "ci"      { $packageVersion = "$baseVersion-ci.$buildId" }
+                "preview" { $packageVersion = "$baseVersion-preview.$buildId" }
+                "rc"      { $packageVersion = "$baseVersion-rc.$buildId" }
+                "release" { $packageVersion = $baseVersion }
+                default   { throw "Unsupported packageType '$packageType'." }
+              }
+
+              $assemblyVersion = "$major.$minor.$patch.0"
+              $fileVersion = "$major.$minor.$patch.$buildId"
+              $informationalVersion = $packageVersion
+            }
+
+            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$packageVersion"
+            Write-Host "##vso[task.setvariable variable=ASSEMBLY_VERSION]$assemblyVersion"
+            Write-Host "##vso[task.setvariable variable=FILE_VERSION]$fileVersion"
+            Write-Host "##vso[task.setvariable variable=INFORMATIONAL_VERSION]$informationalVersion"
+
+      - task: PowerShell@2
+        displayName: Read release notes from CHANGELOG.md
+        inputs:
+          targetType: inline
+          script: |
+            $path = "$(Build.SourcesDirectory)/$(changelogPath)"
+
+            if (-not (Test-Path $path)) {
+              throw "CHANGELOG.md not found: $path"
+            }
+
+            $content = Get-Content $path -Raw
+
+            $releaseMatch = [regex]::Match(
+              $content,
+              '(?ms)^##\s+.+?(?=^##\s+|\z)'
+            )
+
+            if (-not $releaseMatch.Success) {
+              throw "No release section found in CHANGELOG.md"
+            }
+
+            $releaseSection = $releaseMatch.Value
+
+            $frameworkMatch = [regex]::Match(
+              $releaseSection,
+              '(?ms)^###\s+Pillaro\.Dataverse\.PluginFramework\s*\r?\n(?<body>.*?)(?=^###\s+|\z)'
+            )
+
+            $testingMatch = [regex]::Match(
+              $releaseSection,
+              '(?ms)^###\s+Pillaro\.Dataverse\.PluginFramework\.Testing\s*\r?\n(?<body>.*?)(?=^###\s+|\z)'
+            )
+
+            if (-not $frameworkMatch.Success) {
+              throw "Framework release notes section not found in latest CHANGELOG.md release."
+            }
+
+            if (-not $testingMatch.Success) {
+              throw "Testing release notes section not found in latest CHANGELOG.md release."
+            }
+
+            $frameworkNotes = $frameworkMatch.Groups['body'].Value.Trim()
+            $testingNotes = $testingMatch.Groups['body'].Value.Trim()
+
+            $frameworkNotesEscaped = $frameworkNotes -replace "`r","%0D" -replace "`n","%0A"
+            $testingNotesEscaped = $testingNotes -replace "`r","%0D" -replace "`n","%0A"
+
+            Write-Host "##vso[task.setvariable variable=FRAMEWORK_RELEASE_NOTES]$frameworkNotesEscaped"
+            Write-Host "##vso[task.setvariable variable=TESTING_RELEASE_NOTES]$testingNotesEscaped"
+
+      - task: PowerShell@2
+        displayName: Stamp FrameworkVersion
+        inputs:
+          targetType: inline
+          script: |
+            $file = "$(Build.SourcesDirectory)/$(frameworkConstantsPath)"
+            $content = Get-Content $file -Raw
+            $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
+            Set-Content $file -Value $updated -NoNewline
+
+      - task: PowerShell@2
+        displayName: Patch Framework AssemblyInfo.cs versions
+        inputs:
+          targetType: inline
+          script: |
+            $file = "$(Build.SourcesDirectory)/$(frameworkAssemblyInfoPath)"
+            $content = Get-Content $file -Raw
+
+            $content = $content -replace 'AssemblyVersion\(".*?"\)', 'AssemblyVersion("$(ASSEMBLY_VERSION)")'
+
+            if ($content -match 'AssemblyFileVersion') {
+              $content = $content -replace 'AssemblyFileVersion\(".*?"\)', 'AssemblyFileVersion("$(FILE_VERSION)")'
+            } else {
+              $content += "`r`n[assembly: AssemblyFileVersion(""$(FILE_VERSION)"")]"
+            }
+
+            if ($content -match 'AssemblyInformationalVersion') {
+              $content = $content -replace 'AssemblyInformationalVersion\(".*?"\)', 'AssemblyInformationalVersion("$(INFORMATIONAL_VERSION)")'
+            } else {
+              $content += "`r`n[assembly: AssemblyInformationalVersion(""$(INFORMATIONAL_VERSION)"")]"
+            }
+
+            Set-Content $file -Value $content -NoNewline
+
+      - task: PowerShell@2
+        displayName: Inject framework release notes into nuspec
+        inputs:
+          targetType: inline
+          script: |
+            $nuspec = "$(Build.SourcesDirectory)/$(frameworkNuspecPath)"
+            [xml]$xml = Get-Content $nuspec
+            $metadata = $xml.package.metadata
+
+            if ($metadata.releaseNotes) {
+              $metadata.releaseNotes = "$(FRAMEWORK_RELEASE_NOTES)"
+            } else {
+              $node = $xml.CreateElement("releaseNotes")
+              $node.InnerText = "$(FRAMEWORK_RELEASE_NOTES)"
+              $metadata.AppendChild($node) | Out-Null
+            }
+
+            $xml.Save($nuspec)
+
+      - task: VSBuild@1
+        displayName: Build framework project
+        inputs:
+          solution: $(frameworkProjectPath)
+          configuration: $(configuration)
+          msbuildArgs: >
+            /restore
+            /t:Rebuild
+            /p:RestorePackagesConfig=true
+            /p:SolutionDir=$(Build.SourcesDirectory)\
+            /p:Version=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /v:minimal
+            /m
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore testing project
+        inputs:
+          command: restore
+          projects: $(testingProjectPath)
+
+      - task: DotNetCoreCLI@2
+        displayName: Build testing project
+        inputs:
+          command: build
+          projects: $(testingProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+            /p:Version=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:IncludeSourceRevisionInInformationalVersion=false
+
+      - script: >
+          nuget pack "$(frameworkNuspecPath)"
+          -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
+          -OutputDirectory "$(Build.ArtifactStagingDirectory)"
+          -NonInteractive
+        displayName: Pack framework package
+
+      - task: DotNetCoreCLI@2
+        displayName: Pack testing project
+        inputs:
+          command: pack
+          packagesToPack: $(testingProjectPath)
+          nobuild: true
+          versioningScheme: byEnvVar
+          versionEnvVar: PACKAGE_VERSION
+          arguments: >
+            --configuration $(configuration)
+            --output $(Build.ArtifactStagingDirectory)
+            /p:PackageReleaseNotes="$(TESTING_RELEASE_NOTES)"
+            /p:IncludeSourceRevisionInInformationalVersion=false
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload NuGet artifacts
+        inputs:
+          targetPath: $(Build.ArtifactStagingDirectory)
+          artifact: nuget-packages

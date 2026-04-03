@@ -25,6 +25,7 @@
 		<RepositoryUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageProjectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</PackageProjectUrl>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	

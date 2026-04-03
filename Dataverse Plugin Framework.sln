@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		.gitignore = .gitignore
 		LICENSE = LICENSE
 		NuGet.config = NuGet.config
+		Packages – Build & Package.yml = Packages – Build & Package.yml
 		Pillaro.Dataverse.PluginFramework Pipeline.yml = Pillaro.Dataverse.PluginFramework Pipeline.yml
 		Pillaro.Dataverse.PluginFramework.Testing Pipeline.yml = Pillaro.Dataverse.PluginFramework.Testing Pipeline.yml
 		README.md = README.md
@@ -36,10 +37,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFramework.Testing", "src\Pillaro.Dataverse.PluginFramework.Testing\Pillaro.Dataverse.PluginFramework.Testing.csproj", "{7B421594-81D0-E65B-3733-217F5B90AC68}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AE8F22ED-AC80-4C78-A94B-091FB7B070A3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}"
 	ProjectSection(SolutionItems) = preProject
-		docs\versioning.md = docs\versioning.md
+		docs\changelog.md = docs\changelog.md
 		docs\README.md = docs\README.md
+		docs\versioning.md = docs\versioning.md
 	EndProjectSection
 EndProject
 Global
