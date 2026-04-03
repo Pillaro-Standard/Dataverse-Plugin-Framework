@@ -1,4 +1,4 @@
-name: Testing – Build & Package
+name: Testing Framework – Build & Package
 
 trigger:
   branches:
