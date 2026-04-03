@@ -15,10 +15,20 @@ pr:
       - main
 
 parameters:
-  - name: version
-    displayName: 'Package version (e.g. 1.0.0)'
+  - name: baseVersion
+    displayName: 'Base version (e.g. 1.0.0)'
     type: string
     default: '1.0.0'
+
+  - name: packageType
+    displayName: 'Package type'
+    type: string
+    default: 'ci'
+    values:
+      - ci
+      - preview
+      - rc
+      - release
 
 variables:
   configuration: Release
@@ -40,14 +50,36 @@ jobs:
           targetType: inline
           script: |
             $ref = "$(Build.SourceBranch)"
+            $baseVersion = "${{ parameters.baseVersion }}"
+            $packageType = "${{ parameters.packageType }}"
+            $buildId = "$(Build.BuildId)"
+
             if ($ref -match "^refs/tags/v(.+)$") {
               $ver = $Matches[1]
-            } elseif ("$(Build.Reason)" -eq "Manual" -and "${{ parameters.version }}" -ne "") {
-              $ver = "${{ parameters.version }}"
-            } else {
-              $ver = "1.0.0-ci.$(Build.BuildId)"
+              Write-Host "Version taken from git tag: $ver"
             }
-            Write-Host "Package version: $ver"
+            else {
+              switch ($packageType) {
+                "ci" {
+                  $ver = "$baseVersion-ci.$buildId"
+                }
+                "preview" {
+                  $ver = "$baseVersion-preview.$buildId"
+                }
+                "rc" {
+                  $ver = "$baseVersion-rc.$buildId"
+                }
+                "release" {
+                  $ver = $baseVersion
+                }
+                default {
+                  throw "Unsupported packageType '$packageType'. Allowed values: ci, preview, rc, release."
+                }
+              }
+
+              Write-Host "Version generated from packageType '$packageType': $ver"
+            }
+
             Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$ver"
 
       - task: PowerShell@2

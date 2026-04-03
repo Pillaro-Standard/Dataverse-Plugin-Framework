@@ -38,8 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AE8F22ED-AC80-4C78-A94B-091FB7B070A3}"
 	ProjectSection(SolutionItems) = preProject
-		docs\index.md = docs\index.md
 		docs\versioning.md = docs\versioning.md
+		docs\README.md = docs\README.md
 	EndProjectSection
 EndProject
 Global
