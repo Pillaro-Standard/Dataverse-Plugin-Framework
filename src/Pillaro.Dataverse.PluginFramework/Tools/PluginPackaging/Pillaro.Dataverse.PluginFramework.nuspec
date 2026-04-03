@@ -7,7 +7,7 @@
 		<owners>Pillaro Labs s.r.o.</owners>
 		<copyright>Copyright © 2026 Pillaro Labs s.r.o.</copyright>
 
-		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="file">LICENSE</license>
 
 		<projectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</projectUrl>
@@ -20,7 +20,8 @@
 		</description>
 
 		<releaseNotes>
-			Initial release of Pillaro Dataverse Plugin Framework.
+			Initial public release of Pillaro Dataverse Plugin Framework including base framework assembly,
+			XML documentation, and build tooling for Dataverse plugin packaging.
 		</releaseNotes>
 
 		<tags>dataverse dynamics crm plugin framework xrm</tags>
@@ -38,7 +39,7 @@
 		<file src="..\..\..\..\LICENSE" target="LICENSE" />
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.dll" target="lib\net462" />
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
-		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net462" />
+		<!--<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net462" />-->
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\ILMerge.exe" target="Content\Tools" />
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\System.Compiler.dll" target="Content\Tools" />
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\PostBuildAction.txt" target="Content\CrmTools" />

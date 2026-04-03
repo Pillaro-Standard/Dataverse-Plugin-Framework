@@ -1,0 +1,96 @@
+name: Testing – Build & Package
+
+trigger:
+  branches:
+    include:
+      - main
+      - release/*
+  tags:
+    include:
+      - v*
+
+pr:
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: version
+    displayName: 'Package version (e.g. 1.0.0)'
+    type: string
+    default: '1.0.0'
+
+variables:
+  configuration: Release
+  testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
+  frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
+
+jobs:
+  - job: Build
+    displayName: Build & Pack NuGet
+    pool:
+      vmImage: windows-latest          # required for .NET Framework 4.6.2 dependency
+
+    steps:
+      - checkout: self
+
+      - task: UseDotNet@2
+        displayName: Install .NET 10 SDK
+        inputs:
+          packageType: sdk
+          version: '10.x'
+
+      - task: NuGetToolInstaller@1
+        displayName: Setup NuGet
+
+      - task: PowerShell@2
+        displayName: Determine version
+        inputs:
+          targetType: inline
+          script: |
+            $ref = "$(Build.SourceBranch)"
+            if ($ref -match "^refs/tags/v(.+)$") {
+              $ver = $Matches[1]
+            } elseif ("$(Build.Reason)" -eq "Manual" -and "${{ parameters.version }}" -ne "") {
+              $ver = "${{ parameters.version }}"
+            } else {
+              $ver = "1.0.0-ci.$(Build.BuildId)"
+            }
+            Write-Host "Package version: $ver"
+            Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION]$ver"
+
+      - task: VSBuild@1
+        displayName: Build .NET Framework dependency
+        inputs:
+          solution: $(frameworkProjectPath)
+          configuration: $(configuration)
+          msbuildArgs: >
+            /restore
+            /t:Rebuild
+            /p:RestorePackagesConfig=true
+            /p:SolutionDir=$(Build.SourcesDirectory)\
+            /v:minimal
+            /m
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore Testing project
+        inputs:
+          command: restore
+          projects: $(testingProjectPath)
+
+      - task: DotNetCoreCLI@2
+        displayName: Build & Pack Testing project
+        inputs:
+          command: build
+          projects: $(testingProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload NuGet artifact
+        inputs:
+          targetPath: $(Build.ArtifactStagingDirectory)
+          artifact: nuget-package
