@@ -121,40 +121,6 @@ jobs:
             Write-Host "##vso[task.setvariable variable=FILE_VERSION]$fileVersion"
             Write-Host "##vso[task.setvariable variable=INFORMATIONAL_VERSION]$informationalVersion"
 
-      - task: PowerShell@2
-        displayName: Patch Testing AssemblyInfo.cs versions
-        inputs:
-          targetType: inline
-          script: |
-            $file = "$(Build.SourcesDirectory)/$(testingAssemblyInfoPath)"
-
-            if (-not (Test-Path $file)) {
-              throw "AssemblyInfo.cs not found: $file"
-            }
-
-            $content = Get-Content $file -Raw
-
-            $content = $content -replace 'AssemblyVersion\(".*?"\)', 'AssemblyVersion("$(ASSEMBLY_VERSION)")'
-
-            if ($content -match 'AssemblyFileVersion') {
-              $content = $content -replace 'AssemblyFileVersion\(".*?"\)', 'AssemblyFileVersion("$(FILE_VERSION)")'
-            } else {
-              $content += "`r`n[assembly: AssemblyFileVersion(""$(FILE_VERSION)"")]"
-            }
-
-            if ($content -match 'AssemblyInformationalVersion') {
-              $content = $content -replace 'AssemblyInformationalVersion\(".*?"\)', 'AssemblyInformationalVersion("$(INFORMATIONAL_VERSION)")'
-            } else {
-              $content += "`r`n[assembly: AssemblyInformationalVersion(""$(INFORMATIONAL_VERSION)"")]"
-            }
-
-            Set-Content $file -Value $content -NoNewline
-
-            Write-Host "Patched AssemblyInfo.cs:"
-            Write-Host "  AssemblyVersion=$(ASSEMBLY_VERSION)"
-            Write-Host "  FileVersion=$(FILE_VERSION)"
-            Write-Host "  InformationalVersion=$(INFORMATIONAL_VERSION)"
-
       - task: VSBuild@1
         displayName: Build .NET Framework dependency
         inputs:
