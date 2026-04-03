@@ -1,4 +1,4 @@
-name: Build & Package
+﻿name: Build & Package
 
 trigger:
   branches:
@@ -121,6 +121,39 @@ jobs:
             $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
             Set-Content $file -Value $updated -NoNewline
             Write-Host "Stamped FrameworkVersion = `"$(PACKAGE_VERSION)`""
+
+      - task: PowerShell@2
+        displayName: Patch AssemblyInfo.cs versions
+        inputs:
+          targetType: inline
+          script: |
+            $file = "$(Build.SourcesDirectory)/src/Pillaro.Dataverse.PluginFramework/Properties/AssemblyInfo.cs"
+
+            $content = Get-Content $file -Raw
+
+            # AssemblyVersion (stabilní)
+            $content = $content -replace 'AssemblyVersion\(".*?"\)', 'AssemblyVersion("$(ASSEMBLY_VERSION)")'
+
+            # FileVersion (číselná)
+            if ($content -match 'AssemblyFileVersion') {
+              $content = $content -replace 'AssemblyFileVersion\(".*?"\)', 'AssemblyFileVersion("$(FILE_VERSION)")'
+            } else {
+              $content += "`n[assembly: AssemblyFileVersion(""$(FILE_VERSION)"")]"
+            }
+
+            # InformationalVersion (full semver)
+            if ($content -match 'AssemblyInformationalVersion') {
+              $content = $content -replace 'AssemblyInformationalVersion\(".*?"\)', 'AssemblyInformationalVersion("$(INFORMATIONAL_VERSION)")'
+            } else {
+              $content += "`n[assembly: AssemblyInformationalVersion(""$(INFORMATIONAL_VERSION)"")]"
+            }
+
+            Set-Content $file -Value $content -NoNewline
+
+            Write-Host "AssemblyInfo patched:"
+            Write-Host "  AssemblyVersion=$(ASSEMBLY_VERSION)"
+            Write-Host "  FileVersion=$(FILE_VERSION)"
+            Write-Host "  InformationalVersion=$(INFORMATIONAL_VERSION)"
 
       - task: NuGetToolInstaller@1
         displayName: Setup NuGet
