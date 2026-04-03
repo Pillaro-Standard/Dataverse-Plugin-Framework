@@ -40,7 +40,7 @@ variables:
 
   testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
 
-  changelogPath: docs/changelog.md
+  changelogPath: CHANGELOG.md
 
 jobs:
   - job: Build

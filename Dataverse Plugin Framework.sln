@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		LICENSE = LICENSE
+		CHANGELOG.md = CHANGELOG.md
 		NuGet.config = NuGet.config
 		Packages – Build & Package.yml = Packages – Build & Package.yml
 		Pillaro.Dataverse.PluginFramework Pipeline.yml = Pillaro.Dataverse.PluginFramework Pipeline.yml
@@ -39,9 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}"
 	ProjectSection(SolutionItems) = preProject
-		docs\changelog.md = docs\changelog.md
 		docs\README.md = docs\README.md
-		docs\versioning.md = docs\versioning.md
+		docs\VERSIONING.md = docs\VERSIONING.md
 	EndProjectSection
 EndProject
 Global
