@@ -39,6 +39,7 @@ variables:
   frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
   testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
+  testingNuspecPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.nuspec
 
   changelogPath: CHANGELOG.md
 
@@ -111,17 +112,28 @@ jobs:
             Write-Host "##vso[task.setvariable variable=INFORMATIONAL_VERSION]$informationalVersion"
 
       - task: PowerShell@2
-        displayName: Read release notes from CHANGELOG.md
+        displayName: Read CHANGELOG.md and inject release notes into package metadata
         inputs:
           targetType: inline
           script: |
-            $path = "$(Build.SourcesDirectory)/$(changelogPath)"
+            $changelogPath = "$(Build.SourcesDirectory)/$(changelogPath)"
+            $frameworkNuspecPath = "$(Build.SourcesDirectory)/$(frameworkNuspecPath)"
+            $testingProjectPath = "$(Build.SourcesDirectory)/$(testingProjectPath)"
+            $testingNuspecPath = "$(Build.SourcesDirectory)/$(testingNuspecPath)"
 
-            if (-not (Test-Path $path)) {
-              throw "CHANGELOG.md not found: $path"
+            if (-not (Test-Path $changelogPath)) {
+              throw "CHANGELOG.md not found: $changelogPath"
             }
 
-            $content = Get-Content $path -Raw
+            if (-not (Test-Path $frameworkNuspecPath)) {
+              throw "Framework nuspec not found: $frameworkNuspecPath"
+            }
+
+            if (-not (Test-Path $testingProjectPath)) {
+              throw "Testing project not found: $testingProjectPath"
+            }
+
+            $content = Get-Content $changelogPath -Raw
 
             $releaseMatch = [regex]::Match(
               $content,
@@ -155,11 +167,89 @@ jobs:
             $frameworkNotes = $frameworkMatch.Groups['body'].Value.Trim()
             $testingNotes = $testingMatch.Groups['body'].Value.Trim()
 
-            $frameworkNotesEscaped = $frameworkNotes -replace "`r","%0D" -replace "`n","%0A"
-            $testingNotesEscaped = $testingNotes -replace "`r","%0D" -replace "`n","%0A"
+            function Set-NuspecReleaseNotes {
+              param(
+                [Parameter(Mandatory = $true)][string]$Path,
+                [Parameter(Mandatory = $true)][string]$ReleaseNotes
+              )
 
-            Write-Host "##vso[task.setvariable variable=FRAMEWORK_RELEASE_NOTES]$frameworkNotesEscaped"
-            Write-Host "##vso[task.setvariable variable=TESTING_RELEASE_NOTES]$testingNotesEscaped"
+              $xml = New-Object System.Xml.XmlDocument
+              $xml.PreserveWhitespace = $true
+              $xml.Load($Path)
+
+              $namespaceUri = $xml.DocumentElement.NamespaceURI
+              $ns = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+
+              if ([string]::IsNullOrWhiteSpace($namespaceUri)) {
+                $metadataNode = $xml.SelectSingleNode('/package/metadata')
+                $releaseNotesNode = $xml.SelectSingleNode('/package/metadata/releaseNotes')
+              }
+              else {
+                $ns.AddNamespace('n', $namespaceUri)
+                $metadataNode = $xml.SelectSingleNode('/n:package/n:metadata', $ns)
+                $releaseNotesNode = $xml.SelectSingleNode('/n:package/n:metadata/n:releaseNotes', $ns)
+              }
+
+              if ($null -eq $metadataNode) {
+                throw "metadata node not found in nuspec: $Path"
+              }
+
+              if ($null -eq $releaseNotesNode) {
+                if ([string]::IsNullOrWhiteSpace($namespaceUri)) {
+                  $releaseNotesNode = $xml.CreateElement('releaseNotes')
+                }
+                else {
+                  $releaseNotesNode = $xml.CreateElement('releaseNotes', $namespaceUri)
+                }
+
+                $metadataNode.AppendChild($releaseNotesNode) | Out-Null
+              }
+
+              $releaseNotesNode.InnerText = $ReleaseNotes
+              $xml.Save($Path)
+            }
+
+            function Set-CsprojPackageReleaseNotes {
+              param(
+                [Parameter(Mandatory = $true)][string]$Path,
+                [Parameter(Mandatory = $true)][string]$ReleaseNotes
+              )
+
+              $xml = New-Object System.Xml.XmlDocument
+              $xml.PreserveWhitespace = $true
+              $xml.Load($Path)
+
+              $projectNode = $xml.SelectSingleNode('/Project')
+              if ($null -eq $projectNode) {
+                throw "Project node not found in csproj: $Path"
+              }
+
+              $propertyGroup = $xml.SelectSingleNode('/Project/PropertyGroup[PackageId]')
+              if ($null -eq $propertyGroup) {
+                $propertyGroup = $xml.SelectSingleNode('/Project/PropertyGroup')
+              }
+
+              if ($null -eq $propertyGroup) {
+                $propertyGroup = $xml.CreateElement('PropertyGroup')
+                $projectNode.AppendChild($propertyGroup) | Out-Null
+              }
+
+              $releaseNotesNode = $propertyGroup.SelectSingleNode('PackageReleaseNotes')
+              if ($null -eq $releaseNotesNode) {
+                $releaseNotesNode = $xml.CreateElement('PackageReleaseNotes')
+                $propertyGroup.AppendChild($releaseNotesNode) | Out-Null
+              }
+
+              $releaseNotesNode.InnerText = $ReleaseNotes
+              $xml.Save($Path)
+            }
+
+            Set-NuspecReleaseNotes -Path $frameworkNuspecPath -ReleaseNotes $frameworkNotes
+            Set-CsprojPackageReleaseNotes -Path $testingProjectPath -ReleaseNotes $testingNotes
+
+            if (Test-Path $testingNuspecPath) {
+              Set-NuspecReleaseNotes -Path $testingNuspecPath -ReleaseNotes $testingNotes
+            }
 
       - task: PowerShell@2
         displayName: Stamp FrameworkVersion
@@ -184,35 +274,16 @@ jobs:
             if ($content -match 'AssemblyFileVersion') {
               $content = $content -replace 'AssemblyFileVersion\(".*?"\)', 'AssemblyFileVersion("$(FILE_VERSION)")'
             } else {
-              $content += "`r`n[assembly: AssemblyFileVersion(""$(FILE_VERSION)"")]"
+              $content += "`r`n[assembly: AssemblyFileVersion(\"$(FILE_VERSION)\")]"
             }
 
             if ($content -match 'AssemblyInformationalVersion') {
               $content = $content -replace 'AssemblyInformationalVersion\(".*?"\)', 'AssemblyInformationalVersion("$(INFORMATIONAL_VERSION)")'
             } else {
-              $content += "`r`n[assembly: AssemblyInformationalVersion(""$(INFORMATIONAL_VERSION)"")]"
+              $content += "`r`n[assembly: AssemblyInformationalVersion(\"$(INFORMATIONAL_VERSION)\")]"
             }
 
             Set-Content $file -Value $content -NoNewline
-
-      - task: PowerShell@2
-        displayName: Inject framework release notes into nuspec
-        inputs:
-          targetType: inline
-          script: |
-            $nuspec = "$(Build.SourcesDirectory)/$(frameworkNuspecPath)"
-            [xml]$xml = Get-Content $nuspec
-            $metadata = $xml.package.metadata
-
-            if ($metadata.releaseNotes) {
-              $metadata.releaseNotes = "$(FRAMEWORK_RELEASE_NOTES)"
-            } else {
-              $node = $xml.CreateElement("releaseNotes")
-              $node.InnerText = "$(FRAMEWORK_RELEASE_NOTES)"
-              $metadata.AppendChild($node) | Out-Null
-            }
-
-            $xml.Save($nuspec)
 
       - task: VSBuild@1
         displayName: Build framework project
@@ -253,7 +324,6 @@ jobs:
             /p:IncludeSourceRevisionInInformationalVersion=false
             /p:GeneratePackageOnBuild=false
 
-
       - script: >
           nuget pack "$(frameworkNuspecPath)"
           -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
@@ -274,7 +344,6 @@ jobs:
             --output $(Build.ArtifactStagingDirectory)
             /p:Version=$(PACKAGE_VERSION)
             /p:PackageVersion=$(PACKAGE_VERSION)
-            /p:PackageReleaseNotes="$(TESTING_RELEASE_NOTES)"
             /p:IncludeSourceRevisionInInformationalVersion=false
             /p:GeneratePackageOnBuild=false
 
