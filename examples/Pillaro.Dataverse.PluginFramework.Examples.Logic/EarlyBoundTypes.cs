@@ -15,7 +15,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum openaischemaversion
 	{
 		
@@ -24,7 +24,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum aioperationoverridetype
 	{
 		
@@ -36,7 +36,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum servertype
 	{
 		
@@ -45,7 +45,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum goal_fiscalperiod
 	{
 		
@@ -147,7 +147,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum goal_fiscalyear
 	{
 		
@@ -360,7 +360,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum metric_goaltype
 	{
 		
@@ -375,7 +375,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum componentstate
 	{
 		
@@ -393,7 +393,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocadminmode
 	{
 		
@@ -405,7 +405,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_sessiontypeoptions
 	{
 		
@@ -417,7 +417,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum optionset_runreport
 	{
 		
@@ -432,7 +432,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iotsearchtype
 	{
 		
@@ -444,7 +444,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum delete_recurringappointmentmaster
 	{
 		
@@ -456,7 +456,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_sequencetemplatesupportedlanguages
 	{
 		
@@ -597,7 +597,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_salesagenthandoverintenttype
 	{
 		
@@ -615,7 +615,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum workflowlog_objecttypecode
 	{
 		
@@ -630,7 +630,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversationcharacteristicsource
 	{
 		
@@ -645,7 +645,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_opportunitymappingtype
 	{
 		
@@ -660,7 +660,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_jurisdiction
 	{
 		
@@ -672,7 +672,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_targettype
 	{
 		
@@ -690,7 +690,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum addlistcampaign
 	{
 		
@@ -702,7 +702,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consentlinktype
 	{
 		
@@ -720,7 +720,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_to_lead_disqualify_status
 	{
 		
@@ -738,7 +738,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_consoleapplicationnotificationaction
 	{
 		
@@ -750,7 +750,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_options
 	{
 		
@@ -768,7 +768,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_overflowactiontype
 	{
 		
@@ -798,7 +798,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consentmodel
 	{
 		
@@ -810,7 +810,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum powerpagecomponenttype
 	{
 		
@@ -909,7 +909,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum botcomponentreusepolicy
 	{
 		
@@ -924,7 +924,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_intent_source
 	{
 		
@@ -939,7 +939,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_actionchoices
 	{
 		
@@ -954,7 +954,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum backendtooltype
 	{
 		
@@ -978,7 +978,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum qooiproduct_propertiesconfigurationstatus
 	{
 		
@@ -993,7 +993,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum organization_applicationbasedaccesscontrolmode
 	{
 		
@@ -1011,7 +1011,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum purchasetimeframe
 	{
 		
@@ -1032,7 +1032,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_invitestatus
 	{
 		
@@ -1050,7 +1050,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversationaction_language_locale
 	{
 		
@@ -1191,7 +1191,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_flow_approval_priority
 	{
 		
@@ -1209,7 +1209,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum rundesktopflowconnectiontype
 	{
 		
@@ -1221,7 +1221,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_purposetype
 	{
 		
@@ -1236,7 +1236,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_routingfailurestage
 	{
 		
@@ -1251,7 +1251,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum yearlymonth_options
 	{
 		
@@ -1293,7 +1293,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum need
 	{
 		
@@ -1311,7 +1311,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_timetrackercategoryoptionset
 	{
 		
@@ -1326,7 +1326,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_desktopnotificationvisibility
 	{
 		
@@ -1341,7 +1341,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_preferredagentbackupmode
 	{
 		
@@ -1353,7 +1353,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_block_types
 	{
 		
@@ -1368,7 +1368,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_intentreviewstate_source
 	{
 		
@@ -1380,7 +1380,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ci_locale
 	{
 		
@@ -1494,7 +1494,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_analyticsreporttype
 	{
 		
@@ -1509,7 +1509,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_datasettype
 	{
 		
@@ -1524,7 +1524,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum mspp_columnpermissionvalues
 	{
 		
@@ -1539,7 +1539,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_directcallbackaction
 	{
 		
@@ -1551,7 +1551,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum powerpagelanguages
 	{
 		
@@ -1692,7 +1692,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum registrationstatustype
 	{
 		
@@ -1710,7 +1710,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_workdistributionmode
 	{
 		
@@ -1722,7 +1722,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_computationaccuracy
 	{
 		
@@ -1734,7 +1734,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_predictivescoretrend
 	{
 		
@@ -1752,7 +1752,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_flow_approval_requesttype
 	{
 		
@@ -1770,7 +1770,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum connectionrole_category
 	{
 		
@@ -1800,7 +1800,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_queuetype
 	{
 		
@@ -1812,7 +1812,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum fullsyncstate
 	{
 		
@@ -1839,7 +1839,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_assignmentconfigurationsteptype
 	{
 		
@@ -1854,7 +1854,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum repeatpattern_options
 	{
 		
@@ -1872,7 +1872,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum isinherited
 	{
 		
@@ -1884,7 +1884,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_screenpoptimeout
 	{
 		
@@ -1920,7 +1920,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum makerfewshotsqlcorrectness
 	{
 		
@@ -1938,7 +1938,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_capacityformat
 	{
 		
@@ -1950,7 +1950,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_applicationtype
 	{
 		
@@ -1980,7 +1980,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_purposeenforcementmodel
 	{
 		
@@ -1995,7 +1995,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum powerbimashupparametervaluesource
 	{
 		
@@ -2010,7 +2010,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum initialcommunication
 	{
 		
@@ -2022,7 +2022,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum botcomponentcollectionsharingroletype
 	{
 		
@@ -2037,7 +2037,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocskillidentmlmodelstatus
 	{
 		
@@ -2052,7 +2052,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_personalmessage_localefield
 	{
 		
@@ -2193,7 +2193,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversation_statuscode
 	{
 		
@@ -2214,7 +2214,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_directcallbackqueuesetting
 	{
 		
@@ -2226,7 +2226,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_panelstateoptions
 	{
 		
@@ -2241,7 +2241,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum orginsightsconfiguration_plotoption
 	{
 		
@@ -2280,7 +2280,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkexternaltablestate
 	{
 		
@@ -2301,7 +2301,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_contactpointtype
 	{
 		
@@ -2319,7 +2319,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_sessionoutcomereason
 	{
 		
@@ -2352,7 +2352,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinksynapsetablecreationstate
 	{
 		
@@ -2370,7 +2370,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_spamtype
 	{
 		
@@ -2382,7 +2382,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_flaggedstatus
 	{
 		
@@ -2397,7 +2397,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_agentinputlanguage
 	{
 		
@@ -2535,7 +2535,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocrichobjecttype
 	{
 		
@@ -2571,7 +2571,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_fittype
 	{
 		
@@ -2583,7 +2583,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_picklistsupportedlanguages
 	{
 		
@@ -2727,7 +2727,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_eventmetadataintegrationstatus
 	{
 		
@@ -2742,7 +2742,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum servicestage
 	{
 		
@@ -2757,7 +2757,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum incidentresolutionformtype
 	{
 		
@@ -2772,7 +2772,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_source
 	{
 		
@@ -2787,7 +2787,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_salesagenthandovertarget
 	{
 		
@@ -2805,7 +2805,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum budgetstatus
 	{
 		
@@ -2823,7 +2823,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum selection_rule_quantity
 	{
 		
@@ -2892,7 +2892,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sharepointdocumentlocation_locationtype
 	{
 		
@@ -2904,7 +2904,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum pl_taskstatus
 	{
 		
@@ -2919,7 +2919,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_propertytype
 	{
 		
@@ -2937,7 +2937,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum pl_pluginmode
 	{
 		
@@ -2949,7 +2949,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum botsharingroletypes
 	{
 		
@@ -2964,7 +2964,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_usecjoconsentsystemformkt
 	{
 		
@@ -2979,7 +2979,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum mainfewshotentitytype
 	{
 		
@@ -2991,7 +2991,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum onlinemeetingtype
 	{
 		
@@ -3000,7 +3000,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_eventmetadatastatus
 	{
 		
@@ -3015,7 +3015,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_to_lead_option
 	{
 		
@@ -3027,7 +3027,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_upgradestatus
 	{
 		
@@ -3042,7 +3042,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkentitymetadatastate
 	{
 		
@@ -3066,7 +3066,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_agentdisplayname
 	{
 		
@@ -3084,7 +3084,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_flow_approvalstage
 	{
 		
@@ -3099,7 +3099,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_to_lead_qualify_status
 	{
 		
@@ -3108,7 +3108,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_smstemplate_category
 	{
 		
@@ -3129,7 +3129,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_lastsessionoutcome
 	{
 		
@@ -3147,7 +3147,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversationcharacteristicstatus
 	{
 		
@@ -3159,7 +3159,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_emailclassificationcategorystatuscode
 	{
 		
@@ -3171,7 +3171,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_bookableresourcetype
 	{
 		
@@ -3201,7 +3201,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum entitytype
 	{
 		
@@ -3210,7 +3210,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_unifiedroutingdiagnostic_msdyn_ruletype
 	{
 		
@@ -3249,7 +3249,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum qooidetail_skippricecalculation
 	{
 		
@@ -3267,7 +3267,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkprofileentitytype
 	{
 		
@@ -3276,7 +3276,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_dataflowtemplatestate
 	{
 		
@@ -3294,7 +3294,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum quotecreationmethod
 	{
 		
@@ -3306,7 +3306,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum activitypointer_deliveryprioritycode
 	{
 		
@@ -3321,7 +3321,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum activity_mailmergetypecode
 	{
 		
@@ -3351,7 +3351,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum activity_typecode
 	{
 		
@@ -3372,7 +3372,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consenttype
 	{
 		
@@ -3387,7 +3387,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_vivacopilottype
 	{
 		
@@ -3402,7 +3402,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_channelconsentresolutionoverrides
 	{
 		
@@ -3423,7 +3423,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocsitrainingdatastatus
 	{
 		
@@ -3438,7 +3438,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum incidentupdateafterresolution
 	{
 		
@@ -3456,7 +3456,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum serviceappointment_status
 	{
 		
@@ -3471,7 +3471,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_playbookactivity_time
 	{
 		
@@ -3549,7 +3549,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum lead_salesstage
 	{
 		
@@ -3558,7 +3558,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_channelmessagecontextparttype
 	{
 		
@@ -3570,7 +3570,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum selection_rule_sites
 	{
 		
@@ -3582,7 +3582,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_interactiontype
 	{
 		
@@ -3678,7 +3678,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkprofilestate
 	{
 		
@@ -3711,7 +3711,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_lobcategory
 	{
 		
@@ -3720,7 +3720,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sla_slaenabledentities
 	{
 		
@@ -3729,7 +3729,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum bulkemail_recipient
 	{
 		
@@ -3744,7 +3744,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocskillidentmlmodeltrainingstatus
 	{
 		
@@ -3774,7 +3774,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum aiplugintype
 	{
 		
@@ -3792,7 +3792,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum powerpagessourcefiletype
 	{
 		
@@ -3822,7 +3822,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum cascadecaseclosurepreference
 	{
 		
@@ -3834,7 +3834,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_personasecurityrolemapping_msdyn_personatype
 	{
 		
@@ -3852,7 +3852,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_backgroundwidthtype
 	{
 		
@@ -3864,7 +3864,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum restapiauthtype
 	{
 		
@@ -3879,7 +3879,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkdestinationsyncstate
 	{
 		
@@ -3894,7 +3894,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_smstemplate_permission
 	{
 		
@@ -3906,7 +3906,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_opportunityresearchtopicchoice
 	{
 		
@@ -3948,7 +3948,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ownerviewstate
 	{
 		
@@ -3963,7 +3963,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_feature_state_option_set
 	{
 		
@@ -3975,7 +3975,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_visitorjourneytype
 	{
 		
@@ -3993,7 +3993,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum capability
 	{
 		
@@ -4017,7 +4017,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_attachmenttype
 	{
 		
@@ -4029,7 +4029,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_imagepickerassetsproviders
 	{
 		
@@ -4041,7 +4041,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_solutiontype
 	{
 		
@@ -4053,7 +4053,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_messagedesignation
 	{
 		
@@ -4065,7 +4065,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum componenttype
 	{
 		
@@ -4341,7 +4341,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iotsource
 	{
 		
@@ -4356,7 +4356,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkentitypartitionstrategy
 	{
 		
@@ -4374,7 +4374,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum securityrole_isautoassigned
 	{
 		
@@ -4386,7 +4386,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkschedulerecurrenceunit
 	{
 		
@@ -4413,7 +4413,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_salesmotion_type
 	{
 		
@@ -4422,7 +4422,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_dataversecomponenttype
 	{
 		
@@ -4434,7 +4434,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocrichobject_msdyn_locale
 	{
 		
@@ -4575,7 +4575,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_visualizationconfigtype
 	{
 		
@@ -4590,7 +4590,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_notificationtypes
 	{
 		
@@ -4605,7 +4605,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocsystemmessageeventtype
 	{
 		
@@ -4854,7 +4854,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum selection_rule_criteria
 	{
 		
@@ -4869,7 +4869,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum connectortype
 	{
 		
@@ -4884,7 +4884,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_opportunitygradeoptset
 	{
 		
@@ -4902,7 +4902,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocauthsettingendpointregions
 	{
 		
@@ -4917,7 +4917,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum searchentity
 	{
 		
@@ -4932,7 +4932,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_doijobstatus_optionset
 	{
 		
@@ -4974,7 +4974,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_lastsessionoutcomereason
 	{
 		
@@ -5007,7 +5007,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_eventtype
 	{
 		
@@ -5019,7 +5019,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum activitypointer_activitytypecode
 	{
 		
@@ -5097,7 +5097,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum workflow_runas
 	{
 		
@@ -5109,7 +5109,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_kpicomputationaccuracy
 	{
 		
@@ -5121,7 +5121,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum qooi_pricingerrorcode
 	{
 		
@@ -5244,7 +5244,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msft_datastate
 	{
 		
@@ -5256,7 +5256,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_agentactivitytype
 	{
 		
@@ -5268,7 +5268,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_salesmicroagenttype
 	{
 		
@@ -5301,7 +5301,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum orginsightsconfiguration_lookback
 	{
 		
@@ -5319,7 +5319,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_dataloadconfigstatus
 	{
 		
@@ -5331,7 +5331,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_reason
 	{
 		
@@ -5364,7 +5364,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocmessagereceiver
 	{
 		
@@ -5376,7 +5376,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_addtocalendarchoiceoptions
 	{
 		
@@ -5391,7 +5391,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sharepoint_validationstatus
 	{
 		
@@ -5412,7 +5412,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum activityfileattachment_objectcode
 	{
 		
@@ -5424,7 +5424,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_postconversationsurveymode
 	{
 		
@@ -5436,7 +5436,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_optinout
 	{
 		
@@ -5448,7 +5448,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_mltrainingstatus
 	{
 		
@@ -5484,7 +5484,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iermlmodeltrainingstatus
 	{
 		
@@ -5514,7 +5514,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_predictivescoringgrade
 	{
 		
@@ -5532,7 +5532,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkscheduletype
 	{
 		
@@ -5544,7 +5544,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_sequencestep_type
 	{
 		
@@ -5604,7 +5604,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_suggestiontype
 	{
 		
@@ -5619,7 +5619,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum serviceappointment_starttime
 	{
 		
@@ -5643,7 +5643,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_externalconsentresolutionoptions
 	{
 		
@@ -5661,7 +5661,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_copilottermtype
 	{
 		
@@ -5673,7 +5673,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkprofiletype
 	{
 		
@@ -5685,7 +5685,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocauthenticationtype
 	{
 		
@@ -5697,7 +5697,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum emailserverprofile_authenticationprotocol
 	{
 		
@@ -5718,7 +5718,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_qualify_lead_options
 	{
 		
@@ -5730,7 +5730,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_importconfigtype
 	{
 		
@@ -5739,7 +5739,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_sessionoutcome
 	{
 		
@@ -5757,7 +5757,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_surveyprovider
 	{
 		
@@ -5769,7 +5769,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sharepointsite_servicetype
 	{
 		
@@ -5787,7 +5787,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversation_statecode
 	{
 		
@@ -5808,7 +5808,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum officedocument_documenttype
 	{
 		
@@ -5820,7 +5820,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_mlmodeltype
 	{
 		
@@ -5835,7 +5835,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversationmode
 	{
 		
@@ -5847,7 +5847,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum httpmethod
 	{
 		
@@ -5868,7 +5868,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum salesordercreationmethod
 	{
 		
@@ -5880,7 +5880,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_actiontype
 	{
 		
@@ -5904,7 +5904,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_opportunityindicator
 	{
 		
@@ -5922,7 +5922,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum field_security_permission_readunmasked
 	{
 		
@@ -5937,7 +5937,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum templatedefaultview
 	{
 		
@@ -5952,7 +5952,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iermlmodelstatus
 	{
 		
@@ -5967,7 +5967,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_consultmodetype
 	{
 		
@@ -5982,7 +5982,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum mobileofflineenabledentities
 	{
 		
@@ -6411,7 +6411,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iotaggregation
 	{
 		
@@ -6435,7 +6435,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_opportunityscoretrendoptset
 	{
 		
@@ -6453,7 +6453,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convertrule_channelactivity
 	{
 		
@@ -6504,7 +6504,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_channelmessageparttype
 	{
 		
@@ -6537,7 +6537,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_agenttype
 	{
 		
@@ -6549,7 +6549,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_basepresencestatus
 	{
 		
@@ -6570,7 +6570,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_extensiontype
 	{
 		
@@ -6582,7 +6582,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_timetrackerreasoncategoryoptionset
 	{
 		
@@ -6600,7 +6600,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_workspacetype
 	{
 		
@@ -6612,7 +6612,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_evaluationcreatetype
 	{
 		
@@ -6630,7 +6630,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_solutionarea_type
 	{
 		
@@ -6639,7 +6639,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_statuschoices
 	{
 		
@@ -6654,7 +6654,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sameweekday_options
 	{
 		
@@ -6690,7 +6690,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum aipluginsubtype
 	{
 		
@@ -6723,7 +6723,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_sequencestep_subtype
 	{
 		
@@ -6747,7 +6747,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum knowledgearticle_expirationstate
 	{
 		
@@ -6762,7 +6762,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum allocationtype
 	{
 		
@@ -6774,7 +6774,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_desktopnotificationsettings
 	{
 		
@@ -6786,7 +6786,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consenttypevalue
 	{
 		
@@ -6798,7 +6798,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consentvalue
 	{
 		
@@ -6813,7 +6813,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_eventparametertype
 	{
 		
@@ -6834,7 +6834,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_reviewstate
 	{
 		
@@ -6849,7 +6849,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum socialactivity_postmessagetype
 	{
 		
@@ -6861,7 +6861,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum serviceappointment_startdate
 	{
 		
@@ -6891,7 +6891,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_occallsessioneventreasons
 	{
 		
@@ -7053,7 +7053,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_evaluationrecordtype
 	{
 		
@@ -7065,7 +7065,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_timerangetype
 	{
 		
@@ -7080,7 +7080,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum syncattributemapping_syncdirection
 	{
 		
@@ -7098,7 +7098,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_suggestioncontroltype
 	{
 		
@@ -7107,7 +7107,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum pl_logseverity
 	{
 		
@@ -7128,7 +7128,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum workflow_stage
 	{
 		
@@ -7140,7 +7140,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_panestate
 	{
 		
@@ -7155,7 +7155,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_aimodeltasktype
 	{
 		
@@ -7170,7 +7170,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_sales_entity_type
 	{
 		
@@ -7185,7 +7185,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_harvestingtag
 	{
 		
@@ -7197,7 +7197,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_consoleapplicationparameterruntimetype
 	{
 		
@@ -7215,7 +7215,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkentitysource
 	{
 		
@@ -7227,7 +7227,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum organization_samesitemodeforsessioncookie
 	{
 		
@@ -7245,7 +7245,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_suggestedpriority
 	{
 		
@@ -7263,7 +7263,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sameweekweek_options
 	{
 		
@@ -7284,7 +7284,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iotfielddataformat
 	{
 		
@@ -7296,7 +7296,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_option
 	{
 		
@@ -7314,7 +7314,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_playbookactivity_priority
 	{
 		
@@ -7329,7 +7329,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_borderstyletype
 	{
 		
@@ -7350,7 +7350,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_notificationtheme
 	{
 		
@@ -7362,7 +7362,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_placeholdertype
 	{
 		
@@ -7377,7 +7377,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_conversationaccesstype
 	{
 		
@@ -7392,7 +7392,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consentlevel
 	{
 		
@@ -7404,7 +7404,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum synapselinkentitysyncstate
 	{
 		
@@ -7434,7 +7434,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_unifiedroutingdiagnostic_msdyn_diagnosticdatatype
 	{
 		
@@ -7455,7 +7455,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_aiagents
 	{
 		
@@ -7476,7 +7476,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_mcsbotstatus
 	{
 		
@@ -7491,7 +7491,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum dependencytype
 	{
 		
@@ -7509,7 +7509,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum resourcetype
 	{
 		
@@ -7527,7 +7527,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum bulkemail_recipients
 	{
 		
@@ -7542,7 +7542,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_routingconfigurationsteptype
 	{
 		
@@ -7560,7 +7560,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum socialprofile_community
 	{
 		
@@ -7620,7 +7620,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum customapifieldtype
 	{
 		
@@ -7665,7 +7665,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_prioritychoices
 	{
 		
@@ -7680,7 +7680,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_relationship_cardinality
 	{
 		
@@ -7692,7 +7692,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum field_security_permission_type
 	{
 		
@@ -7704,7 +7704,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_flow_approvalresponseoptionstype
 	{
 		
@@ -7719,7 +7719,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum purchaseprocess
 	{
 		
@@ -7734,7 +7734,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum convert_campaign_response_deactivate_status
 	{
 		
@@ -7746,7 +7746,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_liveworkitemeventtype
 	{
 		
@@ -7767,7 +7767,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_qualityagentstatus
 	{
 		
@@ -7791,7 +7791,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum opportunity_salesstage
 	{
 		
@@ -7809,7 +7809,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocmessagetemplatetrigger
 	{
 		
@@ -7818,7 +7818,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum photo_resolution
 	{
 		
@@ -7842,7 +7842,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum applicationbasedaccesslist_cloud
 	{
 		
@@ -7860,7 +7860,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum flipswitch_options
 	{
 		
@@ -7872,7 +7872,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_emailtemplatetype
 	{
 		
@@ -7884,7 +7884,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum qooiproduct_producttype
 	{
 		
@@ -7905,7 +7905,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_botfailureactiontype
 	{
 		
@@ -7923,7 +7923,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_consentsource
 	{
 		
@@ -7953,7 +7953,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_solutionbehaviour
 	{
 		
@@ -7965,7 +7965,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_leadscoretrendoptset
 	{
 		
@@ -7983,7 +7983,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum processstage_category
 	{
 		
@@ -8013,7 +8013,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum qooi_skippricecalculation
 	{
 		
@@ -8025,7 +8025,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_salesplay_type
 	{
 		
@@ -8034,7 +8034,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_questiontype
 	{
 		
@@ -8052,7 +8052,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum applicationaccess
 	{
 		
@@ -8064,7 +8064,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum rangeends_options
 	{
 		
@@ -8079,7 +8079,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynmkt_eventmetadatastate
 	{
 		
@@ -8112,7 +8112,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_evaluationmethod
 	{
 		
@@ -8127,7 +8127,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum bookableresourcecharacteristictype
 	{
 		
@@ -8139,7 +8139,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum powerpagesitetype
 	{
 		
@@ -8151,7 +8151,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_occallingoptions
 	{
 		
@@ -8166,7 +8166,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum copilotexamplequestiontknowledgetype
 	{
 		
@@ -8178,7 +8178,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum sharepoint_validationstatusreason
 	{
 		
@@ -8205,7 +8205,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_reviewstatus
 	{
 		
@@ -8220,7 +8220,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum incident_caseorigincode
 	{
 		
@@ -8244,7 +8244,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum recurrencerule_monthofyear
 	{
 		
@@ -8289,7 +8289,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_scenariotype
 	{
 		
@@ -8382,7 +8382,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_numberofsearchresults
 	{
 		
@@ -8409,7 +8409,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_decisionrulesettype
 	{
 		
@@ -8427,7 +8427,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum chatbotlanguage
 	{
 		
@@ -8523,7 +8523,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum syncstatus
 	{
 		
@@ -8538,7 +8538,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum pl_pluginstage
 	{
 		
@@ -8553,7 +8553,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_deviceevent
 	{
 		
@@ -8568,7 +8568,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_languagecodes
 	{
 		
@@ -8580,7 +8580,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdynce_contentstate
 	{
 		
@@ -8592,7 +8592,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_queueassignmentstrategy
 	{
 		
@@ -8610,7 +8610,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_backgroundsizetype
 	{
 		
@@ -8622,7 +8622,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_apiversionoptions
 	{
 		
@@ -8631,7 +8631,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_msdyn_unifiedroutingrun_msdyn_routingstatus
 	{
 		
@@ -8658,7 +8658,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_industryoptions
 	{
 		
@@ -8706,7 +8706,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_leadgradeoptset
 	{
 		
@@ -8724,7 +8724,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum principalsyncattributemapping_syncdirection
 	{
 		
@@ -8742,7 +8742,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_rulesetauthoringmode
 	{
 		
@@ -8751,7 +8751,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_configurationstatus_optionset
 	{
 		
@@ -8769,7 +8769,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_streamsource
 	{
 		
@@ -8778,7 +8778,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_ocsystemmessagetype
 	{
 		
@@ -8790,7 +8790,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyncrm_filecategory
 	{
 		
@@ -8799,7 +8799,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_iotmappingtype
 	{
 		
@@ -8814,7 +8814,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_externalparticipantchanneltype
 	{
 		
@@ -8823,7 +8823,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_jobreviewstate
 	{
 		
@@ -8835,7 +8835,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_adminroletype
 	{
 		
@@ -8847,7 +8847,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_accountcategorycode
 	{
 		
@@ -8859,7 +8859,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_accountclassificationcode
 	{
 		
@@ -8868,7 +8868,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_accountratingcode
 	{
 		
@@ -8877,7 +8877,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_address1_addresstypecode
 	{
 		
@@ -8895,7 +8895,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_address1_freighttermscode
 	{
 		
@@ -8907,7 +8907,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_address1_shippingmethodcode
 	{
 		
@@ -8934,7 +8934,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_address2_addresstypecode
 	{
 		
@@ -8943,7 +8943,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_address2_freighttermscode
 	{
 		
@@ -8952,7 +8952,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_address2_shippingmethodcode
 	{
 		
@@ -8961,7 +8961,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_businesstypecode
 	{
 		
@@ -8970,7 +8970,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_customersizecode
 	{
 		
@@ -8979,7 +8979,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_customertypecode
 	{
 		
@@ -9021,7 +9021,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_industrycode
 	{
 		
@@ -9126,7 +9126,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_ownershipcode
 	{
 		
@@ -9144,7 +9144,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_paymenttermscode
 	{
 		
@@ -9162,7 +9162,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_preferredappointmentdaycode
 	{
 		
@@ -9189,7 +9189,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_preferredappointmenttimecode
 	{
 		
@@ -9204,7 +9204,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_preferredcontactmethodcode
 	{
 		
@@ -9225,7 +9225,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_shippingmethodcode
 	{
 		
@@ -9234,7 +9234,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum AccountState
 	{
 		
@@ -9246,7 +9246,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_statuscode
 	{
 		
@@ -9258,7 +9258,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum account_territorycode
 	{
 		
@@ -9271,7 +9271,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("account")]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public partial class Account : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -12650,7 +12650,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_accountrolecode
 	{
 		
@@ -12665,7 +12665,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address1_addresstypecode
 	{
 		
@@ -12683,7 +12683,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address1_freighttermscode
 	{
 		
@@ -12695,7 +12695,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address1_shippingmethodcode
 	{
 		
@@ -12722,7 +12722,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address2_addresstypecode
 	{
 		
@@ -12731,7 +12731,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address2_freighttermscode
 	{
 		
@@ -12740,7 +12740,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address2_shippingmethodcode
 	{
 		
@@ -12749,7 +12749,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address3_addresstypecode
 	{
 		
@@ -12758,7 +12758,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address3_freighttermscode
 	{
 		
@@ -12767,7 +12767,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_address3_shippingmethodcode
 	{
 		
@@ -12776,7 +12776,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_customersizecode
 	{
 		
@@ -12785,7 +12785,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_customertypecode
 	{
 		
@@ -12794,7 +12794,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_educationcode
 	{
 		
@@ -12803,7 +12803,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_familystatuscode
 	{
 		
@@ -12821,7 +12821,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_gendercode
 	{
 		
@@ -12833,7 +12833,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_haschildrencode
 	{
 		
@@ -12842,7 +12842,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_leadsourcecode
 	{
 		
@@ -12851,7 +12851,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_msdyn_decisioninfluencetag
 	{
 		
@@ -12869,7 +12869,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_msdyn_orgchangestatus
 	{
 		
@@ -12884,7 +12884,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_paymenttermscode
 	{
 		
@@ -12902,7 +12902,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_preferredappointmentdaycode
 	{
 		
@@ -12929,7 +12929,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_preferredappointmenttimecode
 	{
 		
@@ -12944,7 +12944,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_preferredcontactmethodcode
 	{
 		
@@ -12965,7 +12965,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_shippingmethodcode
 	{
 		
@@ -12974,7 +12974,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum ContactState
 	{
 		
@@ -12986,7 +12986,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_statuscode
 	{
 		
@@ -12998,7 +12998,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum contact_territorycode
 	{
 		
@@ -13011,7 +13011,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("contact")]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -17740,7 +17740,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_opportunity_msdyn_forecastcategory
 	{
 		
@@ -17764,7 +17764,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum opportunity_opportunityratingcode
 	{
 		
@@ -17779,7 +17779,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum opportunity_prioritycode
 	{
 		
@@ -17788,7 +17788,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum opportunity_salesstagecode
 	{
 		
@@ -17797,7 +17797,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum OpportunityState
 	{
 		
@@ -17812,7 +17812,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum opportunity_statuscode
 	{
 		
@@ -17833,7 +17833,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum opportunity_timeline
 	{
 		
@@ -17858,7 +17858,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("opportunity")]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public partial class Opportunity : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
 		
@@ -20234,7 +20234,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	/// <summary>
 	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
 	/// </summary>
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public partial class ServiceContext : Microsoft.Xrm.Sdk.Client.OrganizationServiceContext
 	{
 		

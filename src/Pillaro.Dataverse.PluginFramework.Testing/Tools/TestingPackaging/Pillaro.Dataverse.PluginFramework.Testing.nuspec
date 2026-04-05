@@ -39,7 +39,7 @@
 	</metadata>
 
 	<files>
-		<file src="..\..\..\LICENSE" target="LICENSE" />
+		<file src="..\..\LICENSE" target="LICENSE" />
 		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
 		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
 	</files>
