@@ -940,21 +940,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum msdyn_actionchoices
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Nudge = 419550000,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		NotifySupervisor = 419550001,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Nudgeandthennotifysupervisor = 419550002,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum backendtooltype
 	{
 		
@@ -1350,21 +1335,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		NextBestAssignment = 192350001,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum msdyn_block_types
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Alwaysblock = 192350000,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		DontBlock = 192350001,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Customtime = 192350002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -2905,21 +2875,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum pl_taskstatus
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Success = 10,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		NotValid = 20,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Error = 30,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_propertytype
 	{
 		
@@ -2934,18 +2889,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Datetime = 192350003,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum pl_pluginmode
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Synchronous = 0,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Asynchronous = 1,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3156,18 +3099,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Deleted = 192350001,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum msdyn_emailclassificationcategorystatuscode
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Active = 2,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -6485,10 +6416,10 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		ServiceActivity = 4214,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		CustomerVoicesurveyinvite = 10739,
+		CustomerVoicealert = 10724,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		CustomerVoicealert = 10724,
+		CustomerVoicesurveyinvite = 10739,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		CustomerVoicesurveyresponse = 10742,
@@ -6613,44 +6544,11 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum msdyn_evaluationcreatetype
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		OnDemand = 192350000,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		RealTime = 192350001,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		BulkEvaluation = 192350002,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		OnTrigger = 192350003,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_solutionarea_type
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Default = 1,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum msdyn_statuschoices
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		New = 419550000,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Acknowledged = 419550001,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Dismissed = 419550002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -7104,27 +7002,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		AdaptiveCard = 192360000,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum pl_logseverity
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Debug = 1,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Info = 2,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Warning = 3,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Error = 4,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Fatal = 5,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -7662,21 +7539,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Guid = 12,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum msdyn_prioritychoices
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Low = 419550000,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Medium = 419550001,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		High = 419550002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -8539,21 +8401,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
-	public enum pl_pluginstage
-	{
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Prevalidation = 10,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Preoperation = 20,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Postoperation = 40,
-	}
-	
-	[System.Runtime.Serialization.DataContractAttribute()]
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 	public enum msdyn_deviceevent
 	{
 		
@@ -8820,6 +8667,159 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		PhoneNumber = 426120000,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum pl_taskstatus
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Success = 10,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		NotValid = 20,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Error = 30,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum pl_pluginmode
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Synchronous = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Asynchronous = 1,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum pl_logseverity
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Debug = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Info = 2,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Warning = 3,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Error = 4,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Fatal = 5,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum pl_pluginstage
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Prevalidation = 10,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Preoperation = 20,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Postoperation = 40,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum msdyn_block_types
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Alwaysblock = 192350000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		DontBlock = 192350001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Customtime = 192350002,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum msdyn_actionchoices
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Nudge = 419550000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		NotifySupervisor = 419550001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Nudgeandthennotifysupervisor = 419550002,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum msdyn_statuschoices
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		New = 419550000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Acknowledged = 419550001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Dismissed = 419550002,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum msdyn_prioritychoices
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Low = 419550000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Medium = 419550001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		High = 419550002,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum msdyn_evaluationcreatetype
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		OnDemand = 192350000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		RealTime = 192350001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		BulkEvaluation = 192350002,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		OnTrigger = 192350003,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public enum msdyn_emailclassificationcategorystatuscode
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 2,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
