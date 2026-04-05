@@ -174,6 +174,9 @@ Provides a foundation for testing against a real Dataverse environment.
 * Visual Studio
 * Plugin must be deployed as a single assembly
 
+> [!WARNING]
+> If you use SPKL for early-bound entity generation, do **not** upgrade `Microsoft.CrmSdk.CoreTools` beyond version **9.1.0.92** — higher versions break `CrmSvcUtil.exe` generation via SPKL. See [Known Limitations](./docs/README.md#-known-limitations) for details.
+
 ### Quick Start
 
 1. Create a Class Library project targeting .NET Framework 4.6.2

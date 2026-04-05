@@ -21,6 +21,7 @@
 | [Observability](#-observability) | Logging and error handling |
 | [Testing](#-testing) | Testing principles and integration testing |
 | [Packaging & Deployment](#-packaging--deployment) | Signing, assembly structure, and deployment |
+| [Known Limitations](#-known-limitations) | Package constraints and compatibility notes |
 | [Examples](#-examples) | Sample implementations |
 | [Contributing](#-contributing) | Guidelines for contributors |
 
@@ -101,6 +102,17 @@ How to prepare, sign, and deploy plugin assemblies.
 | [Packaging and Deployment](./packaging-and-deployment.md) | Signing, assembly structure, and deployment process |
 | [Versioning](./VERSIONING.md) | Versioning strategy and release model | 
 | [Changelog](../CHANGELOG.md) | Release notes and changes per version |
+
+---
+
+## ⚠️ Known Limitations
+
+### Microsoft.CrmSdk.CoreTools maximum version
+
+> [!WARNING]
+> The maximum supported version of `Microsoft.CrmSdk.CoreTools` is **9.1.0.92**. Upgrading to a higher version will break early-bound entity generation via SPKL (`CrmSvcUtil.exe`). Do **not** update this package beyond the specified version.
+
+This constraint applies to any project that uses SPKL for early-bound type generation (e.g., `Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen`).
 
 ---
 
