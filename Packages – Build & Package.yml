@@ -34,6 +34,7 @@ variables:
   configuration: Release
 
   frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
+  frameworkPackagesConfigPath: src/Pillaro.Dataverse.PluginFramework/packages.config
   frameworkAssemblyInfoPath: src/Pillaro.Dataverse.PluginFramework/Properties/AssemblyInfo.cs
   frameworkConstantsPath: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
   frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
@@ -246,10 +247,13 @@ jobs:
             Set-Content $file -Value $content -NoNewline
 
       - task: NuGetCommand@2
-        displayName: Restore framework project packages
+        displayName: Restore framework packages.config
         inputs:
-          command: restore
-          restoreSolution: $(frameworkProjectPath)
+          command: custom
+          arguments: >
+            restore "$(Build.SourcesDirectory)\$(frameworkPackagesConfigPath)"
+            -PackagesDirectory "$(Build.SourcesDirectory)\packages"
+            -NonInteractive
 
       - task: VSBuild@1
         displayName: Build framework project
