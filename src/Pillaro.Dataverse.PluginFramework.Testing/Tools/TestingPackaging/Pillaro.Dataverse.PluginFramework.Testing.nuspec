@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<package>
+	<metadata>
+		<id>Pillaro.Dataverse.PluginFramework.Testing</id>
+		<version>$version$</version>
+		<authors>Pillaro Labs s.r.o.</authors>
+		<owners>Pillaro Labs s.r.o.</owners>
+		<copyright>Copyright © 2026 Pillaro Labs s.r.o.</copyright>
+
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<license type="file">LICENSE</license>
+
+		<projectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</projectUrl>
+		<repository type="git" url="https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework" />
+
+		<description>
+			Testing support package for integration and end-to-end testing of solutions built with Pillaro Dataverse Plugin Framework.
+		</description>
+
+		<releaseNotes>See CHANGELOG.md</releaseNotes>
+
+		<tags>dataverse dynamics365 plugin testing integration-testing</tags>
+
+		<dependencies>
+			<group targetFramework="net8.0">
+				<dependency id="Pillaro.Dataverse.PluginFramework" version="$version$" exclude="Build,Analyzers" />
+				<dependency id="Autofac" version="8.0.0" />
+				<dependency id="Autofac.Extensions.DependencyInjection" version="9.0.0" />
+				<dependency id="AutoMapper" version="16.1.1" />
+				<dependency id="AutoMapper.Contrib.Autofac.DependencyInjection" version="7.2.0" />
+				<dependency id="MediatR" version="12.2.0" />
+				<dependency id="MediatR.Extensions.Autofac.DependencyInjection" version="12.0.0" />
+				<dependency id="Microsoft.Extensions.Configuration.Json" version="8.0.0" />
+				<dependency id="Microsoft.PowerPlatform.Dataverse.Client" version="1.0.39" />
+				<dependency id="Microsoft.Rest.ClientRuntime" version="2.3.24" />
+				<dependency id="System.Security.Cryptography.Pkcs" version="6.0.3" />
+			</group>
+		</dependencies>
+	</metadata>
+
+	<files>
+		<file src="..\..\..\..\LICENSE" target="LICENSE" />
+		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
+		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
+	</files>
+</package>

@@ -39,7 +39,7 @@ variables:
   frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
   testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
-  testingNuspecPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.nuspec
+  testingNuspecPath: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
 
   changelogPath: CHANGELOG.md
 
@@ -112,13 +112,12 @@ jobs:
             Write-Host "##vso[task.setvariable variable=INFORMATIONAL_VERSION]$informationalVersion"
 
       - task: PowerShell@2
-        displayName: Read CHANGELOG.md and inject release notes into package metadata
+        displayName: Read CHANGELOG.md and inject release notes into nuspec files
         inputs:
           targetType: inline
           script: |
             $changelogPath = "$(Build.SourcesDirectory)/$(changelogPath)"
             $frameworkNuspecPath = "$(Build.SourcesDirectory)/$(frameworkNuspecPath)"
-            $testingProjectPath = "$(Build.SourcesDirectory)/$(testingProjectPath)"
             $testingNuspecPath = "$(Build.SourcesDirectory)/$(testingNuspecPath)"
 
             if (-not (Test-Path $changelogPath)) {
@@ -129,8 +128,8 @@ jobs:
               throw "Framework nuspec not found: $frameworkNuspecPath"
             }
 
-            if (-not (Test-Path $testingProjectPath)) {
-              throw "Testing project not found: $testingProjectPath"
+            if (-not (Test-Path $testingNuspecPath)) {
+              throw "Testing nuspec not found: $testingNuspecPath"
             }
 
             $content = Get-Content $changelogPath -Raw
@@ -209,47 +208,8 @@ jobs:
               $xml.Save($Path)
             }
 
-            function Set-CsprojPackageReleaseNotes {
-              param(
-                [Parameter(Mandatory = $true)][string]$Path,
-                [Parameter(Mandatory = $true)][string]$ReleaseNotes
-              )
-
-              $xml = New-Object System.Xml.XmlDocument
-              $xml.PreserveWhitespace = $true
-              $xml.Load($Path)
-
-              $projectNode = $xml.SelectSingleNode('/Project')
-              if ($null -eq $projectNode) {
-                throw "Project node not found in csproj: $Path"
-              }
-
-              $propertyGroup = $xml.SelectSingleNode('/Project/PropertyGroup[PackageId]')
-              if ($null -eq $propertyGroup) {
-                $propertyGroup = $xml.SelectSingleNode('/Project/PropertyGroup')
-              }
-
-              if ($null -eq $propertyGroup) {
-                $propertyGroup = $xml.CreateElement('PropertyGroup')
-                $projectNode.AppendChild($propertyGroup) | Out-Null
-              }
-
-              $releaseNotesNode = $propertyGroup.SelectSingleNode('PackageReleaseNotes')
-              if ($null -eq $releaseNotesNode) {
-                $releaseNotesNode = $xml.CreateElement('PackageReleaseNotes')
-                $propertyGroup.AppendChild($releaseNotesNode) | Out-Null
-              }
-
-              $releaseNotesNode.InnerText = $ReleaseNotes
-              $xml.Save($Path)
-            }
-
             Set-NuspecReleaseNotes -Path $frameworkNuspecPath -ReleaseNotes $frameworkNotes
-            Set-CsprojPackageReleaseNotes -Path $testingProjectPath -ReleaseNotes $testingNotes
-
-            if (Test-Path $testingNuspecPath) {
-              Set-NuspecReleaseNotes -Path $testingNuspecPath -ReleaseNotes $testingNotes
-            }
+            Set-NuspecReleaseNotes -Path $testingNuspecPath -ReleaseNotes $testingNotes
 
       - task: PowerShell@2
         displayName: Stamp FrameworkVersion
@@ -331,21 +291,12 @@ jobs:
           -NonInteractive
         displayName: Pack framework package
 
-      - task: DotNetCoreCLI@2
-        displayName: Pack testing project
-        inputs:
-          command: pack
-          packagesToPack: $(testingProjectPath)
-          nobuild: true
-          versioningScheme: byEnvVar
-          versionEnvVar: PACKAGE_VERSION
-          arguments: >
-            --configuration $(configuration)
-            --output $(Build.ArtifactStagingDirectory)
-            /p:Version=$(PACKAGE_VERSION)
-            /p:PackageVersion=$(PACKAGE_VERSION)
-            /p:IncludeSourceRevisionInInformationalVersion=false
-            /p:GeneratePackageOnBuild=false
+      - script: >
+          nuget pack "$(testingNuspecPath)"
+          -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
+          -OutputDirectory "$(Build.ArtifactStagingDirectory)"
+          -NonInteractive
+        displayName: Pack testing package
 
       - task: PublishPipelineArtifact@1
         displayName: Upload NuGet artifacts
