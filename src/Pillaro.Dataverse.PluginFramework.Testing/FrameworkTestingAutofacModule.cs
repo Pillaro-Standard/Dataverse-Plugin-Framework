@@ -22,7 +22,7 @@ public class FrameworkTestingAutofacModule : Module
             .AsImplementedInterfaces();
 
         var configuration = MediatRConfigurationBuilder
-            .Create(ThisAssembly)
+            .Create(ThisAssembly.GetName().Name!)
             .WithAllOpenGenericHandlerTypesRegistered()
             .Build();
 

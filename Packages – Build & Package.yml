@@ -301,6 +301,7 @@ jobs:
 
       - script: >
           nuget pack "$(testingNuspecPath)"
+          -BasePath "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework.Testing"
           -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
           -OutputDirectory "$(Build.ArtifactStagingDirectory)"
           -NonInteractive

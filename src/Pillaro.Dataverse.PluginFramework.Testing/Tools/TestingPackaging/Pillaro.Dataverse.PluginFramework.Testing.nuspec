@@ -25,18 +25,22 @@
 			<group targetFramework="net8.0">
 				<dependency id="Pillaro.Dataverse.PluginFramework" version="$version$" exclude="Build,Analyzers" />
 				<dependency id="Autofac" version="8.0.0" />
+				<dependency id="Autofac.Extensions.DependencyInjection" version="9.0.0" />
+				<dependency id="AutoMapper" version="16.1.1" />
 				<dependency id="AutoMapper.Contrib.Autofac.DependencyInjection" version="7.2.0" />
 				<dependency id="MediatR" version="12.2.0" />
 				<dependency id="MediatR.Extensions.Autofac.DependencyInjection" version="12.0.0" />
 				<dependency id="Microsoft.Extensions.Configuration.Json" version="8.0.0" />
 				<dependency id="Microsoft.PowerPlatform.Dataverse.Client" version="1.0.39" />
+				<dependency id="Microsoft.Rest.ClientRuntime" version="2.3.24" />
+				<dependency id="System.Security.Cryptography.Pkcs" version="6.0.3" />
 			</group>
 		</dependencies>
 	</metadata>
 
 	<files>
-		<file src="..\..\..\..\LICENSE" target="LICENSE" />
-		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
-		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
+		<file src="..\..\..\LICENSE" target="LICENSE" />
+		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
+		<file src="bin\$configuration$\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
 	</files>
 </package>

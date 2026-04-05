@@ -6,18 +6,14 @@ using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Opportunity
 {
-    public class Autonumbering : TaskBase<Logic.Opportunity>
+    public class Autonumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Opportunity>(serviceProvider, taskContext)
     {
-        public Autonumbering(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
-        {
-        }
-
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {
             return validator
                 .WithMode(PluginMode.Synchronous)
                 .WithStage(PluginStage.Preoperation)
-                .WithMessages(new[] { "Create" })
+                .WithMessages(["Create"])
                 .ForEntity(ContextEntity.LogicalName)
                 ;
         }
