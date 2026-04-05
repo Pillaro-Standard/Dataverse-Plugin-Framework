@@ -9,6 +9,7 @@ internal class ImageWithConditionValidator : IPredicateValidator
     private readonly ImageValidator _imageValidator;
     private bool _predicateResult;
     private bool? _imageValidationRes;
+
     public string GetName => nameof(ImageWithConditionValidator);
 
     public ImageWithConditionValidator(Func<TaskContext, bool> predicate, bool isPreimage, string imageName)
@@ -25,11 +26,10 @@ internal class ImageWithConditionValidator : IPredicateValidator
 
     public string GetMessage()
     {
-        if (_imageValidationRes == null)
-            return GetPredicateMessage();
+        if (!_predicateResult || _imageValidationRes == null)
+            return string.Empty;
 
-        var mes = _imageValidator.GetMessage();
-        return $"{GetPredicateMessage()}. {mes}";
+        return _imageValidator.GetMessage();
     }
 
     public bool IsPredicateValid(TaskContext taskContext)
@@ -40,9 +40,8 @@ internal class ImageWithConditionValidator : IPredicateValidator
 
     public string GetPredicateMessage()
     {
-        if (_predicateResult)
-            return "Predicate is valid";
-
-        return "Predicate is not valid";
+        return _predicateResult
+            ? "Conditional image validation is applicable."
+            : "Conditional image validation is not applicable.";
     }
 }

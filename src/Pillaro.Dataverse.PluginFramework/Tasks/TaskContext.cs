@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Newtonsoft.Json;
-using Pillaro.Dataverse.PluginFramework.Logging.Enums;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 using System;

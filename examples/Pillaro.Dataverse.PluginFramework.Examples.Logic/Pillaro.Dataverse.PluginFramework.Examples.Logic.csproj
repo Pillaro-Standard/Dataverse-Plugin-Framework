@@ -23,9 +23,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-	<PropertyGroup>
-		<RestoreProjectStyle>PackagesConfig</RestoreProjectStyle>
-	</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -67,17 +64,15 @@
   <ItemGroup>
     <Compile Include="CrmPluginRegistrationAttribute.cs" />
     <Compile Include="EarlyBoundTypes.cs" />
-    <Compile Include="Plugins\OpportunityPlugin.cs" />
     <Compile Include="Plugins\ContactPlugin.cs" />
     <Compile Include="Plugins\PluginBase.cs" />
+    <Compile Include="Plugins\TaskPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Features\ForbiddenNames\CustomerForbiddenNameService.cs" />
     <Compile Include="SettingsKeys.cs" />
-    <Compile Include="Tasks\Opportunity\AutoNumbering.cs" />
-    <Compile Include="Tasks\Contact\ForbiddenNamesTask.cs" />
-    <Compile Include="Tasks\Contact\ScoreOnAddressChange.cs" />
-    <Compile Include="Tasks\Opportunity\ScoreOpportunity.cs" />
-    <Compile Include="Tasks\Opportunity\ValidateOwnerChangeTask.cs" />
+    <Compile Include="Tasks\Contact\ValidateContactNamesTask.cs" />
+    <Compile Include="Tasks\Contact\UpdateAddressLabel.cs" />
+    <Compile Include="Tasks\Task\AutoNumbering.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

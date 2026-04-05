@@ -10,8 +10,8 @@ public class TestAutofacModule : Module
     {
         builder.RegisterModule<FrameworkTestingAutofacModule>();
 
-        builder.RegisterAssemblyTypes(typeof(TestAutofacModule).Assembly)
+        builder.RegisterAssemblyTypes(GetType().Assembly)
             .Where(t => t.GetInterfaces().Any(i => i.IsAssignableFrom(typeof(IAutoRegisteredTestDataRepository))))
-            .AsImplementedInterfaces();
+            .AsSelf();
     }
 }

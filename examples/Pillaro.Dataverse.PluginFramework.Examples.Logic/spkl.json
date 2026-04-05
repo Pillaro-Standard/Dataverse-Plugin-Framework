@@ -1,8 +1,7 @@
 {
   "earlyboundtypes": [
     {
-      "entities": "account,contact,opportunity",
-      "actions": "dev1_simpleaction",
+      "entities": "contact,task",
       "generateOptionsetEnums": true,
       "generateGlobalOptionsets": true,
       "generateStateEnums": true,

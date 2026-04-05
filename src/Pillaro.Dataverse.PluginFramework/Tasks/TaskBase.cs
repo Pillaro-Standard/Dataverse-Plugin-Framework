@@ -77,13 +77,16 @@ public abstract class TaskBase<TEntity> : ITask
 
             Validate(detailBuilder);
 
+            if (Log.Status == TaskStatus.NotValid)
+                return;
+
             ExecuteInternal(detailBuilder);
 
             Log.Status = TaskStatus.Success;
         }
         catch (DataverseValidationException ex)
         {
-            Log.Status = TaskStatus.Success;
+            Log.Status = TaskStatus.NotValid;
             Log.LogSeverity = LogSeverity.Info;
             detailBuilder.AppendLine(ex.ToString());
             throw;
@@ -218,14 +221,11 @@ public abstract class TaskBase<TEntity> : ITask
     {
         var timer = Stopwatch.StartNew();
 
-        message.AppendLine("#Validation registration start");
-
         var validatorExecute = (IExecuteValidation)AddValidations(_validator);
 
         bool isValid;
         try
         {
-            message.AppendLine("#Validate Start");
             isValid = validatorExecute.IsValid();
         }
         catch
@@ -256,7 +256,7 @@ public abstract class TaskBase<TEntity> : ITask
         }
 
         timer.Stop();
-        message.AppendLine("#DoValidate Finish. Elapsed Time: " + timer.Elapsed.TotalMilliseconds + " ms");
+        message.AppendLine("#Validation Elapsed Time: " + timer.Elapsed.TotalMilliseconds + " ms");
     }
 
     private void ExecuteInternal(StringBuilder message)
@@ -266,10 +266,9 @@ public abstract class TaskBase<TEntity> : ITask
 
         var timer = Stopwatch.StartNew();
 
-        message.AppendLine("#DoExecute Start");
         DoExecute();
         timer.Stop();
-        message.AppendLine("#DoExecute Finish. Elapsed Time: " + timer.Elapsed.TotalMilliseconds + " ms");
+        message.AppendLine("#Execution Elapsed Time: " + timer.Elapsed.TotalMilliseconds + " ms");
     }
 
     private void AppendExecutionHeader(StringBuilder message)

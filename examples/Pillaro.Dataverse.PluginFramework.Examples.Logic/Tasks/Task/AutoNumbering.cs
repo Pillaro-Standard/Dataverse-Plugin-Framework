@@ -1,12 +1,12 @@
-﻿using Pillaro.Dataverse.PluginFramework.Plugins;
+using Pillaro.Dataverse.PluginFramework.Plugins;
 using Pillaro.Dataverse.PluginFramework.AutoNumbering;
 using Pillaro.Dataverse.PluginFramework.Tasks;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 using System;
 
-namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Opportunity
+namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
 {
-    public class Autonumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Opportunity>(serviceProvider, taskContext)
+    public class TaskAutoNumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
     {
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {
@@ -27,7 +27,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Opportunity
 
             DataServiceProvider.Admin.UpdateOutsideTransaction(response.Request.Target);
 
-            ContextEntity.Name = $"{response.Number}: {ContextEntity.Name}";
+            ContextEntity.Subject = $"{response.Number}: {ContextEntity.Subject}";
         }
     }
 }

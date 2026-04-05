@@ -1,6 +1,5 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Features.ForbiddenNames;
 using Pillaro.Dataverse.PluginFramework.Plugins;
-using Pillaro.Dataverse.PluginFramework.Data;
 using Pillaro.Dataverse.PluginFramework.Exceptions;
 using Pillaro.Dataverse.PluginFramework.Tasks;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
@@ -8,9 +7,9 @@ using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 {
-    public class ForbiddenNamesTask : TaskBase<Logic.Contact>
+    public class ValidateContactNamesTask : TaskBase<Logic.Contact>
     {
-        public ForbiddenNamesTask(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
+        public ValidateContactNamesTask(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
         {
         }
 
@@ -19,7 +18,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
             return validator
                 .WithMode(PluginMode.Synchronous)
                 .WithStage(PluginStage.Prevalidation)
-                .WithMessages(new[] { "Create", "Update" })
+                .WithMessages(["Create", "Update"])
                 .ForEntity(ContextEntity.LogicalName)
                 .EntityWithAtLeastOneAttribute(ContextEntity, "firstname", "lastname");
         }
@@ -28,12 +27,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
         {
             var forbiddenWords = new CustomerForbiddenNameService(SettingService).GetForbiddenNames();
 
-            var conts = DataServiceProvider.Admin.Query<Logic.Contact>()
-                .Select(c => new { c.FirstName, c.LastName })
-                .ToList();
-
-            AddLogMessageLine($"Count: ${conts.Count}");
-
+            AddLogMessageLine($"Forbidden words: {string.Join(",",forbiddenWords)}");
 
             if (ContextEntity.Contains(nameof(ContextEntity.FirstName).ToLower()) &&
                forbiddenWords.FindIndex(x => x.Equals(ContextEntity.FirstName, StringComparison.InvariantCultureIgnoreCase)) != -1)

@@ -16,6 +16,7 @@ internal class EntityAttributesWithConditionValidator(IEnumerable<string> attrib
     private bool? _attrValidation;
 
     public string GetName => nameof(EntityAttributesWithConditionValidator);
+
     public bool Validate(TaskContext taskContext)
     {
         _attrValidation = _entityAttributesValidator.Validate(taskContext);
@@ -24,11 +25,13 @@ internal class EntityAttributesWithConditionValidator(IEnumerable<string> attrib
 
     public string GetMessage()
     {
-        if (_attrValidation == null)
-            return GetPredicateMessage();
+        if (!_predicateResult)
+            return "Conditional validation was skipped because its predicate was not satisfied.";
 
-        var mess = _entityAttributesValidator.GetMessage();
-        return $"{GetPredicateMessage()} {mess}";
+        if (_attrValidation == null)
+            return string.Empty;
+
+        return _entityAttributesValidator.GetMessage();
     }
 
     public bool IsPredicateValid(TaskContext taskContext)
@@ -39,9 +42,8 @@ internal class EntityAttributesWithConditionValidator(IEnumerable<string> attrib
 
     public string GetPredicateMessage()
     {
-        if (_predicateResult)
-            return "Predicate is valid";
-
-        return "Predicate is not valid";
+        return _predicateResult
+            ? "Conditional validation is applicable."
+            : "Conditional validation is not applicable.";
     }
 }

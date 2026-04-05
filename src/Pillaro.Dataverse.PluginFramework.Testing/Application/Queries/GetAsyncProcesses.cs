@@ -1,6 +1,4 @@
-﻿using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
-
-namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
+﻿namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 
 public class GetAsyncProcesses
 {

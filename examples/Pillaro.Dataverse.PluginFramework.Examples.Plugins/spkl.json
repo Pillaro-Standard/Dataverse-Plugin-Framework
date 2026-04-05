@@ -2,12 +2,12 @@
   "plugins": [
     {
       "solution": "PillaroPluginFrameworkExamples",
-      "profile": "default,release",
+      "profile": "release",
       "assemblypath": "bin\\Release"
     },
     {
       "solution": "PillaroPluginFrameworkExamples",
-      "profile": "debug",
+      "profile": "default,debug",
       "assemblypath": "bin\\Debug"
     }
   ]
