@@ -4,6 +4,7 @@ using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
+using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
 
