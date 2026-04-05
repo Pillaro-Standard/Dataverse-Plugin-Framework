@@ -245,15 +245,19 @@ jobs:
 
             Set-Content $file -Value $content -NoNewline
 
+      - task: NuGetCommand@2
+        displayName: Restore framework project packages
+        inputs:
+          command: restore
+          restoreSolution: $(frameworkProjectPath)
+
       - task: VSBuild@1
         displayName: Build framework project
         inputs:
           solution: $(frameworkProjectPath)
           configuration: $(configuration)
           msbuildArgs: >
-            /restore
             /t:Rebuild
-            /p:RestorePackagesConfig=true
             /p:SolutionDir=$(Build.SourcesDirectory)\
             /p:Version=$(PACKAGE_VERSION)
             /p:AssemblyVersion=$(ASSEMBLY_VERSION)
