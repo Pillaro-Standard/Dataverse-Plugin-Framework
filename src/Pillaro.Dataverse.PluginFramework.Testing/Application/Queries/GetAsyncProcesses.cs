@@ -1,9 +1,8 @@
-﻿using MediatR;
-using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
+﻿using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 
-public class GetAsyncProcesses : IRequest<List<AsyncProcessResult>>
+public class GetAsyncProcesses
 {
     public Guid EntityId { get; }
     public DateTime DateFrom { get; }

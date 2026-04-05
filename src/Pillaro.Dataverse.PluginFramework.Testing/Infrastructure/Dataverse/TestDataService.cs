@@ -1,9 +1,9 @@
 ﻿using Autofac;
-using MediatR;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Pillaro.Dataverse.PluginFramework.Data;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
+using Pillaro.Dataverse.PluginFramework.Testing.Application.Handlers;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
 using System.Collections.Concurrent;
@@ -13,7 +13,6 @@ namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
 internal sealed class TestDataService : DataService, ITestDataService
 {
-    private readonly IMediator _mediator;
     private readonly ILifetimeScope _lifetimeScope;
     private readonly ConcurrentStack<EntityReference> _entitiesToDelete = new();
     private readonly ConcurrentDictionary<string, ICleanupDeleteHandler> _cleanupHandlers = new(StringComparer.OrdinalIgnoreCase);
@@ -23,7 +22,6 @@ internal sealed class TestDataService : DataService, ITestDataService
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         _lifetimeScope = lifetimeScope;
-        _mediator = lifetimeScope.Resolve<IMediator>();
     }
 
     public Guid CreateTestEntity(Entity entity, bool byPassPlugins = false)
@@ -54,19 +52,22 @@ internal sealed class TestDataService : DataService, ITestDataService
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        var created = await _mediator.Send(new CreateEntityAndReturn(entity), cancellation);
+        entity.Id = Create(entity);
+        var created = OrganizationService.Retrieve(entity.LogicalName, entity.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
         _entitiesToDelete.Push(created.ToEntityReference());
         return created;
     }
 
-    public Task WaitOnAsyncProcess(Guid entityId, int numberOfAttempts = 40, int cancellationTimeMs = 120000, CancellationToken cancellation = default)
+    public async Task WaitOnAsyncProcess(Guid entityId, int numberOfAttempts = 40, int cancellationTimeMs = 120000, CancellationToken cancellation = default)
     {
-        return _mediator.Send(new WaitOnAsyncProcess(entityId, numberOfAttempts, cancellationTimeMs), cancellation);
+        var handler = _lifetimeScope.Resolve<WaitOnAsyncProcessHandler>();
+        await handler.HandleAsync(new WaitOnAsyncProcess(entityId, numberOfAttempts, cancellationTimeMs), cancellation);
     }
 
-    public Task<List<AsyncProcessResult>> GetAsyncProcessResults(Guid entityId, DateTime? dateFrom = null, DateTime? dateTo = null, CancellationToken cancellation = default)
+    public async Task<List<AsyncProcessResult>> GetAsyncProcessResults(Guid entityId, DateTime? dateFrom = null, DateTime? dateTo = null, CancellationToken cancellation = default)
     {
-        return _mediator.Send(new GetAsyncProcesses(entityId, dateFrom, dateTo), cancellation);
+        var handler = _lifetimeScope.Resolve<GetAsyncProcessesHandler>();
+        return await handler.HandleAsync(new GetAsyncProcesses(entityId, dateFrom, dateTo), cancellation);
     }
 
     public new TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository

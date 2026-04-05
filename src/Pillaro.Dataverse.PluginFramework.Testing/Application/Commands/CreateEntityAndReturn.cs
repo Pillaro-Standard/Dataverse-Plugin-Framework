@@ -1,9 +1,8 @@
-﻿using MediatR;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
 
-public class CreateEntityAndReturn : IRequest<Entity>
+public class CreateEntityAndReturn
 {
     public Entity Entity { get; }
 

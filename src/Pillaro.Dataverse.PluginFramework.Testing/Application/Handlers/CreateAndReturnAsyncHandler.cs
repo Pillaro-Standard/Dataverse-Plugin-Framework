@@ -1,11 +1,10 @@
-﻿using MediatR;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
 using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Handlers;
 
-public class CreateAndReturnAsyncHandler(IDataverseConnectionService connectionService) : IRequestHandler<CreateEntityAndReturn, Entity>
+public class CreateAndReturnAsyncHandler(IDataverseConnectionService connectionService)
 {
     public async Task<Entity> Handle(CreateEntityAndReturn request, CancellationToken cancellationToken)
     {

@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using MediatR;
 using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 using Xunit;
@@ -12,7 +11,6 @@ public abstract class TestBase<TAutofacModule> : IClassFixture<TestFixture<TAuto
     protected readonly IDataverseConnectionService ConnectionService;
     protected readonly IOrganizationService OrganizationService;
     protected readonly ITestDataService DataService;
-    protected readonly IMediator Mediator;
     protected readonly ILifetimeScope LifetimeScope;
 
     protected TestBase(TestFixture<TAutofacModule> testFixture)
@@ -21,7 +19,6 @@ public abstract class TestBase<TAutofacModule> : IClassFixture<TestFixture<TAuto
         ConnectionService = LifetimeScope.Resolve<IDataverseConnectionService>();
         OrganizationService = ConnectionService.GetOrganizationService();
         DataService = LifetimeScope.Resolve<ITestDataService>();
-        Mediator = LifetimeScope.Resolve<IMediator>();
         ConnectionService.GetOrganizationService();
     }
 

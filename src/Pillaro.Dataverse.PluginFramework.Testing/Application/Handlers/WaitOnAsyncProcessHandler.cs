@@ -1,14 +1,13 @@
-﻿using MediatR;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
 using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Handlers;
 
-internal class WaitOnAsyncProcessHandler(IDataverseConnectionService connectionService) : IRequestHandler<WaitOnAsyncProcess>
+internal class WaitOnAsyncProcessHandler(IDataverseConnectionService connectionService)
 {
-    public async Task Handle(WaitOnAsyncProcess request, CancellationToken cancellationToken)
+    public async Task HandleAsync(WaitOnAsyncProcess request, CancellationToken cancellationToken)
     {
         using var timeoutCts = new CancellationTokenSource(request.CancellationTimeMs);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);

@@ -19,10 +19,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
             "address1_country"
         };
 
-        public ScoreOnAddressChange(
-            IServiceProvider serviceProvider,
-            TaskContext taskContext
-        ) : base(serviceProvider, taskContext)
+        public ScoreOnAddressChange(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
         {
         }
 

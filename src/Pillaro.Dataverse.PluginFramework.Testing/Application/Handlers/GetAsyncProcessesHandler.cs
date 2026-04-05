@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
@@ -8,9 +6,9 @@ using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Handlers;
 
-internal class GetAsyncProcessesHandler(IDataverseConnectionService connectionService, IMapper mapper) : IRequestHandler<GetAsyncProcesses, List<AsyncProcessResult>>
+internal class GetAsyncProcessesHandler(IDataverseConnectionService connectionService)
 {
-    public Task<List<AsyncProcessResult>> Handle(GetAsyncProcesses request, CancellationToken cancellationToken)
+    public Task<List<AsyncProcessResult>> HandleAsync(GetAsyncProcesses request, CancellationToken cancellationToken)
     {
         List<AsyncProcessResult> ret = [];
 
@@ -25,7 +23,15 @@ internal class GetAsyncProcessesHandler(IDataverseConnectionService connectionSe
         if (entityCollection.Entities.Count == 0)
             return Task.FromResult(ret);
 
-        ret.AddRange(entityCollection.Entities.Select(entity => mapper.Map<AsyncProcessResult>(entity)));
+        ret.AddRange(entityCollection.Entities.Select(entity => new AsyncProcessResult
+        {
+            AsyncOperationId = entity.Id,
+            StateCode = ((OptionSetValue)entity["statecode"]).Value,
+            StatusCode = ((OptionSetValue)entity["statuscode"]).Value,
+            CreatedOn = (DateTime)entity["createdon"],
+            CompletedOn = (DateTime)entity["completedon"],
+            RetryCount = (int)entity["retrycount"]
+        }));
 
         return Task.FromResult(ret);
     }

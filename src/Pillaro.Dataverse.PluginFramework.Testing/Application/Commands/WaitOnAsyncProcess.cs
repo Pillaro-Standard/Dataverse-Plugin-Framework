@@ -1,8 +1,6 @@
-﻿using MediatR;
+﻿namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
 
-namespace Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
-
-public class WaitOnAsyncProcess : IRequest
+public class WaitOnAsyncProcess
 {
     public Guid EntityId { get; }
     public int NumberOfAttempts { get; }
