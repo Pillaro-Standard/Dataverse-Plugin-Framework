@@ -19,9 +19,9 @@ public interface ITestDataService : IDataService, IAutoRegisteredService
 {
     /// <summary>
     /// Sets the xUnit test output helper for diagnostic logging.
-    /// Must be set per test since <see cref="ITestOutputHelper"/> is scoped to a single test instance.
+    /// Must be called per test since <see cref="ITestOutputHelper"/> is scoped to a single test instance.
     /// </summary>
-    ITestOutputHelper? Output { get; set; }
+    void SetOutput(ITestOutputHelper output);
 
     Guid CreateTestEntity(Entity entity, bool byPassPlugins = false);
 

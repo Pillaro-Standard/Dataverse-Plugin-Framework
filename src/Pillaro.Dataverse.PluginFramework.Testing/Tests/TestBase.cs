@@ -21,7 +21,7 @@ public abstract class TestBase<TAutofacModule> : IClassFixture<TestFixture<TAuto
         ConnectionService = LifetimeScope.Resolve<IDataverseConnectionService>();
         OrganizationService = ConnectionService.GetOrganizationService();
         DataService = LifetimeScope.Resolve<ITestDataService>();
-        DataService.Output = output;
+        DataService.SetOutput(output);
         ConnectionService.GetOrganizationService();
         Output = output;
     }
