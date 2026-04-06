@@ -30,18 +30,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
     , Image1Attributes = "address1_line1,address1_line2,address1_line3,address1_city,address1_postalcode,address1_stateorprovince,address1_country"
     , Id = "5072086e-1508-f111-8407-000d3ab261ac" 
     )]
-    [CrmPluginRegistration("Create", 
-    "contact", StageEnum.PostOperation, ExecutionModeEnum.Synchronous,
-    "","Pillaro Examples Post Create Contact", 1, 
-    IsolationModeEnum.Sandbox 
-    ,Id = "87598457-1008-f111-8407-000d3ab2695d" 
-    )]
-    [CrmPluginRegistration("Update", 
-    "contact", StageEnum.PostOperation, ExecutionModeEnum.Synchronous,
-    "","Pillaro Examples Post Update Contact", 1, 
-    IsolationModeEnum.Sandbox 
-    ,Id = "8a598457-1008-f111-8407-000d3ab2695d" 
-    )]
     public class ContactPlugin : PluginBase
     {
 
