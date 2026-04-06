@@ -6,7 +6,7 @@
 > Structured documentation for understanding, using, and extending the Pillaro Dataverse Plugin Framework.
 
 > [!NOTE]
-> Documentation is in progress. Some sections may be incomplete or subject to change.
+> Documentation is in progress. Sections marked with 🚧 are placeholders and will be completed in future updates.
 
 ---
 
@@ -31,9 +31,18 @@
 
 Start here if you are new to the framework.
 
-| Document | Description |
-|---|---|
-| [Getting Started](./getting-started.md) | Setup, prerequisites, and first plugin implementation |
+| Document | Description | Status |
+|---|---|---|
+| [Getting Started](./getting-started.md) | Setup, prerequisites, and first plugin implementation | 🚧 |
+
+### Prerequisites
+
+- .NET Framework 4.6.2 (plugin assemblies)
+- .NET 10 (test projects)
+- Microsoft Dataverse environment
+- Visual Studio 2022 or later
+
+### Solution Structure
 
 ---
 
@@ -41,12 +50,48 @@ Start here if you are new to the framework.
 
 Understanding how the framework is designed — from architecture to validation.
 
-| Document | Description |
+| Document | Description | Status |
+|---|---|---|
+| [Architecture](./architecture.md) | High-level execution model and structural overview | 🚧 |
+| [Plugin Model](./plugin-model.md) | Role and responsibilities of plugins | 🚧 |
+| [Task Model](./task-model.md) | Task lifecycle, structure, and single-responsibility pattern | 🚧 |
+| [Validation Model](./validation.md) | Fluent validation API and execution flow | 🚧 |
+
+### Plugin Model Summary
+
+Plugins are **orchestration layers** that register tasks against Dataverse messages. They follow one of two patterns:
+
+| Pattern | Scope | Example |
+|---|---|---|
+| **Entity-based** | Single entity lifecycle | `ContactPlugin` — handles Create/Update on `contact` |
+| **Functionality-based** | Business capability | `TaskPlugin` — handles Create/Update on `task` |
+
+Plugins inherit from `PluginBase` and register tasks in the constructor:
+
+---
+
+### Task Model Summary
+
+Tasks inherit from `TaskBase<TEntity>` and implement single-responsibility business logic. Each task provides:
+
+- **`AddValidations()`** — Fluent validation chain (mode → stage → messages → entity → attributes)
+- **`DoExecute()`** — Business logic only (no guard clauses)
+
+Built-in services available in every task:
+
+| Service | Purpose |
 |---|---|
-| [Architecture](./architecture.md) | High-level execution model and structural overview |
-| [Plugin Model](./plugin-model.md) | Role and responsibilities of plugins |
-| [Task Model](./task-model.md) | Task lifecycle, structure, and single-responsibility pattern |
-| [Validation Model](./validation.md) | Fluent validation API and execution flow |
+| `DataServiceProvider.Admin` / `.User` | Dataverse CRUD with security context separation |
+| `SettingService` | Runtime configuration from `pl_setting` entity (cached) |
+| `LogService` | Structured logging to `pl_log` entity |
+| `TracingService` | Dataverse tracing service |
+| `ContextEntity` / `PreImage` / `PostImage` | Automatic entity context initialization |
+
+### Fluent Validation Summary
+
+Validations use a chainable API executed **before** `DoExecute()`:
+
+Validation failures set `TaskStatus.NotValid` and skip execution — no exception is thrown unless `DataverseValidationException` is explicitly raised.
 
 ---
 
@@ -54,10 +99,18 @@ Understanding how the framework is designed — from architecture to validation.
 
 How the framework behaves during plugin execution in Dataverse.
 
-| Document | Description |
-|---|---|
-| [Execution Pipeline](./execution-pipeline.md) | Task orchestration, ordering, and execution flow |
-| [Runtime Configuration](./configuration.md) | Configuration stored in Dataverse, loaded at runtime |
+| Document | Description | Status |
+|---|---|---|
+| [Execution Pipeline](./execution-pipeline.md) | Task orchestration, ordering, and execution flow | 🚧 |
+| [Runtime Configuration](./configuration.md) | Configuration stored in Dataverse, loaded at runtime | 🚧 |
+
+### Execution Flow
+
+---
+
+### Runtime Configuration
+
+The `SettingsService` reads key-value pairs from the `pl_setting` Dataverse table. Supported value types: Text, JSON, Integer, Boolean, Decimal, DateTime. Values are cached in-memory with configurable TTL (default: 60s).
 
 ---
 
@@ -65,9 +118,21 @@ How the framework behaves during plugin execution in Dataverse.
 
 Configurable sequence generation built into the framework.
 
-| Document | Description |
-|---|---|
-| [Autonumbering](./autonumbering.md) | Sequence configuration, parent-based numbering, and concurrency handling |
+| Document | Description | Status |
+|---|---|---|
+| [Autonumbering](./autonumbering.md) | Sequence configuration, parent-based numbering, and concurrency handling | 🚧 |
+
+### Overview
+
+`AutoNumberingService` generates formatted sequence numbers stored in `pl_autonumbering` records. Features:
+
+- **Format tokens**: `{NUM}`, `{date1}`, `{date2}`, `{date3}`, `{grouping}`, `{attributeName}`
+- **Parent-based numbering**: Separate sequences per parent entity lookup
+- **Grouping**: Separate sequences per grouping value (e.g., year)
+- **Concurrency**: Uses `RowVersion` with `ConcurrencyBehavior.IfRowVersionMatches`
+- **Transactional**: Returns an `UpdateRequest` for the caller to execute within the plugin transaction
+
+Example usage from `TaskAutoNumbering`:
 
 ---
 
@@ -75,10 +140,27 @@ Configurable sequence generation built into the framework.
 
 Monitoring, debugging, and diagnosing execution behavior.
 
-| Document | Description |
+| Document | Description | Status |
+|---|---|---|
+| [Logging](./logging.md) | Diagnostic logging and execution tracing | 🚧 |
+| [Error Handling](./error-handling.md) | Validation failures, warnings, and exception handling | 🚧 |
+
+### Logging
+
+`LogService` persists structured logs to the `pl_log` entity with related `pl_logdetail` records. Log severity levels: `Debug`, `Info`, `Warning`, `Error`, `Fatal`. A minimum severity threshold is configurable via the `MinimalSeverityLevel` setting key.
+
+Each task execution automatically produces a log entry containing:
+- Execution elapsed time, task name, correlation ID
+- Input/Output parameters and Pre/Post entity images
+- Validation messages and execution messages
+
+### Error Handling
+
+| Exception | Behavior |
 |---|---|
-| [Logging](./logging.md) | Diagnostic logging and execution tracing |
-| [Error Handling](./error-handling.md) | Validation failures, warnings, and exception handling |
+| `DataverseValidationException` | Surfaces message to user, logged as `Info` severity |
+| `InvalidPluginExecutionException` | Logged as `Error`, re-thrown to Dataverse |
+| Other `Exception` | Logged as `Error`, wrapped in `InvalidPluginExecutionException` |
 
 ---
 
@@ -86,10 +168,21 @@ Monitoring, debugging, and diagnosing execution behavior.
 
 How to verify behavior against real Dataverse environments.
 
-| Document | Description |
-|---|---|
-| [Testing Overview](./testing.md) | Testing principles and approach |
-| [Integration Testing](./integration-testing.md) | Working with Dataverse environments |
+| Document | Description | Status |
+|---|---|---|
+| [Testing Overview](./testing.md) | Testing principles and approach | 🚧 |
+| [Integration Testing](./integration-testing.md) | Working with Dataverse environments | 🚧 |
+
+### Testing Architecture
+
+- **Integration tests only** — no mocks, no fakes
+- **Framework**: xUnit v3 on .NET 10
+- **DI**: Autofac with `TestAutofacModule`
+- **Base class**: `TestBase<TAutofacModule>` provides `DataService`, `OrganizationService`, `ConnectionService`
+- **Cleanup**: Automatic via `IDisposable` — test entities are deleted after each test
+- **Configuration**: `appsettings.json` / `appsettings.Development.json` for connection strings
+
+Key rule: all Dataverse operations in tests MUST go through `DataService` — never resolve `IOrganizationService` directly.
 
 ---
 
@@ -97,11 +190,22 @@ How to verify behavior against real Dataverse environments.
 
 How to prepare, sign, and deploy plugin assemblies.
 
-| Document | Description |
-|---|---|
-| [Packaging and Deployment](./packaging-and-deployment.md) | Signing, assembly structure, and deployment process |
-| [Versioning](./VERSIONING.md) | Versioning strategy and release model | 
-| [Changelog](../CHANGELOG.md) | Release notes and changes per version |
+| Document | Description | Status |
+|---|---|---|
+| [Packaging and Deployment](./packaging-and-deployment.md) | Signing, assembly structure, and deployment process | 🚧 |
+| [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
+| [Changelog](../CHANGELOG.md) | Release notes and changes per version | ✅ |
+
+### Assembly Structure
+
+The deployable plugin is a **single signed assembly** produced via ILMerge:
+
+1. **Logic project** (`Examples.Logic`) — Plugins, Tasks, Features, Early-bound types
+2. **Plugin project** (`Examples.Plugins`) — References Logic; post-build merges all dependencies into one signed DLL
+3. **Signing**: Strong-name key (`key.snk`) applied during ILMerge
+4. **Registration**: SPKL with `CrmPluginRegistration` attributes
+
+> ⚠️ Do **not** modify the ILMerge setup. It is intentional and required for Dataverse deployment.
 
 ---
 
@@ -114,23 +218,45 @@ How to prepare, sign, and deploy plugin assemblies.
 
 This constraint applies to any project that uses SPKL for early-bound type generation (e.g., `Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen`).
 
+### Target Framework
+
+All plugin assemblies **must** target **.NET Framework 4.6.2**. This is a Dataverse platform requirement. Test projects may target modern .NET.
+
 ---
 
 ## 💡 Examples
 
-Practical usage of the framework with sample implementations.
+The `examples/` folder contains working implementations demonstrating framework patterns.
 
-| Document | Description |
+### Plugins
+
+| Plugin | Entity | Pattern | Stages |
+|---|---|---|---|
+| `ContactPlugin` | `contact` | Entity-based | PreValidation, PreOperation |
+| `TaskPlugin` | `task` | Entity-based | PreOperation, PostOperation |
+
+### Tasks
+
+| Task | Entity | Stage | Purpose |
+|---|---|---|---|
+| `ValidateContactNamesTask` | `contact` | PreValidation | Rejects forbidden first/last names using `SettingsService` |
+| `UpdateAddressLabel` | `contact` | PreOperation | Composes `Address1_Name` from address fields with PreImage merge |
+| `TaskAutoNumbering` | `task` | PreOperation | Generates sequential subject prefix via `AutoNumberingService` |
+| `TaskSummarySync` | `task` | PostOperation | Recalculates parent contact description from related tasks |
+
+### Features
+
+| Feature | Description |
 |---|---|
-| [Examples Overview](./examples.md) | Available sample implementations and patterns |
+| `CustomerForbiddenNameService` | Reads forbidden word list from `SettingsService` JSON configuration |
 
 ---
 
 ## 🤝 Contributing
 
-| Document | Description |
-|---|---|
-| [Contributing](./contributing.md) | Guidelines for contributing to the project |
+| Document | Description | Status |
+|---|---|---|
+| [Contributing](./contributing.md) | Guidelines for contributing to the project | 🚧 |
 
 ---
 
@@ -138,13 +264,13 @@ Practical usage of the framework with sample implementations.
 
 If you are new to the framework:
 
-1. Start with **Getting Started**
-2. Continue with **Architecture** and **Task Model**
-3. Explore **Examples**
-4. Dive into advanced topics as needed
+1. Start with **Getting Started** and **Architecture**
+2. Review the **Examples** section above for concrete patterns
+3. Study `ContactPlugin` → `ValidateContactNamesTask` → `UpdateAddressLabel` as a complete flow
+4. Explore **Autonumbering** and **Observability** for advanced features
 
 If you are implementing a solution:
 
-1. Review **Packaging & Deployment**
-2. Set up **Testing**
-3. Use **Logging** for diagnostics
+1. Review **Packaging & Deployment** and **Known Limitations**
+2. Set up **Testing** with `TestBase` and `DataService`
+3. Use **Logging** and **Error Handling** for diagnostics
