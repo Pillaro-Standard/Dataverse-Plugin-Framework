@@ -90,7 +90,6 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     public new TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository
     {
-        WriteOutput($"Resolving repository '{typeof(TTestDataRepository).Name}'.");
         return _lifetimeScope.Resolve<TTestDataRepository>();
     }
 

@@ -20,7 +20,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
                 .WithStage(PluginStage.Prevalidation)
                 .WithMessages(["Create", "Update"])
                 .ForEntity(ContextEntity.LogicalName)
-                .EntityWithAtLeastOneAttribute(ContextEntity, "firstname", "lastname");
+                .EntityWithAtLeastOneAttribute(ContextEntity, nameof(ContextEntity.FirstName), nameof(ContextEntity.LastName));
         }
 
         protected override void DoExecute()

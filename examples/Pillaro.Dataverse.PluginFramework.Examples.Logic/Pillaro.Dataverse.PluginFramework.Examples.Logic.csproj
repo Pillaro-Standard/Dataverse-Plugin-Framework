@@ -72,6 +72,7 @@
     <Compile Include="SettingsKeys.cs" />
     <Compile Include="Tasks\Contact\ValidateContactNamesTask.cs" />
     <Compile Include="Tasks\Contact\UpdateAddressLabel.cs" />
+    <Compile Include="Tasks\Task\TaskSummarySync.cs" />
     <Compile Include="Tasks\Task\AutoNumbering.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -54,6 +54,7 @@ public interface IDataService
 
     void Delete(EntityCollection entityCollection);
 
+
     SetStateResponse SetState(EntityReference entityReference, int stateCode, int? statusCode);
 
     #endregion

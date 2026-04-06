@@ -8,7 +8,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(TaskAutoNumbering))]
-public class TaskAutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
+public class AutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
 {
     [Fact]
     public void Should_PrefixSubjectWithAutoNumber_When_TaskIsCreated()
