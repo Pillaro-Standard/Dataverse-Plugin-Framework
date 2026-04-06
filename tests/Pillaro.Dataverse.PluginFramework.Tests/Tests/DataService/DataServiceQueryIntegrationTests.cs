@@ -10,7 +10,7 @@ public class DataServiceQueryIntegrationTests : TestBase
 {
     private readonly PluginFramework.Data.DataService _dataService;
 
-    public DataServiceQueryIntegrationTests(TestFixture<TestAutofacModule> testFixture) : base(testFixture)
+    public DataServiceQueryIntegrationTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
         _dataService = new PluginFramework.Data.DataService(OrganizationService);
     }

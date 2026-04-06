@@ -1,4 +1,5 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Examples.Logic;
 using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
@@ -8,8 +9,10 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(UpdateAddressLabel))]
-public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture) : TestBase(testFixture)
+public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) 
+    : TestBase(testFixture, output)
 {
+
     [Fact]
     public void Create_WithAddress_ShouldSetAddressLabel()
     {
@@ -35,7 +38,7 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture)
             .GetNewWithAddress("Jan", "Label", addressLine1: "Old address 1");
 
         c.Id = DataService.CreateTestEntity(c);
-
+        
         var before = DataService
             .Query<Contact>()
             .Where(x => x.Id == c.Id)

@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Configuration;
+using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Tests;
 
@@ -13,6 +14,7 @@ public class TestFixture<TAutofacModule>
         ContainerBuilder builder = new();
         builder.RegisterModule<TAutofacModule>();
         builder.RegisterInstance(GetConfiguration()).As<IConfiguration>();
+
         Container = builder.Build();
     }
 

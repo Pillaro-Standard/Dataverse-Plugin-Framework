@@ -1,13 +1,14 @@
 using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
+using Xunit.Sdk;
 using Task = Pillaro.Dataverse.PluginFramework.Examples.Logic.Task;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(TaskAutoNumbering))]
-public class TaskAutoNumberingTest(TestFixture<TestAutofacModule> testFixture) : TestBase(testFixture)
+public class TaskAutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
 {
     [Fact]
     public void Should_PrefixSubjectWithAutoNumber_When_TaskIsCreated()

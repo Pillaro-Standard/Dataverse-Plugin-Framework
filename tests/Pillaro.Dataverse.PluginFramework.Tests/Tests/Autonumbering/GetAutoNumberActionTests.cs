@@ -15,7 +15,7 @@ public class GetAutoNumberActionTests : TestBase
 {
     private const string EntityName = "contact";
 
-    public GetAutoNumberActionTests(TestFixture<TestAutofacModule> testFixture) : base(testFixture)
+    public GetAutoNumberActionTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
         CleanupAutoNumbering(EntityName);
     }

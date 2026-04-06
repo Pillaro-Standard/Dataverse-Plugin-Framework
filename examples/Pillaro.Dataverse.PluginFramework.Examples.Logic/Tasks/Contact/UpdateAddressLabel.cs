@@ -56,7 +56,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 
         private string GetValue(string attributeName, Func<Logic.Contact, string> selector)
         {
-            if (ContextEntity.Attributes.ContainsKey(attributeName))
+            if (ContextEntity.Attributes.ContainsKey(attributeName.ToLowerInvariant())) 
                 return selector(ContextEntity);
 
             var preImage = ContextEntity;

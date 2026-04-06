@@ -11,10 +11,10 @@ public class ValidateContactNamesTaskFunctionTests : TestBase
 {
     private readonly List<string> _forbiddenWords;
 
-    public ValidateContactNamesTaskFunctionTests(TestFixture<TestAutofacModule> testFixture) : base(testFixture)
+    public ValidateContactNamesTaskFunctionTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
         var forbiddenWordsJson = SettingService.GetJsonValue("ForbiddenWords");
-        _forbiddenWords = JsonConvert.DeserializeObject<List<string>>(forbiddenWordsJson);
+        _forbiddenWords = JsonConvert.DeserializeObject<List<string>>(forbiddenWordsJson) ?? new List<string>();
     }
 
     [Fact]

@@ -9,7 +9,7 @@ public class TestBase : TestBase<TestAutofacModule>
 {
     protected readonly SettingsService SettingService;
 
-    public TestBase(TestFixture<TestAutofacModule> testFixture) : base(testFixture)
+    public TestBase(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
 
         SettingService = testFixture.Container.Resolve<SettingsService>();

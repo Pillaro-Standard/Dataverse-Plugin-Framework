@@ -8,6 +8,7 @@ using Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
@@ -16,6 +17,8 @@ internal sealed class TestDataService : DataService, ITestDataService
     private readonly ILifetimeScope _lifetimeScope;
     private readonly ConcurrentStack<EntityReference> _entitiesToDelete = new();
     private readonly ConcurrentDictionary<string, ICleanupDeleteHandler> _cleanupHandlers = new(StringComparer.OrdinalIgnoreCase);
+
+    public ITestOutputHelper? Output { get; set; }
 
     public TestDataService(IDataverseConnectionService connectionService, ILifetimeScope lifetimeScope)
         : base(connectionService.GetOrganizationService())
@@ -31,6 +34,7 @@ internal sealed class TestDataService : DataService, ITestDataService
         if (!byPassPlugins)
         {
             entity.Id = Create(entity);
+            Output?.WriteLine($"Created entity '{entity.LogicalName}' with Id '{entity.Id}'.");
         }
         else
         {
@@ -42,9 +46,11 @@ internal sealed class TestDataService : DataService, ITestDataService
 
             var response = (CreateResponse)OrganizationService.Execute(request);
             entity.Id = response.id;
+            Output?.WriteLine($"Created entity '{entity.LogicalName}' with Id '{entity.Id}' (bypassed plugins).");
         }
 
         _entitiesToDelete.Push(entity.ToEntityReference());
+
         return entity.Id;
     }
 
@@ -55,23 +61,30 @@ internal sealed class TestDataService : DataService, ITestDataService
         entity.Id = Create(entity);
         var created = OrganizationService.Retrieve(entity.LogicalName, entity.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
         _entitiesToDelete.Push(created.ToEntityReference());
+        Output?.WriteLine($"Created and retrieved entity '{created.LogicalName}' with Id '{created.Id}'.");
         return created;
     }
 
     public async Task WaitOnAsyncProcess(Guid entityId, int numberOfAttempts = 40, int cancellationTimeMs = 120000, CancellationToken cancellation = default)
     {
+        Output?.WriteLine($"Waiting on async process for entity Id '{entityId}' (attempts: {numberOfAttempts}, timeout: {cancellationTimeMs}ms).");
         var handler = _lifetimeScope.Resolve<WaitOnAsyncProcessHandler>();
         await handler.HandleAsync(new WaitOnAsyncProcess(entityId, numberOfAttempts, cancellationTimeMs), cancellation);
+        Output?.WriteLine($"Async process for entity Id '{entityId}' completed.");
     }
 
     public async Task<List<AsyncProcessResult>> GetAsyncProcessResults(Guid entityId, DateTime? dateFrom = null, DateTime? dateTo = null, CancellationToken cancellation = default)
     {
+        Output?.WriteLine($"Fetching async process results for entity Id '{entityId}'.");
         var handler = _lifetimeScope.Resolve<GetAsyncProcessesHandler>();
-        return await handler.HandleAsync(new GetAsyncProcesses(entityId, dateFrom, dateTo), cancellation);
+        var results = await handler.HandleAsync(new GetAsyncProcesses(entityId, dateFrom, dateTo), cancellation);
+        Output?.WriteLine($"Retrieved {results.Count} async process result(s) for entity Id '{entityId}'.");
+        return results;
     }
 
     public new TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository
     {
+        Output?.WriteLine($"Resolving repository '{typeof(TTestDataRepository).Name}'.");
         return _lifetimeScope.Resolve<TTestDataRepository>();
     }
 
@@ -80,10 +93,13 @@ internal sealed class TestDataService : DataService, ITestDataService
         ArgumentNullException.ThrowIfNull(entity);
 
         _entitiesToDelete.Push(entity);
+        Output?.WriteLine($"Registered entity '{entity.LogicalName}' with Id '{entity.Id}' for cleanup.");
     }
 
     public void DeleteTestEntities()
     {
+        Output?.WriteLine("Starting test entity cleanup.");
+
         while (_entitiesToDelete.TryPop(out var entityReference))
         {
             if (entityReference.Id == Guid.Empty)
@@ -91,18 +107,23 @@ internal sealed class TestDataService : DataService, ITestDataService
 
             if (_cleanupHandlers.TryGetValue(entityReference.LogicalName, out var cleanupHandler))
             {
+                Output?.WriteLine($"Running cleanup handler for '{entityReference.LogicalName}' with Id '{entityReference.Id}'.");
                 cleanupHandler.DeleteReferences(entityReference, this);
             }
 
             try
             {
                 Delete(entityReference);
+                Output?.WriteLine($"Deleted entity '{entityReference.LogicalName}' with Id '{entityReference.Id}'.");
             }
             catch (Exception ex)
             {
+                Output?.WriteLine($"Failed to delete entity '{entityReference.LogicalName}' with Id '{entityReference.Id}': {ex.Message}");
                 Debug.WriteLine(ex);
             }
         }
+
+        Output?.WriteLine("Test entity cleanup completed.");
     }
 
     public void AddCleanUpDeleteHandler(ICleanupDeleteHandler handler)
@@ -113,6 +134,8 @@ internal sealed class TestDataService : DataService, ITestDataService
         {
             throw new InvalidOperationException($"Cleanup handler for entity '{handler.EntityLogicalName}' is already registered.");
         }
+
+        Output?.WriteLine($"Registered cleanup handler for entity '{handler.EntityLogicalName}'.");
     }
 
     public void AddCleanUpDeleteHandlers(IEnumerable<ICleanupDeleteHandler> handlers)
@@ -127,6 +150,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     public IReadOnlyCollection<ICleanupDeleteHandler> GetAllCleanUpDeleteHandlers()
     {
+        Output?.WriteLine($"Returning {_cleanupHandlers.Count} registered cleanup handler(s).");
         return _cleanupHandlers.Values.ToList().AsReadOnly();
     }
 }

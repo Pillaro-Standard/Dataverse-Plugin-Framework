@@ -2,6 +2,7 @@
 using Pillaro.Dataverse.PluginFramework.Data;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Interfaces;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
+using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
@@ -16,6 +17,12 @@ namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 /// </remarks>
 public interface ITestDataService : IDataService, IAutoRegisteredService
 {
+    /// <summary>
+    /// Sets the xUnit test output helper for diagnostic logging.
+    /// Must be set per test since <see cref="ITestOutputHelper"/> is scoped to a single test instance.
+    /// </summary>
+    ITestOutputHelper? Output { get; set; }
+
     Guid CreateTestEntity(Entity entity, bool byPassPlugins = false);
 
     Task<Entity> CreateAndReturnTestEntity(Entity entity, CancellationToken cancellation = default);
