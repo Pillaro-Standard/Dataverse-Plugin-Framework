@@ -22,7 +22,7 @@ This configuration enables automatic number generation for Task records in the e
 
 ## Quick test steps
 
-1. Deploy the framework to Dataverse (see `power-platform-solutions/framework/README.md`).
+1. Deploy the framework to Dataverse [see](../framework/README.md).
 2. Configure runtime setting `ForbiddenWords` with the JSON value `["Admin","Test"]`.
 3. Create the required `Autonumberings` record as shown in the table above.
 4. Deploy or register the example solutions/plugins from the `examples` folder.
