@@ -9,8 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		LICENSE = LICENSE
 		CHANGELOG.md = CHANGELOG.md
+		LICENSE = LICENSE
 		NuGet.config = NuGet.config
 		Packages – Build & Package.yml = Packages – Build & Package.yml
 		README.md = README.md
@@ -38,6 +38,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}"
 	ProjectSection(SolutionItems) = preProject
+		docs\getting-started.md = docs\getting-started.md
 		docs\README.md = docs\README.md
 		docs\VERSIONING.md = docs\VERSIONING.md
 	EndProjectSection
