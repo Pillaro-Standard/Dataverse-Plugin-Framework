@@ -183,31 +183,27 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Tasks.Autonumbering
 
         private pl_AutoNumbering LoadPrimaryConfig(IOrganizationService service, string entityName)
         {
-            using (var svc = new ServiceContext(service))
-            {
-                svc.MergeOption = Microsoft.Xrm.Sdk.Client.MergeOption.NoTracking;
-                var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentAutoNumberingId == null && x.pl_ParentLookupId == null).Take(2).ToList();
+            using var svc = new ServiceContext(service);
+            svc.MergeOption = Microsoft.Xrm.Sdk.Client.MergeOption.NoTracking;
+            var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentAutoNumberingId == null && x.pl_ParentLookupId == null).Take(2).ToList();
 
-                if (result.Count > 1)
-                    throw new InvalidPluginExecutionException($"More than one primary autonumbering configuration exists for entity '{entityName}'.");
+            if (result.Count > 1)
+                throw new InvalidPluginExecutionException($"More than one primary autonumbering configuration exists for entity '{entityName}'.");
 
-                return result.Count == 0 ? null : result[0];
-            }
+            return result.Count == 0 ? null : result[0];
         }
 
         private pl_AutoNumbering LoadChildConfig(IOrganizationService service, string entityName, Guid parentLookupId)
         {
-            using (var svc = new ServiceContext(service))
-            {
-                svc.MergeOption = Microsoft.Xrm.Sdk.Client.MergeOption.NoTracking;
-                var parentLookupIdText = parentLookupId.ToString();
-                var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentLookupId == parentLookupIdText).Take(2).ToList();
+            using var svc = new ServiceContext(service);
+            svc.MergeOption = Microsoft.Xrm.Sdk.Client.MergeOption.NoTracking;
+            var parentLookupIdText = parentLookupId.ToString();
+            var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentLookupId == parentLookupIdText).Take(2).ToList();
 
-                if (result.Count > 1)
-                    throw new InvalidPluginExecutionException($"More than one child configuration exists for entity '{entityName}' and ParentLookupId='{parentLookupId}'.");
+            if (result.Count > 1)
+                throw new InvalidPluginExecutionException($"More than one child configuration exists for entity '{entityName}' and ParentLookupId='{parentLookupId}'.");
 
-                return result.Count == 0 ? null : result[0];
-            }
+            return result.Count == 0 ? null : result[0];
         }
 
         private static bool IsRetryableConcurrencyFault(FaultException<OrganizationServiceFault> ex)

@@ -1,7 +1,6 @@
 using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
-using Xunit.Sdk;
 using Task = Pillaro.Dataverse.PluginFramework.Examples.Logic.Task;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;

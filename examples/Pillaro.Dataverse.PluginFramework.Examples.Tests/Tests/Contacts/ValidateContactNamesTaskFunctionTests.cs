@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 using System.ServiceModel;
-using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
 

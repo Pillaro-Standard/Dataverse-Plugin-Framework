@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Autofac.Core.Lifetime;
 using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 using Xunit;

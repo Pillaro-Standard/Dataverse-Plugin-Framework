@@ -1,5 +1,4 @@
 using Microsoft.Xrm.Sdk;
-using Pillaro.Dataverse.PluginFramework.Data;
 using Pillaro.Dataverse.PluginFramework.Examples.Logic;
 using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 

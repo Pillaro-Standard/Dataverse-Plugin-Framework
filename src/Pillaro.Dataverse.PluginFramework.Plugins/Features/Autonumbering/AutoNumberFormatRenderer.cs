@@ -8,8 +8,8 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering
 {
     public partial class AutoNumberFormatRenderer
     {
-        private static readonly Regex TokenRegex = new Regex("(?<={).+?(?=})", RegexOptions.Compiled);
-        private static readonly Regex NumTokenRegex = new Regex("{NUM}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex TokenRegex = new("(?<={).+?(?=})", RegexOptions.Compiled);
+        private static readonly Regex NumTokenRegex = new("{NUM}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         
   
         public RenderPlan Analyze(string formatString, FormatConfig config, int nextNumber)

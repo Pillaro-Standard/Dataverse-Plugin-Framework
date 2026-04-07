@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Configuration;
-using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Tests;
 

@@ -4,7 +4,6 @@ using Pillaro.Dataverse.PluginFramework.Tasks;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
 {
