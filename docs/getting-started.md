@@ -98,9 +98,9 @@ YourSolution.Logic/
 ├── Plugins/
 │   └── PluginBase.cs
 ├── Tasks/
-│   └── (task folders by entity or feature)
+│   └── Task (task folders by entity or feature)
 ├── Features/
-│   └── (shared services and feature-specific code)
+│   └── Feature (shared services and feature-specific code)
 ├── spkl/
 │   ├── earlybound.bat (created by SPKL package)
 │   └── instrument-plugin-code.bat (created by SPKL package)
@@ -111,35 +111,10 @@ YourSolution.Logic/
 **Folder Purpose:**
 - **Plugins**: Plugin registration classes
 - **Tasks**: Business logic tasks organized by entity or capability
-- **Features**: Shared services, helpers, and cross-cutting concerns
+- **Features**: Shared services and feature-specific code
 - **spkl**: SPKL tooling scripts (auto-generated when SPKL package is installed)
 
-### Step 4: Create Your PluginBase
-
-Create `Plugins/PluginBase.cs`:
-
-~~~csharp
-namespace YourSolution.Logic.Plugins
-{
-    public class PluginBase : PluginFramework.Plugins.PluginBase
-    {
-        public PluginBase(string unsecureConfig, string secureConfig) 
-            : base(unsecureConfig, secureConfig)
-        {
-        }
-
-        public override string GetSolutionVersion()
-        {
-            return "1.0.0"; // Update this with each release
-        }
-    }
-}
-~~~
-
-> [!TIP]
-> Update `GetSolutionVersion()` with each release. This version appears in all logs for traceability.
-
-### Step 5: Configure SPKL for Early-Bound Generation
+### Step 4: Configure SPKL for Early-Bound Generation
 
 If you installed SPKL, modify `spkl.json` (auto-created by SPKL NuGet package) in the Logic project root:
 
@@ -166,9 +141,9 @@ If you installed SPKL, modify `spkl.json` (auto-created by SPKL NuGet package) i
 > - `spkl/earlybound.bat` (entity generation script)
 > - `spkl/instrument-plugin-code.bat` (ID injection script)
 >
-> You only need to **modify** `spkl.json` to specify which entities to generate (e.g., add `task` or other entities to the `entities` list).
+> You only need to **modify** `spkl.json` to specify which entities to generate.
 
-### Step 6: Generate Early-Bound Entities
+### Step 5: Generate Early-Bound Entities
 
 Before implementing tasks, generate the early-bound entities:
 
@@ -181,11 +156,36 @@ earlybound.bat
 ~~~
 
 The SPKL wizard will guide you through:
-- Selecting connection profile or creating new one
+- Selecting connection profile or creating a new one
 - Authenticating to Dataverse
 - Generating entity classes based on `spkl.json`
 
-This generates `EarlyBoundTypes.cs` with strongly-typed entity classes.
+This generates `EarlyBoundTypes.cs` with strongly typed entity classes.
+
+### Step 6: Create Your PluginBase
+
+Create `Plugins/PluginBase.cs`:
+
+~~~csharp
+namespace YourSolution.Logic.Plugins
+{
+    public class PluginBase : PluginFramework.Plugins.PluginBase
+    {
+        public PluginBase(string unsecureConfig, string secureConfig) 
+            : base(unsecureConfig, secureConfig)
+        {
+        }
+
+        public override string GetSolutionVersion()
+        {
+            return "1.0.0"; // Update this with each release
+        }
+    }
+}
+~~~
+
+> [!TIP]
+> Update `GetSolutionVersion()` with each release. This version appears in logs for traceability.
 
 ---
 
@@ -216,13 +216,27 @@ Add to `.csproj`:
 </PropertyGroup>
 ~~~
 
-Generate signing key (without password):
+Generate a signing key for the Plugins project root:
 
 ~~~bash
 sn -k key.snk
 ~~~
 
 Or use Visual Studio: __Project Properties > Signing > Create Strong Name Key__
+
+> [!IMPORTANT]
+> The post-build ILMerge step expects `key.snk` in the **root of the Plugins project** because it is referenced from:
+>
+> `$(ProjectDir)key.snk`
+
+> [!NOTE]
+> You do **not** have to use the same `.snk` file for both Logic and Plugins assemblies.
+>
+> What matters is:
+> - the final merged Plugins assembly is signed
+> - the Plugins project has `key.snk` available in its root for the post-build ILMerge step
+>
+> In many projects, using the same key is simpler, but it is not a technical requirement.
 
 ### Step 4: Install NuGet Packages
 
@@ -310,6 +324,21 @@ dotnet new xunit -n YourSolution.Tests -f net8.0
 <PackageReference Include="Pillaro.Dataverse.PluginFramework.Testing" Version="1.0.0" />
 ~~~
 
+### Step 4: Configure Connection String for Tests
+
+Tests require a Dataverse connection. Add the connection string to `appsettings.Development.json`:
+
+~~~json
+{
+  "ConnectionStrings": {
+    "Dataverse": "AuthType=ClientSecret;Url=https://your-org.crm.dynamics.com;ClientId=...;ClientSecret=...;TenantId=..."
+  }
+}
+~~~
+
+> [!IMPORTANT]
+> Without a valid connection string in `appsettings.Development.json`, integration tests will not run.
+
 > [!NOTE]
 > Detailed testing setup is covered in the [Testing](./testing.md) documentation.
 
@@ -394,9 +423,28 @@ namespace YourSolution.Logic.Plugins
 ~~~
 
 > [!IMPORTANT]
-> Always specify the `Id` attribute in `CrmPluginRegistration` for safe, predictable deployments. If you deploy without IDs first, run `spkl/instrument-plugin-code.bat` to automatically add them.
+> `PluginBase` is the shared base class for your solution.
+>
+> `CrmPluginRegistration` belongs on the concrete plugin class, such as `TaskPlugin`.
 
-### Step 3: Build Projects
+### Step 3: Configure AutoNumbering Data in Dataverse
+
+For the sample to work, you must configure autonumbering data in Dataverse.
+
+At minimum:
+1. Open the `pl_autonumber` table
+2. Create a record for the `task` entity
+3. Configure the numbering pattern according to your environment
+
+Example values:
+- **Entity logical name**: `task`
+- **Prefix**: `TSK`
+- **Next number / counter**: starting value for your sequence
+
+> [!IMPORTANT]
+> The `TaskAutoNumbering` sample does not work by code alone. It depends on autonumbering configuration data stored in Dataverse.
+
+### Step 4: Build Projects
 
 1. Build the Logic project first
 2. Build the Plugins project (ILMerge will run automatically via post-build event)
@@ -479,7 +527,7 @@ instrument-plugin-code.bat
 This reads deployed plugin metadata from Dataverse and updates your source code with stable IDs.
 
 > [!WARNING]
-> Without stable IDs, SPKL may not correctly identify existing plugin steps across environments. If plugin IDs change, for example after deleting and recreating a plugin in development, deployments can result in duplicated steps or incorrect step mapping.
+> Without stable IDs, SPKL may not correctly identify existing plugin steps across environments. This can result in duplicated steps or incorrect step mapping.
 
 ### Deployment Checklist
 
@@ -489,6 +537,7 @@ This reads deployed plugin metadata from Dataverse and updates your source code 
 - [ ] Deploy plugins (`deploy-plugins.bat`)
 - [ ] If first deployment without IDs, run `instrument-plugin-code.bat` and redeploy
 - [ ] Verify plugin registration in __Settings > Customizations > Plug-in Assemblies__
+- [ ] Verify that autonumbering data exists in `pl_autonumber`
 
 ### Alternative Deployment Tools
 
@@ -513,7 +562,7 @@ pac plugin push --solution-name YourSolution --path YourSolution.Plugins.dll
 ### Create Your First Test
 
 Create `TaskAutoNumberingTest.cs` in your Tests project:
-..
+
 ~~~csharp
 using Xunit;
 using YourSolution.Logic.Tasks.Task;
@@ -535,6 +584,7 @@ public class AutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITest
         Assert.NotEqual(task.Subject, loaded.Subject);
         Assert.Contains(": Follow up call", loaded.Subject);
     }
+
     private Task LoadTask(Guid id)
     {
         return DataService
@@ -546,8 +596,14 @@ public class AutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITest
 }
 ~~~
 
+> [!IMPORTANT]
+> For this test to pass:
+> - the plugin must be deployed
+> - the Dataverse connection string must be configured
+> - autonumbering data must exist in `pl_autonumber`
+
 > [!NOTE]
-> Detailed testing patterns and TestBase setup are covered in the [Testing](./testing.md) documentation.
+> Detailed testing patterns and `TestBase` setup are covered in the [Testing](./testing.md) documentation.
 
 ---
 
@@ -580,7 +636,7 @@ Study these tasks in the `examples/` folder:
 
 - Ensure all referenced assemblies exist in `$(TargetDir)`
 - Verify the Logic assembly is **last** in the merge list
-- Check that `key.snk` path is correct
+- Check that `key.snk` exists in the Plugins project root
 - Verify `Tools/ILMerge/ILMerge.exe` was installed by the NuGet package
 
 ### Plugin Not Triggering
@@ -589,6 +645,12 @@ Study these tasks in the `examples/` folder:
 - Check plugin registration (stage, message, entity)
 - Review validation rules in `AddValidations()`
 - Ensure plugin was deployed successfully
+
+### AutoNumbering Does Not Work
+
+- Verify the `pl_autonumber` record exists for the target entity
+- Check prefix, counter, and numbering configuration
+- Confirm the plugin runs on the expected message and stage
 
 ### Tests Cannot Reference Logic Project
 
@@ -631,11 +693,11 @@ Study these tasks in the `examples/` folder:
 | `PluginBase.cs` | Logic/Plugins/ | Solution-wide configuration |
 | `TaskPlugin.cs` | Logic/Plugins/ | Entity-specific plugin |
 | `TaskAutoNumbering.cs` | Logic/Tasks/Task/ | Business logic task |
-| `CustomerService.cs` | Logic/Features/Customer/ | Shared feature service |
+| `CustomerService.cs` | Logic/Features/Feature/ | Shared feature service |
 | `spkl.json` | Logic/ | Early-bound generation config (auto-created by SPKL) |
 | `earlybound.bat` | Logic/spkl/ | Generate entity classes (auto-created by SPKL) |
 | `instrument-plugin-code.bat` | Logic/spkl/ | Inject stable plugin IDs (auto-created by SPKL) |
-| `key.snk` | Plugins/ | Assembly signing key |
+| `key.snk` | Plugins/ | Signing key used by the ILMerge post-build step |
 | `spkl.json` | Plugins/ | Plugin deployment metadata (auto-created by SPKL) |
 | `deploy-plugins.bat` | Plugins/spkl/ | Deploy plugins to Dataverse (auto-created by SPKL) |
 
@@ -656,7 +718,7 @@ instrument-plugin-code.bat
 ~~~
 
 > [!NOTE]
-> All SPKL commands use an interactive wizard - no need to specify connection strings in command line.
+> All SPKL commands use an interactive wizard - no need to specify connection strings on the command line.
 
 ---
 
