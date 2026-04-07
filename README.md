@@ -39,7 +39,7 @@ This structure makes plugins predictable, testable, and easier to maintain over 
 
 ## Documentation
 
-Detailed documentation, including setup guides and architecture explanations, is available in the [docs](./docs) section.
+Detailed documentation, including setup guides and architecture explanations, is available in the [docs](./docs/README.md) section.
 
 ---
 
@@ -53,17 +53,35 @@ Standard plugin development often leads to:
 | Validation and execution logic combined | Validation is strictly separated from execution |
 | Duplicated patterns across projects | Consistent structure enforced by base classes |
 | Difficult testing and debugging | Built-in logging; tasks are independently testable |
+| No structured approach to integration testing | Built-in xUnit toolkit for writing programmatic integration tests |
 
 ### Example Scenarios
 
-- **Updating related records after a change**
-  → validation checks conditions, execution updates records
+> **Note:** The following scenarios are provided solely to demonstrate the framework’s functionality. They are not designed for production use and may not meet the security, performance, or process requirements of real-world projects.
 
-- **Complex business rules on create/update**
-  → each rule is implemented as a separate task instead of one large plugin
+- **Automatic validation of contact names on create or update**  
+  Each attempt to create or update a contact triggers the `ValidateContactNamesTask`, which:
+  - Ensures that both first and last name fields are filled in.
+  - Checks that the first name does not contain forbidden words (e.g., according to company policy).
+  - If validation fails, returns a user-friendly error and logs the reason in detail.
 
-- **Owner change validation with multiple rules**
-  → each rule is a fluent validator, ordered from cheapest to most expensive
+- **Dynamic update of contact address label**  
+  The `UpdateAddressLabel` task, when address fields change:
+  - Verifies that relevant fields have actually changed (using PreImage for updates).
+  - Normalizes and concatenates address parts into a single label.
+  - Ensures the update is performed only when necessary, minimizing unnecessary writes.
+
+- **Task summary synchronization based on changes in related entities**  
+  The `TaskSummarySync` task:
+  - Monitors changes in fields such as regarding, scheduled time, or task state.
+  - On change, recalculates the task description based on the current state of the related record (e.g., contact or account).
+  - Uses PreImage and PostImage to compare previous and new states.
+
+- **Complex validation on owner change**  
+  A set of validators within a single task:
+  - First, quickly checks basic conditions (e.g., user permissions).
+  - Then performs more demanding checks (e.g., dependencies on other entities).
+  - Each rule is a separate validator, making extension and maintenance easy.
 
 ---
 
@@ -169,9 +187,10 @@ Provides a foundation for testing against a real Dataverse environment.
 
 ### Prerequisites
 
+* **Dataverse / Dynamics 365 environment**
+* **Framework solution installed** — the framework requires the Dataverse solution located in `power-platform-solutions\framework` to be imported into your environment. This solution contains essential configuration entities and dependencies required for proper functionality.
 * **.NET Framework 4.6.2** (required by Dataverse plugin sandbox)
-* Dataverse / Dynamics 365 environment
-* Visual Studio
+* Visual Studio or Visual Studio Code
 * Plugin must be deployed as a single assembly
 
 > [!WARNING]
@@ -199,12 +218,15 @@ Detailed setup, signing, packaging, and deployment guidance will be provided in 
 Register your solution-wide plugin configuration and common tasks.
 
 ~~~csharp
-public class MyPluginBase : PluginBase
+public class PluginBase : PluginFramework.Plugins.PluginBase
 {
-    protected override void Configure(IPluginConfiguration config)
+    public PluginBase(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
     {
-        // solution-level tasks
-        config.AddTask<SetSolutionNameTask>();
+    }
+
+    public override string GetSolutionVersion()
+    {
+        return "1.0";
     }
 }
 ~~~
@@ -214,13 +236,15 @@ public class MyPluginBase : PluginBase
 Inherit from `PluginBase` and register plugin-specific tasks.
 
 ~~~csharp
-public class AccountCreatePlugin : MyPluginBase
+public class TaskPlugin : PluginBase
 {
-    protected override void Configure(IPluginConfiguration config)
+    public TaskPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
     {
-        base.Configure(config); // call base implementation
+        //Pre
+        RegisterTask<TaskAutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName,PluginMode.Synchronous);
 
-        config.AddTask<SetAccountNameTask>();
+        //Post
+        RegisterTask<TaskSummarySync>(PluginStage.Postoperation, ["Create", "Update"], Task.EntityLogicalName,PluginMode.Synchronous);
     }
 }
 ~~~
@@ -230,29 +254,32 @@ public class AccountCreatePlugin : MyPluginBase
 Define validation and execution logic for a specific task.
 
 ~~~csharp
-public class SetAccountNameTask : PluginTask
-{
-    public override void AddValidations()
-    {
-        Rule.For("Target")
-            .MustExist()
-            .WithMessage("Target entity is required");
+ public class TaskAutoNumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
+ {
+     protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
+     {
+          return validator
+                .WithMode(PluginMode.Synchronous)
+                .WithStage(PluginStage.Postoperation)
+                .WithMessages(["Create", "Update"])
+                .ForEntity(ContextEntity.LogicalName)
+                .HasPreImageWhen(ctx => ctx.Message == "Update")
+                .HasPostImageWhen(ctx => ctx.Message == "Update")
+                .EntityWithAtLeastOneAttributeWhen(
+                    ctx => ctx.Message == "Update",
+                    ContextEntity,
+                    nameof(ContextEntity.RegardingObjectId), 
+                    nameof(ContextEntity.ScheduledEnd), 
+                    nameof(ContextEntity.ScheduledStart), 
+                    nameof(ContextEntity.StateCode),
+                    nameof(ContextEntity.StatusCode));
+     }
 
-        Rule.ForEntity("account")
-            .Attribute("name")
-            .MustBeEmpty()
-            .WithMessage("Name must not be set");
-    }
-
-    public override void Execute()
-    {
-        var account = Context.Target.ToEntity<Account>();
-
-        account.Name = "New Account";
-
-        Service.Update(account);
-    }
-}
+     protected override void DoExecute()
+     {
+         // Business logic goes here
+     }
+ }
 ~~~
 
 ---
@@ -280,10 +307,21 @@ The difference lies in the level of value it brings in a given context.
 ## Repository Structure
 
 ~~~
-/src        → framework source code
-/tests      → test projects
-/examples   → sample implementations
-/docs       → documentation
+/src → Framework source code
+  ├─ Pillaro.Dataverse.PluginFramework
+  ├─ Pillaro.Dataverse.PluginFramework.Plugins
+  └─ Pillaro.Dataverse.PluginFramework.Testing
+/tests → Test projects
+  ├─ Pillaro.Dataverse.PluginFramework.Tests
+  └─ Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen
+/examples → Sample implementations
+  ├─ Pillaro.Dataverse.PluginFramework.Examples.Logic
+  ├─ Pillaro.Dataverse.PluginFramework.Examples.Plugins
+  └─ Pillaro.Dataverse.PluginFramework.Examples.Tests
+/docs → Documentation
+/power-platform-solutions → Solution files ready to import into Dataverse
+  ├- examples
+  └─ framework
 ~~~
 
 ---
@@ -319,9 +357,27 @@ This enables:
 | **Separate validation from execution** | `AddValidations()` and `DoExecute()` are always distinct |
 | **Keep logic small and focused** | One task = one responsibility |
 | **Ensure predictable behavior** | Fluent validators execute in defined order |
-| **Make execution flow explicit** | Logging is automatic; every step is traceable |
+| **Make execution flow explicit** | Logging is automatic, every step is traceable |
 | **Maintain consistency** | All plugins follow the same base pattern |
+| **Versioned logging** | Update `PluginBase.GetSolutionVersion()` on each release so logs include a clear solution/version identifier |
+| **Per-task programmatic tests** | Generate and maintain automated tests for every task; tests must run in CI and nightly builds |
+| **Production logging levels** | Production environments default to `Warning` or `Error` to limit log volume and storage impact |
+| **Environment log retention** | Implement environment-specific log retention/cleanup logic to remove old logs and reduce DB storage usage |
+| **Nightly CI runs** | Schedule a nightly build that runs the full test matrix (including programmatic task tests) to detect regressions early |
 
+## Operational guidelines (summary)
+
+Detailed operational guidance is stored in `/docs/operational-guidelines.md`. Summary actions to include there:
+- Release checklist: update `PluginBase.GetSolutionVersion()`, tag release, and ensure version appears in all logs.
+- Per-task tests: add one xUnit test class per task under `/tests`; tests should be runnable locally and in CI. Prefer programmatic, reproducible tests interacting with a shared test environment.
+- CI: configure pipeline (GitHub Actions / Azure DevOps) to run full test matrix on PR and a nightly build executing all programmatic tests.
+- Production logging policy: default runtime config for production should set log level to `Warning` or `Error`; allow temporary overrides for troubleshooting via secure runtime settings.
+- Log retention: implement environment-specific retention (e.g., purge logs older than N days) via scheduled job (DB stored-procedure, Azure Function, Logic App or similar) to keep DB storage optimal.
+- Where to put details: include sample CI YAMLs, retention scripts, test generation tooling, and example `PluginBase` version propagation code in `/docs/operational-guidelines.md`.
+
+Notes:
+- Move implementation examples (CI YAML, scripts, sample code) to `/docs` to keep README concise and discoverable.
+- I can generate a ready-to-use `/docs/operational-guidelines.md` with sample CI YAML, test stub templates, a log retention SQL/PowerShell script, and a recommended `PluginBase` logging propagation snippet. Tell me if you want that generated now.
 ---
 
 ## License

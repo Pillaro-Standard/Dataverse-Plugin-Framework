@@ -15,7 +15,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
                 .WithMode(PluginMode.Synchronous)
                 .WithStage(PluginStage.Postoperation)
                 .WithMessages(["Create", "Update"])
-                .ForEntity(Logic.Task.EntityLogicalName)
+                .ForEntity(ContextEntity.LogicalName)
                 .HasPreImageWhen(ctx => ctx.Message == "Update")
                 .HasPostImageWhen(ctx => ctx.Message == "Update")
                 .EntityWithAtLeastOneAttributeWhen(
@@ -25,8 +25,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
                     nameof(ContextEntity.ScheduledEnd), 
                     nameof(ContextEntity.ScheduledStart), 
                     nameof(ContextEntity.StateCode),
-                    nameof(ContextEntity.StatusCode))
-                ;
+                    nameof(ContextEntity.StatusCode));
         }
 
         protected override void DoExecute()
