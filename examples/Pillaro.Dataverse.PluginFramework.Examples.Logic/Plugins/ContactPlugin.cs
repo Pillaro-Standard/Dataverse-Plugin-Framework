@@ -36,7 +36,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
         public ContactPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
             //PreVal
-            RegisterTask<ValidateContactNamesTask>(PluginStage.Prevalidation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
+            RegisterTask<ValidateNames>(PluginStage.Prevalidation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
 
 
             //Pre

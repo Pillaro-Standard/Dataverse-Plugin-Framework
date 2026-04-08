@@ -6,7 +6,7 @@ using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
 {
-    public class TaskAutoNumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
+    public class AutoNumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
     {
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {

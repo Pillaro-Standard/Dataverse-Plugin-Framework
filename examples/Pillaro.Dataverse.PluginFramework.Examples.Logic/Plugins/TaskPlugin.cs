@@ -32,10 +32,10 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
         public TaskPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
             //Pre
-            RegisterTask<TaskAutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName, PluginMode.Synchronous);
+            RegisterTask<Tasks.Task.AutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName, PluginMode.Synchronous);
 
             //Post
-            RegisterTask<TaskSummarySync>(PluginStage.Postoperation, ["Create", "Update"], Task.EntityLogicalName, PluginMode.Synchronous);
+            RegisterTask<SummarySync>(PluginStage.Postoperation, ["Create", "Update"], Task.EntityLogicalName, PluginMode.Synchronous);
         }
     }
 }

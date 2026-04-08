@@ -1,16 +1,19 @@
 using Microsoft.Xrm.Sdk;
 using Newtonsoft.Json;
+using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 using System.ServiceModel;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
 
-public class ValidateContactNamesTaskFunctionTests : TestBase
+[Trait("Owner", "JM")]
+[Trait("Category", nameof(ValidateNames))]
+public class ValidateNamesTests : TestBase
 {
     private readonly List<string> _forbiddenWords;
 
-    public ValidateContactNamesTaskFunctionTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
+    public ValidateNamesTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
         var forbiddenWordsJson = SettingService.GetJsonValue("ForbiddenWords");
         _forbiddenWords = JsonConvert.DeserializeObject<List<string>>(forbiddenWordsJson) ?? new List<string>();

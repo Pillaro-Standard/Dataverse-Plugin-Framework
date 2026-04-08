@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
 {
-    public class TaskSummarySync(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
+    public class SummarySync(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
     {
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {

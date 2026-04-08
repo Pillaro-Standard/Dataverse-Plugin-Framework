@@ -9,8 +9,8 @@ using Task = Pillaro.Dataverse.PluginFramework.Examples.Logic.Task;
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;
 
 [Trait("Owner", "JM")]
-[Trait("Category", nameof(TaskSummarySync))]
-public class TaskSummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
+[Trait("Category", nameof(SummarySync))]
+public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
 {
     [Fact]
     public void Should_SetPlannedActivityDate_When_TaskWithScheduledEndIsCreatedForContact()

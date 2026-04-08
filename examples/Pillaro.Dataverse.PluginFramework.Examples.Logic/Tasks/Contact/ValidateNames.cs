@@ -7,9 +7,9 @@ using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 {
-    public class ValidateContactNamesTask : TaskBase<Logic.Contact>
+    public class ValidateNames : TaskBase<Logic.Contact>
     {
-        public ValidateContactNamesTask(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
+        public ValidateNames(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
         {
         }
 

@@ -34,12 +34,12 @@
   <ItemGroup>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.60\lib\net462\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
-		<Private>True</Private>
-	</Reference>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Xrm.Sdk, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.60\lib\net462\Microsoft.Xrm.Sdk.dll</HintPath>
-		<Private>True</Private>
-	</Reference>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -86,9 +86,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Features\ForbiddenNames\CustomerForbiddenNameService.cs" />
     <Compile Include="SettingsKeys.cs" />
-    <Compile Include="Tasks\Contact\ValidateContactNamesTask.cs" />
+    <Compile Include="Tasks\Contact\ValidateNames.cs" />
     <Compile Include="Tasks\Contact\UpdateAddressLabel.cs" />
-    <Compile Include="Tasks\Task\TaskSummarySync.cs" />
+    <Compile Include="Tasks\Task\SummarySync.cs" />
     <Compile Include="Tasks\Task\AutoNumbering.cs" />
   </ItemGroup>
   <ItemGroup>

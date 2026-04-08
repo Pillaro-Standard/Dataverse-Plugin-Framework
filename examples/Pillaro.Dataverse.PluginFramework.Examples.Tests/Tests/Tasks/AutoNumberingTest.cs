@@ -6,7 +6,7 @@ using Task = Pillaro.Dataverse.PluginFramework.Examples.Logic.Task;
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;
 
 [Trait("Owner", "JM")]
-[Trait("Category", nameof(TaskAutoNumbering))]
+[Trait("Category", nameof(Logic.Tasks.Task.AutoNumbering))]
 public class AutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
 {
     [Fact]

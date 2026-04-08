@@ -1,7 +1,7 @@
 {
   "earlyboundtypes": [
     {
-      "entities": "contact,task",
+      "entities": "contact,task,account",
       "generateOptionsetEnums": true,
       "generateGlobalOptionsets": true,
       "generateStateEnums": true,
