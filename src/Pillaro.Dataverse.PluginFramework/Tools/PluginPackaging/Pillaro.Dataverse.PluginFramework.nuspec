@@ -13,6 +13,8 @@
 		<projectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</projectUrl>
 		<repository type="git" url="https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework" />
 
+		<readme>docs\README.md</readme>
+		
 		<description>
 			Lightweight framework for building Microsoft Dataverse plugins with focus on testability,
 			structure, and maintainability. Designed for real-world enterprise usage with support for
@@ -35,7 +37,7 @@
 	</metadata>
 
 	<files>
-		<file src="..\..\..\..\README.md" target="README.md" />
+		<file src="..\..\..\..\README.md" target="docs\" />
 		<file src="..\..\..\..\LICENSE" target="LICENSE" />
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.dll" target="lib\net462" />
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
