@@ -23,16 +23,16 @@
 
 | Section | Description |
 |---|---|
-| [Getting Started](#-getting-started) | Setup, prerequisites, and first plugin |
-| [Core Concepts](#-core-concepts) | Architecture, plugins, tasks, and validation |
-| [Execution & Runtime](#-execution--runtime) | Pipeline and configuration |
-| [Autonumbering](#-autonumbering) | Sequence generation and concurrency handling |
-| [Observability](#-observability) | Logging and error handling |
-| [Testing](#-testing) | Testing principles and integration testing |
-| [Packaging & Deployment](#-packaging--deployment) | Signing, assembly structure, and deployment |
-| [Known Limitations](#-known-limitations) | Package constraints and compatibility notes |
-| [Examples](#-examples) | Sample implementations |
-| [Contributing](#-contributing) | Guidelines for contributors |
+| 🚀 [Getting Started](#-getting-started) | Setup, prerequisites, and first plugin |
+| 🧱 [Core Concepts](#-core-concepts) | Architecture, plugins, tasks, and validation |
+| ⚙️ [Execution & Runtime](#-execution--runtime) | Pipeline and configuration |
+| 🔢 [Autonumbering](#-autonumbering) | Sequence generation and concurrency handling |
+| 🔍 [Observability](#-observability) | Logging and error handling |
+| 🧪 [Testing](#-testing) | Testing principles and integration testing |
+| 📦 [Packaging & Deployment](#-packaging--deployment) | Signing, assembly structure, and deployment |
+| ⚠️ [Known Limitations](#-known-limitations) | Package constraints and compatibility notes |
+| 💡 [Examples](#-examples) | Sample implementations |
+| 🤝 [Contributing](#-contributing) | Guidelines for contributors |
 
 ---
 
@@ -42,7 +42,7 @@ Start here if you are new to the framework.
 
 | Document | Description | Status |
 |---|---|---|
-| [Getting Started](./getting-started.md) | Setup, prerequisites, and first plugin implementation | 🚧 |
+| [Getting Started](./getting-started.md) | Setup, prerequisites, and first plugin implementation | ⌛ |
 
 ### Prerequisites
 
@@ -50,8 +50,6 @@ Start here if you are new to the framework.
 - .NET 10 (test projects)
 - Microsoft Dataverse environment
 - Visual Studio 2022 or later
-
-### Solution Structure
 
 ---
 
@@ -113,7 +111,31 @@ How the framework behaves during plugin execution in Dataverse.
 | [Execution Pipeline](./execution-pipeline.md) | Task orchestration, ordering, and execution flow | 🚧 |
 | [Runtime Configuration](./configuration.md) | Configuration stored in Dataverse, loaded at runtime | 🚧 |
 
-### Execution Flow
+---
+
+### Execution Pipeline
+
+The framework enforces a deterministic execution model aligned with the Dataverse plugin runtime.
+
+All logic is executed strictly within a single `Execute` method and its execution order (execution index). This is a fundamental assumption for correct plugin behavior.
+
+To support task-based architecture, the framework provides a custom `PluginBase` that:
+- dynamically instantiates and executes individual Tasks within the `Execute` method
+- ensures all Tasks share a single, consistent execution context
+
+Each Task receives the same `TaskContext`, which:
+- encapsulates Dataverse services and execution data
+- provides a shared `Items` collection for cross-task communication
+  - `AddItem(key, value)`
+  - `GetItem<T>(key)`
+
+This enables lightweight data sharing between Tasks during a single execution while keeping them loosely coupled.
+
+As a result, the pipeline ensures:
+- strict control over execution flow  
+- consistent context across all Tasks  
+- modular and testable business logic  
+- safe and predictable intra-execution communication  
 
 ---
 
@@ -265,11 +287,11 @@ The `examples/` folder contains working implementations demonstrating framework 
 
 The repository maintains contribution policies and community guidelines at the repository root. Please review these documents before opening issues or pull requests.
 
-| Document | Description | Link |
-|---|---|---|
-| Contributing guide | How to contribute, PR process, and development setup | [CONTRIBUTING.md](CONTRIBUTING.md)
-| Security policy | How to report vulnerabilities and our disclosure process | [SECURITY.md](SECURITY.md)
-| Code of Conduct | Community behavior expectations and reporting | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+| Document | Description | Link | Status |
+|---|---|---|---|
+| Contributing guide | How to contribute, PR process, and development setup | [CONTRIBUTING.md](CONTRIBUTING.md) | ✅ |
+| Security policy | How to report vulnerabilities and our disclosure process | [SECURITY.md](SECURITY.md) | ✅ |
+| Code of Conduct | Community behavior expectations and reporting | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | ✅ |
 
 ---
 
