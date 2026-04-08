@@ -36,6 +36,7 @@
 	</metadata>
 
 	<files>
+		<file src="..\..\README.md" target="README.md" />
 		<file src="..\..\LICENSE" target="LICENSE" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
