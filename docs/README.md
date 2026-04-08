@@ -10,6 +10,15 @@
 
 ---
 
+## Quick links
+
+- Repository policies and contributor guides:
+  - [Contributing guide](../CONTRIBUTING.md)
+  - [Security policy](../SECURITY.md)
+  - [Code of Conduct](../CODE_OF_CONDUCT.md)
+  - [Root README](../README.md)
+
+
 ## 📖 Table of Contents
 
 | Section | Description |
@@ -254,9 +263,13 @@ The `examples/` folder contains working implementations demonstrating framework 
 
 ## 🤝 Contributing
 
-| Document | Description | Status |
+The repository maintains contribution policies and community guidelines at the repository root. Please review these documents before opening issues or pull requests.
+
+| Document | Description | Link |
 |---|---|---|
-| [Contributing](./contributing.md) | Guidelines for contributing to the project | 🚧 |
+| Contributing guide | How to contribute, PR process, and development setup | [CONTRIBUTING.md](CONTRIBUTING.md)
+| Security policy | How to report vulnerabilities and our disclosure process | [SECURITY.md](SECURITY.md)
+| Code of Conduct | Community behavior expectations and reporting | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ---
 
