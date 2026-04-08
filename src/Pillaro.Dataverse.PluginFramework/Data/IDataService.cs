@@ -1,5 +1,4 @@
-﻿using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Pillaro.Dataverse.PluginFramework.Data.Query;
@@ -10,15 +9,30 @@ namespace Pillaro.Dataverse.PluginFramework.Data;
 
 public interface IDataService
 {
+    /// <summary>
+    /// Direct access to the underlying IOrganizationService.
+    /// Use this for standard CRUD operations or when DataService doesn't provide specific functionality.
+    /// </summary>
     IOrganizationService OrganizationService { get; }
 
     Guid GetInstanceId();
 
     int GetMultipleRequestBatchSize();
 
+    /// <summary>
+    /// Creates a LINQ-style query for the specified entity type.
+    /// </summary>
     EntityQuery<TEntity> Query<TEntity>() where TEntity : Entity;
 
-    WhoAmIResponse WhoAmI();
+    /// <summary>
+    /// Gets a typed repository instance for this DataService.
+    /// </summary>
+    TDataServiceRepository GetRepository<TDataServiceRepository>() where TDataServiceRepository : DataServiceRepository;
+
+    /// <summary>
+    /// Waits for async operations to complete for a specific entity.
+    /// </summary>
+    void WaitOnAsyncProcess(Guid entityId, int? numberOfAttempts = null);
 
     #region ExecuteMultiple
 
@@ -34,32 +48,21 @@ public interface IDataService
 
     #endregion
 
-    #region CRUD
+    #region Transactional Operations
 
-    Guid Create(Entity entity);
-
+    /// <summary>
+    /// Creates an entity outside of the current transaction using ExecuteMultiple.
+    /// </summary>
     Guid? CreateOutsideTransaction(Entity entity, bool returnResponse = true);
 
-    void Update(Entity entity);
-
+    /// <summary>
+    /// Updates an entity outside of the current transaction using ExecuteMultiple.
+    /// </summary>
     void UpdateOutsideTransaction(Entity entity);
-
-    void Delete(Entity entity);
-
-    void Delete(string entityName, Guid id);
-
-    void Delete(EntityReference entity);
-
-    void Delete<TEntity>(IEnumerable<TEntity> entityCollection) where TEntity : Entity;
-
-    void Delete(EntityCollection entityCollection);
-
-
-    SetStateResponse SetState(EntityReference entityReference, int stateCode, int? statusCode);
 
     #endregion
 
-    #region Entity helpers
+    #region Entity Helpers
 
     Entity GetWebResourceByName(string webResourceName, bool throwExceptionIfNotExists = true);
 
@@ -73,7 +76,7 @@ public interface IDataService
 
     #endregion
 
-    #region Metadata and option sets
+    #region Metadata and Option Sets
 
     int? GetUserUiLanguageCode(Guid userId);
 

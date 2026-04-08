@@ -106,7 +106,7 @@ public class ValidateNamesTests : TestBase
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.Update(updateEntity), TestContext.Current.CancellationToken));
+            Task.Run(() => DataService.OrganizationService.Update(updateEntity), TestContext.Current.CancellationToken));
 
         Assert.Contains("First name is forbidden word", ex.Detail.Message);
     }
@@ -128,7 +128,7 @@ public class ValidateNamesTests : TestBase
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.Update(updateEntity), TestContext.Current.CancellationToken));
+            Task.Run(() => DataService.OrganizationService.Update(updateEntity), TestContext.Current.CancellationToken));
 
         Assert.Contains("Last name is forbidden word", ex.Detail.Message);
     }
@@ -148,7 +148,7 @@ public class ValidateNamesTests : TestBase
         };
 
         // Act
-        DataService.Update(updateEntity);
+        DataService.OrganizationService.Update(updateEntity);
 
         // Assert
         var updated = DataService.Query<Logic.Contact>()

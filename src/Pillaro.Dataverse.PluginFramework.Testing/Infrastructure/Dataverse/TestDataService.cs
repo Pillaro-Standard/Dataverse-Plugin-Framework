@@ -6,6 +6,7 @@ using Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Handlers;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
+using Pillaro.Dataverse.PluginFramework.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Xunit;
@@ -39,7 +40,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
         if (!byPassPlugins)
         {
-            entity.Id = Create(entity);
+            entity.Id = OrganizationService.Create(entity);
             WriteOutput($"Created entity '{entity.LogicalName}' with Id '{entity.Id}'.");
         }
         else
@@ -64,7 +65,7 @@ internal sealed class TestDataService : DataService, ITestDataService
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        entity.Id = Create(entity);
+        entity.Id = OrganizationService.Create(entity);
         var created = OrganizationService.Retrieve(entity.LogicalName, entity.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
         _entitiesToDelete.Push(created.ToEntityReference());
         WriteOutput($"Created and retrieved entity '{created.LogicalName}' with Id '{created.Id}'.");
@@ -93,6 +94,13 @@ internal sealed class TestDataService : DataService, ITestDataService
         return _lifetimeScope.Resolve<TTestDataRepository>();
     }
 
+    // Explicit interface implementation for IDataService
+    TDataServiceRepository IDataService.GetRepository<TDataServiceRepository>()
+    {
+        // Delegate to your specific implementation or provide a different implementation
+        return base.GetRepository<TDataServiceRepository>();
+    }
+
     public void AddTestEntityToDelete(EntityReference entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -118,7 +126,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
             try
             {
-                Delete(entityReference);
+                OrganizationService.Delete(entityReference);
                 WriteOutput($"Deleted entity '{entityReference.LogicalName}' with Id '{entityReference.Id}'.");
             }
             catch (Exception ex)

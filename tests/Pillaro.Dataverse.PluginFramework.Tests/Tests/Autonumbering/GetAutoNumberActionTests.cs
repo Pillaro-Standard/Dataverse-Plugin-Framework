@@ -2,13 +2,10 @@
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 using Pillaro.Dataverse.PluginFramework.Tests.Data.Repositories;
 using System.Text.RegularExpressions;
+using Pillaro.Dataverse.PluginFramework.Extensions;
 
 namespace Pillaro.Dataverse.PluginFramework.Tests.Tests.Autonumbering;
 
-//[CollectionDefinition("NonParallel", DisableParallelization = true)]
-public class CrmNonParallelCollectionDefinition { }
-
-//[Collection("NonParallel")]
 [Trait("Owner", "JM")]
 [Trait("Category", "Autonumbering.GetAutoNumber")]
 public class GetAutoNumberActionTests : TestBase
@@ -42,7 +39,7 @@ public class GetAutoNumberActionTests : TestBase
             .Select(x => new pl_AutoNumbering { pl_AutoNumberingId = x.pl_AutoNumberingId })
             .ToList();
 
-        DataService.Delete(rows);
+        DataService.OrganizationService.Delete(rows);
     }
 
     private pl_AutoNumbering CreateConfig(
@@ -193,7 +190,7 @@ public class GetAutoNumberActionTests : TestBase
     public void Entity_attribute_is_injected()
     {
         CreateConfig(EntityName, 4, 15, "{firstname}{NUM}");
-        var contact = CreateContact("Invoice", "Test");
+        var contact = CreateContact("Invoice", "Testrecord");
 
         var number = ExecuteGetAutoNumber(contact.ToEntityReference());
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
-
+using Pillaro.Dataverse.PluginFramework.Extensions;
 namespace Pillaro.Dataverse.PluginFramework.Tests.Data.Cleanup;
 
 public class ContactCleanup : ICleanupDeleteHandler
@@ -14,6 +14,6 @@ public class ContactCleanup : ICleanupDeleteHandler
             .Select(o => new pl_AutoNumbering() { pl_AutoNumberingId = o.pl_AutoNumberingId })
             .ToList();
 
-        testDataService.Delete(parConfs);
+        testDataService.OrganizationService.Delete(parConfs);
     }
 }

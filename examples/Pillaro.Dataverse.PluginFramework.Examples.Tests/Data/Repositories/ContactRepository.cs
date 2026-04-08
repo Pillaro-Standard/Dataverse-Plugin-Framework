@@ -6,7 +6,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 
 public class ContactRepository : IAutoRegisteredTestDataRepository
 {
-    public Contact GetNew(string firstName = "Test", string lastName = "Contact", EntityReference? parentCustomer = null, DateTime? birthDate = null)
+    public Contact GetNew(string firstName = "Testrecord", string lastName = "Contact", EntityReference? parentCustomer = null, DateTime? birthDate = null)
     {
         var contact = new Contact
         {
@@ -24,7 +24,7 @@ public class ContactRepository : IAutoRegisteredTestDataRepository
     }
 
     public Contact GetNewWithAddress(
-        string firstName = "Test",
+        string firstName = "Testrecord",
         string lastName = "Contact",
         string? addressLine1 = null,
         string? city = null,

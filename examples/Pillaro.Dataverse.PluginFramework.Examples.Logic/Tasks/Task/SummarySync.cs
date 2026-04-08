@@ -109,13 +109,12 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
             }
 
             var description = BuildDescription(latestPlannedDate, latestCompletedDate);
-
-            DataServiceProvider.Admin.Update(new Logic.Contact
+            OrganizationServiceProvider.Admin.Update(new Logic.Contact
             {
                 Id = regarding.Id,
                 Description = description,
             });
-
+         
             AddLogMessageLine($"Updated {regarding.LogicalName} {regarding.Id} Description.");
         }
 

@@ -119,7 +119,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
 
         var update = new Task { Id = task.Id };
         update["scheduledend"] = null;
-        DataService.Update(update);
+        DataService.OrganizationService.Update(update);
 
         var loadedAfter = LoadContactDescription(contact.Id);
         Assert.Null(loadedAfter.Description);
@@ -176,6 +176,6 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     private void UpdateTaskRegarding(Guid taskId, EntityReference newRegarding)
     {
         var update = new Task { Id = taskId, RegardingObjectId = newRegarding };
-        DataService.Update(update);
+        DataService.OrganizationService.Update(update);
     }
 }

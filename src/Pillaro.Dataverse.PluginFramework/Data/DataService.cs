@@ -18,8 +18,14 @@ namespace Pillaro.Dataverse.PluginFramework.Data;
 
 /// <summary>
 /// Central entry point for Dataverse operations over a single security context.
+/// Provides advanced operations and helpers on top of IOrganizationService.
 /// Create two instances when both User and Admin contexts are needed.
 /// </summary>
+/// <remarks>
+/// For basic CRUD operations, use OrganizationService property directly or extension methods.
+/// DataService focuses on operations with added value like ExecuteMultiple batching, 
+/// transactional control, and specialized helpers.
+/// </remarks>
 public class DataService : IDataService
 {
     private readonly ConcurrentDictionary<Guid, List<OrganizationRequest>> _multipleRequests = new();
@@ -27,6 +33,11 @@ public class DataService : IDataService
     private readonly int _multipleRequestBatchSize;
     private readonly int _waitOnAsyncProcessMaxLoop;
 
+    /// <summary>
+    /// Direct access to the underlying IOrganizationService.
+    /// Use this for standard CRUD operations (Create, Update, Delete, Retrieve).
+    /// Consider using extension methods from OrganizationServiceExtensions for convenient overloads.
+    /// </summary>
     public IOrganizationService OrganizationService { get; }
 
     public DataService(IOrganizationService organizationService, int multipleRequestBatchSize = 1000, int waitOnAsyncProcessMaxLoop = 40)
@@ -57,11 +68,6 @@ public class DataService : IDataService
     public TDataServiceRepository GetRepository<TDataServiceRepository>() where TDataServiceRepository : DataServiceRepository
     {
         return (TDataServiceRepository)Activator.CreateInstance(typeof(TDataServiceRepository), this);
-    }
-
-    public WhoAmIResponse WhoAmI()
-    {
-        return (WhoAmIResponse)OrganizationService.Execute(new WhoAmIRequest());
     }
 
     public void WaitOnAsyncProcess(Guid entityId, int? numberOfAttempts = null)
@@ -221,12 +227,7 @@ public class DataService : IDataService
 
     #endregion
 
-    #region CRUD
-
-    public Guid Create(Entity entity)
-    {
-        return OrganizationService.Create(entity);
-    }
+    #region Transactional Operations
 
     public Guid? CreateOutsideTransaction(Entity entity, bool returnResponse = true)
     {
@@ -267,11 +268,6 @@ public class DataService : IDataService
         return returnValue;
     }
 
-    public void Update(Entity entity)
-    {
-        OrganizationService.Update(entity);
-    }
-
     public void UpdateOutsideTransaction(Entity entity)
     {
         if (entity != null)
@@ -301,52 +297,9 @@ public class DataService : IDataService
         }
     }
 
-    public void Delete(Entity entity)
-    {
-        OrganizationService.Delete(entity.LogicalName, entity.Id);
-    }
-
-    public void Delete(string entityName, Guid id)
-    {
-        OrganizationService.Delete(entityName, id);
-    }
-
-    public void Delete(EntityReference entity)
-    {
-        OrganizationService.Delete(entity.LogicalName, entity.Id);
-    }
-
-    public void Delete<TEntity>(IEnumerable<TEntity> entityCollection) where TEntity : Entity
-    {
-        foreach (var entity in entityCollection)
-        {
-            OrganizationService.Delete(entity.LogicalName, entity.Id);
-        }
-    }
-
-    public void Delete(EntityCollection entityCollection)
-    {
-        foreach (var entity in entityCollection.Entities)
-        {
-            OrganizationService.Delete(entity.LogicalName, entity.Id);
-        }
-    }
-
-    public SetStateResponse SetState(EntityReference entityReference, int stateCode, int? statusCode)
-    {
-        SetStateRequest request = new()
-        {
-            State = new OptionSetValue(stateCode),
-            Status = new OptionSetValue(statusCode ?? -1),
-            EntityMoniker = entityReference
-        };
-
-        return (SetStateResponse)OrganizationService.Execute(request);
-    }
-
     #endregion
 
-    #region Entity helpers
+    #region Entity Helpers
 
     public Entity GetWebResourceByName(string webResourceName, bool throwExceptionIfNotExists = true)
     {
@@ -469,7 +422,7 @@ public class DataService : IDataService
 
     #endregion
 
-    #region Metadata and option sets
+    #region Metadata and Option Sets
 
     public int? GetUserUiLanguageCode(Guid userId)
     {

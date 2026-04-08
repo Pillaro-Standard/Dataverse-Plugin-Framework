@@ -53,7 +53,7 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
             EntityState = EntityState.Changed
         };
 
-        DataService.Update(update);
+        DataService.OrganizationService.Update(update);
 
         var after = DataService
             .Query<Contact>()

@@ -28,8 +28,7 @@ public interface ITestDataService : IDataService, IAutoRegisteredService
     Task<Entity> CreateAndReturnTestEntity(Entity entity, CancellationToken cancellation = default);
 
     void AddTestEntityToDelete(EntityReference entity);
-
-    TDataRepository GetRepository<TDataRepository>() where TDataRepository : IAutoRegisteredTestDataRepository;
+    new TDataRepository GetRepository<TDataRepository>() where TDataRepository : IAutoRegisteredTestDataRepository;
 
     Task WaitOnAsyncProcess(Guid entityId, int numberOfAttempts = 40, int cancellationTimeMs = 120000, CancellationToken cancellation = default);
 

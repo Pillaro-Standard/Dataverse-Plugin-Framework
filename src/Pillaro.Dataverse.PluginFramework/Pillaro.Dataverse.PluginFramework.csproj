@@ -108,6 +108,7 @@
     <Compile Include="Data\IDataService.cs" />
     <Compile Include="Data\Query\QueryExecutor.cs" />
     <Compile Include="Data\Query\QueryState.cs" />
+    <Compile Include="Extensions\OrganizationServiceExtensions.cs" />
     <Compile Include="FrameworkConstants.cs" />
     <Compile Include="Data\DataServiceRepository.cs" />
     <Compile Include="Data\Query\EntityQuery.cs" />
