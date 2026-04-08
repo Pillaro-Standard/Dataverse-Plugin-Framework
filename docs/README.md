@@ -6,18 +6,10 @@
 > Structured documentation for understanding, using, and extending the Pillaro Dataverse Plugin Framework.
 
 > [!NOTE]
-> Documentation is in progress. Sections marked with 🚧 are placeholders and will be completed in future updates.
+> Documentation is in progress. Sections marked with 🚧 are placeholders and will be completed in future updates. 
+Sections marked with ⌛ are partially complete and may be updated with additional details. 
 
 ---
-
-## Quick links
-
-- Repository policies and contributor guides:
-  - [Contributing guide](../CONTRIBUTING.md)
-  - [Security policy](../SECURITY.md)
-  - [Code of Conduct](../CODE_OF_CONDUCT.md)
-  - [Root README](../README.md)
-
 
 ## 📖 Table of Contents
 
