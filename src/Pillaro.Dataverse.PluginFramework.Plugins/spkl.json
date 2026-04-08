@@ -1,7 +1,7 @@
 {
   "plugins": [
     {
-      "profile": "default,debug",
+      "profile": "default,release",
       "solution": "PillaroFramework",
       "assemblypath": "bin\\Debug",
       "excludePluginSteps": false
