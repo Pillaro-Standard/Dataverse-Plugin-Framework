@@ -143,7 +143,7 @@ Tools/CrmTools/
 
 There are two variants:
 
-- **PostBuildAction-logic&plugin-projects.txt**  
+- **PostBuildAction-logic_plugin-projects.txt**  
   Use this when your solution contains separate Logic and Plugin projects.  
   This variant merges the plugin assembly together with the Logic assembly.
 

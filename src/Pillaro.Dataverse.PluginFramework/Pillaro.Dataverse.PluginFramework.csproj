@@ -187,7 +187,7 @@
     <Content Include="Tools\ILMerge\PostBuildAction-single-project.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Tools\ILMerge\PostBuildAction-logic&amp;plugin-projects.txt">
+    <Content Include="Tools\ILMerge\PostBuildAction-logic_plugin-projects.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Tools\ILMerge\System.Compiler.dll">
