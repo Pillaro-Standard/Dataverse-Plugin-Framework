@@ -44,26 +44,20 @@ This ensures tests are isolated, predictable and maintainable.
 
 ## Project structure (recommended)
 
-The package is designed to work with a structured test project:
-
 - **Repositories/**  
-  Defines reusable test data (e.g. `ContactRepository`, `AccountRepository`)  
-  Central place for managing test data structure
+  Reusable test data definitions
 
 - **Tests/**  
-  Contains test scenarios (focused only on behavior)
+  Test scenarios (behavior only)
 
 - **TestBase / Fixtures**  
-  Shared setup (connection, DI, lifecycle)
+  Shared setup (DI, lifecycle)
 
 - **Infrastructure/Dataverse/**  
-  Implementation of:
-  - `TestDataService`
-  - cleanup handling
-  - Dataverse communication
+  `TestDataService`, cleanup, Dataverse access
 
 - **AutoFacModule**  
-  Registers dependencies for test runtime
+  Dependency registration
 
 ---
 
@@ -71,82 +65,148 @@ The package is designed to work with a structured test project:
 
 ### TestDataService
 
-Main entry point for working with Dataverse in tests.
+Central entry point for test interaction with Dataverse.
 
-Responsibilities:
-- create entities in Dataverse
-- track created records
-- ensure cleanup after test execution
-- provide query capabilities
+- creates entities
+- tracks created data
+- provides querying
+- ensures cleanup
 
 ---
 
 ### Data repositories
 
-Repositories define how test data is constructed.
+Encapsulate test data creation.
 
-Responsibilities:
-- encapsulate entity creation logic
-- provide reusable data definitions
-- isolate schema changes
-
-Benefits:
-- single place for updating data structure
-- reduced duplication
-- clearer test intent
+- reusable
+- centralized
+- resilient to schema changes
 
 ---
 
 ### Automatic cleanup
 
-All data created during a test is automatically deleted.
-
-Includes:
-- standard entities
-- referenced entities
-- dependency-aware cleanup
-
-Prevents:
-- data pollution
-- flaky tests
-- manual cleanup logic
+- deletes all created data
+- handles referenced entities
+- prevents test pollution
 
 ---
 
-### Dependency injection
+## Autofac configuration
 
-Tests use a prepared DI container (AutoFac):
-
-- `DataService`
-- repositories
-- services
-
-Ensures:
-- consistent configuration
-- reusable setup
-- easy extensibility
-
----
-
-## Example test flow
+Tests use Autofac for dependency injection.
 
 ```csharp
-[Fact]
-public void Create_WithAddress_ShouldSetAddressLabel()
+public class TestAutofacModule : Module
 {
-    var contact = DataService
-        .GetRepository<ContactRepository>()
-        .GetNewWithAddress("Jan", "Label", "Main street 1", "Prague", "11000", "CZ");
+    protected override void Load(ContainerBuilder builder)
+    {
+        builder.RegisterModule<FrameworkTestingAutofacModule>();
 
-    contact.Id = DataService.CreateTestEntity(contact);
+        builder.RegisterAssemblyTypes(GetType().Assembly)
+            .Where(t => t.GetInterfaces().Any(i => i.IsAssignableFrom(typeof(IAutoRegisteredTestDataRepository))))
+            .AsSelf();
+    }
+}
+```
 
-    var loaded = DataService
-        .Query<Contact>()
-        .Where(x => x.Id == contact.Id)
-        .Select(x => new Contact { Address1_Name = x.Address1_Name })
-        .First();
+---
 
-    Assert.Equal("Main street 1, Prague 11000, CZ", loaded.Address1_Name);
+## Custom TestBase
+
+You can extend the base test class to include your own services:
+
+```csharp
+public class TestBase : TestBase<TestAutofacModule>
+{
+    protected readonly SettingsService SettingService;
+
+    public TestBase(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output)
+        : base(testFixture, output)
+    {
+        SettingService = testFixture.Container.Resolve<SettingsService>();
+    }
+}
+```
+
+---
+
+## Example test class
+
+```csharp
+using Microsoft.Xrm.Sdk;
+using Pillaro.Dataverse.PluginFramework.Examples.Logic;
+using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
+using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
+using Pillaro.Dataverse.PluginFramework.Testing.Tests;
+
+namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
+
+[Trait("Owner", "JM")]
+[Trait("Category", nameof(UpdateAddressLabel))]
+public class UpdateAddressLabelTests(
+    TestFixture<TestAutofacModule> testFixture,
+    ITestOutputHelper output)
+    : TestBase(testFixture, output)
+{
+    [Fact]
+    public void Create_WithAddress_ShouldSetAddressLabel()
+    {
+        Contact c = DataService.GetRepository<ContactRepository>()
+            .GetNewWithAddress("Jan", "Label", "Main street 1", "Prague", "11000", "CZ");
+
+        c.Id = DataService.CreateTestEntity(c);
+
+        var loaded = DataService
+            .Query<Contact>()
+            .Where(x => x.Id == c.Id)
+            .Select(x => new Contact { Address1_Name = x.Address1_Name })
+            .First();
+
+        Assert.False(string.IsNullOrWhiteSpace(loaded.Address1_Name),
+            "Address1_Name must be set on create when address is provided.");
+
+        Assert.Equal("Main street 1, Prague 11000, CZ", loaded.Address1_Name);
+    }
+
+    [Fact]
+    public void Update_WhenAddressChanges_ShouldUpdateAddressLabel()
+    {
+        Contact c = DataService.GetRepository<ContactRepository>()
+            .GetNewWithAddress("Jan", "Label", addressLine1: "Old address 1");
+
+        c.Id = DataService.CreateTestEntity(c);
+
+        var before = DataService
+            .Query<Contact>()
+            .Where(x => x.Id == c.Id)
+            .Select(x => new Contact { Id = x.Id, Address1_Name = x.Address1_Name })
+            .First();
+
+        Assert.Equal("Old address 1", before.Address1_Name);
+
+        Contact update = new()
+        {
+            Id = c.Id,
+            Address1_Line1 = "New address 1",
+            EntityState = EntityState.Changed
+        };
+
+        DataService.OrganizationService.Update(update);
+
+        var after = DataService
+            .Query<Contact>()
+            .Where(x => x.Id == c.Id)
+            .Select(x => new Contact
+            {
+                Address1_Name = x.Address1_Name,
+                Address1_Line1 = x.Address1_Line1
+            })
+            .First();
+
+        Assert.Equal("New address 1", after.Address1_Line1);
+        Assert.NotEqual(before.Address1_Name, after.Address1_Name);
+    }
 }
 ```
 
@@ -162,6 +222,7 @@ Each test should:
 - rely on automatic cleanup
 
 Avoid:
+
 - manual entity construction inside tests
 - manual cleanup logic
 - duplicated data setup
@@ -170,20 +231,17 @@ Avoid:
 
 ## Maintainability strategy
 
-The package is designed to reduce long-term cost of test maintenance.
+The package is designed to reduce long-term cost of test maintenance:
 
-This is achieved by:
-
-- repository-based data definitions
-- centralized data structure management
-- deterministic test execution
+- centralized data definitions (repositories)
+- deterministic execution
 - automatic cleanup
 
 Result:
 
-- easier refactoring when Dataverse schema changes
+- easier refactoring
 - lower maintenance cost
-- higher test clarity
+- higher clarity
 
 ---
 
