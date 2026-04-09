@@ -14,6 +14,7 @@
 		<repository type="git" url="https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework" />
 
 		<readme>docs\README.md</readme>
+		<PackageIcon>icon.png</PackageIcon>
 		
 		<description>
 			Testing support package for integration and end-to-end testing of solutions built with Pillaro Dataverse Plugin Framework.
@@ -38,6 +39,7 @@
 	</metadata>
 
 	<files>
+		<file src="..\..\icon.png" target="icon.png" />
 		<file src="..\..\README.md" target="docs\" />
 		<file src="..\..\LICENSE" target="LICENSE" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
