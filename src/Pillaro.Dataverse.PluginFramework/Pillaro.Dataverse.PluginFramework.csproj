@@ -176,6 +176,7 @@
     <None Include="app.config" />
     <None Include="key.snk" />
     <None Include="packages.config" />
+    <None Include="README.md" />
     <None Include="Tools\PluginPackaging\Pillaro.Dataverse.PluginFramework.nuspec" />
     <None Include="Tools\ILMerge\README.md" />
   </ItemGroup>
