@@ -56,7 +56,7 @@ The application can be found in the project repository under the `power-platform
 
 To enable logging, configure the following setting in Dataverse:
 
-- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0`
+- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0`(int)
 
 Without this configuration, logs may not be recorded.
 
@@ -110,7 +110,7 @@ public class ValidateContactTask : TaskBase<Logic.Contact>
 
     protected override ICompleteValidation AddValidations(IBasicModeValidation v)
     {
-        return v
+        return validator
             .WithMode(PluginMode.Synchronous)
             .WithStage(PluginStage.Preoperation)
             .WithMessages(new[] { "Create", "Update" })
