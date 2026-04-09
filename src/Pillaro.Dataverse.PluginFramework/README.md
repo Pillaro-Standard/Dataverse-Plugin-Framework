@@ -1,25 +1,41 @@
 # Pillaro Dataverse Plugin Framework
 
-A lightweight, task-based framework for building predictable, testable and maintainable Microsoft Dataverse (Dynamics 365) plugins in C#.
+A task-based framework for building predictable and testable Microsoft Dataverse plugins in C#.
 
-This README is included in the NuGet package so consumers can read package intent, quick-start steps and core requirements directly from NuGet.org.
+This README is included in the NuGet package so consumers can understand package intent, quick-start usage and key constraints directly from NuGet.org.
 
 ---
 
 ## What this package provides
 
-- A small, opinionated runtime for Dataverse plugin development that enforces a task-based structure (`Task` = single responsibility).
-- A fluent validation pipeline that cleanly separates validation from execution.
-- Built-in structured logging and conventions useful for diagnostics and automated testing.
-- Utilities to support common plugin scenarios (autonumbering, image handling, consistent registration patterns).
-
+- A small, opinionated runtime for Dataverse plugin development based on tasks (`Task` = single responsibility).
+- A fluent validation pipeline that strictly separates validation from execution.
+- Deterministic execution model — a task either clearly runs or clearly does not run.
+- Validation-level logging — each validation rule produces a clear log message explaining why the task did or did not execute.
+- Structured logging and conventions suitable for diagnostics and automated testing.
+- Opinionated helpers for common scenarios (e.g. autonumbering, entity images, deterministic execution patterns).
 ---
 
 ## Why use it
 
-- Reduce complexity: keep each business rule in a focused task instead of large plugin classes.
-- Improve testability: tasks are independently testable and deterministic.
-- Consistent patterns across teams and solutions, reducing onboarding time and bugs.
+- Reduce complexity — replace large plugin classes with focused, isolated tasks.
+- Improve testability — each task is independently testable and deterministic.
+- Enforce consistency — shared patterns across teams reduce onboarding time and bugs.
+- Make behavior predictable — no hidden execution paths or implicit logic.
+- Designed for long-term maintainability — clear task pipeline, enforced project structure and programmatic testing support reduce complexity and cost of future changes.
+
+---
+
+## Platform constraints (important)
+
+This framework is designed specifically for Microsoft Dataverse plugin runtime:
+
+- Only `.NET Framework 4.6.2` is supported by the platform
+- Plugin must be deployed as a single assembly (DLL)
+- All dependencies must be merged (ILMerge or equivalent)
+- Assemblies should be strong-name signed
+
+These constraints are reflected in the framework design.
 
 ---
 
@@ -31,7 +47,7 @@ This README is included in the NuGet package so consumers can read package inten
 Install-Package Pillaro.Dataverse.PluginFramework
 ~~~
 
-2. Create a solution-level `PluginBase` (one per solution):
+2. Create a solution-level `PluginBase` (one per solution, used as a common entry point and configuration root):
 
 ~~~csharp
 public class PluginBase : PluginFramework.Plugins.PluginBase
@@ -45,7 +61,7 @@ public class PluginBase : PluginFramework.Plugins.PluginBase
 }
 ~~~
 
-3. Create a plugin class and register tasks (one plugin class per logical area or entity):
+3. Create a plugin class and register tasks (one plugin per logical area or entity):
 
 ~~~csharp
 public class ContactPlugin : PluginBase
@@ -81,42 +97,49 @@ public class ValidateContactTask : TaskBase<Logic.Contact>
 
     protected override void DoExecute()
     {
-        // Business logic only
-        if (string.IsNullOrWhiteSpace(ContextEntity.FirstName))
-            throw new InvalidPluginExecutionException("First name is required.");
+        // Business logic only        
     }
 }
 ~~~
 
 ---
 
-## Requirements & packaging notes
+## Core concepts
 
-- Target runtime: ` .NET Framework 4.6.2` (Dataverse sandbox requirement).
-- Package depends on `Microsoft.CrmSdk.CoreAssemblies` and `Newtonsoft.Json` (see package metadata).
-- Plugin assembly must be signed and packaged as a single assembly for deployment (ILMerge or equivalent is recommended).
-- If you use SPKL for early-bound generation, do not upgrade `Microsoft.CrmSdk.CoreTools` beyond `9.1.0.92` (known `CrmSvcUtil.exe` compatibility issue).
+- **Plugin**  
+  Entry point registered in Dataverse. Matches incoming event to registered tasks.
+
+- **Task**  
+  Single unit of work with two explicit phases:
+  - **Validation** — defines when the task should run
+  - **Execution** — pure business logic
+
+- **Validation model**  
+  Designed to guarantee deterministic execution — a task either clearly runs or clearly does not run.  
+  Each validation rule logs a message explaining its decision, making it easy to understand why a task was skipped or executed.  
+  This significantly improves debugging, observability and automated testing.
 
 ---
 
-## Core concepts (short)
+## Requirements & packaging notes
 
-- `Plugin` — entry point registered in Dataverse; matches current event to registered tasks.
-- `Task` — single unit of work containing two phases:
-  - Validation — fluent rules that decide whether task runs
-  - Execution — pure business logic that runs only if validations pass
-- Fluent validation ordering ensures predictable evaluation and clear flow control (`WithBreakValidation`, `ThrowWithError`, etc.).
+- Target runtime: `.NET Framework 4.6.2`
+- Dependencies: `Microsoft.CrmSdk.CoreAssemblies`, `Newtonsoft.Json`
+- Plugin must be deployed as a single merged assembly (ILMerge or equivalent)
+- Strong-name signing is recommended for all assemblies
 
 ---
 
 ## Where to find more
 
-- Full documentation and guides: https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/tree/main/docs
-- Examples and sample plugins: https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/tree/main/examples
-- Report issues or request features: https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues
+- GitHub: https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework
 
 ---
 
 ## License
 
-This project is published under the Pillaro Community License (PCL) v1.0. See the `LICENSE` file in the repository for full terms. Attribution required when the framework is used in delivered solutions: "This solution is built using Pillaro Dataverse Plugin Framework."
+This project is published under the Pillaro Community License (PCL) v1.0.
+
+Attribution is required when the framework is used in delivered solutions:
+
+> "This solution is built using Pillaro Dataverse Plugin Framework."

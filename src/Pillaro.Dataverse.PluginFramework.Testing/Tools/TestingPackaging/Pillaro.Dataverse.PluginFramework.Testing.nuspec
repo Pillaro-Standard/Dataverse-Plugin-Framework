@@ -27,21 +27,17 @@
 		<dependencies>
 			<group targetFramework="net8.0">
 				<dependency id="Pillaro.Dataverse.PluginFramework" version="$version$" exclude="Build,Analyzers" />
-				<dependency id="Autofac" version="9.1.0" />
-				<dependency id="AutoMapper.Contrib.Autofac.DependencyInjection" version="10.0.0" />
-				<dependency id="MediatR" version="14.1.0" />
-				<dependency id="MediatR.Extensions.Autofac.DependencyInjection" version="14.0.0" />
+				<dependency id="Autofac" version="9.1.0" />								
 				<dependency id="Microsoft.Extensions.Configuration.Json" version="10.0.5" />
-				<dependency id="Microsoft.PowerPlatform.Dataverse.Client" version="1.2.10" />
-				<dependency id="System.Security.Cryptography.Pkcs" version="10.0.5" />
+				<dependency id="Microsoft.PowerPlatform.Dataverse.Client" version="1.2.10" />				
 			</group>
 		</dependencies>
 	</metadata>
 
 	<files>
 		<file src="..\..\icon.png" target="icon.png" />
-		<file src="..\..\README.md" target="docs\" />
 		<file src="..\..\LICENSE" target="LICENSE" />
+		<file src="README.md" target="docs\" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
 	</files>
