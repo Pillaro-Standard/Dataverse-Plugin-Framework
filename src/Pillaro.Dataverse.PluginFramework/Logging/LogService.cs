@@ -116,6 +116,7 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
             _tracingService?.Trace(log?.ToString());
 
         try
+        {
             var validLogs = logList.Where(o => IsValidForSave(o.LogSeverity)).ToList();
 
             if (!validLogs.Any())
