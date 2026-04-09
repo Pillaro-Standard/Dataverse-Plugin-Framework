@@ -45,6 +45,6 @@
 		<file src="..\..\bin\$configuration$\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\ILMerge.exe" target="Content\Tools\ILMerge" />
 		<file src="..\..\bin\$configuration$\Tools\ILMerge\System.Compiler.dll" target="Content\Tools\ILMerge" />
-		<file src="..\..\bin\$configuration$\Tools\ILMerge\PostBuildAction.txt" target="Content\CrmTools" />
+		<file src="..\..\bin\$configuration$\Tools\ILMerge\PostBuildAction.txt" target="Content\Tools\CrmTools" />
 	</files>
 </package>
