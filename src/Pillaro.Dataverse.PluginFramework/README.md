@@ -14,6 +14,7 @@ This README is included in the NuGet package so consumers can understand package
 - Validation-level logging — each validation rule produces a clear log message explaining why the task did or did not execute.
 - Structured logging and conventions suitable for diagnostics and automated testing.
 - Opinionated helpers for common scenarios (e.g. autonumbering, entity images, deterministic execution patterns).
+
 ---
 
 ## Why use it
@@ -36,6 +37,28 @@ This framework is designed specifically for Microsoft Dataverse plugin runtime:
 - Assemblies should be strong-name signed
 
 These constraints are reflected in the framework design.
+
+---
+
+## Logging (recommended)
+
+The framework includes structured logging at the task and validation level.
+
+Plugins work without any additional setup, however it is strongly recommended to install the **Pillaro Framework application** into your Dataverse environment.
+
+This application allows you to:
+
+- view logs from individual task executions
+- understand why a task was skipped or executed
+- troubleshoot issues without debugging the plugin directly
+
+The application can be found in the project repository under the `power-platform-solutions/framework` folder.
+
+To enable logging, configure the following setting in Dataverse:
+
+- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0`
+
+Without this configuration, logs may not be recorded.
 
 ---
 
@@ -97,10 +120,49 @@ public class ValidateContactTask : TaskBase<Logic.Contact>
 
     protected override void DoExecute()
     {
-        // Business logic only        
+        // Business logic only
     }
 }
 ~~~
+
+5. Enable assembly signing using a strong-name key file:
+
+~~~text
+key.snk
+~~~
+
+The key file should be placed in the plugin project root and used during build and merge.
+
+6. Configure post-build action for assembly merge.
+
+Post-build actions are available in:
+
+~~~text
+Tools/CrmTools/
+~~~
+
+There are two variants:
+
+- **PostBuildAction-logic&plugin-projects.txt**  
+  Use this when your solution contains separate Logic and Plugin projects.  
+  This variant merges the plugin assembly together with the Logic assembly.
+
+- **PostBuildAction-single-project.txt**  
+  Use this when all logic is implemented in a single plugin project.  
+  This variant merges only the plugin assembly and its dependencies.
+
+Choose the variant that matches your project structure.
+
+7. Build the plugin project.
+
+After signing and post-build configuration, the project produces a single merged assembly ready for deployment.
+
+8. Deploy the plugin assembly.
+
+Recommended tools:
+
+- Plugin Registration Tool  
+- spkl
 
 ---
 

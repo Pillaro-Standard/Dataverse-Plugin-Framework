@@ -25,9 +25,12 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
     private readonly LogFilterService _filterLogService = new();
     private readonly DataService _dataService = new(systemOrganizationService);
 
-    private static readonly string LogEntityExistsCacheKey = "LogService:EntityExists:pl_log";
     public const string MinimalSeverityLevelKey = "MinimalSeverityLevel";
     public const string LogFilterKey = "Pillaro.LogFilter";
+
+    private const string LogEntityLogicalName = "pl_log";
+    private const string SettingEntityLogicalName = "pl_setting";
+    private const string LogDetailEntityLogicalName = "pl_logdetail";
 
     private static readonly CacheProvider CacheProvider = new();
 
@@ -112,45 +115,77 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
         foreach (var log in logList)
             _tracingService?.Trace(log?.ToString());
 
-        var validLogs = logList.Where(o => IsValidForSave(o.LogSeverity));
+        try
+            var validLogs = logList.Where(o => IsValidForSave(o.LogSeverity)).ToList();
 
-        var filters = _settingService.GetModel<List<LogFilterModel>>(LogFilterKey, false);
-        validLogs = validLogs.Union(
-            _filterLogService.GetFilteredLogs(filters, logList),
-            new LogEqualityComparer());
+            if (!validLogs.Any())
+                return;
 
-        var validLogEntities = validLogs
-            .ToList()
-            .Select(GetLogEntity);
-
-        var multipleRequest = new ExecuteMultipleRequest
-        {
-            Settings = new ExecuteMultipleSettings
+            List<LogFilterModel> filters = null;
+            if (CanReadSettings())
             {
-                ContinueOnError = true,
-                ReturnResponses = true,
-            },
-            Requests = []
-        };
+                try
+                {
+                    filters = _settingService.GetModel<List<LogFilterModel>>(LogFilterKey, false);
+                }
+                catch (Exception ex)
+                {
+                    TraceFallback($"Unable to read log filters from settings. Falling back without filters. {ex}");
+                }
+            }
 
-        foreach (var validLog in validLogEntities)
-        {
-            multipleRequest.Requests.Add(new CreateRequest
+            var logsToSave = validLogs.AsEnumerable();
+            if (filters != null)
             {
-                Target = validLog
-            });
+                logsToSave = logsToSave.Union(
+                    _filterLogService.GetFilteredLogs(filters, logList),
+                    new LogEqualityComparer());
+            }
+
+            var validLogEntities = logsToSave
+                .Select(GetLogEntity)
+                .ToList();
+
+            if (!validLogEntities.Any())
+                return;
+
+            var multipleRequest = new ExecuteMultipleRequest
+            {
+                Settings = new ExecuteMultipleSettings
+                {
+                    ContinueOnError = true,
+                    ReturnResponses = true,
+                },
+                Requests = []
+            };
+
+            foreach (var validLog in validLogEntities)
+            {
+                multipleRequest.Requests.Add(new CreateRequest
+                {
+                    Target = validLog
+                });
+            }
+
+            var response = (ExecuteMultipleResponse)_systemOrganizationService.Execute(multipleRequest);
+
+            if (response.IsFaulted)
+            {
+                var faults = response.Responses
+                    .Where(o => o.Fault != null)
+                    .Select(o => o.Fault)
+                    .ToList();
+
+                foreach (var fault in faults)
+                    TraceFallback($"Create {LogEntityLogicalName} fault: {fault.Message}");
+
+                // Logging must never break business logic.
+                return;
+            }
         }
-
-        var response = (ExecuteMultipleResponse)_systemOrganizationService.Execute(multipleRequest);
-
-        if (response.IsFaulted)
+        catch (Exception ex)
         {
-            var fault = response.Responses
-                .Where(o => o.Fault != null)
-                .Select(o => o.Fault)
-                .First();
-
-            throw new FaultException<OrganizationServiceFault>(fault);
+            TraceFallback($"Create {LogEntityLogicalName} batch exception: {ex}");
         }
     }
 
@@ -163,25 +198,26 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
             if (log == null)
                 throw new ArgumentNullException(nameof(log));
 
+            _tracingService?.Trace(log.ToString());
+
             if (!IsValidForSave(log.LogSeverity))
                 return;
 
-            _tracingService?.Trace(log.ToString());
-
             var logEntity = GetLogEntity(log);
-            var outsideTransaction = _dataService.CreateOutsideTransaction(logEntity) ?? throw new Exception("OutsideTransaction response is null");
-            logEntity.Id = outsideTransaction;
+            var outsideTransaction = _dataService.CreateOutsideTransaction(logEntity);
+
+            if (outsideTransaction != null)
+                logEntity.Id = outsideTransaction.Value;
         }
         catch (Exception ex)
         {
-            _tracingService?.Trace(string.Format(CultureInfo.InvariantCulture, "Create pl_Log Exception: {0}", ex));
-            throw;
+            TraceFallback($"Create {LogEntityLogicalName} exception: {ex}");
         }
     }
 
     protected virtual Entity GetLogEntity(Log log)
     {
-        var logEntity = new Entity("pl_log")
+        var logEntity = new Entity(LogEntityLogicalName)
         {
             ["pl_name"] = log.Name,
             ["pl_correlationid"] = log.CorrelationId,
@@ -215,39 +251,66 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
             if (logDetail == null)
                 continue;
 
-            logDetailsCol.Entities.Add(new Entity("pl_logdetail")
+            logDetailsCol.Entities.Add(new Entity(LogDetailEntityLogicalName)
             {
                 ["pl_detail"] = logDetail.Detail,
                 ["pl_name"] = logDetail.Name,
             });
         }
 
-        logEntity.RelatedEntities.Add(new KeyValuePair<Relationship, EntityCollection>(new Relationship("pl_pl_log_pl_logdetail_LogId"), logDetailsCol));
+        logEntity.RelatedEntities.Add(
+            new KeyValuePair<Relationship, EntityCollection>(
+                new Relationship("pl_pl_log_pl_logdetail_LogId"),
+                logDetailsCol));
 
         return logEntity;
     }
 
     public bool IsValidForSave(LogSeverity severity)
     {
-        if (!ExistEntity("pl_log"))
+        if (!ExistEntity(LogEntityLogicalName))
             return false;
 
-        var minimalSeverityLevel = _settingService.GetIntegerValue(MinimalSeverityLevelKey);
+        if (!ExistEntity(SettingEntityLogicalName))
+            return false;
+
+        var minimalSeverityLevel = TryGetMinimalSeverityLevel();
         return (int)severity >= minimalSeverityLevel;
+    }
+
+    private int TryGetMinimalSeverityLevel()
+    {
+        if (!CanReadSettings())
+            return 0;
+
+        try
+        {
+            return _settingService.GetIntegerValue(MinimalSeverityLevelKey);
+        }
+        catch (Exception ex)
+        {
+            TraceFallback($"Unable to read setting '{MinimalSeverityLevelKey}'. Defaulting to 0. {ex}");
+            return 0;
+        }
+    }
+
+    private bool CanReadSettings()
+    {
+        // podpora pro obě varianty názvu entity
+        return ExistEntity(SettingEntityLogicalName);
     }
 
     private string GetCallerName()
     {
         try
         {
-            // skipFrames=2: skip GetCallerName + the calling wrapper (e.g. Debug/Info/Warning/Error)
             var frame = new System.Diagnostics.StackTrace(2, false).GetFrame(0);
             if (frame?.GetMethod() != null)
                 return frame.GetMethod().Name;
         }
         catch (Exception ex)
         {
-            Fatal(ex);
+            TraceFallback($"GetCallerName exception: {ex}");
         }
 
         return "N/A";
@@ -255,23 +318,52 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
 
     private bool ExistEntity(string logicalName)
     {
-        var val = CacheProvider.GetItem<object>(LogEntityExistsCacheKey);
-        if (val != null)
-            return (bool)val;
+        var cacheKey = GetEntityExistsCacheKey(logicalName);
+        var cachedValue = CacheProvider.GetItem<object>(cacheKey);
+        if (cachedValue != null)
+            return (bool)cachedValue;
 
         var expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(CacheNoEntityTimeInSeconds));
 
         try
         {
-            _systemOrganizationService.Execute(new RetrieveEntityRequest { LogicalName = logicalName, EntityFilters = EntityFilters.Entity });
-            CacheProvider.AddItem(LogEntityExistsCacheKey, true, expiration);
+            _systemOrganizationService.Execute(new RetrieveEntityRequest
+            {
+                LogicalName = logicalName,
+                EntityFilters = EntityFilters.Entity
+            });
+
+            CacheProvider.AddItem(cacheKey, true, expiration);
             return true;
         }
-        catch
+        catch (FaultException<OrganizationServiceFault> ex) when (IsEntityNotFoundFault(ex))
         {
-            CacheProvider.AddItem(LogEntityExistsCacheKey, false, expiration);
-            _tracingService?.Trace($"Entity '{logicalName}' does not exist. Logging to Dataverse is disabled for {CacheNoEntityTimeInSeconds}s.");
+            CacheProvider.AddItem(cacheKey, false, expiration);
+            TraceFallback($"Entity '{logicalName}' does not exist. Logging to Dataverse is disabled for {CacheNoEntityTimeInSeconds}s.");
             return false;
         }
+        catch (Exception ex)
+        {
+            CacheProvider.AddItem(cacheKey, false, expiration);
+            TraceFallback($"Unable to verify existence of entity '{logicalName}'. Logging to Dataverse is disabled for {CacheNoEntityTimeInSeconds}s. {ex.Message}");
+            return false;
+        }
+    }
+
+    private static string GetEntityExistsCacheKey(string logicalName)
+    {
+        return $"LogService:EntityExists:{logicalName}";
+    }
+
+    private static bool IsEntityNotFoundFault(FaultException<OrganizationServiceFault> ex)
+    {
+        return ex?.Detail?.ErrorCode == unchecked((int)0x80041102)
+               || ex?.Detail?.Message?.IndexOf("was not found in the MetadataCache", StringComparison.OrdinalIgnoreCase) >= 0
+               || ex?.Detail?.Message?.IndexOf("does not exist", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private void TraceFallback(string message)
+    {
+        _tracingService?.Trace(message);
     }
 }
