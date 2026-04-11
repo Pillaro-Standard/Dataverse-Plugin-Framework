@@ -1,198 +1,41 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CA838E06-B380-412D-AA9D-1F5564575747}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pillaro.Dataverse.PluginFramework</RootNamespace>
-    <AssemblyName>Pillaro.Dataverse.PluginFramework</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Pillaro.Dataverse.PluginFramework.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Pillaro.Dataverse.PluginFramework.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.60\lib\net462\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Xrm.Sdk, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.60\lib\net462\Microsoft.Xrm.Sdk.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.DirectoryServices" />
-    <Reference Include="System.DirectoryServices.AccountManagement" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Http, Version=4.10.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ServiceModel.Http.4.10.3\lib\net461\System.ServiceModel.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ServiceModel.Primitives, Version=4.10.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ServiceModel.Primitives.4.10.3\lib\net461\System.ServiceModel.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Caching\CacheProvider.cs" />
-    <Compile Include="Data\DataServiceProvider.cs" />
-    <Compile Include="Data\IDataService.cs" />
-    <Compile Include="Data\Query\QueryExecutor.cs" />
-    <Compile Include="Data\Query\QueryState.cs" />
-    <Compile Include="Extensions\OrganizationServiceExtensions.cs" />
-    <Compile Include="FrameworkConstants.cs" />
-    <Compile Include="Data\DataServiceRepository.cs" />
-    <Compile Include="Data\Query\EntityQuery.cs" />
-    <Compile Include="Data\Query\EntityQuery.Select.cs" />
-    <Compile Include="Data\Query\ExpressionExtensions.cs" />
-    <Compile Include="AutoNumbering\UseParentConfiguration.cs" />
-    <Compile Include="AutoNumbering\AutoNumberingService.cs" />
-    <Compile Include="Exceptions\DataverseValidationException.cs" />
-    <Compile Include="Plugins\PluginRegistration.cs" />
-    <Compile Include="Tasks\OrganizationServiceProvider.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBasicAttributeValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBasicImageValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBasicPrimaryEntityValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBasicMessageValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBasicStageValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBasicModeValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\ICompleteValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\ICustomValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IBreakValidation.cs" />
-    <Compile Include="Tasks\Validation\FluentInterfaces\IExecuteValidation.cs" />
-    <Compile Include="Tasks\Validation\ValidatorProcessor.cs" />
-    <Compile Include="Tasks\Validation\TaskValidator.cs" />
-    <Compile Include="Tasks\Validation\TaskValidatorBase.cs" />
-    <Compile Include="Tasks\Validation\Validators\EntityAttributesValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\EntityAttributesWithConditionValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\CustomBreakValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\CustomValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\ImageValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\ImageWithConditionValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\Interfaces\IPredicateValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\MessageValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\Interfaces\IBasicValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\Interfaces\IBreakValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\Interfaces\IValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\ModeValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\EntityValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\StageValidator.cs" />
-    <Compile Include="Tasks\Validation\Validators\ThrowExceptionValidator.cs" />
-    <Compile Include="Logging\Events\BeforeSaveLogEventArgs.cs" />
-    <Compile Include="Data\DataService.cs" />
-    <Compile Include="Plugins\PluginMode.cs" />
-    <Compile Include="Plugins\PluginStage.cs" />
-    <Compile Include="Tasks\ExecutionContextParameters.cs" />
-    <Compile Include="Utilities\StringExtensions.cs" />
-    <Compile Include="Tasks\ITask.cs" />
-    <Compile Include="Tasks\TaskBase.cs" />
-    <Compile Include="Plugins\PluginBase.cs" />
-    <Compile Include="Tasks\TaskContext.cs" />
-    <Compile Include="Logging\Events\BeforeSaveLogsEventArgs.cs" />
-    <Compile Include="Logging\Models\LogFilterModel.cs" />
-    <Compile Include="Logging\LogFilterService.cs" />
-    <Compile Include="Logging\LogEqualityComparer.cs" />
-    <Compile Include="Logging\LogService.cs" />
-    <Compile Include="Logging\Models\Log.cs" />
-    <Compile Include="Logging\Models\LogDetail.cs" />
-    <Compile Include="Logging\Models\LogExecutionContext.cs" />
-    <Compile Include="Logging\Enums\LogSeverity.cs" />
-    <Compile Include="Logging\Enums\TaskStatus.cs" />
-    <Compile Include="AutoNumbering\AutoNumberingResponse.cs" />
-    <Compile Include="Settings\SettingsService.cs" />
-    <Compile Include="Utilities\EnumExtensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="key.snk" />
-    <None Include="packages.config" />
-    <None Include="README.md" />
-    <None Include="Tools\PluginPackaging\Pillaro.Dataverse.PluginFramework.nuspec" />
-    <None Include="Tools\ILMerge\README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Tools\ILMerge\ILMerge.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Tools\ILMerge\PostBuildAction-single-project.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Tools\ILMerge\PostBuildAction-logic_plugin-projects.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Tools\ILMerge\System.Compiler.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net462;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+		<PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.60" />
+		<Reference Include="System.Runtime.Caching" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.2.10" />
+		<PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+		<Content Include="Tools\ILMerge\ILMerge.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Tools\ILMerge\PostBuildAction-logic_plugin-projects.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Tools\ILMerge\PostBuildAction-single-project.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Tools\ILMerge\System.Compiler.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
 </Project>

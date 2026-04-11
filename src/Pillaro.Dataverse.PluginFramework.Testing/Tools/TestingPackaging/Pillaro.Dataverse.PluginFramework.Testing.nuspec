@@ -15,21 +15,20 @@
 
 		<readme>docs\README.md</readme>
 		<icon>icon.png</icon>
-		
+
 		<description>
 			Testing support package for integration and end-to-end testing of solutions built with Pillaro Dataverse Plugin Framework.
 		</description>
 
-		<releaseNotes>See CHANGELOG.md</releaseNotes>
+		<releaseNotes>$releaseNotes$</releaseNotes>
 
 		<tags>dataverse dynamics365 plugin testing integration-testing</tags>
 
 		<dependencies>
 			<group targetFramework="net8.0">
 				<dependency id="Pillaro.Dataverse.PluginFramework" version="$version$" exclude="Build,Analyzers" />
-				<dependency id="Autofac" version="9.1.0" />								
+				<dependency id="Autofac" version="9.1.0" />
 				<dependency id="Microsoft.Extensions.Configuration.Json" version="10.0.5" />
-				<dependency id="Microsoft.PowerPlatform.Dataverse.Client" version="1.2.10" />				
 			</group>
 		</dependencies>
 	</metadata>

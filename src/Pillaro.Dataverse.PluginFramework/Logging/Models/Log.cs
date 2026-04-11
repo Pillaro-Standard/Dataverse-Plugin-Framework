@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using TaskStatus = Pillaro.Dataverse.PluginFramework.Logging.Enums.TaskStatus;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging.Models;
 

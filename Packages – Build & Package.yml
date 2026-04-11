@@ -34,9 +34,8 @@ variables:
   configuration: Release
 
   frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
-  frameworkPackagesConfigPath: src/Pillaro.Dataverse.PluginFramework/packages.config
-  frameworkAssemblyInfoPath: src/Pillaro.Dataverse.PluginFramework/Properties/AssemblyInfo.cs
   frameworkConstantsPath: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
+  frameworkAssemblyInfoPath: src/Pillaro.Dataverse.PluginFramework/Properties/AssemblyInfo.cs
   frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
   testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
@@ -224,6 +223,7 @@ jobs:
 
       - task: PowerShell@2
         displayName: Patch Framework AssemblyInfo.cs versions
+        condition: exists('$(Build.SourcesDirectory)/$(frameworkAssemblyInfoPath)')
         inputs:
           targetType: inline
           script: |
@@ -246,29 +246,27 @@ jobs:
 
             Set-Content $file -Value $content -NoNewline
 
-      - task: NuGetCommand@2
-        displayName: Restore framework packages.config
+      - task: DotNetCoreCLI@2
+        displayName: Restore framework project
         inputs:
-          command: custom
-          arguments: >
-            restore "$(Build.SourcesDirectory)\$(frameworkPackagesConfigPath)"
-            -PackagesDirectory "$(Build.SourcesDirectory)\packages"
-            -NonInteractive
+          command: restore
+          projects: $(frameworkProjectPath)
 
-      - task: VSBuild@1
+      - task: DotNetCoreCLI@2
         displayName: Build framework project
         inputs:
-          solution: $(frameworkProjectPath)
-          configuration: $(configuration)
-          msbuildArgs: >
-            /t:Rebuild
-            /p:SolutionDir=$(Build.SourcesDirectory)\
+          command: build
+          projects: $(frameworkProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
             /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
             /p:AssemblyVersion=$(ASSEMBLY_VERSION)
             /p:FileVersion=$(FILE_VERSION)
             /p:InformationalVersion=$(INFORMATIONAL_VERSION)
-            /v:minimal
-            /m
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
 
       - task: DotNetCoreCLI@2
         displayName: Restore testing project
@@ -294,6 +292,7 @@ jobs:
 
       - script: >
           nuget pack "$(frameworkNuspecPath)"
+          -BasePath "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework"
           -Properties "configuration=$(configuration);version=$(PACKAGE_VERSION)"
           -OutputDirectory "$(Build.ArtifactStagingDirectory)"
           -NonInteractive
