@@ -1,0 +1,50 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <PillaroPackageRoot>$(MSBuildThisFileDirectory)..\</PillaroPackageRoot>
+    <PillaroToolsRoot>$(PillaroPackageRoot)tools\</PillaroToolsRoot>
+
+    <PillaroEnablePluginPackaging Condition="'$(PillaroEnablePluginPackaging)' == '' and '$(TargetFrameworkIdentifier)' == '.NETFramework' and '$(TargetFrameworkVersion)' == 'v4.6.2'">true</PillaroEnablePluginPackaging>
+
+    <PillaroILMergeExe>$(PillaroToolsRoot)ILMerge\ILMerge.exe</PillaroILMergeExe>
+    <PillaroSystemCompilerDll>$(PillaroToolsRoot)ILMerge\System.Compiler.dll</PillaroSystemCompilerDll>
+    <PillaroPostBuildSingleProject>$(PillaroToolsRoot)CrmTools\PostBuildAction-single-project.txt</PillaroPostBuildSingleProject>
+    <PillaroPostBuildLogicProjects>$(PillaroToolsRoot)CrmTools\PostBuildAction-logic_plugin-projects.txt</PillaroPostBuildLogicProjects>
+  </PropertyGroup>
+
+  <Target Name="PillaroValidatePackagingTools"
+          BeforeTargets="Build"
+          Condition="'$(PillaroEnablePluginPackaging)' == 'true'">
+
+    <Error Condition="!Exists('$(PillaroILMergeExe)')"
+           Text="Pillaro.Dataverse.PluginFramework: Missing ILMerge.exe in package tools." />
+    <Error Condition="!Exists('$(PillaroSystemCompilerDll)')"
+           Text="Pillaro.Dataverse.PluginFramework: Missing System.Compiler.dll in package tools." />
+    <Error Condition="!Exists('$(PillaroPostBuildSingleProject)')"
+           Text="Pillaro.Dataverse.PluginFramework: Missing PostBuildAction-single-project.txt in package tools." />
+    <Error Condition="!Exists('$(PillaroPostBuildLogicProjects)')"
+           Text="Pillaro.Dataverse.PluginFramework: Missing PostBuildAction-logic_plugin-projects.txt in package tools." />
+  </Target>
+
+  <Target Name="PillaroCopyPackagingTools"
+          AfterTargets="Build"
+          Condition="'$(PillaroEnablePluginPackaging)' == 'true'">
+
+    <MakeDir Directories="$(MSBuildProjectDirectory)\Tools\ILMerge" />
+    <MakeDir Directories="$(MSBuildProjectDirectory)\Tools\CrmTools" />
+
+    <Copy SourceFiles="$(PillaroILMergeExe)"
+          DestinationFiles="$(MSBuildProjectDirectory)\Tools\ILMerge\ILMerge.exe"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(PillaroSystemCompilerDll)"
+          DestinationFiles="$(MSBuildProjectDirectory)\Tools\ILMerge\System.Compiler.dll"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(PillaroPostBuildSingleProject)"
+          DestinationFiles="$(MSBuildProjectDirectory)\Tools\CrmTools\PostBuildAction-single-project.txt"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(PillaroPostBuildLogicProjects)"
+          DestinationFiles="$(MSBuildProjectDirectory)\Tools\CrmTools\PostBuildAction-logic_plugin-projects.txt"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
