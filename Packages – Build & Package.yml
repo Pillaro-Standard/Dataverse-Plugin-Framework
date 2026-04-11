@@ -35,7 +35,6 @@ variables:
 
   frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
   frameworkConstantsPath: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
-  frameworkAssemblyInfoPath: src/Pillaro.Dataverse.PluginFramework/Properties/AssemblyInfo.cs
   frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
 
   testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
@@ -220,32 +219,7 @@ jobs:
             $content = Get-Content $file -Raw
             $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
             Set-Content $file -Value $updated -NoNewline
-
-      - task: PowerShell@2
-        displayName: Patch Framework AssemblyInfo.cs versions
-        condition: exists('$(Build.SourcesDirectory)/$(frameworkAssemblyInfoPath)')
-        inputs:
-          targetType: inline
-          script: |
-            $file = "$(Build.SourcesDirectory)/$(frameworkAssemblyInfoPath)"
-            $content = Get-Content $file -Raw
-
-            $content = $content -replace 'AssemblyVersion\(".*?"\)', 'AssemblyVersion("$(ASSEMBLY_VERSION)")'
-
-            if ($content -match 'AssemblyFileVersion') {
-              $content = $content -replace 'AssemblyFileVersion\(".*?"\)', 'AssemblyFileVersion("$(FILE_VERSION)")'
-            } else {
-              $content += "`r`n[assembly: AssemblyFileVersion(""$(FILE_VERSION)"")]"
-            }
-
-            if ($content -match 'AssemblyInformationalVersion') {
-              $content = $content -replace 'AssemblyInformationalVersion\(".*?"\)', 'AssemblyInformationalVersion("$(INFORMATIONAL_VERSION)")'
-            } else {
-              $content += "`r`n[assembly: AssemblyInformationalVersion(""$(INFORMATIONAL_VERSION)"")]"
-            }
-
-            Set-Content $file -Value $content -NoNewline
-
+                 
       - task: DotNetCoreCLI@2
         displayName: Restore framework project
         inputs:
