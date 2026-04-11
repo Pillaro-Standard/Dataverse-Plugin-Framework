@@ -51,11 +51,9 @@
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.dll" target="lib\net8.0" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.xml" target="lib\net8.0" />
 
-		<file src="Tools\NuGet\Pillaro.Dataverse.PluginFramework.targets" target="build\Pillaro.Dataverse.PluginFramework.targets" />
-
-		<file src="bin\$configuration$\net462\Tools\ILMerge\ILMerge.exe" target="tools\ILMerge\ILMerge.exe" />
-		<file src="bin\$configuration$\net462\Tools\ILMerge\System.Compiler.dll" target="tools\ILMerge\System.Compiler.dll" />
-		<file src="bin\$configuration$\net462\Tools\ILMerge\PostBuildAction-logic_plugin-projects.txt" target="tools\CrmTools\PostBuildAction-logic_plugin-projects.txt" />
-		<file src="bin\$configuration$\net462\Tools\ILMerge\PostBuildAction-single-project.txt" target="tools\CrmTools\PostBuildAction-single-project.txt" />
+		<file src="bin\$configuration$\net462\Tools\ILMerge\ILMerge.exe" target="Content\tools\ILMerge\ILMerge.exe" />
+		<file src="bin\$configuration$\net462\Tools\ILMerge\System.Compiler.dll" target="Content\tools\ILMerge\System.Compiler.dll" />
+		<file src="bin\$configuration$\net462\Tools\ILMerge\PostBuildAction-logic_plugin-projects.txt" target="Content\tools\CrmTools\PostBuildAction-logic_plugin-projects.txt" />
+		<file src="bin\$configuration$\net462\Tools\ILMerge\PostBuildAction-single-project.txt" target="Content\tools\CrmTools\PostBuildAction-single-project.txt" />
 	</files>
 </package>
