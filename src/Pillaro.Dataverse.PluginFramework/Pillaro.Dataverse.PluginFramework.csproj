@@ -7,6 +7,8 @@
 		<LangVersion>latest</LangVersion>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Pillaro.Dataverse.PluginFramework.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net462'">
