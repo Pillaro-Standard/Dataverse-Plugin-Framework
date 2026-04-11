@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
+﻿namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 
 /// <summary>
 /// Custom data validation. Runs only in case that all previous validations were successful.

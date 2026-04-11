@@ -6,7 +6,7 @@
         {
         }
 
-        public override string GetSolutionVersion()
+        public override string GetVersion()
         {
             return "1.0";
         }

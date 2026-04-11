@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
+﻿namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 
 /// <summary>
 /// Execute validation process

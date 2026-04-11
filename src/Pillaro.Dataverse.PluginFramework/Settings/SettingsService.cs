@@ -2,8 +2,6 @@
 using Microsoft.Xrm.Sdk.Query;
 using Newtonsoft.Json;
 using Pillaro.Dataverse.PluginFramework.Caching;
-using System;
-using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Settings;
 

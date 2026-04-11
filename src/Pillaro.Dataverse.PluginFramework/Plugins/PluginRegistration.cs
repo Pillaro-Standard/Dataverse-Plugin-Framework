@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Pillaro.Dataverse.PluginFramework.Plugins;
+﻿namespace Pillaro.Dataverse.PluginFramework.Plugins;
 
 public class PluginRegistration
 {

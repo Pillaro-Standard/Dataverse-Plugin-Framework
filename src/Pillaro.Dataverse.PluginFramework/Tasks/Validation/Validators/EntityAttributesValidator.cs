@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators;
 

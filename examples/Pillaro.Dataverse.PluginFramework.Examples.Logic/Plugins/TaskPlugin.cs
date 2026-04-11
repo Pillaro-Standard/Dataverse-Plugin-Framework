@@ -1,4 +1,3 @@
-using Pillaro.Dataverse.PluginFramework.Plugins;
 using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins

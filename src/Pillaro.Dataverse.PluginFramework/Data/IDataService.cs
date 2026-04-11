@@ -2,8 +2,6 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Pillaro.Dataverse.PluginFramework.Data.Query;
-using System;
-using System.Collections.Generic;
 
 namespace Pillaro.Dataverse.PluginFramework.Data;
 

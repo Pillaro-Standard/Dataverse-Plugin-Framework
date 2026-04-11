@@ -7,10 +7,6 @@ using Pillaro.Dataverse.PluginFramework.Logging.Enums;
 using Pillaro.Dataverse.PluginFramework.Logging.Events;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
 using Pillaro.Dataverse.PluginFramework.Settings;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.ServiceModel;
 using System.Text;
 

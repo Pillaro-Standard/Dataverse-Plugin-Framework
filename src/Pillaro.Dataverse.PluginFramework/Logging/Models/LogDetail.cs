@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging.Models;
 

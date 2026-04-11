@@ -1,6 +1,4 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Logging.Enums;
-using System;
-using System.Collections.Generic;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging.Models;
 

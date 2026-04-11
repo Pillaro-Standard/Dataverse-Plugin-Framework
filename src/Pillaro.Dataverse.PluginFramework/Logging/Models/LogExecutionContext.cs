@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Plugins;
-using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging.Models;
 

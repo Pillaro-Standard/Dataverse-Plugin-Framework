@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xrm.Sdk;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace Pillaro.Dataverse.PluginFramework.Data.Query;

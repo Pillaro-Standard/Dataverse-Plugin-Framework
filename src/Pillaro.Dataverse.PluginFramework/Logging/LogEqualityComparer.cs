@@ -1,5 +1,4 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Logging.Models;
-using System.Collections.Generic;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging;
 

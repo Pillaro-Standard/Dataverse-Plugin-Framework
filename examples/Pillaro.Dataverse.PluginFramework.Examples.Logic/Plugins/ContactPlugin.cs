@@ -1,5 +1,4 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
-using Pillaro.Dataverse.PluginFramework.Plugins;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {

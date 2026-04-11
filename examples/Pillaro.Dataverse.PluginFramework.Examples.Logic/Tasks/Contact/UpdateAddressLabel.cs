@@ -1,7 +1,4 @@
-﻿using Pillaro.Dataverse.PluginFramework.Plugins;
-using Pillaro.Dataverse.PluginFramework.Tasks;
-using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
-using System;
+﻿using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 {

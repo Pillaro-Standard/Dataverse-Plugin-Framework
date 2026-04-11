@@ -7,10 +7,7 @@ using Pillaro.Dataverse.PluginFramework.Logging;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using TaskStatus = Pillaro.Dataverse.PluginFramework.Logging.Enums.TaskStatus;
 
@@ -160,7 +157,7 @@ public abstract class TaskBase<TEntity> : ITask
     protected TEntity GetPreImage(string name = DefaultImageName, bool throwException = true)
     {
         return GetImage(
-            TaskContext.PluginExecutionContext != null ? TaskContext.PluginExecutionContext.PreEntityImages : null,
+            TaskContext?.PluginExecutionContext?.PreEntityImages,
             name,
             throwException,
             "pre");
@@ -169,13 +166,13 @@ public abstract class TaskBase<TEntity> : ITask
     protected TEntity GetPostImage(string name = DefaultImageName, bool throwException = true)
     {
         return GetImage(
-            TaskContext.PluginExecutionContext != null ? TaskContext.PluginExecutionContext.PostEntityImages : null,
+            TaskContext?.PluginExecutionContext?.PostEntityImages,
             name,
             throwException,
             "post");
     }
 
- 
+
     protected void AddLogMessageLine(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
@@ -187,15 +184,9 @@ public abstract class TaskBase<TEntity> : ITask
             ExecutionMessage += Environment.NewLine + message;
     }
 
-    protected string GetTaskTypeName()
-    {
-        return GetType().FullName ?? string.Empty;
-    }
-
     protected string GetTaskName()
     {
-        var names = GetTaskTypeName().Split('.');
-        return names.LastOrDefault() ?? string.Empty;
+        return GetType().Name;
     }
 
     protected virtual bool ShouldInitializeContextEntity()
@@ -257,7 +248,7 @@ public abstract class TaskBase<TEntity> : ITask
         }
 
         timer.Stop();
-        message.AppendLine("#Validation Elapsed Time: " + timer.Elapsed.TotalMilliseconds + " ms");
+        message.AppendLine("#Validation: " + timer.Elapsed.TotalMilliseconds + " ms");
     }
 
     private void ExecuteInternal(StringBuilder message)
@@ -269,14 +260,12 @@ public abstract class TaskBase<TEntity> : ITask
 
         DoExecute();
         timer.Stop();
-        message.AppendLine("#Execution Elapsed Time: " + timer.Elapsed.TotalMilliseconds + " ms");
+        message.AppendLine("#Execution: " + timer.Elapsed.TotalMilliseconds + " ms");
     }
 
     private void AppendExecutionHeader(StringBuilder message)
     {
-        message.AppendLine("Framework: " + FrameworkConstants.FrameworkVersion);
-        message.AppendLine("Version: " + TaskContext.Version);
-        message.AppendLine("TaskOf: " + TaskContext.TaskOrder + " from " + TaskContext.CountOfTasks);
+        message.AppendLine($"Framework: {FrameworkConstants.FrameworkVersion} | Plugin: {TaskContext.Version} | Task: {TaskContext.TaskOrder}/{TaskContext.CountOfTasks}");
     }
 
     private Log CreateDefaultLog(IPluginExecutionContext executionContext)
@@ -306,7 +295,7 @@ public abstract class TaskBase<TEntity> : ITask
         {
             if (throwException)
                 throw new InvalidPluginExecutionException(
-                    string.Format("Plugin step does not have registered {0} image with name '{1}'.", imageType, name));
+                    string.Format("No {0} image named '{1}' is registered on the plugin step.", imageType, name));
 
             return null;
         }

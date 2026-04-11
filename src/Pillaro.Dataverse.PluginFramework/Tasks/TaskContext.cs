@@ -2,10 +2,7 @@
 using Newtonsoft.Json;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
 using Pillaro.Dataverse.PluginFramework.Plugins;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Tasks;
 

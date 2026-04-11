@@ -4,11 +4,8 @@ using Pillaro.Dataverse.PluginFramework.Logging.Enums;
 using Pillaro.Dataverse.PluginFramework.Logging;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
 using Pillaro.Dataverse.PluginFramework.Tasks;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 
 namespace Pillaro.Dataverse.PluginFramework.Plugins;
 
@@ -50,7 +47,6 @@ public abstract class PluginBase : IPlugin
             var adminOrgSvc = orgServiceFactory.CreateOrganizationService(null);
             var logService = new LogService(execContext, adminOrgSvc, tracingService);
 
-
             var logData = true;
 
             try
@@ -64,7 +60,7 @@ public abstract class PluginBase : IPlugin
                     .ToList();
 
                 taskContext.CountOfTasks = entityAction.Count;
-                taskContext.Version = GetSolutionVersion();
+                taskContext.Version = GetVersion();
 
                 object instance;
                 try
@@ -74,7 +70,7 @@ public abstract class PluginBase : IPlugin
                         taskContext.TaskOrder++;
 
                         object[] taskArgs = [serviceProvider, taskContext];
-                        
+
                         try
                         {
                             instance = Activator.CreateInstance(o.TaskType, taskArgs);
@@ -82,7 +78,7 @@ public abstract class PluginBase : IPlugin
                         catch (MissingMethodException ex)
                         {
                             throw new InvalidOperationException(
-                                $"Registered task '{o.TaskType.FullName}' must define a constructor accepting IServiceProvider and TaskContext.",
+                                $"Registered task '{o.TaskType.FullName}' must have a constructor with IServiceProvider and TaskContext.",
                                 ex);
                         }
 
@@ -107,38 +103,32 @@ public abstract class PluginBase : IPlugin
                     throw;
                 }
 
-                var checkSumMessage = $"Task Execution elapsed time is {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
+                var checkSumMessage = $"Execution: {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
                 stop.Restart();
 
-                // If no tasks found still create an executor-level log (with parameters/images if present)
                 if (entityAction.Count == 0)
                 {
                     var executorLog = new Log(LogSeverity.Info, new LogExecutionContext(taskContext.PluginExecutionContext), "Plugin")
                     {
                         StartUtc = DateTime.UtcNow,
                         TaskName = "",
-                        Detail = $"Framework: {FrameworkConstants.FrameworkVersion}{Environment.NewLine}" +
-                        $"Version: {GetSolutionVersion()}{Environment.NewLine}" +
-                        $"No registered tasks for this event."
-
+                        Detail = $"Framework: {FrameworkConstants.FrameworkVersion} | Plugin: {GetVersion()} | No tasks registered."
                     };
 
-                    // Enrich task log with parameters/images
                     EnrichLogWithParametersAndImages(executorLog, taskContext.PluginExecutionContext);
                     logService.SaveLog(executorLog);
                     logData = false;
                 }
 
-
-                checkSumMessage += $"SaveUpdateEntity elapsed time is {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
+                checkSumMessage += $"Save log entity: {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
                 stop.Restart();
                 var logs = taskContext.GetLogs();
                 logService.SaveLogs(logs);
 
-                checkSumMessage += $"SaveLogs count{logs.Count()} elapsed time is {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
+                checkSumMessage += $"Save logs: {logs.Count()} item(s) in {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
                 stop.Stop();
 
-                tracingService.Trace($"Pillaro Plugin Executor Elapsed Times: {checkSumMessage}");
+                tracingService.Trace($"Plugin execution summary:{Environment.NewLine}{checkSumMessage}");
             }
             catch (DataverseValidationException notlogex)
             {
@@ -147,14 +137,14 @@ public abstract class PluginBase : IPlugin
             catch (Exception ex)
             {
                 if (logData)
-                    logService.Error($"{GetSolutionVersion()} - Execute Exception: " + ex);
+                    logService.Error($"Plugin: {GetVersion()} | Execution failed: {ex}");
 
                 throw;
             }
         }
         catch (Exception ex)
         {
-            tracingService.Trace($"{GetSolutionVersion()} - Critical Plugin Executor Exception: {ex}");
+            tracingService?.Trace($"Plugin: {GetVersion()} | Critical error: {ex}");
             throw new InvalidPluginExecutionException(ex.Message, ex);
         }
     }
@@ -170,7 +160,7 @@ public abstract class PluginBase : IPlugin
         {
             foreach (var item in ctx.InputParameters)
             {
-                log.LogDetails.Add(new LogDetail($"InputParameters - {item.Key}", item.Value));
+                log.LogDetails.Add(new LogDetail($"Input parameter: {item.Key}", item.Value));
             }
         }
 
@@ -178,7 +168,7 @@ public abstract class PluginBase : IPlugin
         {
             foreach (var item in ctx.OutputParameters)
             {
-                log.LogDetails.Add(new LogDetail($"OutputParameters - {item.Key}", item.Value));
+                log.LogDetails.Add(new LogDetail($"Output parameter: {item.Key}", item.Value));
             }
         }
 
@@ -186,7 +176,7 @@ public abstract class PluginBase : IPlugin
         {
             foreach (var item in ctx.PreEntityImages)
             {
-                log.LogDetails.Add(new LogDetail($"PreEntityImages - {item.Key}", item.Value));
+                log.LogDetails.Add(new LogDetail($"Pre image: {item.Key}", item.Value));
             }
         }
 
@@ -194,11 +184,10 @@ public abstract class PluginBase : IPlugin
         {
             foreach (var item in ctx.PostEntityImages)
             {
-                log.LogDetails.Add(new LogDetail($"PostEntityImages - {item.Key}", item.Value));
+                log.LogDetails.Add(new LogDetail($"Post image: {item.Key}", item.Value));
             }
         }
     }
-
 
     #region Register task
 
@@ -267,5 +256,5 @@ public abstract class PluginBase : IPlugin
         return _registeredEvents.AsReadOnly();
     }
 
-    public virtual string GetSolutionVersion() => "Unknown";
+    public virtual string GetVersion() => "Unknown";
 }

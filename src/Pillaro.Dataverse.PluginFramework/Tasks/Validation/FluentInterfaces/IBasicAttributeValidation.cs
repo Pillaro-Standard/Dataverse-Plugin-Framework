@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xrm.Sdk;
-using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 
