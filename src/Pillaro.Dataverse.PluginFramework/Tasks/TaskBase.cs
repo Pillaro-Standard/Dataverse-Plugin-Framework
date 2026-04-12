@@ -138,8 +138,7 @@ public abstract class TaskBase<TEntity> : ITask
         if (log == null)
             throw new ArgumentNullException(nameof(log));
 
-        if (log.LogDetails == null)
-            log.LogDetails = new List<LogDetail>();
+        log.LogDetails ??= [];
 
         return ExecutionContextParameters.GetEntityTarget<TEntity>(taskContext.PluginExecutionContext);
     }
@@ -289,7 +288,7 @@ public abstract class TaskBase<TEntity> : ITask
         return images != null && images.ContainsKey(name);
     }
 
-    private TEntity GetImage(EntityImageCollection images, string name, bool throwException, string imageType)
+    private static TEntity GetImage(EntityImageCollection images, string name, bool throwException, string imageType)
     {
         if (!HasImage(images, name))
         {
@@ -301,7 +300,7 @@ public abstract class TaskBase<TEntity> : ITask
         }
 
         var image = images[name];
-        return image != null ? image.ToEntity<TEntity>() : null;
+        return image?.ToEntity<TEntity>();
     }
 
     private static string BuildLogDetail(string message, string executionMessage)

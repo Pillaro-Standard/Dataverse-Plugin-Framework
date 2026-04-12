@@ -15,12 +15,12 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
     [Fact]
     public void Create_WithAddress_ShouldSetAddressLabel()
     {
-        Contact c = DataService.GetRepository<ContactRepository>()
+        Contact c = TestDataService.GetRepository<ContactRepository>()
             .GetNewWithAddress("Jan", "Label", "Main street 1", "Prague", "11000", "CZ");
 
-        c.Id = DataService.CreateTestEntity(c);
+        c.Id = TestDataService.CreateTestEntity(c);
 
-        var loaded = DataService
+        var loaded = TestDataService
             .Query<Contact>()
             .Where(x => x.Id == c.Id)
             .Select(x => new Contact { Address1_Name = x.Address1_Name })
@@ -33,12 +33,12 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
     [Fact]
     public void Update_WhenAddressChanges_ShouldUpdateAddressLabel()
     {
-        Contact c = DataService.GetRepository<ContactRepository>()
+        Contact c = TestDataService.GetRepository<ContactRepository>()
             .GetNewWithAddress("Jan", "Label", addressLine1: "Old address 1");
 
-        c.Id = DataService.CreateTestEntity(c);
+        c.Id = TestDataService.CreateTestEntity(c);
         
-        var before = DataService
+        var before = TestDataService
             .Query<Contact>()
             .Where(x => x.Id == c.Id)
             .Select(x => new Contact { Id = x.Id, Address1_Name = x.Address1_Name })
@@ -53,9 +53,9 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
             EntityState = EntityState.Changed
         };
 
-        DataService.OrganizationService.Update(update);
+        OrganizationService.Update(update);
 
-        var after = DataService
+        var after = TestDataService
             .Query<Contact>()
             .Where(x => x.Id == c.Id)
             .Select(x => new Contact { Address1_Name = x.Address1_Name, Address1_Line1 = x.Address1_Line1 })

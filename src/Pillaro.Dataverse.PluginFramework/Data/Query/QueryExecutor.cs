@@ -34,15 +34,15 @@ internal static class QueryExecutor
         {
             if (state.Skip.HasValue) q = q.Skip(state.Skip.Value);
             if (state.Take.HasValue) q = q.Take(state.Take.Value);
-            return q.ToList();
+            return [.. q];
         }
         catch (NotSupportedException)
         {
             var safeTake = (state.Skip ?? 0) + (state.Take ?? int.MaxValue / 4);
             var list = q.Take(safeTake).ToList();
 
-            if (state.Skip.HasValue) list = list.Skip(state.Skip.Value).ToList();
-            if (state.Take.HasValue) list = list.Take(state.Take.Value).ToList();
+            if (state.Skip.HasValue) list = [.. list.Skip(state.Skip.Value)];
+            if (state.Take.HasValue) list = [.. list.Take(state.Take.Value)];
 
             return list;
         }
@@ -61,7 +61,7 @@ internal static class QueryExecutor
             if (state.Skip.HasValue) q = q.Skip(state.Skip.Value);
             if (state.Take.HasValue) q = q.Take(state.Take.Value);
 
-            return q.Select(selector).ToList();
+            return [.. q.Select(selector)];
         }
         catch (NotSupportedException)
         {
@@ -71,8 +71,8 @@ internal static class QueryExecutor
                         .Select(selector.Compile())
                         .ToList();
 
-            if (state.Skip.HasValue) list = list.Skip(state.Skip.Value).ToList();
-            if (state.Take.HasValue) list = list.Take(state.Take.Value).ToList();
+            if (state.Skip.HasValue) list = [.. list.Skip(state.Skip.Value)];
+            if (state.Take.HasValue) list = [.. list.Take(state.Take.Value)];
 
             return list;
         }

@@ -2,6 +2,8 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering;
+using Pillaro.Dataverse.PluginFramework.Tasks;
+using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +34,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Tasks.Autonumbering
             var inputParameters = TaskContext.PluginExecutionContext.InputParameters;
             var entityInput = inputParameters.ContainsKey("Entity") ? inputParameters["Entity"] : null;
 
-            if (!(entityInput is EntityReference entityReference))
+            if (entityInput is not EntityReference entityReference)
                 throw new InvalidPluginExecutionException($"InputParameters['Entity'] must be EntityReference. Actual: {entityInput?.GetType().FullName ?? "null"}");
 
             var entityName = entityReference.LogicalName;
@@ -143,7 +145,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Tasks.Autonumbering
             if (!plan.HasDynamicTokens)
                 return plan.PartialFormat;
 
-            var rootEntity = service.Retrieve(entityName, entityId, new ColumnSet(plan.RootAttributes.ToArray()));
+            var rootEntity = service.Retrieve(entityName, entityId, new ColumnSet([.. plan.RootAttributes]));
             if (rootEntity == null)
                 throw new InvalidPluginExecutionException($"Record '{entityName}' Id='{entityId}' could not be loaded.");
 
@@ -157,10 +159,10 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Tasks.Autonumbering
 
             foreach (var lookup in parentLookups)
             {
-                if (!rootEntity.Contains(lookup.Key) || !(rootEntity[lookup.Key] is EntityReference parentRef))
+                if (!rootEntity.Contains(lookup.Key) || rootEntity[lookup.Key] is not EntityReference parentRef)
                     throw new InvalidPluginExecutionException($"Lookup '{lookup.Key}' is missing or not an EntityReference on '{rootEntity.LogicalName}' Id='{rootEntity.Id}'.");
 
-                var parentEntity = service.Retrieve(parentRef.LogicalName, parentRef.Id, new ColumnSet(lookup.Value.ToArray()));
+                var parentEntity = service.Retrieve(parentRef.LogicalName, parentRef.Id, new ColumnSet([.. lookup.Value]));
                 if (parentEntity == null)
                     throw new InvalidPluginExecutionException($"Could not load parent '{parentRef.LogicalName}' Id='{parentRef.Id}' for lookup '{lookup.Key}'.");
 

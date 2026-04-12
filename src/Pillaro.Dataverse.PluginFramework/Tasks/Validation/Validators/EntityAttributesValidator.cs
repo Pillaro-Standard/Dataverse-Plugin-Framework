@@ -3,25 +3,18 @@ using Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
 
 namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators;
 
-internal class EntityAttributesValidator : IBasicValidator
+internal class EntityAttributesValidator(Entity entity, IEnumerable<string> attributes, bool containsAll) : IBasicValidator
 {
-    private readonly IEnumerable<string> _attributes;
-    private readonly Entity _entity;
-    private readonly bool _containsAll;
-    private IEnumerable<string> _missingAttributes;
-
-    public EntityAttributesValidator(Entity entity, IEnumerable<string> attributes, bool containsAll)
-    {
-        _attributes = attributes.Select(x => x.ToLower());
-        _entity = entity;
-        _containsAll = containsAll;
-    }
+    private readonly IEnumerable<string> _attributes = attributes.Select(x => x.ToLower());
+    private readonly Entity _entity = entity;
+    private readonly bool _containsAll = containsAll;
+    private IEnumerable<string> _missingAttributes = [];
 
     public string GetName => nameof(EntityAttributesValidator);
 
     public bool Validate(TaskContext taskContext)
     {
-        List<string> entityAttributes = _entity.Attributes.Select(x => x.Key.ToLower()).ToList();
+        List<string> entityAttributes = [.. _entity.Attributes.Select(x => x.Key.ToLower())];
         _missingAttributes = GetMissingAttributes(entityAttributes);
         return !_missingAttributes.Any();
     }
@@ -29,9 +22,9 @@ internal class EntityAttributesValidator : IBasicValidator
     private List<string> GetMissingAttributes(List<string> entityAttributes)
     {
         if (_containsAll)
-            return _attributes.Where(x => !entityAttributes.Contains(x)).ToList();
+            return [.. _attributes.Where(x => !entityAttributes.Contains(x))];
         //at least one
-        return _attributes.Any(x => entityAttributes.Contains(x)) ? [] : _attributes.ToList();
+        return _attributes.Any(x => entityAttributes.Contains(x)) ? [] : [.. _attributes];
     }
 
     public string GetMessage()

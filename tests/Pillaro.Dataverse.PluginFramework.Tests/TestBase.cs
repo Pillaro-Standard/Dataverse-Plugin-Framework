@@ -18,7 +18,7 @@ public class TestBase : TestBase<TestAutofacModule>
 
         foreach (var item in handlers)
         {
-            DataService.AddCleanUpDeleteHandler(item);
+            TestDataService.AddCleanUpDeleteHandler(item);
         }
 
     }

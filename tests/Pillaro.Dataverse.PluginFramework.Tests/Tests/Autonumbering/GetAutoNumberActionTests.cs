@@ -33,13 +33,13 @@ public class GetAutoNumberActionTests : TestBase
 
     private void CleanupAutoNumbering(string entityName)
     {
-        var rows = DataService.Query<pl_AutoNumbering>()
+        var rows = TestDataService.Query<pl_AutoNumbering>()
             .Where(x => x.pl_EntityName == entityName)
             .OrderByDescending(x => x.CreatedOn)
             .Select(x => new pl_AutoNumbering { pl_AutoNumberingId = x.pl_AutoNumberingId })
             .ToList();
 
-        DataService.OrganizationService.Delete(rows);
+        OrganizationService.Delete(rows);
     }
 
     private pl_AutoNumbering CreateConfig(
@@ -80,27 +80,27 @@ public class GetAutoNumberActionTests : TestBase
                 ? crd8e_pl_autonumbering_pl_useparentconfiguration.Ano
                 : crd8e_pl_autonumbering_pl_useparentconfiguration.Ne;
 
-        config.Id = DataService.CreateTestEntity(config);
+        config.Id = TestDataService.CreateTestEntity(config);
         return config;
     }
 
     private Contact CreateContact(string? firstName = "Jan", string lastName = "Mucha", DateTime? birthDate = null, EntityReference? parentCustomer = null)
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNewContact(firstName!, lastName, birthDate: birthDate, parentCustomer: parentCustomer);
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNewContact(firstName!, lastName, birthDate: birthDate, parentCustomer: parentCustomer);
+        contact.Id = TestDataService.CreateTestEntity(contact);
         return contact;
     }
 
     private Account CreateAccount(string name)
     {
-        var account = DataService.GetRepository<AccountRepository>().GetNewAccount(name);
-        account.Id = DataService.CreateTestEntity(account);
+        var account = TestDataService.GetRepository<AccountRepository>().GetNewAccount(name);
+        account.Id = TestDataService.CreateTestEntity(account);
         return account;
     }
 
     private int GetPrimaryCounterValue()
     {
-        return DataService.Query<pl_AutoNumbering>()
+        return TestDataService.Query<pl_AutoNumbering>()
             .Where(x => x.pl_EntityName == EntityName && x.pl_ParentAutoNumberingId == null && x.pl_ParentLookupId == null)
             .Select(x => new pl_AutoNumbering { pl_Number = x.pl_Number })
             .First()
@@ -110,7 +110,7 @@ public class GetAutoNumberActionTests : TestBase
 
     private pl_AutoNumbering GetChildConfig(Guid parentId)
     {
-        return DataService.Query<pl_AutoNumbering>()
+        return TestDataService.Query<pl_AutoNumbering>()
             .Where(x => x.pl_EntityName == EntityName && x.pl_ParentLookupId == parentId.ToString("D").ToLowerInvariant())
             .Select(x => new pl_AutoNumbering
             {
@@ -302,20 +302,20 @@ public class GetAutoNumberActionTests : TestBase
     [Fact]
     public void Child_configuration_uses_primary_configuration_when_use_parent_configuration_is_yes()
     {
-        var account = DataService.GetRepository<AccountRepository>().GetNewAccount("Inherited Parent");
-        account.Id = DataService.CreateTestEntity(account);
+        var account = TestDataService.GetRepository<AccountRepository>().GetNewAccount("Inherited Parent");
+        account.Id = TestDataService.CreateTestEntity(account);
 
         var primary = CreateConfig("contact", 4, 100, "P-{NUM}", parentLookupAttribute: "parentcustomerid");
         CreateConfig("contact", 2, 4, "C-{NUM}", parentId: account.Id, primaryConfig: primary, useParentConfiguration: true);
 
-        var contact = DataService.GetRepository<ContactRepository>().GetNewContact("Jan", "Mucha", parentCustomer: account.ToEntityReference());
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNewContact("Jan", "Mucha", parentCustomer: account.ToEntityReference());
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var number = ExecuteGetAutoNumber(contact.ToEntityReference(), account.Id);
 
         Assert.Equal("P-0005", number);
 
-        var child = DataService.Query<pl_AutoNumbering>()
+        var child = TestDataService.Query<pl_AutoNumbering>()
             .Where(x => x.pl_EntityName == "contact" && x.pl_ParentLookupId == account.Id.ToString("D").ToLowerInvariant())
             .Select(x => new pl_AutoNumbering
             {
@@ -333,8 +333,8 @@ public class GetAutoNumberActionTests : TestBase
     [Fact]
     public void Missing_primary_configuration_fails()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNewContact("Jan", "Mucha");
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNewContact("Jan", "Mucha");
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var ex = Assert.ThrowsAny<Exception>(() => ExecuteGetAutoNumber(contact.ToEntityReference()));
         var message = ex.ToString();
@@ -383,8 +383,8 @@ public class GetAutoNumberActionTests : TestBase
     public void Missing_date_format_for_used_date_token_fails()
     {
         CreateConfig("contact", 3, 0, "{date1}-{NUM}");
-        var contact = DataService.GetRepository<ContactRepository>().GetNewContact("Jan", "Mucha");
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNewContact("Jan", "Mucha");
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var ex = Assert.ThrowsAny<Exception>(() => ExecuteGetAutoNumber(contact.ToEntityReference()));
         var message = ex.ToString();

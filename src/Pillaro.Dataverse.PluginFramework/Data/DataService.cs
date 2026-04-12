@@ -28,12 +28,7 @@ public class DataService : IDataService
     private readonly int _multipleRequestBatchSize;
     private readonly int _waitOnAsyncProcessMaxLoop;
 
-    /// <summary>
-    /// Direct access to the underlying IOrganizationService.
-    /// Use this for standard CRUD operations (Create, Update, Delete, Retrieve).
-    /// Consider using extension methods from OrganizationServiceExtensions for convenient overloads.
-    /// </summary>
-    public IOrganizationService OrganizationService { get; }
+    protected IOrganizationService OrganizationService { get; }
 
     public DataService(IOrganizationService organizationService, int multipleRequestBatchSize = 1000, int waitOnAsyncProcessMaxLoop = 40)
     {
@@ -169,7 +164,7 @@ public class DataService : IDataService
         List<OrganizationRequest> batchRequests;
         lock (requests)
         {
-            batchRequests = requests.ToList();
+            batchRequests = [.. requests];
         }
 
         if (!batchRequests.Any())
@@ -364,7 +359,7 @@ public class DataService : IDataService
         if (searchValues == null) throw new ArgumentNullException(nameof(searchValues));
         if (searchAttributes.Length != searchValues.Length) throw new ArgumentException("searchAttributes and searchValues must have same length.");
 
-        var query = BuildQuery(entityName, searchAttributes, searchValues.Cast<object>().ToArray());
+        var query = BuildQuery(entityName, searchAttributes, [.. searchValues.Cast<object>()]);
         return OrganizationService.RetrieveMultiple(query).Entities;
     }
 

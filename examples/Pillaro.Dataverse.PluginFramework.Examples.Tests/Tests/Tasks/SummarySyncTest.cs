@@ -15,14 +15,14 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     [Fact]
     public void Should_SetPlannedActivityDate_When_TaskWithScheduledEndIsCreatedForContact()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNew();
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew();
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var scheduledEnd = DateTime.UtcNow.Date.AddDays(7);
-        var task = DataService.GetRepository<TaskRepository>().GetNew();
+        var task = TestDataService.GetRepository<TaskRepository>().GetNew();
         task.RegardingObjectId = contact.ToEntityReference();
         task.ScheduledEnd = scheduledEnd;
-        task.Id = DataService.CreateTestEntity(task);
+        task.Id = TestDataService.CreateTestEntity(task);
 
         var loaded = LoadContactDescription(contact.Id);
 
@@ -34,13 +34,13 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     [Fact]
     public void Should_SetCompletedActivityDate_When_TaskIsCompletedForContact()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNew();
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew();
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
-        var task = DataService.GetRepository<TaskRepository>().GetNew();
+        var task = TestDataService.GetRepository<TaskRepository>().GetNew();
         task.RegardingObjectId = contact.ToEntityReference();
         task.ScheduledEnd = DateTime.UtcNow.Date.AddDays(7);
-        task.Id = DataService.CreateTestEntity(task);
+        task.Id = TestDataService.CreateTestEntity(task);
 
         CompleteTask(task.Id);
 
@@ -54,19 +54,19 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     [Fact]
     public void Should_SetBothDates_When_PlannedAndCompletedTasksExistForContact()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNew();
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew();
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var plannedDate = DateTime.UtcNow.Date.AddDays(14);
-        var activeTask = DataService.GetRepository<TaskRepository>().GetNew();
+        var activeTask = TestDataService.GetRepository<TaskRepository>().GetNew();
         activeTask.RegardingObjectId = contact.ToEntityReference();
         activeTask.ScheduledEnd = plannedDate;
-        activeTask.Id = DataService.CreateTestEntity(activeTask);
+        activeTask.Id = TestDataService.CreateTestEntity(activeTask);
 
-        var completedTask = DataService.GetRepository<TaskRepository>().GetNew();
+        var completedTask = TestDataService.GetRepository<TaskRepository>().GetNew();
         completedTask.RegardingObjectId = contact.ToEntityReference();
         completedTask.ScheduledEnd = DateTime.UtcNow.Date.AddDays(-3);
-        completedTask.Id = DataService.CreateTestEntity(completedTask);
+        completedTask.Id = TestDataService.CreateTestEntity(completedTask);
 
         CompleteTask(completedTask.Id);
 
@@ -80,21 +80,21 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     [Fact]
     public void Should_UseLatestScheduledEnd_When_MultipleActiveTasksExist()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNew();
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew();
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var earlierDate = DateTime.UtcNow.Date.AddDays(5);
         var laterDate = DateTime.UtcNow.Date.AddDays(30);
 
-        var task1 = DataService.GetRepository<TaskRepository>().GetNew();
+        var task1 = TestDataService.GetRepository<TaskRepository>().GetNew();
         task1.RegardingObjectId = contact.ToEntityReference();
         task1.ScheduledEnd = earlierDate;
-        task1.Id = DataService.CreateTestEntity(task1);
+        task1.Id = TestDataService.CreateTestEntity(task1);
 
-        var task2 = DataService.GetRepository<TaskRepository>().GetNew();
+        var task2 = TestDataService.GetRepository<TaskRepository>().GetNew();
         task2.RegardingObjectId = contact.ToEntityReference();
         task2.ScheduledEnd = laterDate;
-        task2.Id = DataService.CreateTestEntity(task2);
+        task2.Id = TestDataService.CreateTestEntity(task2);
 
         var loaded = LoadContactDescription(contact.Id);
 
@@ -105,21 +105,21 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     [Fact]
     public void Should_ClearDescription_When_NoTasksMeetConditions()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNew();
-        contact.Id = DataService.CreateTestEntity(contact);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew();
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
         var scheduledEnd = DateTime.UtcNow.Date.AddDays(7);
-        var task = DataService.GetRepository<TaskRepository>().GetNew();
+        var task = TestDataService.GetRepository<TaskRepository>().GetNew();
         task.RegardingObjectId = contact.ToEntityReference();
         task.ScheduledEnd = scheduledEnd;
-        task.Id = DataService.CreateTestEntity(task);
+        task.Id = TestDataService.CreateTestEntity(task);
 
         var loadedBefore = LoadContactDescription(contact.Id);
         Assert.NotNull(loadedBefore.Description);
 
         var update = new Task { Id = task.Id };
         update["scheduledend"] = null;
-        DataService.OrganizationService.Update(update);
+        OrganizationService.Update(update);
 
         var loadedAfter = LoadContactDescription(contact.Id);
         Assert.Null(loadedAfter.Description);
@@ -128,17 +128,17 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     [Fact]
     public void Should_RecalculateBothRecords_When_RegardingChanges()
     {
-        var contact1 = DataService.GetRepository<ContactRepository>().GetNew("First", "Contact");
-        contact1.Id = DataService.CreateTestEntity(contact1);
+        var contact1 = TestDataService.GetRepository<ContactRepository>().GetNew("First", "Contact");
+        contact1.Id = TestDataService.CreateTestEntity(contact1);
 
-        var contact2 = DataService.GetRepository<ContactRepository>().GetNew("Second", "Contact");
-        contact2.Id = DataService.CreateTestEntity(contact2);
+        var contact2 = TestDataService.GetRepository<ContactRepository>().GetNew("Second", "Contact");
+        contact2.Id = TestDataService.CreateTestEntity(contact2);
 
         var scheduledEnd = DateTime.UtcNow.Date.AddDays(10);
-        var task = DataService.GetRepository<TaskRepository>().GetNew();
+        var task = TestDataService.GetRepository<TaskRepository>().GetNew();
         task.RegardingObjectId = contact1.ToEntityReference();
         task.ScheduledEnd = scheduledEnd;
-        task.Id = DataService.CreateTestEntity(task);
+        task.Id = TestDataService.CreateTestEntity(task);
 
         var loaded1Before = LoadContactDescription(contact1.Id);
         Assert.Contains($"Last planned activity: {scheduledEnd:yyyy-MM-dd}", loaded1Before.Description);
@@ -155,7 +155,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
 
     private Contact LoadContactDescription(Guid id)
     {
-        return DataService
+        return TestDataService
             .Query<Contact>()
             .Where(x => x.Id == id)
             .Select(x => new Contact { Description = x.Description })
@@ -164,7 +164,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
 
     private void CompleteTask(Guid taskId)
     {
-        DataService.OrganizationService.Execute(new SetStateRequest
+        OrganizationService.Execute(new SetStateRequest
         {
             EntityMoniker = new EntityReference(Task.EntityLogicalName, taskId),
             State = new OptionSetValue((int)TaskState.Completed),
@@ -176,6 +176,6 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     private void UpdateTaskRegarding(Guid taskId, EntityReference newRegarding)
     {
         var update = new Task { Id = taskId, RegardingObjectId = newRegarding };
-        DataService.OrganizationService.Update(update);
+        OrganizationService.Update(update);
     }
 }

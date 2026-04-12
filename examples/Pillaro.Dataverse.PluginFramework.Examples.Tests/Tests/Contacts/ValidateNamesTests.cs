@@ -16,19 +16,19 @@ public class ValidateNamesTests : TestBase
     public ValidateNamesTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
         var forbiddenWordsJson = SettingService.GetJsonValue("ForbiddenWords");
-        _forbiddenWords = JsonConvert.DeserializeObject<List<string>>(forbiddenWordsJson) ?? new List<string>();
+        _forbiddenWords = JsonConvert.DeserializeObject<List<string>>(forbiddenWordsJson) ?? [];
     }
 
     [Fact]
     public void CreateContact_WithValidNames_ShouldSucceed()
     {
-        var contact = DataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", "ValidTestLastName");
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", "ValidTestLastName");
 
         // Act
-        contact.Id = DataService.CreateTestEntity(contact);
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
 
-        var created = DataService.Query<Logic.Contact>()
+        var created = TestDataService.Query<Logic.Contact>()
             .Where(c => c.Id == contact.Id)
             .FirstOrDefault();
 
@@ -44,11 +44,11 @@ public class ValidateNamesTests : TestBase
         Assert.True(_forbiddenWords.Count > 0, "ForbiddenWords setting must contain at least one entry.");
 
         var forbiddenFirstName = _forbiddenWords[0];
-        var contact = DataService.GetRepository<ContactRepository>().GetNew(forbiddenFirstName, "ValidTestLastName");
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew(forbiddenFirstName, "ValidTestLastName");
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.CreateTestEntity(contact)));
+            Task.Run(() => TestDataService.CreateTestEntity(contact)));
 
         Assert.Contains("First name is forbidden word", ex.Detail.Message);
     }
@@ -60,11 +60,11 @@ public class ValidateNamesTests : TestBase
         Assert.True(_forbiddenWords.Count > 0, "ForbiddenWords setting must contain at least one entry.");
 
         var forbiddenLastName = _forbiddenWords[0];
-        var contact = DataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", forbiddenLastName);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", forbiddenLastName);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.CreateTestEntity(contact)));
+            Task.Run(() => TestDataService.CreateTestEntity(contact)));
 
         Assert.Contains("Last name is forbidden word", ex.Detail.Message);
     }
@@ -80,11 +80,11 @@ public class ValidateNamesTests : TestBase
             ? char.ToUpper(forbiddenWord[0]) + forbiddenWord.Substring(1).ToLower()
             : forbiddenWord.ToUpper();
 
-        var contact = DataService.GetRepository<ContactRepository>().GetNew(mixedCaseName, "ValidTestLastName");
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew(mixedCaseName, "ValidTestLastName");
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.CreateTestEntity(contact)));
+            Task.Run(() => TestDataService.CreateTestEntity(contact)));
 
         Assert.Contains("First name is forbidden word", ex.Detail.Message);
     }
@@ -95,8 +95,8 @@ public class ValidateNamesTests : TestBase
         // Arrange
         Assert.True(_forbiddenWords.Count > 0, "ForbiddenWords setting must contain at least one entry.");
 
-        var contact = DataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", "ValidTestLastName");
-        var contactId = DataService.CreateTestEntity(contact, byPassPlugins: true);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", "ValidTestLastName");
+        var contactId = TestDataService.CreateTestEntity(contact, byPassPlugins: true);
 
         var updateEntity = new Logic.Contact
         {
@@ -106,7 +106,7 @@ public class ValidateNamesTests : TestBase
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.OrganizationService.Update(updateEntity), TestContext.Current.CancellationToken));
+            Task.Run(() => OrganizationService.Update(updateEntity), TestContext.Current.CancellationToken));
 
         Assert.Contains("First name is forbidden word", ex.Detail.Message);
     }
@@ -117,8 +117,8 @@ public class ValidateNamesTests : TestBase
         // Arrange
         Assert.True(_forbiddenWords.Count > 0, "ForbiddenWords setting must contain at least one entry.");
 
-        var contact = DataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", "ValidTestLastName");
-        var contactId = DataService.CreateTestEntity(contact, byPassPlugins: true);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew("ValidTestFirstName", "ValidTestLastName");
+        var contactId = TestDataService.CreateTestEntity(contact, byPassPlugins: true);
 
         var updateEntity = new Logic.Contact
         {
@@ -128,7 +128,7 @@ public class ValidateNamesTests : TestBase
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
-            Task.Run(() => DataService.OrganizationService.Update(updateEntity), TestContext.Current.CancellationToken));
+            Task.Run(() => OrganizationService.Update(updateEntity), TestContext.Current.CancellationToken));
 
         Assert.Contains("Last name is forbidden word", ex.Detail.Message);
     }
@@ -137,8 +137,8 @@ public class ValidateNamesTests : TestBase
     public void UpdateContact_WithValidNames_ShouldSucceed()
     {
         // Arrange
-        var contact = DataService.GetRepository<ContactRepository>().GetNew("OriginalFirst", "OriginalLast");
-        var contactId = DataService.CreateTestEntity(contact, byPassPlugins: true);
+        var contact = TestDataService.GetRepository<ContactRepository>().GetNew("OriginalFirst", "OriginalLast");
+        var contactId = TestDataService.CreateTestEntity(contact, byPassPlugins: true);
 
         var updateEntity = new Logic.Contact
         {
@@ -148,10 +148,10 @@ public class ValidateNamesTests : TestBase
         };
 
         // Act
-        DataService.OrganizationService.Update(updateEntity);
+        OrganizationService.Update(updateEntity);
 
         // Assert
-        var updated = DataService.Query<Logic.Contact>()
+        var updated = TestDataService.Query<Logic.Contact>()
             .Where(c => c.Id == contactId)
             .FirstOrDefault();
         Assert.NotNull(updated);

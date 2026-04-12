@@ -17,7 +17,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering
 
             public string PartialFormat { get; }
             internal FormatConfig Config { get; }
-            public List<TokenInfo> Tokens { get; } = new List<TokenInfo>();
+            public List<TokenInfo> Tokens { get; } = [];
             public HashSet<string> RootAttributes { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, HashSet<string>> ParentLookups { get; } = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
             public bool HasDynamicTokens => Tokens.Count > 0;

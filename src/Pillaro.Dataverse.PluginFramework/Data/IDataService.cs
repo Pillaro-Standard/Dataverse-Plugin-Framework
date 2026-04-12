@@ -7,12 +7,6 @@ namespace Pillaro.Dataverse.PluginFramework.Data;
 
 public interface IDataService
 {
-    /// <summary>
-    /// Direct access to the underlying IOrganizationService.
-    /// Use this for standard CRUD operations or when DataService doesn't provide specific functionality.
-    /// </summary>
-    IOrganizationService OrganizationService { get; }
-
     Guid GetInstanceId();
 
     int GetMultipleRequestBatchSize();

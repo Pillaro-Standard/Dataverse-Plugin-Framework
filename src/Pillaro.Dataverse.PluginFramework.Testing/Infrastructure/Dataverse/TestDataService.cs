@@ -41,7 +41,7 @@ internal sealed class TestDataService : DataService, ITestDataService
         if (!byPassPlugins)
         {
             entity.Id = OrganizationService.Create(entity);
-            WriteOutput($"Created entity '{entity.LogicalName}' with Id '{entity.Id}'.");
+            WriteOutput($"Entity '{entity.LogicalName}' created. Id: {entity.Id}.");
         }
         else
         {
@@ -53,7 +53,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
             var response = (CreateResponse)OrganizationService.Execute(request);
             entity.Id = response.id;
-            WriteOutput($"Created entity '{entity.LogicalName}' with Id '{entity.Id}' (bypassed plugins).");
+            WriteOutput($"Entity '{entity.LogicalName}' created without plugins. Id: {entity.Id}.");
         }
 
         _entitiesToDelete.Push(entity.ToEntityReference());
@@ -68,24 +68,24 @@ internal sealed class TestDataService : DataService, ITestDataService
         entity.Id = OrganizationService.Create(entity);
         var created = OrganizationService.Retrieve(entity.LogicalName, entity.Id, new Microsoft.Xrm.Sdk.Query.ColumnSet(true));
         _entitiesToDelete.Push(created.ToEntityReference());
-        WriteOutput($"Created and retrieved entity '{created.LogicalName}' with Id '{created.Id}'.");
+        WriteOutput($"Entity '{created.LogicalName}' created and retrieved. Id: {created.Id}.");
         return created;
     }
 
     public async Task WaitOnAsyncProcess(Guid entityId, int numberOfAttempts = 40, int cancellationTimeMs = 120000, CancellationToken cancellation = default)
     {
-        WriteOutput($"Waiting on async process for entity Id '{entityId}' (attempts: {numberOfAttempts}, timeout: {cancellationTimeMs}ms).");
+        WriteOutput($"Waiting for async process for entity Id {entityId}. Attempts: {numberOfAttempts}, timeout: {cancellationTimeMs} ms.");
         var handler = _lifetimeScope.Resolve<WaitOnAsyncProcessHandler>();
         await handler.HandleAsync(new WaitOnAsyncProcess(entityId, numberOfAttempts, cancellationTimeMs), cancellation);
-        WriteOutput($"Async process for entity Id '{entityId}' completed.");
+        WriteOutput($"Async process for entity Id {entityId} completed.");
     }
 
     public async Task<List<AsyncProcessResult>> GetAsyncProcessResults(Guid entityId, DateTime? dateFrom = null, DateTime? dateTo = null, CancellationToken cancellation = default)
     {
-        WriteOutput($"Fetching async process results for entity Id '{entityId}'.");
+        WriteOutput($"Getting async process results for entity Id {entityId}.");
         var handler = _lifetimeScope.Resolve<GetAsyncProcessesHandler>();
         var results = await handler.HandleAsync(new GetAsyncProcesses(entityId, dateFrom, dateTo), cancellation);
-        WriteOutput($"Retrieved {results.Count} async process result(s) for entity Id '{entityId}'.");
+        WriteOutput($"Found {results.Count} async process result(s) for entity Id {entityId}.");
         return results;
     }
 
@@ -94,10 +94,8 @@ internal sealed class TestDataService : DataService, ITestDataService
         return _lifetimeScope.Resolve<TTestDataRepository>();
     }
 
-    // Explicit interface implementation for IDataService
     TDataServiceRepository IDataService.GetRepository<TDataServiceRepository>()
     {
-        // Delegate to your specific implementation or provide a different implementation
         return base.GetRepository<TDataServiceRepository>();
     }
 
@@ -106,12 +104,12 @@ internal sealed class TestDataService : DataService, ITestDataService
         ArgumentNullException.ThrowIfNull(entity);
 
         _entitiesToDelete.Push(entity);
-        WriteOutput($"Registered entity '{entity.LogicalName}' with Id '{entity.Id}' for cleanup.");
+        WriteOutput($"Entity '{entity.LogicalName}' (Id: {entity.Id}) added to cleanup.");
     }
 
     public void DeleteTestEntities()
     {
-        WriteOutput("Starting test entity cleanup.");
+        WriteOutput("Starting cleanup of test entities.");
 
         while (_entitiesToDelete.TryPop(out var entityReference))
         {
@@ -120,23 +118,23 @@ internal sealed class TestDataService : DataService, ITestDataService
 
             if (_cleanupHandlers.TryGetValue(entityReference.LogicalName, out var cleanupHandler))
             {
-                WriteOutput($"Running cleanup handler for '{entityReference.LogicalName}' with Id '{entityReference.Id}'.");
-                cleanupHandler.DeleteReferences(entityReference, this);
+                WriteOutput($"Running cleanup handler for '{entityReference.LogicalName}' (Id: {entityReference.Id}).");
+                cleanupHandler.DeleteReferences(entityReference, this, OrganizationService);
             }
 
             try
             {
                 OrganizationService.Delete(entityReference);
-                WriteOutput($"Deleted entity '{entityReference.LogicalName}' with Id '{entityReference.Id}'.");
+                WriteOutput($"Entity '{entityReference.LogicalName}' (Id: {entityReference.Id}) deleted.");
             }
             catch (Exception ex)
             {
-                WriteOutput($"Failed to delete entity '{entityReference.LogicalName}' with Id '{entityReference.Id}': {ex.Message}");
+                WriteOutput($"Failed to delete entity '{entityReference.LogicalName}' (Id: {entityReference.Id}): {ex.Message}");
                 Debug.WriteLine(ex);
             }
         }
 
-        WriteOutput("Test entity cleanup completed.");
+        WriteOutput("Cleanup of test entities completed.");
     }
 
     public void AddCleanUpDeleteHandler(ICleanupDeleteHandler handler)
@@ -148,7 +146,7 @@ internal sealed class TestDataService : DataService, ITestDataService
             throw new InvalidOperationException($"Cleanup handler for entity '{handler.EntityLogicalName}' is already registered.");
         }
 
-        WriteOutput($"Registered cleanup handler for entity '{handler.EntityLogicalName}'.");
+        WriteOutput($"Cleanup handler registered for entity '{handler.EntityLogicalName}'.");
     }
 
     public void AddCleanUpDeleteHandlers(IEnumerable<ICleanupDeleteHandler> handlers)
@@ -163,7 +161,7 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     public IReadOnlyCollection<ICleanupDeleteHandler> GetAllCleanUpDeleteHandlers()
     {
-        WriteOutput($"Returning {_cleanupHandlers.Count} registered cleanup handler(s).");
+        WriteOutput($"Returning {_cleanupHandlers.Count} cleanup handler(s).");
         return _cleanupHandlers.Values.ToList().AsReadOnly();
     }
 
@@ -175,7 +173,6 @@ internal sealed class TestDataService : DataService, ITestDataService
         }
         catch (InvalidOperationException)
         {
-            // ITestOutputHelper throws when the test has already completed.
             Debug.WriteLine(message);
         }
     }

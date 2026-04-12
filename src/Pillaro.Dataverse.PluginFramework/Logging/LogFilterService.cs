@@ -36,7 +36,7 @@ public class LogFilterService
             if (filter.InitiatingUserIds?.Any() ?? false)
                 logAdd = logAdd.Where(x => x.InitiatingUser != null && filter.InitiatingUserIds.Contains(x.InitiatingUser.Id));
 
-            filteredLogs = filteredLogs.Union(logAdd, new LogEqualityComparer()).ToList();
+            filteredLogs = [.. filteredLogs.Union(logAdd, new LogEqualityComparer())];
         }
 
         return filteredLogs;

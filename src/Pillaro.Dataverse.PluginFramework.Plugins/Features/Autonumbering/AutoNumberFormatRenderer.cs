@@ -79,7 +79,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering
 
                     if (!plan.ParentLookups.TryGetValue(token.ParentLookupAttribute, out var attrs))
                     {
-                        attrs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        attrs = new HashSet<string>();
                         plan.ParentLookups[token.ParentLookupAttribute] = attrs;
                     }
 
@@ -101,7 +101,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering
 
             if (raw.Contains("."))
             {
-                var parts = raw.Split(new[] { '.' }, 2);
+                var parts = raw.Split(['.'], 2);
                 var (attr, fmt) = SplitAttribAndFormat(parts[1]);
                 return new TokenInfo(raw, attr.ToLowerInvariant(), fmt, TokenType.ParentAttribute, parts[0].ToLowerInvariant());
             }
@@ -121,15 +121,12 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering
 
         private static string ResolveTokenValue(TokenInfo token, Entity entity, IDictionary<string, Entity> parentEntities, FormatConfig config)
         {
-            switch (token.Type)
+            return token.Type switch
             {
-                case TokenType.RootAttribute:
-                    return ResolveRootToken(token, entity, config);
-                case TokenType.ParentAttribute:
-                    return ResolveParentToken(token, parentEntities, config);
-                default:
-                    throw new InvalidPluginExecutionException($"Unknown token type '{token.Type}' for token '{token.Raw}'.");
-            }
+                TokenType.RootAttribute => ResolveRootToken(token, entity, config),
+                TokenType.ParentAttribute => ResolveParentToken(token, parentEntities, config),
+                _ => throw new InvalidPluginExecutionException($"Unknown token type '{token.Type}' for token '{token.Raw}'."),
+            };
         }
 
         private static string ResolveRootToken(TokenInfo token, Entity entity, FormatConfig config)
@@ -159,7 +156,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Features.Autonumbering
             if (value is AliasedValue aliased)
                 value = aliased.Value;
 
-            if (!(value is DateTime dateTime))
+            if (value is not DateTime dateTime)
                 throw new InvalidPluginExecutionException($"Token '{token}' uses format key '{formatKey}', but the resolved value is not a DateTime. Actual type: {value?.GetType().FullName ?? "null"}");
 
             var format = GetDateFormatString(formatKey, config);

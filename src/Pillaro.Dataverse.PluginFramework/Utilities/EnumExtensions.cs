@@ -44,7 +44,7 @@ public static class EnumExtensions
 
     public static bool TryToEnum<T>(this string value, out T result, bool ignoreCase = false) where T : struct
     {
-        result = default(T);
+        result = default;
 
         if (!typeof(T).IsEnum || string.IsNullOrWhiteSpace(value))
             return false;
@@ -61,7 +61,7 @@ public static class EnumExtensions
 
     public static bool TryToEnum<T>(this int value, out T result) where T : struct
     {
-        result = default(T);
+        result = default;
 
         if (!typeof(T).IsEnum)
             return false;
@@ -77,7 +77,7 @@ public static class EnumExtensions
 
     public static bool TryToEnum<T>(this OptionSetValue value, out T result) where T : struct
     {
-        result = default(T);
+        result = default;
 
         if (value == null)
             return false;

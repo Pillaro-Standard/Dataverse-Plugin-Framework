@@ -10,23 +10,24 @@ public abstract class TestBase<TAutofacModule> : IClassFixture<TestFixture<TAuto
 {
     protected readonly IDataverseConnectionService ConnectionService;
     protected readonly IOrganizationService OrganizationService;
-    protected readonly ITestDataService DataService;
+    protected readonly ITestDataService TestDataService;
     protected readonly ILifetimeScope LifetimeScope;
     protected readonly ITestOutputHelper Output;
 
     protected TestBase(TestFixture<TAutofacModule> testFixture, ITestOutputHelper output)
     {
+        Output = output;
         LifetimeScope = testFixture.Container;
+
+        TestDataService = LifetimeScope.Resolve<ITestDataService>();
+        TestDataService.SetOutput(output);
+
         ConnectionService = LifetimeScope.Resolve<IDataverseConnectionService>();
         OrganizationService = ConnectionService.GetOrganizationService();
-        DataService = LifetimeScope.Resolve<ITestDataService>();
-        DataService.SetOutput(output);
-        ConnectionService.GetOrganizationService();
-        Output = output;
     }
 
     public void Dispose()
     {
-        DataService.DeleteTestEntities();
+        TestDataService.DeleteTestEntities();
     }
 }

@@ -122,7 +122,7 @@ public class TaskContext
     }
 
     public IReadOnlyList<Entity> EntitiesToUpdate =>
-        new ReadOnlyCollection<Entity>(_entitiesToUpdate.Values.ToList());
+        new ReadOnlyCollection<Entity>([.. _entitiesToUpdate.Values]);
 
     public void AddEntityToUpdate(Entity entity)
     {

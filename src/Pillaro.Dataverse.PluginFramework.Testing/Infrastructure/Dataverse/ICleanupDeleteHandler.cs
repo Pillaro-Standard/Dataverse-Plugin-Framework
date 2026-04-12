@@ -16,5 +16,5 @@ public interface ICleanupDeleteHandler
 {
     string EntityLogicalName { get; }
 
-    void DeleteReferences(EntityReference entity, ITestDataService testDataService);
+    void DeleteReferences(EntityReference entity, ITestDataService testDataService, IOrganizationService organizationService);
 }

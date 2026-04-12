@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Pillaro.Dataverse.PluginFramework.Exceptions;
+﻿namespace Pillaro.Dataverse.PluginFramework.Exceptions;
 
 public class DataverseValidationException : Exception
 {
@@ -13,10 +11,6 @@ public class DataverseValidationException : Exception
     }
 
     public DataverseValidationException(string message, Exception innerException) : base(message, innerException)
-    {
-    }
-
-    protected DataverseValidationException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
     }
 }

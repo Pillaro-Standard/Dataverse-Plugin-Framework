@@ -18,7 +18,7 @@ internal class DataverseConnectionServiceFactory : IDataverseConnectionService
     {
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         _connectionString = configuration?.GetConnectionString("Dataverse")
-            ?? throw new InvalidOperationException("Missing connection string with name 'Dataverse'.");
+            ?? throw new InvalidOperationException("Connection string with name 'Dataverse' is missing.");
     }
 
     public IOrganizationServiceAsync2 GetOrganizationService(bool ignoreCache = false)

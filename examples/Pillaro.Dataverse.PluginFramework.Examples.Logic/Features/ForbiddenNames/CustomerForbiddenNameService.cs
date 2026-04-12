@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Pillaro.Dataverse.PluginFramework.Settings;
 using System.Collections.Generic;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Features.ForbiddenNames

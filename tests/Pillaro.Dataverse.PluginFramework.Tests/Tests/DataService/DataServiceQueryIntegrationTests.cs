@@ -18,9 +18,9 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_WhereById_ReturnsExpectedEntity()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var acc = repo.GetNewAccount(1);
-        acc.Id = DataService.CreateTestEntity(acc);
+        acc.Id = TestDataService.CreateTestEntity(acc);
 
         var result = _dataService.Query<Account>().Where(a => a.Id == acc.Id).SingleOrDefault();
 
@@ -42,13 +42,13 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_CalledMultipleTimes_ReturnsSeparateResults()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
 
         var acc1 = repo.GetNewAccount(1);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount(2);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var result1 = _dataService.Query<Account>().Where(a => a.Id == acc1.Id).SingleOrDefault();
         var result2 = _dataService.Query<Account>().Where(a => a.Id == acc2.Id).SingleOrDefault();
@@ -63,17 +63,17 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Where_ReturnsOnlyMatchingRecords()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "Test account", Guid.NewGuid().ToString());
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).ToList();
 
@@ -86,17 +86,17 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_OrderBy_ReturnsAscendingOrder()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc3 = repo.GetNewAccount($"{key}-03", "Test account", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).ToList();
 
@@ -109,17 +109,17 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_OrderByDescending_ReturnsDescendingOrder()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "Test account", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderByDescending(a => a.Name).ToList();
 
@@ -132,13 +132,13 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Take_ReturnsLimitedResults()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         for (int i = 0; i < 3; i++)
         {
             var acc = repo.GetNewAccount($"{key}-{i}", "Test account", key);
-            acc.Id = DataService.CreateTestEntity(acc);
+            acc.Id = TestDataService.CreateTestEntity(acc);
         }
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).Take(2).ToList();
@@ -149,17 +149,17 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Skip_ReturnsRemainingResults()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "Test account", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).Skip(1).ToList();
 
@@ -171,14 +171,14 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Select_ReturnsProjectedValues()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).Select(a => a.Name).ToList();
 
@@ -190,14 +190,14 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_First_ReturnsFirstRecord()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).First();
 
@@ -215,14 +215,14 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Single_WhenMultiple_Throws()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         Assert.Throws<InvalidOperationException>(() => _dataService.Query<Account>().Where(a => a.Telephone1 == key).Single());
     }
@@ -238,20 +238,20 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Page_ReturnsCorrectPage()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "Test account", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var acc4 = repo.GetNewAccount($"{key}-04", "Test account", key);
-        acc4.Id = DataService.CreateTestEntity(acc4);
+        acc4.Id = TestDataService.CreateTestEntity(acc4);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).Page(2, 2).ToList();
 
@@ -263,13 +263,13 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Page_FirstPage_ReturnsFirstItems()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         for (int i = 1; i <= 3; i++)
         {
             var acc = repo.GetNewAccount($"{key}-{i:D2}", "Test account", key);
-            acc.Id = DataService.CreateTestEntity(acc);
+            acc.Id = TestDataService.CreateTestEntity(acc);
         }
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).Page(1, 2).ToList();
@@ -282,14 +282,14 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_MultipleWhere_CombinesPredicates()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "A", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "B", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).Where(a => a.Name == $"{key}-02").SingleOrDefault();
 
@@ -300,20 +300,20 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_ThenBy_ReturnsSecondarySortedResults()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc2 = repo.GetNewAccount($"{key}-02", "A", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc1 = repo.GetNewAccount($"{key}-01", "A", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc4 = repo.GetNewAccount($"{key}-04", "B", key);
-        acc4.Id = DataService.CreateTestEntity(acc4);
+        acc4.Id = TestDataService.CreateTestEntity(acc4);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "B", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Description).ThenBy(a => a.Name).ToList();
 
@@ -327,20 +327,20 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_ThenByDescending_ReturnsSecondarySortedResults()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "A", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "A", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "B", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var acc4 = repo.GetNewAccount($"{key}-04", "B", key);
-        acc4.Id = DataService.CreateTestEntity(acc4);
+        acc4.Id = TestDataService.CreateTestEntity(acc4);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Description).ThenByDescending(a => a.Name).ToList();
 
@@ -354,20 +354,20 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Page_WithoutExplicitOrderBy_ReturnsRequestedPageSizeWithoutDuplicates()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc3 = repo.GetNewAccount($"{key}-03", "Test account", key);
-        acc3.Id = DataService.CreateTestEntity(acc3);
+        acc3.Id = TestDataService.CreateTestEntity(acc3);
 
         var acc4 = repo.GetNewAccount($"{key}-04", "Test account", key);
-        acc4.Id = DataService.CreateTestEntity(acc4);
+        acc4.Id = TestDataService.CreateTestEntity(acc4);
 
         var expectedIds = new[] { acc1.Id, acc2.Id, acc3.Id, acc4.Id };
 
@@ -384,14 +384,14 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Select_First_ReturnsProjectedValue()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc2 = repo.GetNewAccount($"{key}-02", "Test account", key);
-        acc2.Id = DataService.CreateTestEntity(acc2);
+        acc2.Id = TestDataService.CreateTestEntity(acc2);
 
         var acc1 = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc1.Id = DataService.CreateTestEntity(acc1);
+        acc1.Id = TestDataService.CreateTestEntity(acc1);
 
         var result = _dataService.Query<Account>().Where(a => a.Telephone1 == key).OrderBy(a => a.Name).Select(a => a.Name).First();
 
@@ -401,11 +401,11 @@ public class DataServiceQueryIntegrationTests : TestBase
     [Fact]
     public void Query_Select_SingleOrDefault_ReturnsProjectedValue()
     {
-        var repo = DataService.GetRepository<AccountRepository>();
+        var repo = TestDataService.GetRepository<AccountRepository>();
         var key = Guid.NewGuid().ToString();
 
         var acc = repo.GetNewAccount($"{key}-01", "Test account", key);
-        acc.Id = DataService.CreateTestEntity(acc);
+        acc.Id = TestDataService.CreateTestEntity(acc);
 
         var result = _dataService.Query<Account>().Where(a => a.Id == acc.Id).Select(a => a.Name).SingleOrDefault();
 
@@ -419,12 +419,12 @@ public class DataServiceQueryIntegrationTests : TestBase
         Expression<Func<Account, string>>? orderBy = null;
         Expression<Func<Account, string>>? selector = null;
 
-        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().Where(predicate));
-        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().OrderBy(orderBy));
-        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().OrderByDescending(orderBy));
-        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().ThenBy(orderBy));
-        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().ThenByDescending(orderBy));
-        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().Select(selector));
+        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().Where(predicate!));
+        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().OrderBy(orderBy!));
+        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().OrderByDescending(orderBy!));
+        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().ThenBy(orderBy!));
+        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().ThenByDescending(orderBy!));
+        Assert.Throws<ArgumentNullException>(() => _dataService.Query<Account>().Select(selector!));
     }
 
     [Fact]

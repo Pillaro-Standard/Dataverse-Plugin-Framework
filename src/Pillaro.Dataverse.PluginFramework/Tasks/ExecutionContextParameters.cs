@@ -72,7 +72,7 @@ public static class ExecutionContextParameters
             if (throwException)
                 throw new InvalidPluginExecutionException($"Input parameter '{param}' was not found in execution context.");
 
-            return default(T);
+            return default;
         }
 
         var value = context.InputParameters[param];
@@ -82,7 +82,7 @@ public static class ExecutionContextParameters
             if (throwException)
                 throw new InvalidPluginExecutionException($"Input parameter '{param}' is null.");
 
-            return default(T);
+            return default;
         }
 
         if (value is T typedValue)
@@ -92,7 +92,7 @@ public static class ExecutionContextParameters
             throw new InvalidPluginExecutionException(
                 $"Input parameter '{param}' is of type '{value.GetType().FullName}', expected '{typeof(T).FullName}'.");
 
-        return default(T);
+        return default;
     }
 
     public static T GetEntity<T>(IExecutionContext context, string param, bool throwException = true)
@@ -119,7 +119,7 @@ public static class ExecutionContextParameters
             return null;
         }
 
-        if (!(value is Entity entity))
+        if (value is not Entity entity)
         {
             if (throwException)
                 throw new InvalidPluginExecutionException(
@@ -133,7 +133,7 @@ public static class ExecutionContextParameters
 
     public static bool TryGetParam<T>(IExecutionContext context, string param, out T result)
     {
-        result = default(T);
+        result = default;
 
         if (context == null || string.IsNullOrWhiteSpace(param))
             return false;
@@ -143,7 +143,7 @@ public static class ExecutionContextParameters
 
         var value = context.InputParameters[param];
 
-        if (!(value is T typedValue))
+        if (value is not T typedValue)
             return false;
 
         result = typedValue;
@@ -153,7 +153,7 @@ public static class ExecutionContextParameters
     public static bool TryGetEntity<T>(IExecutionContext context, string param, out T result)
         where T : Entity
     {
-        result = null;
+        result = default;
 
         if (context == null || string.IsNullOrWhiteSpace(param))
             return false;
@@ -161,7 +161,7 @@ public static class ExecutionContextParameters
         if (!context.InputParameters.ContainsKey(param))
             return false;
 
-        if (!(context.InputParameters[param] is Entity entity))
+        if (context.InputParameters[param] is not Entity entity)
             return false;
 
         result = entity.ToEntity<T>();

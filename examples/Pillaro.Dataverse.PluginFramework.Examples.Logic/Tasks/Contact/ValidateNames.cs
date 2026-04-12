@@ -1,4 +1,8 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Features.ForbiddenNames;
+using Pillaro.Dataverse.PluginFramework.Exceptions;
+using Pillaro.Dataverse.PluginFramework.Plugins;
+using Pillaro.Dataverse.PluginFramework.Tasks;
+using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
