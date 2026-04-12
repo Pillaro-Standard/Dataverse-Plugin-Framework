@@ -23,7 +23,6 @@ public abstract class TaskBase<TEntity> : ITask
     protected readonly Log Log;
     protected readonly ITracingService TracingService;
     protected readonly SettingsService SettingService;
-    protected readonly LogService LogService;
     protected readonly DataServiceProvider DataServiceProvider;
     protected readonly OrganizationServiceProvider OrganizationServiceProvider;
 
@@ -55,7 +54,6 @@ public abstract class TaskBase<TEntity> : ITask
             executionContext.InitiatingUserId);
 
         SettingService = new SettingsService(OrganizationServiceProvider.Admin);
-        LogService = new LogService(executionContext, OrganizationServiceProvider.Admin, TracingService);
         DataServiceProvider = new DataServiceProvider(OrganizationServiceProvider);
         _validator = TaskValidator.Create(TaskContext);
 
@@ -84,7 +82,7 @@ public abstract class TaskBase<TEntity> : ITask
         }
         catch (DataverseValidationException ex)
         {
-            Log.Status = TaskStatus.NotValid;
+            Log.Status = TaskStatus.Success;
             Log.LogSeverity = LogSeverity.Info;
             detailBuilder.AppendLine(ex.ToString());
             throw;
@@ -181,6 +179,21 @@ public abstract class TaskBase<TEntity> : ITask
             ExecutionMessage = message;
         else
             ExecutionMessage += Environment.NewLine + message;
+    }
+    protected void AddLogDetail(string name, string detail)
+    {
+        if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(detail))
+            return;
+
+        Log.AddDetail(name ?? string.Empty, detail ?? string.Empty);
+    }
+
+    protected void AddLogDetail(string name, object detail)
+    {
+        if (string.IsNullOrWhiteSpace(name) && detail == null)
+            return;
+
+        Log.AddDetail(name ?? string.Empty, detail);
     }
 
     protected string GetTaskName()

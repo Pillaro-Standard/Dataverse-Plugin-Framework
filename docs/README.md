@@ -1,13 +1,12 @@
 ﻿# Pillaro Dataverse Plugin Framework — Documentation
 
-[![Docs: In Progress](https://img.shields.io/badge/Docs-In%20Progress-orange.svg)](#-table-of-contents)
-[![License: PCL v1.0](https://img.shields.io/badge/License-PCL%20v1.0-blue.svg)](../LICENSE)
-
-> Structured documentation for understanding, using, and extending the Pillaro Dataverse Plugin Framework.
+> [!IMPORTANT]
+> The root [README](../README.md) helps you decide whether the framework is relevant for your solution.
+> This documentation section helps you understand how to use it, structure it, test it, and extend it.
 
 > [!NOTE]
-> Documentation is in progress. Sections marked with 🚧 are placeholders and will be completed in future updates. 
-Sections marked with ⌛ are partially complete and may be updated with additional details. 
+> This page is the documentation hub and working structure for the repository.
+> Some documents are already available, others are planned and will be added incrementally.
 
 ---
 
@@ -15,289 +14,177 @@ Sections marked with ⌛ are partially complete and may be updated with addition
 
 | Section | Description |
 |---|---|
-| 🚀 [Getting Started](#-getting-started) | Setup, prerequisites, and first plugin |
-| 🧱 [Core Concepts](#-core-concepts) | Architecture, plugins, tasks, and validation |
-| ⚙️ [Execution & Runtime](#-execution--runtime) | Pipeline and configuration |
-| 🔢 [Autonumbering](#-autonumbering) | Sequence generation and concurrency handling |
-| 🔍 [Observability](#-observability) | Logging and error handling |
-| 🧪 [Testing](#-testing) | Testing principles and integration testing |
-| 📦 [Packaging & Deployment](#-packaging--deployment) | Signing, assembly structure, and deployment |
-| ⚠️ [Known Limitations](#-known-limitations) | Package constraints and compatibility notes |
-| 💡 [Examples](#-examples) | Sample implementations |
-| 🤝 [Contributing](#-contributing) | Guidelines for contributors |
+| 🚀 [Plugin Development](#-plugin-development) | Build and structure Dataverse plugins with the framework |
+| 🧪 [Test Development](#-test-development) | Build and run programmatic tests against Dataverse |
+| 🧱 [Shared Concepts](#-shared-concepts) | Repository-wide concepts shared across plugins and tests |
+| 📦 [Packaging & Deployment](#-packaging--deployment) | Build, package, version, and deploy the solution |
+| ⚠️ [Known Limitations](#-known-limitations) | Technical constraints and compatibility notes |
+| 🤝 [Contributing](#-contributing) | Basic repository policies and contribution entry points |
+| 🗺️ [Recommended Reading Path](#️-recommended-reading-path) | Suggested reading order by goal |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Plugin Development
 
-Start here if you are new to the framework.
+Use this section when you are building Dataverse plugins with the framework.
+
+### Start
 
 | Document | Description | Status |
 |---|---|---|
-| [Getting Started](./getting-started.md) | Setup, prerequisites, and first plugin implementation | ⌛ |
+| [Getting Started](./plugins/getting-started.md) | First setup, first plugin, and first deployable assembly | ⌛ |
 
-### Prerequisites
-
-- .NET Framework 4.6.2 (plugin assemblies)
-- .NET 10 (test projects)
-- Microsoft Dataverse environment
-- Visual Studio 2022 or later
-
----
-
-## 🧱 Core Concepts
-
-Understanding how the framework is designed — from architecture to validation.
+### Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
-| [Architecture](./architecture.md) | High-level execution model and structural overview | 🚧 |
-| [Plugin Model](./plugin-model.md) | Role and responsibilities of plugins | 🚧 |
-| [Task Model](./task-model.md) | Task lifecycle, structure, and single-responsibility pattern | 🚧 |
-| [Validation Model](./validation.md) | Fluent validation API and execution flow | 🚧 |
+| [Architecture](./plugins/architecture.md) | High-level plugin architecture and project structure | 🚧 |
+| [Plugin Model](./plugins/plugin-model.md) | Plugin responsibilities and registration approach | 🚧 |
+| [Task Model](./plugins/task-model.md) | Task lifecycle, structure, and responsibilities | 🚧 |
+| [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | 🚧 |
+| [Execution Pipeline](./plugins/execution-pipeline.md) | Plugin execution flow and task orchestration | ✅ |
 
-### Plugin Model Summary
-
-Plugins are **orchestration layers** that register tasks against Dataverse messages. They follow one of two patterns:
-
-| Pattern | Scope | Example |
-|---|---|---|
-| **Entity-based** | Single entity lifecycle | `ContactPlugin` — handles Create/Update on `contact` |
-| **Functionality-based** | Business capability | `TaskPlugin` — handles Create/Update on `task` |
-
-Plugins inherit from `PluginBase` and register tasks in the constructor:
-
----
-
-### Task Model Summary
-
-Tasks inherit from `TaskBase<TEntity>` and implement single-responsibility business logic. Each task provides:
-
-- **`AddValidations()`** — Fluent validation chain (mode → stage → messages → entity → attributes)
-- **`DoExecute()`** — Business logic only (no guard clauses)
-
-Built-in services available in every task:
-
-| Service | Purpose |
-|---|---|
-| `DataServiceProvider.Admin` / `.User` | Dataverse CRUD with security context separation |
-| `SettingService` | Runtime configuration from `pl_setting` entity (cached) |
-| `LogService` | Structured logging to `pl_log` entity |
-| `TracingService` | Dataverse tracing service |
-| `ContextEntity` / `PreImage` / `PostImage` | Automatic entity context initialization |
-
-### Fluent Validation Summary
-
-Validations use a chainable API executed **before** `DoExecute()`:
-
-Validation failures set `TaskStatus.NotValid` and skip execution — no exception is thrown unless `DataverseValidationException` is explicitly raised.
-
----
-
-## ⚙️ Execution & Runtime
-
-How the framework behaves during plugin execution in Dataverse.
+### Data Access
 
 | Document | Description | Status |
 |---|---|---|
-| [Execution Pipeline](./execution-pipeline.md) | Task orchestration, ordering, and execution flow | ✅ |
-| [Runtime Configuration](./configuration.md) | Configuration stored in Dataverse, loaded at runtime | 🚧 |
+| [Data Access](./plugins/data-access.md) | Working with Dataverse data in plugin runtime | 🚧 |
+| [Security Contexts](./plugins/security-contexts.md) | Initiating user, user, and admin access patterns | 🚧 |
 
----
-
-### Execution Pipeline
-
-The framework enforces a deterministic execution model aligned with the Dataverse plugin runtime.
-
-All logic is executed strictly within a single `Execute` method and its execution order (execution index). This is a fundamental assumption for correct plugin behavior.
-
-To support task-based architecture, the framework provides a custom `PluginBase` that:
-- dynamically instantiates and executes individual Tasks within the `Execute` method
-- ensures all Tasks share a single, consistent execution context
-
-Each Task receives the same `TaskContext`, which:
-- encapsulates Dataverse services and execution data
-- provides a shared `Items` collection for cross-task communication
-  - `AddItem(key, value)`
-  - `GetItem<T>(key)`
-
-This enables lightweight data sharing between Tasks during a single execution while keeping them loosely coupled.
-
-As a result, the pipeline ensures:
-- strict control over execution flow  
-- consistent context across all Tasks  
-- modular and testable business logic  
-- safe and predictable intra-execution communication  
-
----
-
-### Runtime Configuration
-
-The `SettingsService` reads key-value pairs from the `pl_setting` Dataverse table. Supported value types: Text, JSON, Integer, Boolean, Decimal, DateTime. Values are cached in-memory with configurable TTL (default: 60s).
-
----
-
-## 🔢 Autonumbering
-
-Configurable sequence generation built into the framework.
+### Modules
 
 | Document | Description | Status |
 |---|---|---|
-| [Autonumbering](./autonumbering.md) | Sequence configuration, parent-based numbering, and concurrency handling | 🚧 |
+| [Runtime Configuration](./configuration.md) | Settings and runtime behavior configuration | 🚧 |
+| [Autonumbering](./autonumbering.md) | Number sequence generation and related patterns | 🚧 |
+| [Logging](./logging.md) | Runtime logging and diagnostics | 🚧 |
+| [Error Handling](./error-handling.md) | Exceptions, validation failures, and runtime behavior | 🚧 |
 
-### Overview
-
-`AutoNumberingService` generates formatted sequence numbers stored in `pl_autonumbering` records. Features:
-
-- **Format tokens**: `{NUM}`, `{date1}`, `{date2}`, `{date3}`, `{grouping}`, `{attributeName}`
-- **Parent-based numbering**: Separate sequences per parent entity lookup
-- **Grouping**: Separate sequences per grouping value (e.g., year)
-- **Concurrency**: Uses `RowVersion` with `ConcurrencyBehavior.IfRowVersionMatches`
-- **Transactional**: Returns an `UpdateRequest` for the caller to execute within the plugin transaction
-
-Example usage from `TaskAutoNumbering`:
+> [!TIP]
+> Example implementations should be used mainly as support material while working through Getting Started and the plugin-focused documents above.
 
 ---
 
-## 🔍 Observability
+## 🧪 Test Development
 
-Monitoring, debugging, and diagnosing execution behavior.
+Use this section when you are building programmatic tests for Dataverse solutions.
+
+### Start
 
 | Document | Description | Status |
 |---|---|---|
-| [Logging](./logging.md) | Diagnostic logging and execution tracing | 🚧 |
-| [Error Handling](./error-handling.md) | Validation failures, warnings, and exception handling | 🚧 |
+| [Testing Overview](./testing.md) | Entry point for test setup and test usage | 🚧 |
+| [Integration Testing](./integration-testing.md) | Running tests against Dataverse environments | 🚧 |
 
-### Logging
+### Core Concepts
 
-`LogService` persists structured logs to the `pl_log` entity with related `pl_logdetail` records. Log severity levels: `Debug`, `Info`, `Warning`, `Error`, `Fatal`. A minimum severity threshold is configurable via the `MinimalSeverityLevel` setting key.
+| Document | Description | Status |
+|---|---|---|
+| [Test Architecture](./tests/test-architecture.md) | Structure of the testing project and main building blocks | 🚧 |
+| [Test Execution Flow](./tests/test-execution-flow.md) | How test setup, execution, assertion, and cleanup work | 🚧 |
+| [Test Data Lifecycle](./tests/test-data-lifecycle.md) | Creating, using, and removing test data safely | 🚧 |
+| [Cleanup Strategy](./tests/cleanup-strategy.md) | Cleanup responsibilities and isolation rules | 🚧 |
 
-Each task execution automatically produces a log entry containing:
-- Execution elapsed time, task name, correlation ID
-- Input/Output parameters and Pre/Post entity images
-- Validation messages and execution messages
+### Data Access
 
-### Error Handling
+| Document | Description | Status |
+|---|---|---|
+| [Test Data Access](./tests/data-access.md) | Working with Dataverse through the testing stack | 🚧 |
+| [Test Security Contexts](./tests/security-contexts.md) | Access patterns, context selection, and test execution behavior | 🚧 |
 
-| Exception | Behavior |
-|---|---|
-| `DataverseValidationException` | Surfaces message to user, logged as `Info` severity |
-| `InvalidPluginExecutionException` | Logged as `Error`, re-thrown to Dataverse |
-| Other `Exception` | Logged as `Error`, wrapped in `InvalidPluginExecutionException` |
+> [!NOTE]
+> The testing part of the repository is intentionally separate from plugin development.
+> You should be able to understand and use the testing stack without mixing it with plugin implementation details.
 
 ---
 
-## 🧪 Testing
+## 🧱 Shared Concepts
 
-How to verify behavior against real Dataverse environments.
+Use this section for concepts shared across the repository.
 
 | Document | Description | Status |
 |---|---|---|
-| [Testing Overview](./testing.md) | Testing principles and approach | 🚧 |
-| [Integration Testing](./integration-testing.md) | Working with Dataverse environments | 🚧 |
+| [Repository Structure](./repository-structure.md) | How the repository is organized across plugins, tests, and shared parts | 🚧 |
+| [Shared Terminology](./terminology.md) | Common terms used across framework documentation | 🚧 |
+| [Design Principles](./design-principles.md) | Core technical principles used across the framework | 🚧 |
 
-### Testing Architecture
-
-- **Integration tests only** — no mocks, no fakes
-- **Framework**: xUnit v3 on .NET 10
-- **DI**: Autofac with `TestAutofacModule`
-- **Base class**: `TestBase<TAutofacModule>` provides `DataService`, `OrganizationService`, `ConnectionService`
-- **Cleanup**: Automatic via `IDisposable` — test entities are deleted after each test
-- **Configuration**: `appsettings.json` / `appsettings.Development.json` for connection strings
-
-Key rule: all Dataverse operations in tests MUST go through `DataService` — never resolve `IOrganizationService` directly.
+> [!NOTE]
+> Shared Concepts should stay focused on repository-wide topics.
+> Plugin-specific and test-specific concepts should stay in their respective sections.
 
 ---
 
 ## 📦 Packaging & Deployment
 
-How to prepare, sign, and deploy plugin assemblies.
+Use this section when you need to package, version, or deploy the framework-based solution.
 
 | Document | Description | Status |
 |---|---|---|
-| [Packaging and Deployment](./packaging-and-deployment.md) | Signing, assembly structure, and deployment process | 🚧 |
+| [Packaging and Deployment](./packaging-and-deployment.md) | Packaging model, deployment flow, and assembly preparation | 🚧 |
 | [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
-| [Changelog](../CHANGELOG.md) | Release notes and changes per version | ✅ |
-
-### Assembly Structure
-
-The deployable plugin is a **single signed assembly** produced via ILMerge:
-
-1. **Logic project** (`Examples.Logic`) — Plugins, Tasks, Features, Early-bound types
-2. **Plugin project** (`Examples.Plugins`) — References Logic; post-build merges all dependencies into one signed DLL
-3. **Signing**: Strong-name key (`key.snk`) applied during ILMerge
-4. **Registration**: SPKL with `CrmPluginRegistration` attributes
-
-> ⚠️ Do **not** modify the ILMerge setup. It is intentional and required for Dataverse deployment.
+| [Changelog](../CHANGELOG.md) | Release notes and change history | ✅ |
 
 ---
 
 ## ⚠️ Known Limitations
 
-### Microsoft.CrmSdk.CoreTools maximum version
+Use this section to understand current technical limits and compatibility constraints.
 
-> [!WARNING]
-> The maximum supported version of `Microsoft.CrmSdk.CoreTools` is **9.1.0.92**. Upgrading to a higher version will break early-bound entity generation via SPKL (`CrmSvcUtil.exe`). Do **not** update this package beyond the specified version.
+| Document | Description | Status |
+|---|---|---|
+| [Known Limitations](./limitations.md) | Framework-specific constraints and compatibility notes | 🚧 |
 
-This constraint applies to any project that uses SPKL for early-bound type generation (e.g., `Pillaro.Dataverse.PluginFramework.Tests.EarlyBoundGen`).
+Current important areas include:
 
-### Target Framework
-
-All plugin assemblies **must** target **.NET Framework 4.6.2**. This is a Dataverse platform requirement. Test projects may target modern .NET.
-
----
-
-## 💡 Examples
-
-The `examples/` folder contains working implementations demonstrating framework patterns.
-
-### Plugins
-
-| Plugin | Entity | Pattern | Stages |
-|---|---|---|---|
-| `ContactPlugin` | `contact` | Entity-based | PreValidation, PreOperation |
-| `TaskPlugin` | `task` | Entity-based | PreOperation, PostOperation |
-
-### Tasks
-
-| Task | Entity | Stage | Purpose |
-|---|---|---|---|
-| `ValidateContactNamesTask` | `contact` | PreValidation | Rejects forbidden first/last names using `SettingsService` |
-| `UpdateAddressLabel` | `contact` | PreOperation | Composes `Address1_Name` from address fields with PreImage merge |
-| `TaskAutoNumbering` | `task` | PreOperation | Generates sequential subject prefix via `AutoNumberingService` |
-| `TaskSummarySync` | `task` | PostOperation | Recalculates parent contact description from related tasks |
-
-### Features
-
-| Feature | Description |
-|---|---|
-| `CustomerForbiddenNameService` | Reads forbidden word list from `SettingsService` JSON configuration |
+- package and tooling compatibility constraints
+- framework-specific runtime assumptions
+- supported setup expectations for plugins and tests
 
 ---
 
 ## 🤝 Contributing
 
-The repository maintains contribution policies and community guidelines at the repository root. Please review these documents before opening issues or pull requests.
+Repository-level policies and contribution guidance are kept at the repository root.
 
-| Document | Description | Link | Status |
-|---|---|---|---|
-| Contributing guide | How to contribute, PR process, and development setup | [CONTRIBUTING.md](CONTRIBUTING.md) | ✅ |
-| Security policy | How to report vulnerabilities and our disclosure process | [SECURITY.md](SECURITY.md) | ✅ |
-| Code of Conduct | Community behavior expectations and reporting | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | ✅ |
+| Document | Description |
+|---|---|
+| [Contributing](../CONTRIBUTING.md) | Basic contribution process and expectations |
+| [Security](../SECURITY.md) | Vulnerability reporting and security handling |
+| [Code of Conduct](../CODE_OF_CONDUCT.md) | Community behavior expectations |
+| [License](../LICENSE) | Repository license |
 
 ---
 
 ## 🗺️ Recommended Reading Path
 
-If you are new to the framework:
+### I want to build plugins
 
-1. Start with **Getting Started** and **Architecture**
-2. Review the **Examples** section above for concrete patterns
-3. Study `ContactPlugin` → `ValidateContactNamesTask` → `UpdateAddressLabel` as a complete flow
-4. Explore **Autonumbering** and **Observability** for advanced features
+1. [Getting Started](./getting-started.md)
+2. [Architecture](./architecture.md)
+3. [Plugin Model](./plugin-model.md)
+4. [Task Model](./task-model.md)
+5. [Validation Model](./validation.md)
+6. [Execution Pipeline](./execution-pipeline.md)
+7. [Logging](./logging.md)
 
-If you are implementing a solution:
+### I want to build tests
 
-1. Review **Packaging & Deployment** and **Known Limitations**
-2. Set up **Testing** with `TestBase` and `DataService`
-3. Use **Logging** and **Error Handling** for diagnostics
+1. [Testing Overview](./testing.md)
+2. [Integration Testing](./integration-testing.md)
+3. [Test Architecture](./tests/test-architecture.md)
+4. [Test Execution Flow](./tests/test-execution-flow.md)
+5. [Test Data Access](./tests/data-access.md)
+
+### I want to understand the repository structure
+
+1. [Repository Structure](./repository-structure.md)
+2. [Design Principles](./design-principles.md)
+3. [Architecture](./architecture.md)
+4. [Versioning](./VERSIONING.md)
+
+### I want to contribute
+
+1. [Contributing](../CONTRIBUTING.md)
+2. [Security](../SECURITY.md)
+3. [Code of Conduct](../CODE_OF_CONDUCT.md)
+4. [License](../LICENSE)

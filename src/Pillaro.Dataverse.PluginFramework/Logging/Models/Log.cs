@@ -60,6 +60,12 @@ public class Log : ICloneable
     {
         LogDetails.Add(new LogDetail(name, detail));
     }
+
+    public void AddDetail(string name, object detail)
+    {
+        LogDetails.Add(new LogDetail(name, detail));
+    }
+
     public override string ToString()
     {
         return
