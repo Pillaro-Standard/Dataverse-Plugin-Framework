@@ -1,16 +1,18 @@
 # Changelog
 
-## 1.0.0-rc
+## 1.0.1-ci
 
 ### Pillaro.Dataverse.PluginFramework
-- Release candidate for the core plugin framework.
-- Stabilized API and ready for validation before production release.
-- Provides a structured task-based foundation for Microsoft Dataverse plugins.
+- Finalizing framework logic and validating it before production release.
+- Ongoing testing of the stabilized API.
+- Documentation is being completed and refined for the final release.
+- Provides a structured, task-based foundation for Microsoft Dataverse plugins.
 
 ### Pillaro.Dataverse.PluginFramework.Testing
-- Release candidate for the testing package.
-- Supports testing of framework-based plugin scenarios.
-- Version aligned with the core framework package.
+- Finalizing testing layer logic and validating real-world scenarios.
+- Ongoing testing of integration with the core framework.
+- Documentation is being completed and refined for the final release.
+- Enables effective testing of plugins built on top of the framework.
 
 ## 1.0.0-ci
 
