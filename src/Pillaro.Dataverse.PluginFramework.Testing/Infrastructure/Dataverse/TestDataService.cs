@@ -2,11 +2,11 @@
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Pillaro.Dataverse.PluginFramework.Data;
+using Pillaro.Dataverse.PluginFramework.Extensions;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Commands;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Handlers;
 using Pillaro.Dataverse.PluginFramework.Testing.Application.Queries;
 using Pillaro.Dataverse.PluginFramework.Testing.Domain.Models;
-using Pillaro.Dataverse.PluginFramework.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Xunit;
@@ -21,8 +21,8 @@ internal sealed class TestDataService : DataService, ITestDataService
 
     private volatile ITestOutputHelper? _output;
 
-    public TestDataService(IDataverseConnectionService connectionService, ILifetimeScope lifetimeScope)
-        : base(connectionService.GetOrganizationService())
+    public TestDataService(IOrganizationService organizationService, ILifetimeScope lifetimeScope)
+        : base(organizationService)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         _lifetimeScope = lifetimeScope;
