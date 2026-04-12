@@ -1,15 +1,14 @@
 ﻿using Microsoft.Xrm.Sdk;
+using System.Collections.Concurrent;
 
 namespace Pillaro.Dataverse.PluginFramework.Tasks;
 
-/// <summary>
-/// Provides organization services for supported Dataverse identities.
-/// </summary>
 public class OrganizationServiceProvider
 {
-    private readonly Func<IOrganizationService> _createUserOrganizationService;
-    private readonly Func<IOrganizationService> _createAdminOrganizationService;
-    private readonly Func<IOrganizationService> _createInitiatingUserOrganizationService;
+    private readonly IOrganizationServiceFactory _organizationServiceFactory;
+
+    private readonly Guid _userId;
+    private readonly Guid _initiatingUserId;
 
     private IOrganizationService _user;
     private IOrganizationService _admin;
@@ -17,27 +16,31 @@ public class OrganizationServiceProvider
 
     public OrganizationServiceProvider(IOrganizationServiceFactory organizationServiceFactory, Guid? userId, Guid? initiatingUserId)
     {
-        if (organizationServiceFactory == null) throw new ArgumentNullException(nameof(organizationServiceFactory));
-        if (userId == null) throw new ArgumentNullException(nameof(userId));
-        if (initiatingUserId == null) throw new ArgumentNullException(nameof(initiatingUserId));
+        if (organizationServiceFactory == null)
+            throw new ArgumentNullException(nameof(organizationServiceFactory));
 
-        _createAdminOrganizationService = () => organizationServiceFactory.CreateOrganizationService(null);
-        _createUserOrganizationService = () => organizationServiceFactory.CreateOrganizationService(userId);
-        _createInitiatingUserOrganizationService = () => organizationServiceFactory.CreateOrganizationService(initiatingUserId);
+        if (userId == null)
+            throw new ArgumentNullException(nameof(userId));
+
+        if (initiatingUserId == null)
+            throw new ArgumentNullException(nameof(initiatingUserId));
+
+        _organizationServiceFactory = organizationServiceFactory;
+        _userId = userId.Value;
+        _initiatingUserId = initiatingUserId.Value;
     }
 
     public IOrganizationService User
-    {
-        get { return _user ??= _createUserOrganizationService(); }
-    }
+        => _user ??= _organizationServiceFactory.CreateOrganizationService(_userId);
 
     public IOrganizationService Admin
-    {
-        get { return _admin ??= _createAdminOrganizationService(); }
-    }
+        => _admin ??= _organizationServiceFactory.CreateOrganizationService(null);
 
     public IOrganizationService InitiatingUser
+        => _initiatingUser ??= _organizationServiceFactory.CreateOrganizationService(_initiatingUserId);
+
+    public IOrganizationService GetForUser(Guid userId)
     {
-        get { return _initiatingUser ??= _createInitiatingUserOrganizationService(); }
+        return _organizationServiceFactory.CreateOrganizationService(userId);
     }
 }

@@ -7,12 +7,8 @@ using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 {
-    public class ValidateNames : TaskBase<Logic.Contact>
+    public class ValidateNames(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Contact>(serviceProvider, taskContext)
     {
-        public ValidateNames(IServiceProvider serviceProvider, TaskContext taskContext) : base(serviceProvider, taskContext)
-        {
-        }
-
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {
             return validator
@@ -26,9 +22,9 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
         protected override void DoExecute()
         {
             var forbiddenWords = new CustomerForbiddenNameService(SettingService).GetForbiddenNames();
-
+            
             AddLogMessageLine($"Forbidden words: {string.Join(",",forbiddenWords)}");
-
+            
             if (ContextEntity.Contains(nameof(ContextEntity.FirstName).ToLower()) &&
                forbiddenWords.FindIndex(x => x.Equals(ContextEntity.FirstName, StringComparison.InvariantCultureIgnoreCase)) != -1)
             {

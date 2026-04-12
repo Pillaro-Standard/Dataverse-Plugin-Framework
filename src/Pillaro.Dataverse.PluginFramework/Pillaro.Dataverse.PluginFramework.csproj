@@ -11,6 +11,7 @@
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Pillaro.Dataverse.PluginFramework.xml</DocumentationFile>
 		<Nullable>disable</Nullable>
 		<NoWarn>$(NoWarn);CA1510</NoWarn>
+		<NoWarn>$(NoWarn);IDE0016</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net462'">
