@@ -100,7 +100,7 @@ How the framework behaves during plugin execution in Dataverse.
 
 | Document | Description | Status |
 |---|---|---|
-| [Execution Pipeline](./execution-pipeline.md) | Task orchestration, ordering, and execution flow | 🚧 |
+| [Execution Pipeline](./execution-pipeline.md) | Task orchestration, ordering, and execution flow | ✅ |
 | [Runtime Configuration](./configuration.md) | Configuration stored in Dataverse, loaded at runtime | 🚧 |
 
 ---

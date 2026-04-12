@@ -2,44 +2,68 @@
 
 > A source-available framework providing a structured, task-based approach for building predictable, testable, and maintainable Microsoft Dataverse plugins in C#.
 
-[![License: PCL v1.0](https://img.shields.io/badge/License-PCL%20v1.0-blue.svg)](#license)
 [![Status: Pre-release](https://img.shields.io/badge/Status-Pre--release-orange.svg)](#current-status)
+[![License: PCL v1.0](https://img.shields.io/badge/License-PCL%20v1.0-blue.svg)](#license)
 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Documentation](#documentation)
+- [Adoption and Support](#adoption-and-support)
 - [What Problem It Solves](#what-problem-it-solves)
-- [Architecture](#architecture)
+- [Architecture](#architecture-simplified)
 - [Key Features](#key-features)
 - [Getting Started](#getting-started)
 - [Examples](#examples)
 - [When to Use](#when-to-use)
 - [Repository Structure](#repository-structure)
 - [AI-Ready Structure](#ai-ready-structure)
+- [Key Principles](#key-principles)
+- [Operational Guidelines (Summary)](#operational-guidelines-summary)
 - [Current Status](#current-status)
 - [License](#license)
 
 ---
 
 ## Overview
-> This project uses a community license that allows commercial use in services but restricts resale as a standalone product.
 
 Pillaro Framework provides a consistent way to design and implement Dataverse plugins using a **task-based execution model**.
 
-Each piece of business logic is split into small, focused units called **tasks** with a clear lifecycle:
+Each piece of business logic is split into small, focused units called **Tasks** with a clear lifecycle:
 
-1. **Validation** — can this task run?
+1. **Validation** — can this Task run?
 2. **Execution** — do the work.
 
 This structure makes plugins predictable, testable, and easier to maintain over time.
 
 ---
 
+## Current Status
+
+- 🟡 Preparing for first public release
+- 📝 Documentation in progress
+ 
+---
+
 ## Documentation
 
 Detailed documentation, including setup guides and architecture explanations, is available in the [docs](./docs/README.md) section.
+
+---
+
+## Adoption and Support
+
+If you want to adopt the framework in a controlled way or ensure a smooth production rollout, we can help with:
+
+- architecture setup and review
+- best practices and patterns
+- team onboarding
+- production readiness
+
+Learn more at [pillaro.cz](https://pillaro.cz).  
+If you want guided onboarding, contact us through the contact form on the website.
 
 ---
 
@@ -49,10 +73,10 @@ Standard plugin development often leads to:
 
 | Problem | Framework Solution |
 |---|---|
-| Large classes with mixed responsibilities | Each piece of functionality = one task |
+| Large classes with mixed responsibilities | Each piece of functionality = one Task |
 | Validation and execution logic combined | Validation is strictly separated from execution |
 | Duplicated patterns across projects | Consistent structure enforced by base classes |
-| Difficult testing and debugging | Built-in logging; tasks are independently testable |
+| Difficult testing and debugging | Built-in logging; Tasks are independently testable |
 | No structured approach to integration testing | Built-in xUnit toolkit for writing programmatic integration tests |
 
 ### Example Scenarios
@@ -61,70 +85,100 @@ Standard plugin development often leads to:
 
 - **Automatic validation of contact names on create or update**  
   Each attempt to create or update a contact triggers the `ValidateContactNamesTask`, which:
-  - Ensures that both first and last name fields are filled in.
-  - Checks that the first name does not contain forbidden words (e.g., according to company policy).
-  - If validation fails, returns a user-friendly error and logs the reason in detail.
+  - ensures that both first and last name fields are filled in
+  - checks that the first name does not contain forbidden words
+  - returns a user-friendly error and logs the reason in detail if validation fails
 
 - **Dynamic update of contact address label**  
-  The `UpdateAddressLabel` task, when address fields change:
-  - Verifies that relevant fields have actually changed (using PreImage for updates).
-  - Normalizes and concatenates address parts into a single label.
-  - Ensures the update is performed only when necessary, minimizing unnecessary writes.
+  The `UpdateAddressLabel` Task, when address fields change:
+  - verifies that relevant fields have actually changed using PreImage for updates
+  - normalizes and concatenates address parts into a single label
+  - ensures the update is performed only when necessary, minimizing unnecessary writes
 
 - **Task summary synchronization based on changes in related entities**  
-  The `TaskSummarySync` task:
-  - Monitors changes in fields such as regarding, scheduled time, or task state.
-  - On change, recalculates the task description based on the current state of the related record (e.g., contact or account).
-  - Uses PreImage and PostImage to compare previous and new states.
+  The `TaskSummarySync` Task:
+  - monitors changes in fields such as regarding, scheduled time, or task state
+  - recalculates the task description based on the current state of the related record
+  - uses PreImage and PostImage to compare previous and new states
 
 - **Complex validation on owner change**  
-  A set of validators within a single task:
-  - First, quickly checks basic conditions (e.g., user permissions).
-  - Then performs more demanding checks (e.g., dependencies on other entities).
-  - Each rule is a separate validator, making extension and maintenance easy.
+  A set of validators within a single Task:
+  - first checks basic conditions such as user permissions
+  - then performs more demanding checks such as dependencies on other entities
+  - keeps each rule separate for easier extension and maintenance
 
 ---
 
 ## Architecture (Simplified)
 
-```
-Plugin
-  ↓
-Task
-  ├─ Validation
-  └─ Execution
+```mermaid
+flowchart TD
+    DV[Dataverse Event] --> P[Plugin]
+
+    P --> T[Task]
+
+    T --> V[Validation]
+    T --> E[Execution]
+
+    TC[(TaskContext)] -.-> T
+
+    L[(Logging)] -.-> P
+    L -.-> T
+
+    RC[(Runtime Configuration)] -.-> T
 ```
 
 ### Plugin
 
 The entry point registered with Dataverse. It:
 
-- Receives the execution context
-- Matches registered tasks to the current event (stage, message, entity, mode)
-- Executes matching tasks in order
-- Handles logging and pipeline flow
+- receives the execution context from Dataverse
+- resolves and orchestrates Tasks based on stage, message, entity, and mode
+- executes Tasks in a deterministic order within a single pipeline
+- handles logging, exception propagation, and transaction boundaries
 
 ### Task
 
-A single unit of business logic. Each task:
+A single unit of business logic. Each Task:
 
-- Has one responsibility
-- Defines fluent validation rules in `AddValidations()`
-- Contains execution logic in `DoExecute()`
-- Is independently testable
+- has one clear responsibility
+- defines validation rules in `AddValidations()`
+- contains business logic in `DoExecute()`
+- is executed within a shared `TaskContext`
+- is independently testable
 
 ### Validation
 
-- Runs **before** execution
-- Uses a fluent API to chain validators in a specific order
-- Can **skip** the task (`WithBreakValidation`) or **throw** an error (`ThrowWithError`)
-- Allows other tasks to continue even if one task's validation fails
+- runs **before execution**
+- uses a fluent API to define rules in a strict order
+- can mark the Task as **Not Valid** so execution is skipped and the pipeline continues
+- can stop execution by throwing an error when required
+- does not affect other Tasks unless an exception is thrown
 
 ### Execution
 
-- Runs **only** if all validations pass
-- Contains **only** business logic — no guard checks or validation
-- Produces predictable, traceable results
+- runs **only if validation passes**
+- contains **pure business logic** without guard checks or validation
+- produces deterministic and traceable results
+- triggers a full transaction rollback on any **unhandled exception** while logs are preserved
+
+### Shared Components
+
+#### TaskContext
+
+- provides access to Dataverse services and execution data
+- enables lightweight data sharing between Tasks via an `Items` collection
+
+#### Logging
+
+- captures execution flow, validation outcomes, and errors
+- is used by both Plugin and Tasks
+- is persisted even if the transaction is rolled back
+
+#### Runtime Configuration
+
+- is loaded from Dataverse at runtime
+- allows behavior changes without redeploying the plugin
 
 ---
 
@@ -132,15 +186,15 @@ A single unit of business logic. Each task:
 
 ### 🧩 Task-Based Architecture
 
-Each plugin is composed of independent tasks registered via `RegisterTask<T>()`.
+Each plugin is composed of independent Tasks registered via `RegisterTask<T>()`.
 
-- Keeps business logic small and focused
-- Makes code easier to understand and maintain
-- Allows testing logic in isolation
+- keeps business logic small and focused
+- makes code easier to understand and maintain
+- allows testing logic in isolation
 
 ### ✅ Fluent Validation Model
 
-Each task defines its own validation rules through a fluent API with enforced ordering:
+Each Task defines its own validation rules through a fluent API with enforced ordering:
 
 1. Context filters (`WithMode`, `WithStage`, `WithMessage`)
 2. Entity scope (`ForEntity` / `ForEntities`)
@@ -153,33 +207,33 @@ Each task defines its own validation rules through a fluent API with enforced or
 
 Configuration is stored in Dataverse and loaded at runtime.
 
-- Change behavior without redeploying plugins
-- Supports environment-specific settings
-- Avoids hardcoded values
+- change behavior without redeploying plugins
+- support environment-specific settings
+- avoid hardcoded values
 
 ### 🔢 Autonumbering
 
 Supports configurable number sequences.
 
-- Consistent numbering across records
-- Supports parent-based numbering
-- Safe for concurrent operations
+- consistent numbering across records
+- support for parent-based numbering
+- safe for concurrent operations
 
 ### 📋 Diagnostic Logging
 
-Logging is built into the execution pipeline — every task produces a structured log automatically.
+Logging is built into the execution pipeline and every Task produces a structured log automatically.
 
-- Shows exactly what happened during execution
-- Tracks execution flow, timing, and depth
-- Includes input/output parameters and entity images
+- shows exactly what happened during execution
+- tracks execution flow, timing, and depth
+- includes input/output parameters and entity images
 
 ### 🧪 Testing Support
 
 Provides a foundation for testing against a real Dataverse environment.
 
-- Validates real behavior, not just isolated code
-- Ensures plugins work together correctly
-- Reduces risk in production deployments
+- validates real behavior, not just isolated code
+- ensures plugins work together correctly
+- reduces risk in production deployments
 
 ---
 
@@ -187,35 +241,35 @@ Provides a foundation for testing against a real Dataverse environment.
 
 ### Prerequisites
 
-* **Dataverse / Dynamics 365 environment**
-* **Framework solution installed** — the framework requires the Dataverse solution located in `power-platform-solutions\framework` to be imported into your environment. This solution contains essential configuration entities and dependencies required for proper functionality.
-* **.NET Framework 4.6.2** (required by Dataverse plugin sandbox)
-* Visual Studio or Visual Studio Code
-* Plugin must be deployed as a single assembly
+- **Dataverse / Dynamics 365 environment**
+- **Framework solution installed** — import the `PillaroFramework.zip` solution from `power-platform-solutions/framework` into your environment. This solution contains the required configuration entities and dependencies for proper framework functionality.
+- **.NET Framework 4.6.2** (required by Dataverse plugin sandbox)
+- Visual Studio or Visual Studio Code
+- Plugin must be deployed as a single assembly
 
 > [!WARNING]
-> If you use SPKL for early-bound entity generation, do **not** upgrade `Microsoft.CrmSdk.CoreTools` beyond version **9.1.0.92** — higher versions break `CrmSvcUtil.exe` generation via SPKL. See [Known Limitations](./docs/README.md#-known-limitations) for details.
+> If you use SPKL for early-bound entity generation, do **not** upgrade `Microsoft.CrmSdk.CoreTools` beyond version **9.1.0.92**. Higher versions break `CrmSvcUtil.exe` generation via SPKL. See [Known Limitations](./docs/README.md#-known-limitations) for details.
 
 ### Quick Start
 
-1. Create a Class Library project targeting .NET Framework 4.6.2
-2. Add a reference to the framework via NuGet
-3. Enable assembly signing for the plugin project
-4. Create your solution-specific `PluginBase`
-5. Create plugin classes and register tasks
-6. Implement validation and execution logic in tasks
-7. Configure the build to produce a single deployable assembly
-8. Build and register the plugin assembly in Dataverse
+1. Import the `PillaroFramework.zip` solution into your Dataverse environment
+2. Create a Class Library project targeting .NET Framework 4.6.2
+3. Add a reference to the framework via NuGet:  
+   [Pillaro.Dataverse.PluginFramework](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework)
+4. Enable assembly signing for the plugin project
+5. Create your solution-specific `PluginBase`
+6. Create plugin classes and register Tasks
+7. Implement validation and execution logic in Tasks
+8. Configure the build to produce a single deployable assembly
+9. Build and register the plugin assembly in Dataverse
 
-Detailed setup, signing, packaging, and deployment guidance will be provided in the [docs](./docs) section.
+Detailed setup, signing, packaging, and deployment guidance is available in the [Getting Started](./docs/getting-started.md).
 
 ---
 
-## Examples
+### Minimal Example
 
-### PluginBase (one per solution)
-
-Register your solution-wide plugin configuration and common tasks.
+#### PluginBase
 
 ~~~csharp
 public class PluginBase : PluginFramework.Plugins.PluginBase
@@ -231,55 +285,39 @@ public class PluginBase : PluginFramework.Plugins.PluginBase
 }
 ~~~
 
-### Plugin (one per entity)
-
-Inherit from `PluginBase` and register plugin-specific tasks.
+#### Plugin
 
 ~~~csharp
 public class TaskPlugin : PluginBase
 {
     public TaskPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
     {
-        //Pre
-        RegisterTask<TaskAutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName,PluginMode.Synchronous);
-
-        //Post
-        RegisterTask<TaskSummarySync>(PluginStage.Postoperation, ["Create", "Update"], Task.EntityLogicalName,PluginMode.Synchronous);
+        RegisterTask<TaskAutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName, PluginMode.Synchronous);
+        RegisterTask<TaskSummarySync>(PluginStage.Postoperation, ["Create", "Update"], Task.EntityLogicalName, PluginMode.Synchronous);
     }
 }
 ~~~
 
-### Task
-
-Define validation and execution logic for a specific task.
+#### Task
 
 ~~~csharp
- public class TaskAutoNumbering(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Logic.Task>(serviceProvider, taskContext)
- {
-     protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
-     {
-          return validator
-                .WithMode(PluginMode.Synchronous)
-                .WithStage(PluginStage.Postoperation)
-                .WithMessages(["Create", "Update"])
-                .ForEntity(ContextEntity.LogicalName)
-                .HasPreImageWhen(ctx => ctx.Message == "Update")
-                .HasPostImageWhen(ctx => ctx.Message == "Update")
-                .EntityWithAtLeastOneAttributeWhen(
-                    ctx => ctx.Message == "Update",
-                    ContextEntity,
-                    nameof(ContextEntity.RegardingObjectId), 
-                    nameof(ContextEntity.ScheduledEnd), 
-                    nameof(ContextEntity.ScheduledStart), 
-                    nameof(ContextEntity.StateCode),
-                    nameof(ContextEntity.StatusCode));
-     }
+public class TaskAutoNumbering(IServiceProvider serviceProvider, TaskContext taskContext) 
+    : TaskBase<Logic.Task>(serviceProvider, taskContext)
+{
+    protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
+    {
+        return validator
+            .WithMode(PluginMode.Synchronous)
+            .WithStage(PluginStage.Postoperation)
+            .WithMessages(["Create", "Update"])
+            .ForEntity(ContextEntity.LogicalName);
+    }
 
-     protected override void DoExecute()
-     {
-         // Business logic goes here
-     }
- }
+    protected override void DoExecute()
+    {
+        // Business logic
+    }
+}
 ~~~
 
 ---
@@ -290,15 +328,16 @@ Define validation and execution logic for a specific task.
 |---|---|
 | Solution contains multiple plugins or integration points | Solution contains one or a few simple plugins |
 | Long-term evolution and feature growth are expected | No significant future development is expected |
-| Business logic is growing or expected to grow in complexity | Logic is simple (e.g., single operation, basic update) |
+| Business logic is growing or expected to grow in complexity | Logic is simple, such as a single operation or basic update |
 | You need reliable, repeatable automated testing | Testing is not a key requirement |
-| You want consistent structure across projects and teams | Project is small, isolated, without need for shared standards |
+| You want consistent structure across projects and teams | Project is small, isolated, and does not need shared standards |
 | Maintainability and scalability are important | Short-term or one-off solution |
 | You need structured logging for debugging and observability during development | Basic or minimal logging is sufficient |
 | You need the ability to adjust or toggle behavior at runtime without a new release | Behavior is static and does not need to change without deployment |
 
 ### Summary
-The framework can be used in any scenario — its core purpose is to structure the solution and prepare it for future growth while enabling fast development start.
+
+The framework can be used in any scenario. Its core purpose is to structure the solution, support future growth, and enable a fast development start.
 
 The difference lies in the level of value it brings in a given context.
 
@@ -320,7 +359,7 @@ The difference lies in the level of value it brings in a given context.
   └─ Pillaro.Dataverse.PluginFramework.Examples.Tests
 /docs → Documentation
 /power-platform-solutions → Solution files ready to import into Dataverse
-  ├- examples
+  ├─ examples
   └─ framework
 ~~~
 
@@ -328,25 +367,18 @@ The difference lies in the level of value it brings in a given context.
 
 ## AI-Ready Structure
 
-The framework enforces a consistent and predictable structure, making the codebase easier to analyze and reason about — both for developers and automated tools.
+The framework enforces a consistent and predictable structure, making the codebase easier to analyze and reason about for both developers and automated tools.
 
-- Functionality is split into clearly defined tasks
-- Each task has explicit validation and execution phases
-- Behavior is deterministic and traceable
-- Patterns are uniform across all plugins
+- functionality is split into clearly defined Tasks
+- each Task has explicit validation and execution phases
+- behavior is deterministic and traceable
+- patterns are uniform across all plugins
 
 This enables:
 
-- **Automated code generation** — AI tools can reliably produce new tasks and plugins
+- **Automated code generation** — AI tools can reliably produce new Tasks and plugins
 - **Consistent structure** — every project follows the same conventions
 - **Analysis and mapping** — straightforward correlation between requirements and implementation
-
----
-
-## Current Status
-
-- 🟡 Preparing for first public release
-- 📝 Documentation in progress
 
 ---
 
@@ -355,29 +387,32 @@ This enables:
 | Principle | Description |
 |---|---|
 | **Separate validation from execution** | `AddValidations()` and `DoExecute()` are always distinct |
-| **Keep logic small and focused** | One task = one responsibility |
+| **Keep logic small and focused** | One Task = one responsibility |
 | **Ensure predictable behavior** | Fluent validators execute in defined order |
-| **Make execution flow explicit** | Logging is automatic, every step is traceable |
+| **Make execution flow explicit** | Logging is automatic and every step is traceable |
 | **Maintain consistency** | All plugins follow the same base pattern |
 | **Versioned logging** | Update `PluginBase.GetSolutionVersion()` on each release so logs include a clear solution/version identifier |
-| **Per-task programmatic tests** | Generate and maintain automated tests for every task; tests must run in CI and nightly builds |
+| **Per-task programmatic tests** | Generate and maintain automated tests for every Task; tests must run in CI and nightly builds |
 | **Production logging levels** | Production environments default to `Warning` or `Error` to limit log volume and storage impact |
-| **Environment log retention** | Implement environment-specific log retention/cleanup logic to remove old logs and reduce DB storage usage |
-| **Nightly CI runs** | Schedule a nightly build that runs the full test matrix (including programmatic task tests) to detect regressions early |
+| **Environment log retention** | Implement environment-specific log retention and cleanup to remove old logs and reduce database storage usage |
+| **Nightly CI runs** | Schedule a nightly build that runs the full test matrix, including programmatic Task tests, to detect regressions early |
 
-## Operational guidelines (summary)
+---
 
-Detailed operational guidance is stored in `/docs/operational-guidelines.md`. Summary actions to include there:
-- Release checklist: update `PluginBase.GetSolutionVersion()`, tag release, and ensure version appears in all logs.
-- Per-task tests: add one xUnit test class per task under `/tests`; tests should be runnable locally and in CI. Prefer programmatic, reproducible tests interacting with a shared test environment.
-- CI: configure pipeline (GitHub Actions / Azure DevOps) to run full test matrix on PR and a nightly build executing all programmatic tests.
-- Production logging policy: default runtime config for production should set log level to `Warning` or `Error`; allow temporary overrides for troubleshooting via secure runtime settings.
-- Log retention: implement environment-specific retention (e.g., purge logs older than N days) via scheduled job (DB stored-procedure, Azure Function, Logic App or similar) to keep DB storage optimal.
-- Where to put details: include sample CI YAMLs, retention scripts, test generation tooling, and example `PluginBase` version propagation code in `/docs/operational-guidelines.md`.
+## Operational Guidelines (Summary)
 
-Notes:
-- Move implementation examples (CI YAML, scripts, sample code) to `/docs` to keep README concise and discoverable.
-- I can generate a ready-to-use `/docs/operational-guidelines.md` with sample CI YAML, test stub templates, a log retention SQL/PowerShell script, and a recommended `PluginBase` logging propagation snippet. Tell me if you want that generated now.
+The framework assumes a production-ready development approach with emphasis on testing, observability, and controlled releases.
+
+Key practices:
+
+- **Versioning** — update `PluginBase.GetSolutionVersion()` on each release so logs contain a clear version identifier  
+- **Per-task testing** — maintain automated tests for each Task (run in CI and nightly builds)  
+- **CI/CD** — run full test suite on pull requests and scheduled nightly builds  
+- **Production logging** — default log level should be `Warning` or `Error`, with temporary overrides for troubleshooting  
+- **Log retention** — implement cleanup strategy to prevent unnecessary database growth  
+
+Detailed implementation (CI pipelines, scripts, examples) will be added to: 👉 `/docs/operational-guidelines.md`
+
 ---
 
 ## License
@@ -394,7 +429,6 @@ If you use the framework in a delivered solution, you must include:
 
 > "This solution is built using Pillaro Dataverse Plugin Framework."
 
-This framework is open for use, extension, and contribution,
-but is not licensed as a permissive open-source project and is not intended for resale as a standalone or competing product.
+This framework is open for use, extension, and contribution, but is not licensed as a permissive open-source project and is not intended for resale as a standalone or competing product.
 
 See the full license in the [LICENSE](LICENSE) file.

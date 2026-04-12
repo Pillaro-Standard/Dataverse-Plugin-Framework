@@ -3,7 +3,7 @@
     {
       "profile": "default,release",
       "solution": "PillaroFramework",
-      "assemblypath": "bin\\Debug",
+      "assemblypath": "bin\\Release",
       "excludePluginSteps": false
     }
   ],
