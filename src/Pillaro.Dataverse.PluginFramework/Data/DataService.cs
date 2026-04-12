@@ -11,16 +11,6 @@ using System.ServiceModel;
 
 namespace Pillaro.Dataverse.PluginFramework.Data;
 
-/// <summary>
-/// Central entry point for Dataverse operations over a single security context.
-/// Provides advanced operations and helpers on top of IOrganizationService.
-/// Create two instances when both User and Admin contexts are needed.
-/// </summary>
-/// <remarks>
-/// For basic CRUD operations, use OrganizationService property directly or extension methods.
-/// DataService focuses on operations with added value like ExecuteMultiple batching, 
-/// transactional control, and specialized helpers.
-/// </remarks>
 public class DataService : IDataService
 {
     private readonly ConcurrentDictionary<Guid, List<OrganizationRequest>> _multipleRequests = new();
@@ -53,11 +43,6 @@ public class DataService : IDataService
     public EntityQuery<TEntity> Query<TEntity>() where TEntity : Entity
     {
         return new EntityQuery<TEntity>(() => new OrganizationServiceContext(OrganizationService));
-    }
-
-    public TDataServiceRepository GetRepository<TDataServiceRepository>() where TDataServiceRepository : DataServiceRepository
-    {
-        return (TDataServiceRepository)Activator.CreateInstance(typeof(TDataServiceRepository), this);
     }
 
     public void WaitOnAsyncProcess(Guid entityId, int? numberOfAttempts = null)

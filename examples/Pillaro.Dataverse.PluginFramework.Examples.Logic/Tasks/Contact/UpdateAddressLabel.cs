@@ -1,4 +1,5 @@
-﻿using Pillaro.Dataverse.PluginFramework.Plugins;
+﻿using Pillaro.Dataverse.PluginFramework.Data;
+using Pillaro.Dataverse.PluginFramework.Plugins;
 using Pillaro.Dataverse.PluginFramework.Tasks;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 using System;
@@ -56,11 +57,11 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 
         private string GetValue(string attributeName, Func<Logic.Contact, string> selector)
         {
-            if (ContextEntity.Attributes.ContainsKey(attributeName.ToLowerInvariant())) 
+            if (ContextEntity.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
                 return selector(ContextEntity);
 
             var preImage = ContextEntity;
-            if(TaskContext.Message.Equals("Update"  , StringComparison.InvariantCultureIgnoreCase))
+            if (TaskContext.Message.Equals("Update", StringComparison.InvariantCultureIgnoreCase))
                 preImage = GetPreImage();
 
             return preImage == null ? null : selector(preImage);

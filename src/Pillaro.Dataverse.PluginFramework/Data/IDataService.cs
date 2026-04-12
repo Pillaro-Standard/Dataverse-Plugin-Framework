@@ -11,19 +11,8 @@ public interface IDataService
 
     int GetMultipleRequestBatchSize();
 
-    /// <summary>
-    /// Creates a LINQ-style query for the specified entity type.
-    /// </summary>
     EntityQuery<TEntity> Query<TEntity>() where TEntity : Entity;
 
-    /// <summary>
-    /// Gets a typed repository instance for this DataService.
-    /// </summary>
-    TDataServiceRepository GetRepository<TDataServiceRepository>() where TDataServiceRepository : DataServiceRepository;
-
-    /// <summary>
-    /// Waits for async operations to complete for a specific entity.
-    /// </summary>
     void WaitOnAsyncProcess(Guid entityId, int? numberOfAttempts = null);
 
     #region ExecuteMultiple

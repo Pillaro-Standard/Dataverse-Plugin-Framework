@@ -6,21 +6,8 @@ using Xunit;
 
 namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
-/// <summary>
-/// Provides operations for managing test data in Dataverse.
-/// </summary>
-/// <remarks>
-/// This service encapsulates common operations used in integration tests,
-/// such as entity creation, async process handling, and cleanup of created data.
-///
-/// It is part of the infrastructure layer and works directly with Dataverse.
-/// </remarks>
 public interface ITestDataService : IDataService, IAutoRegisteredService
 {
-    /// <summary>
-    /// Sets the xUnit test output helper for diagnostic logging.
-    /// Must be called per test since <see cref="ITestOutputHelper"/> is scoped to a single test instance.
-    /// </summary>
     void SetOutput(ITestOutputHelper output);
 
     Guid CreateTestEntity(Entity entity, bool byPassPlugins = false);
@@ -28,7 +15,8 @@ public interface ITestDataService : IDataService, IAutoRegisteredService
     Task<Entity> CreateAndReturnTestEntity(Entity entity, CancellationToken cancellation = default);
 
     void AddTestEntityToDelete(EntityReference entity);
-    new TDataRepository GetRepository<TDataRepository>() where TDataRepository : IAutoRegisteredTestDataRepository;
+
+    TDataRepository GetRepository<TDataRepository>() where TDataRepository : IAutoRegisteredTestDataRepository;
 
     Task WaitOnAsyncProcess(Guid entityId, int numberOfAttempts = 40, int cancellationTimeMs = 120000, CancellationToken cancellation = default);
 

@@ -2,9 +2,6 @@ using Pillaro.Dataverse.PluginFramework.Tasks;
 
 namespace Pillaro.Dataverse.PluginFramework.Data;
 
-/// <summary>
-/// Single entry point for task code. Exposes DataService per security context.
-/// </summary>
 public class DataServiceProvider
 {
     private readonly Func<DataService> _createUserDataService;

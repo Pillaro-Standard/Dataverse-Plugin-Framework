@@ -89,14 +89,9 @@ internal sealed class TestDataService : DataService, ITestDataService
         return results;
     }
 
-    public new TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository
+    public TTestDataRepository GetRepository<TTestDataRepository>() where TTestDataRepository : IAutoRegisteredTestDataRepository
     {
         return _lifetimeScope.Resolve<TTestDataRepository>();
-    }
-
-    TDataServiceRepository IDataService.GetRepository<TDataServiceRepository>()
-    {
-        return base.GetRepository<TDataServiceRepository>();
     }
 
     public void AddTestEntityToDelete(EntityReference entity)
