@@ -32,24 +32,23 @@ Use this section when you are building Dataverse plugins with the framework.
 
 | Document | Description | Status |
 |---|---|---|
-| [Getting Started](./plugins/getting-started.md) | First setup, first plugin, and first deployable assembly | ⌛ |
+| [Getting Started](./plugins/getting-started.md) | First setup, first plugin, and first deployable assembly | ✅ |
 
 ### Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
-| [Architecture](./plugins/architecture.md) | High-level plugin architecture and project structure | 🚧 |
-| [Plugin Model](./plugins/plugin-model.md) | Plugin responsibilities and registration approach | 🚧 |
-| [Task Model](./plugins/task-model.md) | Task lifecycle, structure, and responsibilities | 🚧 |
-| [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | 🚧 |
+| [Architecture](./plugins/architecture.md) | High-level plugin architecture and project structure | ✅ |
+| [Plugin Model](./plugins/plugin-model.md) | Plugin responsibilities and registration approach | ✅ |
+| [Task Model](./plugins/task-model.md) | Task lifecycle, structure, and responsibilities | ✅ |
+| [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | ✅ |
 | [Execution Pipeline](./plugins/execution-pipeline.md) | Plugin execution flow and task orchestration | ✅ |
 
 ### Data Access
 
 | Document | Description | Status |
 |---|---|---|
-| [Data Access](./plugins/data-access.md) | Working with Dataverse data in plugin runtime | 🚧 |
-| [Security Contexts](./plugins/security-contexts.md) | Initiating user, user, and admin access patterns | 🚧 |
+| [Data Access](./plugins/data-access.md) | Working with Dataverse data in plugin runtime | ✅ |
 
 ### Modules
 
@@ -132,7 +131,7 @@ Use this section to understand current technical limits and compatibility constr
 
 | Document | Description | Status |
 |---|---|---|
-| [Known Limitations](./limitations.md) | Framework-specific constraints and compatibility notes | 🚧 |
+| [Known Limitations](./limitations.md) | Framework-specific constraints and compatibility notes | ✅ |
 
 Current important areas include:
 
@@ -148,9 +147,9 @@ Repository-level policies and contribution guidance are kept at the repository r
 
 | Document | Description |
 |---|---|
-| [Contributing](../CONTRIBUTING.md) | Basic contribution process and expectations |
-| [Security](../SECURITY.md) | Vulnerability reporting and security handling |
-| [Code of Conduct](../CODE_OF_CONDUCT.md) | Community behavior expectations |
+| [Contributing](./CONTRIBUTING.md) | Basic contribution process and expectations |
+| [Security](./SECURITY.md) | Vulnerability reporting and security handling |
+| [Code of Conduct](./CODE_OF_CONDUCT.md) | Community behavior expectations |
 | [License](../LICENSE) | Repository license |
 
 ---

@@ -40,8 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B58A9E8D-B
 	ProjectSection(SolutionItems) = preProject
 		docs\CODE_OF_CONDUCT.md = docs\CODE_OF_CONDUCT.md
 		docs\CONTRIBUTING.md = docs\CONTRIBUTING.md
-		docs\execution-pipeline.md = docs\execution-pipeline.md
 		docs\getting-started.md = docs\getting-started.md
+		docs\limitations.md = docs\limitations.md
 		docs\README.md = docs\README.md
 		docs\SECURITY.md = docs\SECURITY.md
 		docs\VERSIONING.md = docs\VERSIONING.md
@@ -49,6 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B58A9E8D-B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{04AD17F8-0845-497D-AF36-826F81C26C1B}"
 	ProjectSection(SolutionItems) = preProject
+		docs\plugins\architecture.md = docs\plugins\architecture.md
 		docs\plugins\data-access.md = docs\plugins\data-access.md
 		docs\plugins\data-service.md = docs\plugins\data-service.md
 		docs\plugins\execution-pipeline.md = docs\plugins\execution-pipeline.md

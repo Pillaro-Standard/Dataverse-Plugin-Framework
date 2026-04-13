@@ -13,7 +13,6 @@
 - [🎯 Responsibilities of a task](#-responsibilities-of-a-task)
 - [📦 What belongs in a task](#-what-belongs-in-a-task)
 - [🧰 Prepared services and runtime context](#-prepared-services-and-runtime-context)
-- [🚫 What should not be in a task](#-what-should-not-be-in-a-task)
 - [🧭 Task scope patterns](#-task-scope-patterns)
 - [🔗 Relationship between task, validation, and plugin](#-relationship-between-task-validation-and-plugin)
 - [💻 Example](#-example)
