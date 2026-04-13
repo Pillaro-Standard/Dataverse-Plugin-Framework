@@ -1,6 +1,6 @@
 # Contributing to Pillaro Dataverse Plugin Framework
 
-Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing! This guide will help you get started quickly.
 
 ---
 
@@ -18,7 +18,7 @@ Thank you for your interest in contributing! This document provides guidelines a
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before contributing.
+By participating in this project, you agree to abide by our [Code of Conduct](../CODE_OF_CONDUCT.md). Please read it before contributing.
 
 ---
 
@@ -53,29 +53,15 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 2. **Open the solution in Visual Studio**
 
-   ~~~bash
-   start Pillaro.Dataverse.PluginFramework.sln
-   ~~~
+   Open `Pillaro.Dataverse.PluginFramework.sln` in Visual Studio.
 
-3. **Restore NuGet packages**
+3. **Build the solution**
 
-   Visual Studio will restore packages automatically, or run:
+   Use __Build > Build Solution__ (Ctrl+Shift+B) in Visual Studio.
 
-   ~~~bash
-   dotnet restore
-   ~~~
+4. **Run tests**
 
-4. **Build the solution**
-
-   Press Ctrl+Shift+B or use **Build > Build Solution**.
-
-5. **Run tests**
-
-   Use **Test > Run All Tests** or:
-
-   ~~~bash
-   dotnet test
-   ~~~
+   Use __Test > Run All Tests__ in Visual Studio.
 
 ---
 
@@ -83,23 +69,22 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### Types of Contributions
 
-| Type | Description |
-|------|-------------|
-| Bug fixes | Fix issues in existing functionality |
-| Features | Add new capabilities (discuss first) |
-| Documentation | Improve or add documentation |
-| Tests | Add or improve test coverage |
-| Refactoring | Improve code quality without changing behavior |
+We welcome:
+
+- **Bug fixes** — Fix issues in existing functionality
+- **Features** — Add new capabilities (discuss in an issue first)
+- **Documentation** — Improve or add documentation
+- **Tests** — Add or improve test coverage
 
 ### Contribution Workflow
 
-1. **Check existing issues** - Avoid duplicating work
-2. **Open an issue** - Discuss significant changes before implementation
-3. **Fork the repository** - Create your own copy
-4. **Create a feature branch** - Branch from main
-5. **Make your changes** - Follow code guidelines
-6. **Write/update tests** - Maintain test coverage
-7. **Submit a pull request** - Reference the related issue
+1. **Check existing issues** — Avoid duplicating work
+2. **Open an issue** — Discuss significant changes before implementation
+3. **Fork the repository** — Create your own copy
+4. **Create a feature branch** — Use the naming convention `feature/your-feature-name`
+5. **Make your changes** — Follow code guidelines
+6. **Write/update tests** — Maintain or improve test coverage
+7. **Submit a pull request** — Reference the related issue
 
 ---
 
@@ -110,28 +95,31 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 - Follow existing architecture and patterns strictly
 - Keep logic simple, readable, and maintainable
 - Prefer composition over complexity
-- Generate only meaningful business logic
+- Write meaningful business logic (avoid demo-only code)
 
 ### Coding Standards
 
 - **Target Framework**: .NET Framework 4.6.2 (sandbox compatible)
-- **Entity Access**: Always use early-bound with Logic.EntityName prefix
+- **Entity Access**: Always use early-bound with `Logic.EntityName` prefix
 - **Single Assembly**: Output must be ILMerge compatible
 
 ### Build Quality Gate
 
-All contributions must pass with **zero warnings** from compiler and analyzers.
+All contributions must build with **zero warnings** from compiler and analyzers.
 
-Must avoid:
+Common issues to avoid:
 
 | Code | Issue |
 |------|-------|
-| SYSLIB1045 | No [GeneratedRegex] in sandbox code |
-| CA1862 | Use string.Equals(..., StringComparison.OrdinalIgnoreCase) |
+| SYSLIB1045 | No `[GeneratedRegex]` in sandbox code |
+| CA1862 | Use `string.Equals(..., StringComparison.OrdinalIgnoreCase)` |
 | CA1861 | No repeated inline array allocations |
 | CA1822 | Mark static when no instance access |
 | IDE0005 | Remove unused usings |
 | IDE0028 | Use collection expressions |
+
+> [!TIP]
+> After building in Visual Studio, check the __Output__ window for warnings. Address all warnings before submitting a PR.
 
 ### Plugin Architecture
 
@@ -144,25 +132,24 @@ Must avoid:
 
 ### Before Submitting
 
-- Code compiles without warnings
-- All existing tests pass
-- New functionality includes tests
-- Documentation updated if needed
-- Commit messages are clear and descriptive
+- ✅ Code compiles without warnings
+- ✅ All existing tests pass
+- ✅ New functionality includes tests (if applicable)
+- ✅ Documentation updated (if needed)
+- ✅ Commit messages are clear and descriptive
 
 ### PR Requirements
 
 1. **Title**: Clear, concise description of the change
 2. **Description**: Explain what and why (not how)
-3. **Issue Reference**: Link to related issue using Fixes #123 or Closes #123
+3. **Issue Reference**: Link to related issue using `Fixes #123` or `Closes #123`
 4. **Small Scope**: Keep PRs focused on a single concern
 
 ### Review Process
 
-1. Automated checks must pass
-2. At least one maintainer approval required
-3. Address review feedback promptly
-4. Squash commits before merge (if requested)
+1. At least one maintainer approval required
+2. Address review feedback promptly
+3. All checks must pass before merge
 
 ---
 
@@ -183,16 +170,6 @@ Include the following information:
 - **Problem Statement**: What problem does this solve?
 - **Proposed Solution**: How should it work?
 - **Alternatives Considered**: Other approaches you evaluated
-- **Additional Context**: Screenshots, examples, references
-
----
-
-## Questions?
-
-If you have questions about contributing, feel free to:
-
-- Open a [Discussion](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions)
-- Check existing [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues)
 
 ---
 

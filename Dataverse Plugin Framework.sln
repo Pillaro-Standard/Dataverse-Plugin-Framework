@@ -50,10 +50,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{04AD17F8-0845-497D-AF36-826F81C26C1B}"
 	ProjectSection(SolutionItems) = preProject
 		docs\plugins\architecture.md = docs\plugins\architecture.md
+		docs\plugins\autonumbering.md = docs\plugins\autonumbering.md
+		docs\plugins\configuration.md = docs\plugins\configuration.md
 		docs\plugins\data-access.md = docs\plugins\data-access.md
 		docs\plugins\data-service.md = docs\plugins\data-service.md
+		docs\plugins\error-handling.md = docs\plugins\error-handling.md
 		docs\plugins\execution-pipeline.md = docs\plugins\execution-pipeline.md
 		docs\plugins\getting-started.md = docs\plugins\getting-started.md
+		docs\plugins\logging.md = docs\plugins\logging.md
 		docs\plugins\plugin-model.md = docs\plugins\plugin-model.md
 		docs\plugins\task-model.md = docs\plugins\task-model.md
 		docs\plugins\validation.md = docs\plugins\validation.md

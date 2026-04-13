@@ -12,14 +12,25 @@
 
 ## 📖 Table of Contents
 
-| Section | Description |
-|---|---|
-| 🚀 [Plugin Development](#-plugin-development) | Build and structure Dataverse plugins with the framework |
-| 🧪 [Test Development](#-test-development) | Build and run programmatic tests against Dataverse |
-| 📦 [Release and Versioning](#-release-and-versioning) | Build, package, version, and deploy the solution |
-| ⚠️ [Known Limitations](#-known-limitations) | Technical constraints and compatibility notes |
-| 🤝 [Contributing](#-contributing) | Basic repository policies and contribution entry points |
-| 🗺️ [Recommended Reading Path](#-recommended-reading-path) | Suggested reading order by goal |
+| Section                                                    | Description                                                                 |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
+| 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
+| 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
+| 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
+| ⚠️ [Known Limitations](#-known-limitations)                | Technical constraints and compatibility notes                               |
+| 🤝 [Contributing](#-contributing)                          | Repository policies and contribution entry points                           |
+| 🗺️ [Recommended Reading Path](#-recommended-reading-path) | Suggested reading order by goal                                             |
+
+---
+
+## 💬 Questions & Discussions
+
+👉 https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions
+
+- ❓ Questions → Q&A
+- 💡 Ideas → Ideas
+- 🐛 Bugs → Issues
 
 ---
 
@@ -48,18 +59,16 @@ Use this section when you are building Dataverse plugins with the framework.
 | Document | Description | Status |
 |---|---|---|
 | [Data Access](./plugins/data-access.md) | Working with Dataverse data in plugin runtime | ✅ |
+| [DataService](./plugins/data-service.md) | Framework data layer, query model, and related helpers | ✅ |
 
 ### Modules
 
 | Document | Description | Status |
 |---|---|---|
-| [Runtime Configuration](./configuration.md) | Settings and runtime behavior configuration | 🚧 |
-| [Autonumbering](./autonumbering.md) | Number sequence generation and related patterns | 🚧 |
-| [Logging](./logging.md) | Runtime logging and diagnostics | 🚧 |
-| [Error Handling](./error-handling.md) | Exceptions, validation failures, and runtime behavior | 🚧 |
-
-> [!TIP]
-> Example implementations should be used mainly as support material while working through Getting Started and the plugin-focused documents above.
+| [Runtime Configuration](./plugins/configuration.md) | Settings and runtime behavior configuration | ✅ |
+| [Autonumbering](./plugins/autonumbering.md) | Number sequence generation and related patterns | 🚧 |
+| [Logging](./plugins/logging.md) | Runtime logging and diagnostics | ✅ |
+| [Error Handling](./plugins/error-handling.md) | Exceptions, validation failures, and runtime behavior | ✅ |
 
 ---
 
@@ -71,8 +80,7 @@ Use this section when you are building programmatic tests for Dataverse solution
 
 | Document | Description | Status |
 |---|---|---|
-| [Testing Overview](./testing.md) | Entry point for test setup and test usage | 🚧 |
-| [Integration Testing](./integration-testing.md) | Running tests against Dataverse environments | 🚧 |
+| [Testing Overview](./tests/testing.md) | Entry point for test setup and test usage | 🚧 |
 
 ### Core Concepts
 
@@ -88,7 +96,6 @@ Use this section when you are building programmatic tests for Dataverse solution
 | Document | Description | Status |
 |---|---|---|
 | [Test Data Access](./tests/data-access.md) | Working with Dataverse through the testing stack | 🚧 |
-| [Test Security Contexts](./tests/security-contexts.md) | Access patterns, context selection, and test execution behavior | 🚧 |
 
 > [!NOTE]
 > The testing part of the repository is intentionally separate from plugin development.
@@ -115,23 +122,12 @@ Use this section to understand current technical limits and compatibility constr
 |---|---|---|
 | [Known Limitations](./limitations.md) | Framework-specific constraints and compatibility notes | ✅ |
 
-Current important areas include:
-
-- package and tooling compatibility constraints
-- framework-specific runtime assumptions
-- supported setup expectations for plugins and tests
-
 ---
-
-## 🤝 Contributing
-
-Repository-level policies and contribution guidance are kept at the repository root.
-
-| Document | Description | Status |
+Repository-level policies and contribution guidance.ocument | Description | Status |
 |---|---|---|
-| [Contributing](./CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
-| [Security](./SECURITY.md) | Vulnerability reporting and security handling | ✅ |
-| [Code of Conduct](./CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
+| [Contributing](../CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
+| [Security](../SECURITY.md) | Vulnerability reporting and security handling | ✅ |
+| [Code of Conduct](../CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
 | [License](../LICENSE) | Repository license | ✅ |
 
 ---
@@ -140,32 +136,30 @@ Repository-level policies and contribution guidance are kept at the repository r
 
 ### I want to build plugins
 
-1. [Getting Started](./getting-started.md)
+1. [Getting Started](./plugins/getting-started.md)
 2. [Architecture](./plugins/architecture.md)
 3. [Plugin Model](./plugins/plugin-model.md)
 4. [Task Model](./plugins/task-model.md)
 5. [Validation Model](./plugins/validation.md)
 6. [Execution Pipeline](./plugins/execution-pipeline.md)
-7. [Logging](./plugins/logging.md)
+7. [Data Access](./plugins/data-access.md)
+8. [DataService](./plugins/data-service.md)
 
 ### I want to build tests
 
-1. [Testing Overview](./testing.md)
-2. [Integration Testing](./integration-testing.md)
-3. [Test Architecture](./tests/test-architecture.md)
-4. [Test Execution Flow](./tests/test-execution-flow.md)
-5. [Test Data Access](./tests/data-access.md)
-
-### I want to understand the documentation structure
-
-1. [Repository Structure](./repository-structure.md)
-2. [Design Principles](./design-principles.md)
-3. [Plugin Architecture](./plugins/architecture.md)
-4. [Test Architecture](./tests/test-architecture.md)
+1. [Testing Overview](./tests/testing.md)
+2. [Test Architecture](./tests/test-architecture.md)
+3. [Test Execution Flow](./tests/test-execution-flow.md)
+4. [Test Data Access](./tests/data-access.md)
 
 ### I want to contribute
 
-1. [Contributing](./CONTRIBUTING.md)
-2. [Security](./SECURITY.md)
-3. [Code of Conduct](./CODE_OF_CONDUCT.md)
+1. [Contributing](../CONTRIBUTING.md)
+2. [Code of Conduct](../CODE_OF_CONDUCT.md)
+3. [Security](../SECURITY.md)
+
+---
+
+**Questions?** Open a [Discussion](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions) or check [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues) 2. [Security](../SECURITY.md)
+3. [Code of Conduct](../CODE_OF_CONDUCT.md)
 4. [License](../LICENSE)
