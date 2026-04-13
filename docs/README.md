@@ -16,11 +16,10 @@
 |---|---|
 | 🚀 [Plugin Development](#-plugin-development) | Build and structure Dataverse plugins with the framework |
 | 🧪 [Test Development](#-test-development) | Build and run programmatic tests against Dataverse |
-| 🧱 [Shared Concepts](#-shared-concepts) | Repository-wide concepts shared across plugins and tests |
-| 📦 [Packaging & Deployment](#-packaging--deployment) | Build, package, version, and deploy the solution |
+| 📦 [Release and Versioning](#-release-and-versioning) | Build, package, version, and deploy the solution |
 | ⚠️ [Known Limitations](#-known-limitations) | Technical constraints and compatibility notes |
 | 🤝 [Contributing](#-contributing) | Basic repository policies and contribution entry points |
-| 🗺️ [Recommended Reading Path](#️-recommended-reading-path) | Suggested reading order by goal |
+| 🗺️ [Recommended Reading Path](#-recommended-reading-path) | Suggested reading order by goal |
 
 ---
 
@@ -97,29 +96,12 @@ Use this section when you are building programmatic tests for Dataverse solution
 
 ---
 
-## 🧱 Shared Concepts
+## 📦 Release and Versioning
 
-Use this section for concepts shared across the repository.
-
-| Document | Description | Status |
-|---|---|---|
-| [Repository Structure](./repository-structure.md) | How the repository is organized across plugins, tests, and shared parts | 🚧 |
-| [Shared Terminology](./terminology.md) | Common terms used across framework documentation | 🚧 |
-| [Design Principles](./design-principles.md) | Core technical principles used across the framework | 🚧 |
-
-> [!NOTE]
-> Shared Concepts should stay focused on repository-wide topics.
-> Plugin-specific and test-specific concepts should stay in their respective sections.
-
----
-
-## 📦 Packaging & Deployment
-
-Use this section when you need to package, version, or deploy the framework-based solution.
+Use this section when you need release and versioning information for the framework-based solution.
 
 | Document | Description | Status |
 |---|---|---|
-| [Packaging and Deployment](./packaging-and-deployment.md) | Packaging model, deployment flow, and assembly preparation | 🚧 |
 | [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
 | [Changelog](../CHANGELOG.md) | Release notes and change history | ✅ |
 
@@ -145,12 +127,12 @@ Current important areas include:
 
 Repository-level policies and contribution guidance are kept at the repository root.
 
-| Document | Description |
-|---|---|
-| [Contributing](./CONTRIBUTING.md) | Basic contribution process and expectations |
-| [Security](./SECURITY.md) | Vulnerability reporting and security handling |
-| [Code of Conduct](./CODE_OF_CONDUCT.md) | Community behavior expectations |
-| [License](../LICENSE) | Repository license |
+| Document | Description | Status |
+|---|---|---|
+| [Contributing](./CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
+| [Security](./SECURITY.md) | Vulnerability reporting and security handling | ✅ |
+| [Code of Conduct](./CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
+| [License](../LICENSE) | Repository license | ✅ |
 
 ---
 
@@ -159,12 +141,12 @@ Repository-level policies and contribution guidance are kept at the repository r
 ### I want to build plugins
 
 1. [Getting Started](./getting-started.md)
-2. [Architecture](./architecture.md)
-3. [Plugin Model](./plugin-model.md)
-4. [Task Model](./task-model.md)
-5. [Validation Model](./validation.md)
-6. [Execution Pipeline](./execution-pipeline.md)
-7. [Logging](./logging.md)
+2. [Architecture](./plugins/architecture.md)
+3. [Plugin Model](./plugins/plugin-model.md)
+4. [Task Model](./plugins/task-model.md)
+5. [Validation Model](./plugins/validation.md)
+6. [Execution Pipeline](./plugins/execution-pipeline.md)
+7. [Logging](./plugins/logging.md)
 
 ### I want to build tests
 
@@ -174,16 +156,16 @@ Repository-level policies and contribution guidance are kept at the repository r
 4. [Test Execution Flow](./tests/test-execution-flow.md)
 5. [Test Data Access](./tests/data-access.md)
 
-### I want to understand the repository structure
+### I want to understand the documentation structure
 
 1. [Repository Structure](./repository-structure.md)
 2. [Design Principles](./design-principles.md)
-3. [Architecture](./architecture.md)
-4. [Versioning](./VERSIONING.md)
+3. [Plugin Architecture](./plugins/architecture.md)
+4. [Test Architecture](./tests/test-architecture.md)
 
 ### I want to contribute
 
-1. [Contributing](../CONTRIBUTING.md)
-2. [Security](../SECURITY.md)
-3. [Code of Conduct](../CODE_OF_CONDUCT.md)
+1. [Contributing](./CONTRIBUTING.md)
+2. [Security](./SECURITY.md)
+3. [Code of Conduct](./CODE_OF_CONDUCT.md)
 4. [License](../LICENSE)
