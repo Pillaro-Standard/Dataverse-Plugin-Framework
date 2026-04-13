@@ -66,7 +66,7 @@ Use this section when you are building Dataverse plugins with the framework.
 | Document | Description | Status |
 |---|---|---|
 | [Runtime Configuration](./plugins/configuration.md) | Settings and runtime behavior configuration | ✅ |
-| [Autonumbering](./plugins/autonumbering.md) | Number sequence generation and related patterns | 🚧 |
+| [Autonumbering](./plugins/autonumbering.md) | Number sequence generation and related patterns | ✅ |
 | [Logging](./plugins/logging.md) | Runtime logging and diagnostics | ✅ |
 | [Error Handling](./plugins/error-handling.md) | Exceptions, validation failures, and runtime behavior | ✅ |
 
