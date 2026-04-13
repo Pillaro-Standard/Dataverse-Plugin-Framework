@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Autofac.Core.Lifetime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;

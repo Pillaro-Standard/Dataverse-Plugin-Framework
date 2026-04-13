@@ -8,7 +8,6 @@ using Pillaro.Dataverse.PluginFramework.Logging.Events;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
 using Pillaro.Dataverse.PluginFramework.Settings;
 using System.ServiceModel;
-using System.Text;
 
 namespace Pillaro.Dataverse.PluginFramework.Logging;
 
@@ -37,24 +36,6 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
     public event SaveLogsEventHandler BeforeSaveLogs = delegate { };
 
     protected int CacheNoEntityTimeInSeconds { get; } = cacheNoEntityTimeInSeconds;
-
-    public void Fatal(string name, Exception ex)
-    {
-        var sb = new StringBuilder();
-        var current = ex;
-        while (current != null)
-        {
-            sb.AppendLine().Append(current);
-            current = current.InnerException;
-        }
-
-        SaveLog(new Log(LogSeverity.Fatal, _executionContext, name, sb.ToString()));
-    }
-
-    public void Fatal(Exception ex)
-    {
-        Fatal(ex.Message, ex);
-    }
 
     public void Debug(string name, string detail, IList<LogDetail> logDetails = null)
     {
