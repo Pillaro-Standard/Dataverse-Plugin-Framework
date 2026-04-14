@@ -70,6 +70,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "framework", "framework", "{
 		power-platform-solutions\framework\README.md = power-platform-solutions\framework\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{822CB412-FB1A-4B8C-9BD8-7B7A6EAC0635}"
+	ProjectSection(SolutionItems) = preProject
+		docs\tests\testing.md = docs\tests\testing.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +126,7 @@ Global
 		{7B421594-81D0-E65B-3733-217F5B90AC68} = {25FE1426-88F6-47E1-B942-DCAAC521C232}
 		{04AD17F8-0845-497D-AF36-826F81C26C1B} = {B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}
 		{605E5F63-8CFE-44B7-A983-C231CF0ABD93} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
+		{822CB412-FB1A-4B8C-9BD8-7B7A6EAC0635} = {B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}
