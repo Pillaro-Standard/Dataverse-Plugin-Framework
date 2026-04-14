@@ -1,0 +1,8 @@
+﻿namespace Pillaro.Dataverse.PluginFramework.Tasks.Validation.Validators.Interfaces;
+
+internal interface IValidator
+{
+    string GetName { get; }
+    bool Validate(TaskContext taskContext);
+    string GetMessage();
+}
