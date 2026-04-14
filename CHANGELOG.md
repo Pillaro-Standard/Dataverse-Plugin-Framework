@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.1-rc
+
+### Pillaro.Dataverse.PluginFramework
+- Release candidate for the next framework release.
+- Core plugin documentation has been completed and aligned with the current framework structure.
+- Framework behavior is being validated before final release.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+- Release candidate for the next testing package release.
+- Core testing documentation structure has been prepared and aligned with the current testing architecture.
+- Testing behavior is being validated before final release.
+
 ## 1.0.1-ci
 
 ### Pillaro.Dataverse.PluginFramework
