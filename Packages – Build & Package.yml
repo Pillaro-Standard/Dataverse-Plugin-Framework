@@ -1,18 +1,8 @@
 name: Packages – Build & Package
 
-trigger:
-  branches:
-    include:
-      - main
-      - release/*
-  tags:
-    include:
-      - v*
+trigger: none
 
-pr:
-  branches:
-    include:
-      - main
+pr: none
 
 parameters:
   - name: baseVersion
