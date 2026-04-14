@@ -1,0 +1,14 @@
+{
+  "earlyboundtypes": [
+    {
+      "entities": "contact,task,account",
+      "generateOptionsetEnums": true,
+      "generateGlobalOptionsets": true,
+      "generateStateEnums": true,
+      "filename": "EarlyBoundTypes.cs",
+      "classNamespace": "Pillaro.Dataverse.PluginFramework.Examples.Logic",
+      "serviceContextName": "ServiceContext",
+      "oneTypePerFile": false
+    }
+  ]
+}
