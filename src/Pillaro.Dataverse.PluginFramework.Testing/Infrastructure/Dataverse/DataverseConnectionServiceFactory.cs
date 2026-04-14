@@ -9,60 +9,77 @@ namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 internal class DataverseConnectionServiceFactory : IDataverseConnectionService
 {
     private const int CacheExpirationMinutes = 5;
-    private readonly string _connectionString;
+    private readonly IConfiguration _configuration;
     private readonly IMemoryCache _memoryCache;
-
-    private string BaseCacheKey => $"{nameof(IOrganizationService)}:{_connectionString}";
 
     public DataverseConnectionServiceFactory(IConfiguration configuration, IMemoryCache memoryCache)
     {
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-        _connectionString = configuration?.GetConnectionString("Dataverse")
-            ?? throw new InvalidOperationException("Connection string with name 'Dataverse' is missing.");
     }
 
-    public IOrganizationServiceAsync2 GetOrganizationService(bool ignoreCache = false)
+    public IOrganizationServiceAsync2 GetOrganizationService(string connectionStringName = "Dataverse", bool ignoreCache = false)
     {
+        if (string.IsNullOrWhiteSpace(connectionStringName))
+            throw new ArgumentException("Connection string name cannot be null or whitespace.", nameof(connectionStringName));
+
+        var connectionString = GetConnectionString(connectionStringName);
         ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(30);
 
         if (ignoreCache)
-            return new ServiceClient(_connectionString);
+            return new ServiceClient(connectionString);
 
-        if (_memoryCache.TryGetValue(BaseCacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
-            return cachedClient;
-
-        var client = new ServiceClient(_connectionString);
-        _memoryCache.Set(BaseCacheKey, client, DateTimeOffset.UtcNow.AddMinutes(CacheExpirationMinutes));
-        return client;
-    }
-
-    public IOrganizationServiceAsync2 GetOrganizationService(Guid callerId, bool ignoreCache = false)
-    {
-        ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(30);
-
-        if (ignoreCache)
-            return CreateCallerClient(callerId);
-
-        var cacheKey = GetCallerCacheKey(callerId);
+        var cacheKey = GetBaseCacheKey(connectionString);
         if (_memoryCache.TryGetValue(cacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
             return cachedClient;
 
-        var client = CreateCallerClient(callerId);
+        var client = new ServiceClient(connectionString);
         _memoryCache.Set(cacheKey, client, DateTimeOffset.UtcNow.AddMinutes(CacheExpirationMinutes));
         return client;
     }
 
-    private ServiceClient CreateCallerClient(Guid callerId)
+    public IOrganizationServiceAsync2 GetOrganizationService(Guid callerId, string connectionStringName = "Dataverse", bool ignoreCache = false)
     {
-        var client = new ServiceClient(_connectionString)
+        if (string.IsNullOrWhiteSpace(connectionStringName))
+            throw new ArgumentException("Connection string name cannot be null or whitespace.", nameof(connectionStringName));
+
+        var connectionString = GetConnectionString(connectionStringName);
+        ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(30);
+
+        if (ignoreCache)
+            return CreateCallerClient(connectionString, callerId);
+
+        var cacheKey = GetCallerCacheKey(connectionString, callerId);
+        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
+            return cachedClient;
+
+        var client = CreateCallerClient(connectionString, callerId);
+        _memoryCache.Set(cacheKey, client, DateTimeOffset.UtcNow.AddMinutes(CacheExpirationMinutes));
+        return client;
+    }
+
+    private string GetConnectionString(string connectionStringName)
+    {
+        return _configuration.GetConnectionString(connectionStringName)
+            ?? throw new InvalidOperationException($"Connection string with name '{connectionStringName}' is missing.");
+    }
+
+    private ServiceClient CreateCallerClient(string connectionString, Guid callerId)
+    {
+        var client = new ServiceClient(connectionString)
         {
             CallerId = callerId
         };
         return client;
     }
 
-    private string GetCallerCacheKey(Guid callerId)
+    private string GetBaseCacheKey(string connectionString)
     {
-        return $"{BaseCacheKey}:{callerId}";
+        return $"{nameof(IOrganizationService)}:{connectionString}";
+    }
+
+    private string GetCallerCacheKey(string connectionString, Guid callerId)
+    {
+        return $"{GetBaseCacheKey(connectionString)}:{callerId}";
     }
 }

@@ -80,22 +80,21 @@ Use this section when you are building programmatic tests for Dataverse solution
 
 | Document | Description | Status |
 |---|---|---|
-| [Testing Overview](./tests/testing.md) | Entry point for test setup and test usage | 🚧 |
+| [Testing Overview](./tests/testing.md) | Entry point for test setup and test usage | ✅ |
 
 ### Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
-| [Test Architecture](./tests/test-architecture.md) | Structure of the testing project and main building blocks | 🚧 |
-| [Test Execution Flow](./tests/test-execution-flow.md) | How test setup, execution, assertion, and cleanup work | 🚧 |
-| [Test Data Lifecycle](./tests/test-data-lifecycle.md) | Creating, using, and removing test data safely | 🚧 |
-| [Cleanup Strategy](./tests/cleanup-strategy.md) | Cleanup responsibilities and isolation rules | 🚧 |
+| [Test Architecture](./tests/test-architecture.md) | Structure of the testing project and main building blocks | ✅ |
+| [Test Execution Flow](./tests/test-execution-flow.md) | How test setup, execution, assertion, and cleanup work | ✅ |
+| [Test Data Lifecycle](./tests/test-data-lifecycle.md) | Creating, using, and removing test data safely | ✅ |
 
 ### Data Access
 
 | Document | Description | Status |
 |---|---|---|
-| [Test Data Access](./tests/data-access.md) | Working with Dataverse through the testing stack | 🚧 |
+| [Test Data Access](./tests/data-access.md) | Working with Dataverse through the testing stack | ✅ |
 
 > [!NOTE]
 > The testing part of the repository is intentionally separate from plugin development.
@@ -123,7 +122,12 @@ Use this section to understand current technical limits and compatibility constr
 | [Known Limitations](./limitations.md) | Framework-specific constraints and compatibility notes | ✅ |
 
 ---
-Repository-level policies and contribution guidance.ocument | Description | Status |
+
+## 🤝 Contributing
+
+Repository-level policies and contribution guidance.
+
+| Document | Description | Status |
 |---|---|---|
 | [Contributing](../CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
 | [Security](../SECURITY.md) | Vulnerability reporting and security handling | ✅ |
@@ -157,9 +161,8 @@ Repository-level policies and contribution guidance.ocument | Description | Stat
 1. [Contributing](../CONTRIBUTING.md)
 2. [Code of Conduct](../CODE_OF_CONDUCT.md)
 3. [Security](../SECURITY.md)
+4. [License](../LICENSE)
 
 ---
 
-**Questions?** Open a [Discussion](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions) or check [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues) 2. [Security](../SECURITY.md)
-3. [Code of Conduct](../CODE_OF_CONDUCT.md)
-4. [License](../LICENSE)
+**Questions?** Open a [Discussion](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions) or check [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues)

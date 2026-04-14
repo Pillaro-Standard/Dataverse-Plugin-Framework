@@ -72,6 +72,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "framework", "framework", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{822CB412-FB1A-4B8C-9BD8-7B7A6EAC0635}"
 	ProjectSection(SolutionItems) = preProject
+		docs\tests\data-access.md = docs\tests\data-access.md
+		docs\tests\test-architecture.md = docs\tests\test-architecture.md
+		docs\tests\test-data-lifecycle.md = docs\tests\test-data-lifecycle.md
+		docs\tests\test-execution-flow.md = docs\tests\test-execution-flow.md
 		docs\tests\testing.md = docs\tests\testing.md
 	EndProjectSection
 EndProject

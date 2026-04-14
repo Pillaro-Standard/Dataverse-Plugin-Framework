@@ -35,6 +35,8 @@ Examples:
 - [Pre-release Labels](#pre-release-labels)
 - [Release Flow](#release-flow)
 - [Notes](#notes)
+- [Upgrading Between Versions](#upgrading-between-versions)
+- [Breaking Changes Policy](#breaking-changes-policy)
 
 ---
 
@@ -174,14 +176,20 @@ This ensures:
 
 ## Version Source
 
-The base version (e.g. `1.1.0`) is defined in the repository and used by the build pipeline.
+The base version (e.g. `1.1.0`) is defined centrally in the repository.
 
-The pipeline is responsible for:
+Location:
 
-* appending prerelease suffixes (`preview`, `rc`, `ci`)
-* generating build numbers
+* **Main version**: Defined in repository configuration (e.g., `Directory.Build.props` or CI/CD pipeline variables)
 
----
+The build pipeline is responsible for:
+
+* appending prerelease suffixes based on branch (`preview`, `rc`, `ci`)
+* generating and appending build numbers
+* ensuring all packages share the same version
+
+> [!NOTE]
+> The version number is managed centrally to ensure all framework packages remain aligned.
 
 ---
 
@@ -261,3 +269,74 @@ Typical release flow:
 * Feature builds are not part of the public release cycle
 * Release notes are stored in [CHANGELOG.md](../CHANGELOG.md)
 * Each package includes only its own relevant changes
+
+---
+
+## Upgrading Between Versions
+
+### Stable to Stable
+
+~~~bash
+# Upgrade to latest stable
+dotnet add package Pillaro.Dataverse.PluginFramework
+dotnet add package Pillaro.Dataverse.PluginFramework.Testing
+~~~
+
+### Using Prerelease Versions
+
+~~~bash
+# Install specific preview
+dotnet add package Pillaro.Dataverse.PluginFramework --version 1.1.0-preview.5
+
+# Install latest preview
+dotnet add package Pillaro.Dataverse.PluginFramework --prerelease
+~~~
+
+> [!WARNING]
+> Preview and RC versions are for testing only. Do not use in production.
+
+### Version Compatibility
+
+| Framework Package | Testing Package | Compatible |
+|-------------------|----------------|------------|
+| 1.0.0 | 1.0.0 | ✅ Yes |
+| 1.0.0 | 1.0.1 | ✅ Yes (patch) |
+| 1.0.0 | 1.1.0 | ⚠️ Update both |
+| 1.0.0 | 2.0.0 | ❌ No (major) |
+
+> [!IMPORTANT]
+> Always keep framework and testing packages on the same MAJOR.MINOR version
+
+---
+
+## Breaking Changes Policy
+
+### What Constitutes a Breaking Change
+
+Breaking changes require a **MAJOR version increment**:
+
+- Removing or renaming public types, methods, or properties
+- Changing method signatures in public APIs
+- Removing or changing behavior of validation rules
+- Changes to plugin registration patterns
+- Incompatible changes to framework solution schema
+
+### Non-Breaking Changes
+
+The following **do not** require a MAJOR version increment:
+
+- Adding new public types, methods, or properties
+- Adding optional parameters with default values
+- Internal implementation changes
+- Performance improvements
+- Documentation updates
+
+### Migration Guides
+
+For MAJOR version upgrades, migration guides are provided in:
+
+- [CHANGELOG.md](../CHANGELOG.md) - What changed
+- `docs/migration/` - How to migrate (if significant changes)
+
+> [!IMPORTANT]
+> We aim to minimize breaking changes and provide clear migration paths when they are necessary.
