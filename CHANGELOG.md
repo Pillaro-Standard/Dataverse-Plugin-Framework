@@ -4,10 +4,18 @@
 
 ### 1.0.2-rc
 
-- Added nightly test pipeline for automated continuous testing against live Dataverse environment
-- Added comprehensive CI/CD documentation in `docs/ci-cd-pipelines.md`
-- Updated contributing guidelines with CI/CD and testing requirements
-- Enhanced testing documentation with continuous testing information
+### Pillaro.Dataverse.PluginFramework
+- Improved release readiness before the production version.
+- Added CI/CD documentation for testing, packaging, and release workflow.
+- Updated contributing guidelines with branching strategy and pull request rules.
+- Added documentation for the model-driven Pillaro Plugin Framework application.
+- Documented recommended C# language version setup for plugin projects.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+- Added nightly automated testing against a live Dataverse environment.
+- Added test execution to the package build pipeline.
+- Added publishing of test results and code coverage.
+- Updated testing documentation with continuous testing information.
 
 ## 1.0.1-rc
 

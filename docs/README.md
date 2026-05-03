@@ -16,7 +16,7 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
-| 📱 [Model-Driven Application](#-model-driven-application)  | VIS application for runtime management and diagnostics                      |
+| 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
 | 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
 | ⚠️ [Known Limitations](#-known-limitations)                | Technical constraints and compatibility notes                               |
@@ -75,11 +75,11 @@ Use this section when you are building Dataverse plugins with the framework.
 
 ## 📱 Model-Driven Application
 
-Use this section to learn about the VIS application included with the framework.
+Use this section to learn about the Pillaro Plugin Framework included with the framework.
 
 | Document | Description | Status |
 |---|---|---|
-| [Model-Driven Application](./solution/model-driven-application.md) | VIS application overview, features, and installation guide | ✅ |
+| [Model-Driven Application](./solution/model-driven-application.md) | Pillaro Plugin Framework overview, features, and installation guide | ✅ |
 
 ---
 
@@ -168,7 +168,7 @@ Repository-level policies and contribution guidance.
 3. [Test Execution Flow](./tests/test-execution-flow.md)
 4. [Test Data Access](./tests/data-access.md)
 
-### I want to use the VIS application
+### I want to use the Pillaro Plugin Framework
 
 1. [Model-Driven Application](./solution/model-driven-application.md)
 2. [Runtime Configuration](./plugins/configuration.md)
