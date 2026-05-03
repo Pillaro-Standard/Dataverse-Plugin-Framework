@@ -19,6 +19,11 @@ public class SettingsService
         _organizationService = organizationService ?? throw new ArgumentNullException(nameof(organizationService));
     }
 
+    public bool Contains(string key)
+    { 
+        return Contains(_organizationService, key);
+    }
+
     public string GetTextValue(string key)
     {
         var val = CacheProvider.GetItem<string>(key);
@@ -108,6 +113,11 @@ public class SettingsService
         }
 
         return val.Value;
+    }
+
+    protected static bool Contains(IOrganizationService service, string key)
+    { 
+        return GetEntityByKey(service, key) != null;
     }
 
     protected static string GetTextValue(IOrganizationService service, string key)
