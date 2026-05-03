@@ -36,16 +36,20 @@ jobs:
           version: '10.x'
 
       - task: DotNetCoreCLI@2
-        displayName: Restore solution
+        displayName: Restore test projects
         inputs:
           command: restore
-          projects: '**/*.csproj'
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
 
       - task: DotNetCoreCLI@2
-        displayName: Build solution
+        displayName: Build test projects
         inputs:
           command: build
-          projects: '**/*.csproj'
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
             --no-restore
