@@ -14,6 +14,7 @@
 ## 📑 Navigation
 
 - [⚙️ Prerequisites](#️-prerequisites)
+- [⚙️ Language version](#️-language-version)
 - [1. Import the framework solution](#1-import-the-framework-solution)
 - [2. Create the recommended solution structure](#2-create-the-recommended-solution-structure)
 - [3. Create the `Logic` project](#3-create-the-logic-project)
@@ -42,6 +43,21 @@ You need:
 
 > [!NOTE]
 > Standard Dataverse plugin prerequisites remain the same whether you use this framework or not.
+
+---
+
+## ⚙️ Language version
+
+All projects in the solution should use the same C# language version.
+
+Even when targeting `.NET Framework 4.6.2`, you can use modern C# features because the language version is controlled by the compiler, not the runtime.
+
+Add the following to each `.csproj`:
+
+    <LangVersion>latest</LangVersion>
+
+> [!TIP]
+> Keep the C# language version consistent across all projects in your solution.
 
 ---
 
@@ -143,7 +159,11 @@ Example:
 
     dotnet new classlib -n YourSolution.Plugins -f net462
 
-### 4.2 Add reference to the `Logic` project
+### 4.2 Enable modern C# language features
+
+Apply the shared language version configuration described in [Language version](#️-language-version).
+
+### 4.3 Add reference to the `Logic` project
 
 Add a project reference from `YourSolution.Plugins` to `YourSolution.Logic`.
 
