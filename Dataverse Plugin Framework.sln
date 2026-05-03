@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		.gitignore = .gitignore
 		CHANGELOG.md = CHANGELOG.md
 		LICENSE = LICENSE
+		Nightly – Tests Only.yml = Nightly – Tests Only.yml
 		NuGet.config = NuGet.config
 		Packages – Build & Package.yml = Packages – Build & Package.yml
 		README.md = README.md
