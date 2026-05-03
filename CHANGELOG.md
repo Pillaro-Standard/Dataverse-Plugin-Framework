@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### 1.0.2-rc
+
+- Added nightly test pipeline for automated continuous testing against live Dataverse environment
+- Added comprehensive CI/CD documentation in `docs/ci-cd-pipelines.md`
+- Updated contributing guidelines with CI/CD and testing requirements
+- Enhanced testing documentation with continuous testing information
+
 ## 1.0.1-rc
 
 ### Pillaro.Dataverse.PluginFramework

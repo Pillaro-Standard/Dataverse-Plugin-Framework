@@ -10,6 +10,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
 - [Branching Strategy](#branching-strategy)
+- [CI/CD & Automated Testing](#cicd--automated-testing)
 - [How to Contribute](#how-to-contribute)
 - [Code Guidelines](#code-guidelines)
 - [Pull Request Process](#pull-request-process)
@@ -93,6 +94,29 @@ Use the naming convention:
 - `feature/your-feature-name` — New features
 - `bugfix/issue-description` — Bug fixes
 - `docs/documentation-topic` — Documentation updates
+
+---
+
+## CI/CD & Automated Testing
+
+The repository uses Azure DevOps pipelines to ensure code quality through automated testing and package building.
+
+**Nightly tests** run automatically every night to validate all tests against a real Dataverse environment, ensuring continuous validation without blocking development.
+
+**Package build pipeline** is available for creating versioned NuGet packages on demand.
+
+> [!NOTE]
+> For detailed information about pipelines, schedules, and execution flow, see [CI/CD Pipelines](ci-cd-pipelines.md).
+
+### Testing Requirements
+
+All contributions that modify functionality must include or update tests:
+
+- tests must pass locally before submitting PR
+- nightly pipeline validates tests do not break existing functionality
+
+> [!TIP]
+> Run all tests locally using __Test > Run All Tests__ in Visual Studio before submitting a pull request.
 
 ---
 

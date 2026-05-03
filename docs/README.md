@@ -121,6 +121,7 @@ Use this section when you need release and versioning information for the framew
 |---|---|---|
 | [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
 | [Changelog](../CHANGELOG.md) | Release notes and change history | ✅ |
+| [CI/CD Pipelines](./ci-cd-pipelines.md) | Automated testing, building, and packaging | ✅ |
 
 ---
 
@@ -177,9 +178,10 @@ Repository-level policies and contribution guidance.
 ### I want to contribute
 
 1. [Contributing](../CONTRIBUTING.md)
-2. [Code of Conduct](../CODE_OF_CONDUCT.md)
-3. [Security](../SECURITY.md)
-4. [License](../LICENSE)
+2. [CI/CD Pipelines](./ci-cd-pipelines.md)
+3. [Code of Conduct](../CODE_OF_CONDUCT.md)
+4. [Security](../SECURITY.md)
+5. [License](../LICENSE)
 
 ---
 
