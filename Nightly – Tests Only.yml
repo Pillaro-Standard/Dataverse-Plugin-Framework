@@ -1,0 +1,82 @@
+name: Nightly – Tests Only
+
+trigger: none
+
+pr: none
+
+schedules:
+  - cron: "0 2 * * *"
+    displayName: Daily midnight build (UTC+2)
+    branches:
+      include:
+        - main
+        - develop
+    always: true
+
+variables:
+  configuration: Release
+
+jobs:
+  - job: Test
+    displayName: Run All Tests
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 1
+
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: '10.x'
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore solution
+        inputs:
+          command: restore
+          projects: '**/*.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: Build solution
+        inputs:
+          command: build
+          projects: '**/*.csproj'
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+
+      - task: DotNetCoreCLI@2
+        displayName: Run all tests
+        inputs:
+          command: test
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-build
+            --no-restore
+            --logger trx
+            --results-directory $(Agent.TempDirectory)/TestResults
+            --collect "Code Coverage"
+          publishTestResults: true
+
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        condition: always()
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/*.trx'
+          searchFolder: $(Agent.TempDirectory)/TestResults
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+          testRunTitle: 'Nightly Tests'
+
+      - task: PublishCodeCoverageResults@2
+        displayName: Publish code coverage
+        condition: succeededOrFailed()
+        inputs:
+          summaryFileLocation: $(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml
+          failIfCoverageEmpty: false

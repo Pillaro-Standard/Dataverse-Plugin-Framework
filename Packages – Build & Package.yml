@@ -254,6 +254,32 @@ jobs:
             /p:IncludeSourceRevisionInInformationalVersion=false
             /p:GeneratePackageOnBuild=false
 
+      - task: DotNetCoreCLI@2
+        displayName: Run all tests
+        inputs:
+          command: test
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-build
+            --no-restore
+            --logger trx
+            --results-directory $(Agent.TempDirectory)/TestResults
+          publishTestResults: true
+
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        condition: always()
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/*.trx'
+          searchFolder: $(Agent.TempDirectory)/TestResults
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+          testRunTitle: 'Unit Tests'
+
       - script: >
           nuget pack "$(frameworkNuspecPath)"
           -BasePath "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework"
