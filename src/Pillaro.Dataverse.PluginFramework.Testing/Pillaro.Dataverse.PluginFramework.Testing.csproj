@@ -44,7 +44,8 @@
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="9.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
-
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.5" />
+		
 		<PackageReference Include="FluentAssertions" Version="8.9.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
