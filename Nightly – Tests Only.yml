@@ -14,7 +14,10 @@ schedules:
     always: true
 
 variables:
-  configuration: Release
+  - group: dataverse-test-secrets
+
+  - name: configuration
+    value: Release
 
 jobs:
   - job: Test
@@ -56,11 +59,14 @@ jobs:
             examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
+            --no-build
             --no-restore
-            --logger "trx;LogFileName=test-results.trx"
-            --results-directory $(Agent.TempDirectory)/TestResults
+            --logger trx
+            --results-directory "$(Agent.TempDirectory)\TestResults"
             --collect "XPlat Code Coverage"
           publishTestResults: false
+        env:
+          ConnectionStrings__Dataverse: $(DataverseConnectionString)
 
       - task: PublishTestResults@2
         displayName: Publish test results
@@ -68,7 +74,7 @@ jobs:
         inputs:
           testResultsFormat: VSTest
           testResultsFiles: '**/*.trx'
-          searchFolder: $(Agent.TempDirectory)/TestResults
+          searchFolder: '$(Agent.TempDirectory)\TestResults'
           mergeTestResults: true
           failTaskOnFailedTests: true
           testRunTitle: 'Nightly Tests'
@@ -77,5 +83,5 @@ jobs:
         displayName: Publish code coverage
         condition: succeededOrFailed()
         inputs:
-          summaryFileLocation: $(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml
+          summaryFileLocation: '$(Agent.TempDirectory)\TestResults\**\coverage.cobertura.xml'
           failIfCoverageEmpty: false
