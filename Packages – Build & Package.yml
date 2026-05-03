@@ -289,11 +289,23 @@ jobs:
             examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
-            --no-build
-            --no-restore
-            --logger "trx;LogFileName=test-results.trx"
+            --logger trx
             --results-directory "$(Agent.TempDirectory)\TestResults"
           publishTestResults: false
+
+      - powershell: |
+          Write-Host "Agent.TempDirectory: $(Agent.TempDirectory)"
+          Write-Host "TestResults content:"
+          if (Test-Path "$(Agent.TempDirectory)\TestResults") {
+            Get-ChildItem "$(Agent.TempDirectory)\TestResults" -Recurse | Select-Object FullName, Length
+          } else {
+            Write-Host "Directory does not exist."
+          }
+
+          Write-Host "All trx files under temp:"
+          Get-ChildItem "$(Agent.TempDirectory)" -Recurse -Filter *.trx -ErrorAction SilentlyContinue | Select-Object FullName, Length
+        displayName: List test result files
+        condition: always()
 
       - task: PublishTestResults@2
         displayName: Publish test results
@@ -301,7 +313,7 @@ jobs:
         inputs:
           testResultsFormat: VSTest
           testResultsFiles: '**/*.trx'
-          searchFolder: '$(Agent.TempDirectory)\TestResults'
+          searchFolder: '$(Agent.TempDirectory)'
           mergeTestResults: true
           failTaskOnFailedTests: true
           testRunTitle: 'Unit Tests'
