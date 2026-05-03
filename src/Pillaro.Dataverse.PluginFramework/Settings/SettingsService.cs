@@ -110,11 +110,6 @@ public class SettingsService
         return val.Value;
     }
 
-    public bool Contains(string key)
-    {
-        return Contains(_organizationService, key);
-    }
-
     protected static string GetTextValue(IOrganizationService service, string key)
     {
         var entity = GetEntityByKey(service, key);
@@ -161,11 +156,6 @@ public class SettingsService
     {
         var i = GetValue<DateTime>(service, key);
         return i;
-    }
-
-    protected static bool Contains(IOrganizationService service, string key)
-    {
-        return GetEntityByKey(service, key) != null;
     }
 
     protected static Entity GetEntityByKey(IOrganizationService service, string key)
