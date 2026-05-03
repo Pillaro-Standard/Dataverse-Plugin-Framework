@@ -16,6 +16,7 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
+| 📱 [Model-Driven Application](#-model-driven-application)  | VIS application for runtime management and diagnostics                      |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
 | 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
 | ⚠️ [Known Limitations](#-known-limitations)                | Technical constraints and compatibility notes                               |
@@ -69,6 +70,16 @@ Use this section when you are building Dataverse plugins with the framework.
 | [Autonumbering](./plugins/autonumbering.md) | Number sequence generation and related patterns | ✅ |
 | [Logging](./plugins/logging.md) | Runtime logging and diagnostics | ✅ |
 | [Error Handling](./plugins/error-handling.md) | Exceptions, validation failures, and runtime behavior | ✅ |
+
+---
+
+## 📱 Model-Driven Application
+
+Use this section to learn about the VIS application included with the framework.
+
+| Document | Description | Status |
+|---|---|---|
+| [Model-Driven Application](./solution/model-driven-application.md) | VIS application overview, features, and installation guide | ✅ |
 
 ---
 
@@ -155,6 +166,13 @@ Repository-level policies and contribution guidance.
 2. [Test Architecture](./tests/test-architecture.md)
 3. [Test Execution Flow](./tests/test-execution-flow.md)
 4. [Test Data Access](./tests/data-access.md)
+
+### I want to use the VIS application
+
+1. [Model-Driven Application](./solution/model-driven-application.md)
+2. [Runtime Configuration](./plugins/configuration.md)
+3. [Autonumbering](./plugins/autonumbering.md)
+4. [Logging](./plugins/logging.md)
 
 ### I want to contribute
 
