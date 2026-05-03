@@ -163,7 +163,6 @@ public class SettingsService
         return i;
     }
 
-    
     protected static bool Contains(IOrganizationService service, string key)
     {
         return GetEntityByKey(service, key) != null;
