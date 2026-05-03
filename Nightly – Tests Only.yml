@@ -56,12 +56,11 @@ jobs:
             examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
-            --no-build
             --no-restore
-            --logger trx
+            --logger "trx;LogFileName=test-results.trx"
             --results-directory $(Agent.TempDirectory)/TestResults
-            --collect "Code Coverage"
-          publishTestResults: true
+            --collect "XPlat Code Coverage"
+          publishTestResults: false
 
       - task: PublishTestResults@2
         displayName: Publish test results

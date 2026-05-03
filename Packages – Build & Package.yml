@@ -255,6 +255,32 @@ jobs:
             /p:GeneratePackageOnBuild=false
 
       - task: DotNetCoreCLI@2
+        displayName: Restore test projects
+        inputs:
+          command: restore
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+
+      - task: DotNetCoreCLI@2
+        displayName: Build test projects
+        inputs:
+          command: build
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
+
+      - task: DotNetCoreCLI@2
         displayName: Run all tests
         inputs:
           command: test
