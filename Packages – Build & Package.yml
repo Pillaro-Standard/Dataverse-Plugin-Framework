@@ -209,7 +209,7 @@ jobs:
             $content = Get-Content $file -Raw
             $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
             Set-Content $file -Value $updated -NoNewline
-                 
+
       - task: DotNetCoreCLI@2
         displayName: Restore framework project
         inputs:
@@ -289,23 +289,11 @@ jobs:
             examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
+            --no-build
+            --no-restore
             --logger trx
             --results-directory "$(Agent.TempDirectory)\TestResults"
           publishTestResults: false
-
-      - powershell: |
-          Write-Host "Agent.TempDirectory: $(Agent.TempDirectory)"
-          Write-Host "TestResults content:"
-          if (Test-Path "$(Agent.TempDirectory)\TestResults") {
-            Get-ChildItem "$(Agent.TempDirectory)\TestResults" -Recurse | Select-Object FullName, Length
-          } else {
-            Write-Host "Directory does not exist."
-          }
-
-          Write-Host "All trx files under temp:"
-          Get-ChildItem "$(Agent.TempDirectory)" -Recurse -Filter *.trx -ErrorAction SilentlyContinue | Select-Object FullName, Length
-        displayName: List test result files
-        condition: always()
 
       - task: PublishTestResults@2
         displayName: Publish test results
@@ -313,7 +301,7 @@ jobs:
         inputs:
           testResultsFormat: VSTest
           testResultsFiles: '**/*.trx'
-          searchFolder: '$(Agent.TempDirectory)'
+          searchFolder: '$(Agent.TempDirectory)\TestResults'
           mergeTestResults: true
           failTaskOnFailedTests: true
           testRunTitle: 'Unit Tests'
