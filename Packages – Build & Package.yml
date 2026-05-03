@@ -21,16 +21,28 @@ parameters:
       - release
 
 variables:
-  configuration: Release
+  - group: dataverse-test-secrets
 
-  frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
-  frameworkConstantsPath: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
-  frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+  - name: configuration
+    value: Release
 
-  testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
-  testingNuspecPath: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
+  - name: frameworkProjectPath
+    value: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
 
-  changelogPath: CHANGELOG.md
+  - name: frameworkConstantsPath
+    value: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
+
+  - name: frameworkNuspecPath
+    value: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+
+  - name: testingProjectPath
+    value: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
+
+  - name: testingNuspecPath
+    value: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
+
+  - name: changelogPath
+    value: CHANGELOG.md
 
 jobs:
   - job: Build
@@ -294,6 +306,8 @@ jobs:
             --logger trx
             --results-directory "$(Agent.TempDirectory)\TestResults"
           publishTestResults: false
+        env:
+           ConnectionStrings__Dataverse: $(DataverseConnectionString)
 
       - task: PublishTestResults@2
         displayName: Publish test results
