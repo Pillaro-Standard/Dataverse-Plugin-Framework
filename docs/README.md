@@ -16,6 +16,7 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
+| 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
 | 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
 | ⚠️ [Known Limitations](#-known-limitations)                | Technical constraints and compatibility notes                               |
@@ -72,6 +73,16 @@ Use this section when you are building Dataverse plugins with the framework.
 
 ---
 
+## 📱 Model-Driven Application
+
+Use this section to learn about the Pillaro Plugin Framework included with the framework.
+
+| Document | Description | Status |
+|---|---|---|
+| [Model-Driven Application](./solution/model-driven-application.md) | Pillaro Plugin Framework overview, features, and installation guide | ✅ |
+
+---
+
 ## 🧪 Test Development
 
 Use this section when you are building programmatic tests for Dataverse solutions.
@@ -110,6 +121,7 @@ Use this section when you need release and versioning information for the framew
 |---|---|---|
 | [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
 | [Changelog](../CHANGELOG.md) | Release notes and change history | ✅ |
+| [CI/CD Pipelines](./ci-cd-pipelines.md) | Automated testing, building, and packaging | ✅ |
 
 ---
 
@@ -156,12 +168,20 @@ Repository-level policies and contribution guidance.
 3. [Test Execution Flow](./tests/test-execution-flow.md)
 4. [Test Data Access](./tests/data-access.md)
 
+### I want to use the Pillaro Plugin Framework
+
+1. [Model-Driven Application](./solution/model-driven-application.md)
+2. [Runtime Configuration](./plugins/configuration.md)
+3. [Autonumbering](./plugins/autonumbering.md)
+4. [Logging](./plugins/logging.md)
+
 ### I want to contribute
 
 1. [Contributing](../CONTRIBUTING.md)
-2. [Code of Conduct](../CODE_OF_CONDUCT.md)
-3. [Security](../SECURITY.md)
-4. [License](../LICENSE)
+2. [CI/CD Pipelines](./ci-cd-pipelines.md)
+3. [Code of Conduct](../CODE_OF_CONDUCT.md)
+4. [Security](../SECURITY.md)
+5. [License](../LICENSE)
 
 ---
 

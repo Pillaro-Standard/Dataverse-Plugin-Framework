@@ -158,6 +158,12 @@ The testing infrastructure:
 
 This allows reliable validation of real-world behavior in a controlled environment.
 
+#### Continuous Testing
+
+All tests are automatically executed nightly against a live Dataverse environment, ensuring continuous quality assurance and early detection of integration issues.
+
+See [CI/CD Pipelines](docs/ci-cd-pipelines.md) for details about automated testing infrastructure.
+
 
 ## Architecture (Simplified)
 
