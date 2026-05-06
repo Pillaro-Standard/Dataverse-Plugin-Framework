@@ -1,6 +1,9 @@
 # Pillaro Dataverse Plugin Framework
 
-Open-source AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
+[![NuGet - Framework](https://img.shields.io/badge/NuGet-Pillaro.Dataverse.PluginFramework-blue?logo=nuget)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework)
+[![NuGet - Testing](https://img.shields.io/badge/NuGet-Pillaro.Dataverse.PluginFramework.Testing-blue?logo=nuget)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing)
+
+Source-open, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
 
 
 ## Overview
@@ -17,47 +20,23 @@ It introduces a task-based execution model with explicit validation and executio
 The framework is designed for real-world production environments and long-term solution sustainability.
 
 
-## AI-Ready Standard
+## Proven in Production
 
-The framework is part of the Pillaro delivery standards, designed to support the entire development lifecycle.
+✅ **Production Ready**
 
-The architecture is intentionally structured to be understandable by both developers and AI-driven tools and agents.
+The framework is production-proven, actively used in enterprise environments.
 
-Key principles:
+**First production adopter:**
 
-- functionality is decomposed into clearly defined tasks
-- tasks can be identified already during the analysis phase
-- each task represents a predictable and isolated unit of behavior
+<p align="left">
+  <a href="https://www.seyfor.com/?utm_source=pillaro_github&utm_medium=partner_referral&utm_campaign=dataverse_plugin_framework&utm_content=seyfor_logo">
+    <img src=".github/assets/seyfor-logo.png" alt="Seyfor" height="60"/>
+  </a>
+</p>
 
-This enables:
-
-- direct mapping between analysis and implementation
-- scalable development using AI-assisted workflows
-- consistent structure across projects
-
-In future scenarios, tasks can be implemented by specialized AI agents based on analysis outputs.
+Seyfor has successfully implemented and deployed the framework in their enterprise Dynamics 365 and Power Platform solutions, validating its real-world readiness, reliability, and enterprise-grade quality.
 
 ---
-
-### AI Feedback Loop
-
-Diagnostic logging and testing provide structured feedback for automated systems.
-
-- logs contain detailed execution flow and context data
-- programmatic tests validate real behavior in the environment
-- failures include enough information to identify root causes
-
-This allows:
-
-- more accurate issue detection
-- better automated code suggestions
-- iterative improvement of solutions
-
-The long-term goal is to support semi-autonomous or autonomous development workflows, where:
-
-- AI systems generate and refine implementations
-- developers focus on architecture, validation, and review
-
 
 ## What Problem It Solves
 
@@ -77,6 +56,7 @@ This framework introduces a consistent structure:
 - built-in testing support
 - built-in diagnostic logging
 
+---
 
 ## Key Features
 
@@ -119,26 +99,21 @@ Each plugin is composed of independent tasks:
 
 ### Diagnostic Logging
 
-Logging is integrated into the execution pipeline.
+Comprehensive logging integrated throughout the execution pipeline:
 
-- tracks full execution flow across plugins and tasks
-- records detailed diagnostic information
-- measures execution time
-- tracks execution depth
+- tracks full execution flow across all plugins and tasks
+- records detailed diagnostic information with context data
+- measures execution time and performance metrics
+- tracks execution depth to detect excessive nesting
+- provides a logging console for tasks to write structured runtime messages
 
-The framework also provides a logging console that allows tasks to write structured runtime messages.
+This significantly simplifies debugging and troubleshooting:
 
-- logs clearly show which code was executed
-- logs include relevant input and context data
-- enables step-by-step tracing of task execution
-
-This significantly simplifies debugging and, in most cases, eliminates the need for complex plugin debugging.
-
-This makes it possible to:
-
-- understand what triggered each operation
+- understand what code was executed and why
+- trace step-by-step execution with input and context data
 - identify performance bottlenecks
 - detect excessive plugin nesting
+- in most cases eliminates the need for complex plugin debugging
 
 ---
 
@@ -158,6 +133,7 @@ The testing infrastructure:
 
 This allows reliable validation of real-world behavior in a controlled environment.
 
+---
 
 ## Architecture (Simplified)
 
@@ -226,27 +202,24 @@ Execution contains the actual business logic.
 
 ### Logging and Diagnostics
 
-Logging is integrated into the execution pipeline.
+The framework implements a multi-layer logging architecture:
 
-- tracks full execution flow across plugins and tasks
-- records detailed diagnostic information
-- measures execution time
-- tracks execution depth
+**Pipeline-level logging:**
+- automatic tracking of plugin and task execution flow
+- performance metrics collection (execution time, depth)
+- correlation of operations across the entire pipeline
+- detection of circular dependencies and excessive nesting
 
-The framework provides a logging console for tasks:
+**Task-level logging console:**
+- tasks can write structured diagnostic messages
+- messages include execution context and input data
+- enables step-by-step tracing of business logic
+- supports debugging without attaching to plugin process
 
-- allows writing structured runtime messages
-- clearly shows which code was executed
-- includes relevant input and context data
-- enables step-by-step tracing of execution
-
-This significantly simplifies debugging and, in most cases, eliminates the need for complex plugin debugging.
-
-This makes it possible to:
-
-- understand what triggered each operation
-- identify performance bottlenecks
-- detect excessive plugin nesting
+**Benefits:**
+- understand exactly what was executed and why
+- identify performance bottlenecks with precise metrics
+- troubleshoot issues using log analysis instead of complex debugging sessions
 
 ---
 
@@ -260,13 +233,14 @@ Configuration is loaded dynamically from Dataverse.
 - cached to ensure minimal performance impact
 - allows safe runtime adjustments of logic
 
+---
 
 ## Getting Started
 
 > 🚧 TODO  
 > Detailed setup and usage guide will be added soon.
 
-
+---
 
 ## Repository Structure
 
@@ -277,11 +251,7 @@ Configuration is loaded dynamically from Dataverse.
 /docs       → documentation
 ~~~
 
-
-## Current Status
-
-- preparing for first public release
-- documentation in progress
+---
 
 ## Key Principles
 
@@ -291,6 +261,64 @@ Configuration is loaded dynamically from Dataverse.
 - explicit and transparent execution flow
 - consistent structure across all plugins and tasks
 - design focused on long-term maintainability and scalability
+
+---
+
+## AI-Ready Standard
+
+The framework is part of the Pillaro delivery standards, designed to support the entire development lifecycle.
+
+The architecture is intentionally structured to be understandable by both developers and AI-driven tools and agents.
+
+Key principles:
+
+- functionality is decomposed into clearly defined tasks
+- tasks can be identified already during the analysis phase
+- each task represents a predictable and isolated unit of behavior
+
+This enables:
+
+- direct mapping between analysis and implementation
+- scalable development using AI-assisted workflows
+- consistent structure across projects
+
+In future scenarios, tasks can be implemented by specialized AI agents based on analysis outputs.
+
+---
+
+### AI Feedback Loop
+
+Diagnostic logging and testing provide structured feedback for automated systems.
+
+- logs contain detailed execution flow and context data
+- programmatic tests validate real behavior in the environment
+- failures include enough information to identify root causes
+
+This allows:
+
+- more accurate issue detection
+- better automated code suggestions
+- iterative improvement of solutions
+
+The long-term goal is to support semi-autonomous or autonomous development workflows, where:
+
+- AI systems generate and refine implementations
+- developers focus on architecture, validation, and review
+
+---
+
+## Support & Partnership
+
+Need help with implementation, extended support, or business collaboration?
+
+Visit [www.pillaro.cz](https://www.pillaro.cz?utm_source=github&utm_medium=referral&utm_campaign=dataverse_plugin_framework&utm_content=repository_link) to get in touch with us.
+
+We offer:
+
+- implementation consulting and guidance
+- extended technical support
+- business partnership opportunities
+- custom development and integration services
 
 
 ## License

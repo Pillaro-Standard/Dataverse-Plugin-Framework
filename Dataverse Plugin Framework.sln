@@ -79,6 +79,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{822CB412
 		docs\tests\testing.md = docs\tests\testing.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{206940DF-D361-446D-A573-1D848E50AAF7}"
+	ProjectSection(SolutionItems) = preProject
+		power-platform-solutions\examples\changelog.md = power-platform-solutions\examples\changelog.md
+		power-platform-solutions\examples\README.md = power-platform-solutions\examples\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +137,7 @@ Global
 		{04AD17F8-0845-497D-AF36-826F81C26C1B} = {B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}
 		{605E5F63-8CFE-44B7-A983-C231CF0ABD93} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
 		{822CB412-FB1A-4B8C-9BD8-7B7A6EAC0635} = {B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}
+		{206940DF-D361-446D-A573-1D848E50AAF7} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}

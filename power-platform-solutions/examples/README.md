@@ -15,7 +15,7 @@ The examples require a specific record in the **Autonumberings** entity (custom 
 | **Entity System Name** | Task |
 | **Last Used Number {NUM}** | 1000 |
 | **Number of Digits** | 6 |
-| **Format** | {date1}-{NUM} |
+| **Format** | `{date1}-{NUM}` |
 | **Date 1 Format {date1}** | yy-MM-dd |
 
 This configuration enables automatic number generation for Task records in the examples with format like `26-04-07-001000`.
