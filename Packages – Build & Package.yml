@@ -21,16 +21,28 @@ parameters:
       - release
 
 variables:
-  configuration: Release
+  - group: dataverse-test-secrets
 
-  frameworkProjectPath: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
-  frameworkConstantsPath: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
-  frameworkNuspecPath: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+  - name: configuration
+    value: Release
 
-  testingProjectPath: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
-  testingNuspecPath: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
+  - name: frameworkProjectPath
+    value: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
 
-  changelogPath: CHANGELOG.md
+  - name: frameworkConstantsPath
+    value: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
+
+  - name: frameworkNuspecPath
+    value: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+
+  - name: testingProjectPath
+    value: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
+
+  - name: testingNuspecPath
+    value: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
+
+  - name: changelogPath
+    value: CHANGELOG.md
 
 jobs:
   - job: Build
@@ -209,7 +221,7 @@ jobs:
             $content = Get-Content $file -Raw
             $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
             Set-Content $file -Value $updated -NoNewline
-                 
+
       - task: DotNetCoreCLI@2
         displayName: Restore framework project
         inputs:
@@ -253,6 +265,60 @@ jobs:
             /p:InformationalVersion=$(INFORMATIONAL_VERSION)
             /p:IncludeSourceRevisionInInformationalVersion=false
             /p:GeneratePackageOnBuild=false
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore test projects
+        inputs:
+          command: restore
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+
+      - task: DotNetCoreCLI@2
+        displayName: Build test projects
+        inputs:
+          command: build
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
+
+      - task: DotNetCoreCLI@2
+        displayName: Run all tests
+        inputs:
+          command: test
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-build
+            --no-restore
+            --logger trx
+            --results-directory "$(Agent.TempDirectory)\TestResults"
+          publishTestResults: false
+        env:
+           ConnectionStrings__Dataverse: $(DataverseConnectionString)
+
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        condition: always()
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/*.trx'
+          searchFolder: '$(Agent.TempDirectory)\TestResults'
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+          testRunTitle: 'Unit Tests'
 
       - script: >
           nuget pack "$(frameworkNuspecPath)"

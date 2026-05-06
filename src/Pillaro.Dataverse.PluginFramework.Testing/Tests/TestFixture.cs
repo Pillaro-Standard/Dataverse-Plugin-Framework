@@ -11,8 +11,12 @@ public class TestFixture<TAutofacModule>
     public TestFixture()
     {
         ContainerBuilder builder = new();
+
+        builder.RegisterInstance(GetConfiguration())
+            .As<IConfiguration>()
+            .SingleInstance();
+
         builder.RegisterModule<TAutofacModule>();
-        builder.RegisterInstance(GetConfiguration()).As<IConfiguration>();
 
         Container = builder.Build();
     }
@@ -23,6 +27,7 @@ public class TestFixture<TAutofacModule>
          .SetBasePath(Directory.GetCurrentDirectory())
          .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
          .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false)
+         .AddEnvironmentVariables()
          .Build();
     }
 }
