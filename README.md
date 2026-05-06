@@ -30,7 +30,7 @@ The framework is production-proven, actively used in enterprise environments.
 
 <p align="left">
   <a href="https://www.seyfor.com/?utm_source=pillaro_github&utm_medium=partner_referral&utm_campaign=dataverse_plugin_framework&utm_content=seyfor_logo">
-    <img src=".github/assets/seyfor-logo.png" alt="Seyfor" height="60"/>
+    <img src="docs/assets/seyfor-logo.png" alt="Seyfor" height="60"/>
   </a>
 </p>
 
