@@ -1,0 +1,51 @@
+name: Sync develop after release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync-develop:
+    name: Sync develop branch to main after release PR
+    runs-on: ubuntu-latest
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'develop'
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify develop did not move after release PR
+        run: |
+          git fetch origin main develop
+
+          EXPECTED_DEVELOP_SHA="${{ github.event.pull_request.head.sha }}"
+          CURRENT_DEVELOP_SHA="$(git rev-parse origin/develop)"
+
+          echo "Expected develop SHA from merged PR: $EXPECTED_DEVELOP_SHA"
+          echo "Current origin/develop SHA: $CURRENT_DEVELOP_SHA"
+
+          if [ "$CURRENT_DEVELOP_SHA" != "$EXPECTED_DEVELOP_SHA" ]; then
+            echo "::error::develop moved after the release PR was merged. Refusing to sync automatically to avoid overwriting new work."
+            echo "Resolve manually: merge or release the new develop changes, then sync again."
+            exit 1
+          fi
+
+      - name: Sync develop to main
+        run: |
+          git push --force-with-lease=refs/heads/develop:${{ github.event.pull_request.head.sha }} origin HEAD:refs/heads/develop
