@@ -15,7 +15,7 @@ internal static class PluginDeployCommand
             var options = CommandLineOptions.Parse(args);
             var settings = await PillaroSettingsLoader.LoadAsync(options);
             var assemblyPath = options.Get("assembly") ?? settings.Plugins.Assembly;
-            var solutionName = options.Get("solution") ?? settings.Solution;
+            var solutionName = ResolveSolutionName(options, settings);
             var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options, settings);
             var pacPushOptions = PacPluginPushOptions.From(options);
             var allowConfirmationRequired = options.HasFlag("confirm");
@@ -29,12 +29,20 @@ internal static class PluginDeployCommand
             if (string.IsNullOrWhiteSpace(solutionName))
             {
                 Console.Error.WriteLine("Missing solution. Set top-level 'solution' in PillaroSettings.json or pass --solution.");
+                Console.Error.WriteLine("Note: earlyBound.solution is used only as fallback for now. Preferred config is top-level 'solution'.");
                 return 3;
+            }
+
+            if (string.IsNullOrWhiteSpace(settings.Solution) && !string.IsNullOrWhiteSpace(settings.EarlyBound.Solution))
+            {
+                Console.WriteLine("Warning: using earlyBound.solution as plugin deployment solution fallback. Move it to top-level 'solution'.");
+                Console.WriteLine();
             }
 
             if (string.IsNullOrWhiteSpace(assemblyPath) || !File.Exists(assemblyPath))
             {
                 Console.Error.WriteLine($"Assembly was not found: {assemblyPath}");
+                Console.Error.WriteLine("Set plugins.assembly in PillaroSettings.json or pass --assembly.");
                 return 2;
             }
 
@@ -152,5 +160,17 @@ internal static class PluginDeployCommand
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
+    }
+
+    private static string? ResolveSolutionName(CommandLineOptions options, PillaroSettings settings)
+    {
+        return options.Get("solution")
+            ?? NullIfWhiteSpace(settings.Solution)
+            ?? NullIfWhiteSpace(settings.EarlyBound.Solution);
+    }
+
+    private static string? NullIfWhiteSpace(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value;
     }
 }
