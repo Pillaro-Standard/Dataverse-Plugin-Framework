@@ -101,7 +101,7 @@ internal static class PluginDeployCommand
             }
 
             Console.WriteLine("Plugin manifest is valid.");
-            Console.WriteLine($"SDK target environment: {connectionOptions.SdkEnvironmentUrl ?? "<connection-string>"}");
+            Console.WriteLine("SDK target environment: <from sdk connection string>");
             Console.WriteLine($"Assembly: {Path.GetFullPath(assemblyPath)}");
             Console.WriteLine($"Solution: {connectionOptions.SolutionName ?? "<not specified>"}");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
