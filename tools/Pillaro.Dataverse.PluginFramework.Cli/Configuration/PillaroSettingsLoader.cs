@@ -6,6 +6,7 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.Configuration;
 internal static class PillaroSettingsLoader
 {
     public const string DefaultFileName = "PillaroSettings.json";
+    public const string DefaultProfilesFileName = "dataverse-profiles.json";
 
     public static async Task<PillaroSettings> LoadAsync(CommandLineOptions options)
     {
@@ -18,6 +19,57 @@ internal static class PillaroSettingsLoader
         await using var stream = File.OpenRead(path);
         var settings = await JsonSerializer.DeserializeAsync(stream, PillaroSettingsJsonContext.Default.PillaroSettings);
         return settings ?? throw new InvalidOperationException($"Pillaro settings file '{path}' is empty or invalid.");
+    }
+
+    public static async Task<DataverseProfile?> TryLoadProfileAsync(CommandLineOptions options, PillaroSettings? settings = null)
+    {
+        var explicitConnectionString = options.Get("conn") ?? options.Get("sdk-connection-string") ?? options.Get("connection-string");
+        if (!string.IsNullOrWhiteSpace(explicitConnectionString))
+        {
+            return new DataverseProfile
+            {
+                ConnectionString = explicitConnectionString,
+                PacProfile = options.Get("pac-profile") ?? options.Get("pac-auth-profile") ?? string.Empty,
+            };
+        }
+
+        var profilesPath = GetProfilesPath(options);
+        if (!File.Exists(profilesPath))
+        {
+            return null;
+        }
+
+        await using var stream = File.OpenRead(profilesPath);
+        var profilesDocument = await JsonSerializer.DeserializeAsync(stream, PillaroSettingsJsonContext.Default.DataverseProfilesDocument);
+        if (profilesDocument == null)
+        {
+            return null;
+        }
+
+        var profileName = options.Get("profile")
+            ?? settings?.Profile
+            ?? profilesDocument.DefaultProfile;
+
+        if (string.IsNullOrWhiteSpace(profileName))
+        {
+            return null;
+        }
+
+        return profilesDocument.Profiles.TryGetValue(profileName, out var profile)
+            ? profile
+            : null;
+    }
+
+    public static string GetProfilesPath(CommandLineOptions options)
+    {
+        var configuredPath = options.Get("profiles");
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return Path.GetFullPath(configuredPath);
+        }
+
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return Path.Combine(userProfile, ".pillaro", DefaultProfilesFileName);
     }
 
     public static async Task<string> WritePacModelBuilderSettingsAsync(PillaroSettings settings, IReadOnlyCollection<string> entityNames)
