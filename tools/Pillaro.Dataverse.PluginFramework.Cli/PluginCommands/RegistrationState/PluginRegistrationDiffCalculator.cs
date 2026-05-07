@@ -5,6 +5,9 @@ internal static class PluginRegistrationDiffCalculator
     public static PluginRegistrationDiff Calculate(PluginManifestDocument manifest, DataverseRegistrationState currentState)
     {
         var diff = new PluginRegistrationDiff();
+        var desiredStepIds = manifest.Plugins.SelectMany(plugin => plugin.Steps).Select(step => step.StepId).ToHashSet();
+        var desiredImageIds = manifest.Plugins.SelectMany(plugin => plugin.Steps).SelectMany(step => step.Images).Select(image => image.ImageId).ToHashSet();
+        var managedPluginTypes = manifest.Plugins.Select(plugin => plugin.TypeName).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         foreach (var plugin in manifest.Plugins)
         {
@@ -18,6 +21,36 @@ internal static class PluginRegistrationDiffCalculator
                     diff.ImageChanges.Add(CalculateImageDiff(step, image, currentState));
                 }
             }
+        }
+
+        foreach (var currentStep in currentState.StepsById.Values.Where(step => managedPluginTypes.Contains(step.PluginTypeName) && !desiredStepIds.Contains(step.StepId)))
+        {
+            var deleteStep = new PluginStepDiff
+            {
+                Action = PluginDiffAction.Delete,
+                StepId = currentStep.StepId,
+                PluginTypeName = currentStep.PluginTypeName,
+                MessageName = currentStep.MessageName,
+                EntityName = currentStep.EntityName,
+                StageName = currentStep.Stage.ToString(),
+                ModeName = currentStep.Mode.ToString(),
+            };
+            deleteStep.Reasons.Add("Step exists in Dataverse for managed plugin type but is missing in C# registration manifest.");
+            diff.StepChanges.Add(deleteStep);
+        }
+
+        foreach (var currentImage in currentState.ImagesById.Values.Where(image => IsManagedImage(image, currentState, managedPluginTypes) && !desiredImageIds.Contains(image.ImageId)))
+        {
+            var deleteImage = new PluginImageDiff
+            {
+                Action = PluginDiffAction.Delete,
+                ImageId = currentImage.ImageId,
+                StepId = currentImage.StepId,
+                Name = currentImage.Name,
+                Type = currentImage.Type,
+            };
+            deleteImage.Reasons.Add("Image exists in Dataverse for managed step but is missing in C# registration manifest.");
+            diff.ImageChanges.Add(deleteImage);
         }
 
         return diff;
@@ -46,6 +79,7 @@ internal static class PluginRegistrationDiffCalculator
             return result;
         }
 
+        AddDifference(result.Reasons, "PluginType", current.PluginTypeName, plugin.TypeName);
         AddDifference(result.Reasons, "Message", current.MessageName, desired.MessageName);
         AddDifference(result.Reasons, "Entity", current.EntityName, desired.EntityName);
         AddDifference(result.Reasons, "Stage", current.Stage.ToString(), desired.Stage.ToString());
@@ -93,6 +127,12 @@ internal static class PluginRegistrationDiffCalculator
         }
 
         return result;
+    }
+
+    private static bool IsManagedImage(DataverseImageState image, DataverseRegistrationState currentState, HashSet<string> managedPluginTypes)
+    {
+        return currentState.StepsById.TryGetValue(image.StepId, out var step)
+            && managedPluginTypes.Contains(step.PluginTypeName);
     }
 
     private static void AddDifference(List<string> reasons, string fieldName, string? currentValue, string? desiredValue)
