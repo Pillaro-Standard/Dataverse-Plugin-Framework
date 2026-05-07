@@ -15,7 +15,7 @@ internal static class PluginDeployCommand
             var options = CommandLineOptions.Parse(args);
             var settings = await PillaroSettingsLoader.LoadAsync(options);
             var configuredAssemblyPath = options.Get("assembly") ?? settings.Plugins.Assembly;
-            var assemblyPath = ResolveAssemblyPath(options, configuredAssemblyPath);
+            var assemblyPath = ResolveAssemblyPath(configuredAssemblyPath);
             var solutionName = ResolveSolutionName(options, settings);
             var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options, settings);
             var pacPushOptions = PacPluginPushOptions.From(options);
@@ -44,7 +44,7 @@ internal static class PluginDeployCommand
             if (string.IsNullOrWhiteSpace(assemblyPath) || !File.Exists(assemblyPath))
             {
                 Console.Error.WriteLine($"Assembly was not found: {assemblyPath}");
-                Console.Error.WriteLine("Relative paths from PillaroSettings.json are resolved from the settings file directory.");
+                Console.Error.WriteLine("Relative paths are resolved from the current working directory.");
                 Console.Error.WriteLine("Set plugins.assembly in PillaroSettings.json or pass --assembly.");
                 return 2;
             }
@@ -104,7 +104,7 @@ internal static class PluginDeployCommand
                 return 4;
             }
 
-            var manifestPath = PillaroSettingsLoader.ResolvePathFromSettings(options, InternalManifestPath);
+            var manifestPath = PillaroSettingsLoader.ResolveConfiguredPath(InternalManifestPath);
             Directory.CreateDirectory(Path.GetDirectoryName(manifestPath)!);
             await PluginManifestSerializer.SaveAsync(manifest, manifestPath);
 
@@ -166,11 +166,11 @@ internal static class PluginDeployCommand
         }
     }
 
-    private static string? ResolveAssemblyPath(CommandLineOptions options, string? configuredAssemblyPath)
+    private static string? ResolveAssemblyPath(string? configuredAssemblyPath)
     {
         return string.IsNullOrWhiteSpace(configuredAssemblyPath)
             ? null
-            : PillaroSettingsLoader.ResolvePathFromSettings(options, configuredAssemblyPath);
+            : PillaroSettingsLoader.ResolveConfiguredPath(configuredAssemblyPath);
     }
 
     private static string? ResolveSolutionName(CommandLineOptions options, PillaroSettings settings)
