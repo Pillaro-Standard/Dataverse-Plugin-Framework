@@ -28,22 +28,9 @@ internal static class PillaroSettingsLoader
         return ResolveSettingsPath(configuredPath);
     }
 
-    public static string GetSettingsDirectory(CommandLineOptions options)
+    public static string ResolveConfiguredPath(string configuredPath)
     {
-        var settingsPath = GetResolvedSettingsPath(options);
-        return settingsPath == null
-            ? Directory.GetCurrentDirectory()
-            : Path.GetDirectoryName(settingsPath) ?? Directory.GetCurrentDirectory();
-    }
-
-    public static string ResolvePathFromSettings(CommandLineOptions options, string configuredPath)
-    {
-        if (Path.IsPathRooted(configuredPath))
-        {
-            return Path.GetFullPath(configuredPath);
-        }
-
-        return Path.GetFullPath(Path.Combine(GetSettingsDirectory(options), configuredPath));
+        return Path.GetFullPath(configuredPath);
     }
 
     public static async Task<DataverseProfile?> TryLoadProfileAsync(CommandLineOptions options, PillaroSettings? settings = null)
@@ -116,7 +103,7 @@ internal static class PillaroSettingsLoader
             EmitVirtualAttributes = earlyBound.EmitVirtualAttributes,
         };
 
-        var artifactsDirectory = ResolvePathFromSettings(options, "artifacts");
+        var artifactsDirectory = ResolveConfiguredPath("artifacts");
         Directory.CreateDirectory(artifactsDirectory);
         var path = Path.Combine(artifactsDirectory, "pac-modelbuilder-settings.json");
         await using var stream = File.Create(path);
