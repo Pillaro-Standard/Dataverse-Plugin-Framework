@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/appsettings.Development.json
 /tests/Pillaro.Dataverse.PluginFramework.Tests/appsettings.Development.json
 /.vscode
+/.github
