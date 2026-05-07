@@ -13,6 +13,7 @@ The goal is to keep plugin registration readable for developers while preserving
 - IntelliSense guides the developer through valid registration order
 - update filtering attributes are available only for Update steps
 - deployment confirmation policy is attached directly to the step it belongs to
+- attributes can be selected either by logical-name constants or by typed early-bound entity properties
 
 ## Example
 
@@ -77,6 +78,50 @@ public sealed class ContactPlugin : PluginBase
 }
 ```
 
+## Attribute Selection Modes
+
+There are two supported ways to select Dataverse attributes.
+
+### Text / Logical Name Constants
+
+Use this mode when you already have generated logical-name constants or when you need a simple string-based fallback.
+
+```csharp
+registration
+    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .WhenChanged(
+        Contact.Fields.FirstName,
+        Contact.Fields.LastName)
+    .WithPreImage(
+        "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
+        "PreImage",
+        Contact.Fields.FirstName,
+        Contact.Fields.LastName);
+```
+
+### Typed Early-Bound Properties
+
+Use this mode when you want IntelliSense over the early-bound entity type. The registration API reads `AttributeLogicalNameAttribute` from the selected property.
+
+```csharp
+registration
+    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .WhenChanged(
+        c => c.FirstName,
+        c => c.LastName)
+    .WithPreImage(
+        "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
+        "PreImage",
+        c => c.FirstName,
+        c => c.LastName);
+```
+
+Typed selection is available for `OnUpdate<TEntity>(...)` steps. It keeps the entity type from `OnUpdate<Contact>(...)` through the fluent chain, so only properties from `Contact` are offered by IntelliSense.
+
 ## Multiple Images Per Step
 
 A step can have multiple images. Each image has its own Dataverse `SdkMessageProcessingStepImageId`.
@@ -86,17 +131,17 @@ registration
     .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
     .PreOperation()
     .Synchronous()
-    .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName)
+    .WhenChanged(c => c.FirstName, c => c.LastName)
     .WithPreImage(
         "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
         "PreImage",
-        Contact.Fields.FirstName,
-        Contact.Fields.LastName)
+        c => c.FirstName,
+        c => c.LastName)
     .WithPostImage(
         "c7876278-a6f7-4b87-a47c-0e9ecb391002",
         "PostImage",
-        Contact.Fields.FirstName,
-        Contact.Fields.LastName);
+        c => c.FirstName,
+        c => c.LastName);
 ```
 
 The fluent chain keeps every image attached to the exact step where it is declared. No additional linking attribute or registration ID is needed.
@@ -150,4 +195,5 @@ The deployment manifest validator enforces basic safety rules:
 
 - a step can define multiple pre-images and/or post-images when the Dataverse step supports them.
 - entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes.
+- typed attribute selection reads logical names from `AttributeLogicalNameAttribute` on early-bound entity properties.
 - custom API and custom action messages can be registered with `OnMessage(...)`.
