@@ -28,8 +28,13 @@ public interface IPluginStepStageBuilder
     IPluginStepModeBuilder PostOperation();
 }
 
-public interface IPluginUpdateStepStageBuilder : IPluginStepStageBuilder
+public interface IPluginUpdateStepStageBuilder
 {
+    IPluginUpdateStepModeBuilder PreValidation();
+
+    IPluginUpdateStepModeBuilder PreOperation();
+
+    IPluginUpdateStepModeBuilder PostOperation();
 }
 
 public interface IPluginStepModeBuilder
@@ -37,6 +42,13 @@ public interface IPluginStepModeBuilder
     IPluginStepBuilder Synchronous();
 
     IPluginStepBuilder Asynchronous();
+}
+
+public interface IPluginUpdateStepModeBuilder
+{
+    IPluginUpdateStepBuilder Synchronous();
+
+    IPluginUpdateStepBuilder Asynchronous();
 }
 
 public interface IPluginStepBuilder
@@ -52,5 +64,13 @@ public interface IPluginStepBuilder
 
 public interface IPluginUpdateStepBuilder : IPluginStepBuilder
 {
+    new IPluginUpdateStepBuilder Rank(int rank);
+
     IPluginUpdateStepBuilder WhenChanged(params string[] attributes);
+
+    new IPluginUpdateStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
+
+    new IPluginUpdateStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
+
+    new IPluginUpdateStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All);
 }
