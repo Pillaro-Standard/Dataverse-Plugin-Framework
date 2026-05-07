@@ -8,7 +8,7 @@ internal sealed class PacPluginPushOptions
 
     public string PluginType { get; private init; } = "Assembly";
 
-    public bool SkipPacPush { get; private init; }
+    public bool SkipPacPush { get; private init; } = true;
 
     public static PacPluginPushOptions From(CommandLineOptions options)
     {
@@ -16,7 +16,7 @@ internal sealed class PacPluginPushOptions
         {
             PluginId = options.Get("plugin-id"),
             PluginType = options.Get("plugin-type") ?? "Assembly",
-            SkipPacPush = options.HasFlag("skip-pac-push"),
+            SkipPacPush = !options.HasFlag("pac-push"),
         };
     }
 
@@ -31,7 +31,7 @@ internal sealed class PacPluginPushOptions
 
         if (string.IsNullOrWhiteSpace(PluginId))
         {
-            errors.Add("Missing --plugin-id. It is required for 'pac plugin push'. Use --skip-pac-push to skip PAC upload.");
+            errors.Add("Missing --plugin-id. PAC plugin push requires an existing plugin assembly/package id. Default deployment skips PAC push and deploys step/image metadata only.");
         }
         else if (!Guid.TryParse(PluginId, out var pluginId) || pluginId == Guid.Empty)
         {
