@@ -12,7 +12,7 @@ internal static class PluginDeployCommand
             var options = CommandLineOptions.Parse(args);
             var manifestPath = options.Require("manifest");
             var assemblyPath = options.Require("assembly");
-            var connectionOptions = DataverseConnectionOptions.From(options);
+            var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options);
             var pacPushOptions = PacPluginPushOptions.From(options);
             var allowConfirmationRequired = options.HasFlag("confirm");
             var includeUnchanged = options.HasFlag("include-unchanged");
@@ -101,7 +101,7 @@ internal static class PluginDeployCommand
             }
 
             Console.WriteLine("Plugin manifest is valid.");
-            Console.WriteLine("SDK target environment: <from connection string>");
+            Console.WriteLine("SDK target environment: <from profile/connection string>");
             Console.WriteLine($"Assembly: {Path.GetFullPath(assemblyPath)}");
             Console.WriteLine($"Solutions: {string.Join(", ", GetSolutions(manifest))}");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
