@@ -4,17 +4,17 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
 internal sealed class DataverseConnectionOptions
 {
-    public string? EnvironmentUrl { get; private init; }
+    public string? SdkEnvironmentUrl { get; private init; }
 
-    public string? AuthType { get; private init; }
+    public string? SdkAuthType { get; private init; }
 
-    public string? TenantId { get; private init; }
+    public string? SdkTenantId { get; private init; }
 
-    public string? ClientId { get; private init; }
+    public string? SdkClientId { get; private init; }
 
-    public string? ClientSecret { get; private init; }
+    public string? SdkClientSecret { get; private init; }
 
-    public string? ConnectionString { get; private init; }
+    public string? SdkConnectionString { get; private init; }
 
     public string? PacAuthProfile { get; private init; }
 
@@ -22,79 +22,93 @@ internal sealed class DataverseConnectionOptions
 
     public string? SolutionName { get; private init; }
 
-    public bool UsesPacCli => string.Equals(AuthType, "PacCli", StringComparison.OrdinalIgnoreCase);
+    public bool UsesPacCli => !string.IsNullOrWhiteSpace(PacAuthProfile) || !string.IsNullOrWhiteSpace(PacCliPath);
 
     public static DataverseConnectionOptions From(CommandLineOptions options)
     {
         return new DataverseConnectionOptions
         {
-            EnvironmentUrl = options.Get("environment"),
-            AuthType = options.Get("auth-type") ?? "ClientSecret",
-            TenantId = options.Get("tenant-id"),
-            ClientId = options.Get("client-id"),
-            ClientSecret = options.Get("client-secret"),
-            ConnectionString = options.Get("connection-string"),
+            SdkEnvironmentUrl = options.Get("sdk-environment") ?? options.Get("environment"),
+            SdkAuthType = options.Get("sdk-auth-type") ?? NormalizeLegacyAuthType(options.Get("auth-type")) ?? "ClientSecret",
+            SdkTenantId = options.Get("sdk-tenant-id") ?? options.Get("tenant-id"),
+            SdkClientId = options.Get("sdk-client-id") ?? options.Get("client-id"),
+            SdkClientSecret = options.Get("sdk-client-secret") ?? options.Get("client-secret"),
+            SdkConnectionString = options.Get("sdk-connection-string") ?? options.Get("connection-string"),
             PacAuthProfile = options.Get("pac-auth-profile"),
             PacCliPath = options.Get("pac-cli") ?? "pac",
             SolutionName = options.Get("solution"),
         };
     }
 
-    public IReadOnlyCollection<string> Validate()
+    public IReadOnlyCollection<string> ValidateSdk()
     {
         var errors = new List<string>();
 
-        if (string.Equals(AuthType, "ConnectionString", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(SdkAuthType, "ConnectionString", StringComparison.OrdinalIgnoreCase))
         {
-            if (string.IsNullOrWhiteSpace(ConnectionString))
+            if (string.IsNullOrWhiteSpace(SdkConnectionString))
             {
-                errors.Add("Missing --connection-string for ConnectionString authentication.");
+                errors.Add("Missing --sdk-connection-string for ConnectionString authentication.");
             }
 
             return errors;
         }
 
-        if (string.Equals(AuthType, "PacCli", StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(SdkEnvironmentUrl))
         {
-            if (string.IsNullOrWhiteSpace(PacCliPath))
-            {
-                errors.Add("Missing --pac-cli for PacCli authentication.");
-            }
-
-            return errors;
+            errors.Add("Missing --sdk-environment.");
         }
 
-        if (string.IsNullOrWhiteSpace(EnvironmentUrl))
-        {
-            errors.Add("Missing --environment.");
-        }
-
-        if (string.Equals(AuthType, "Interactive", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(SdkAuthType, "Interactive", StringComparison.OrdinalIgnoreCase))
         {
             return errors;
         }
 
-        if (!string.Equals(AuthType, "ClientSecret", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(SdkAuthType, "ClientSecret", StringComparison.OrdinalIgnoreCase))
         {
-            errors.Add($"Unsupported --auth-type '{AuthType}'. Supported values: ClientSecret, ConnectionString, Interactive, PacCli.");
+            errors.Add($"Unsupported --sdk-auth-type '{SdkAuthType}'. Supported values: ClientSecret, ConnectionString, Interactive.");
             return errors;
         }
 
-        if (string.IsNullOrWhiteSpace(TenantId))
+        if (string.IsNullOrWhiteSpace(SdkTenantId))
         {
-            errors.Add("Missing --tenant-id for ClientSecret authentication.");
+            errors.Add("Missing --sdk-tenant-id for ClientSecret authentication.");
         }
 
-        if (string.IsNullOrWhiteSpace(ClientId))
+        if (string.IsNullOrWhiteSpace(SdkClientId))
         {
-            errors.Add("Missing --client-id for ClientSecret authentication.");
+            errors.Add("Missing --sdk-client-id for ClientSecret authentication.");
         }
 
-        if (string.IsNullOrWhiteSpace(ClientSecret))
+        if (string.IsNullOrWhiteSpace(SdkClientSecret))
         {
-            errors.Add("Missing --client-secret for ClientSecret authentication.");
+            errors.Add("Missing --sdk-client-secret for ClientSecret authentication.");
         }
 
         return errors;
+    }
+
+    public IReadOnlyCollection<string> ValidatePac(bool required)
+    {
+        var errors = new List<string>();
+
+        if (!required && string.IsNullOrWhiteSpace(PacAuthProfile))
+        {
+            return errors;
+        }
+
+        if (string.IsNullOrWhiteSpace(PacCliPath))
+        {
+            errors.Add("Missing --pac-cli.");
+        }
+
+        return errors;
+    }
+
+    private static string? NormalizeLegacyAuthType(string? authType)
+    {
+        return string.Equals(authType, "PacCli", StringComparison.OrdinalIgnoreCase)
+            ? null
+            : authType;
     }
 }
