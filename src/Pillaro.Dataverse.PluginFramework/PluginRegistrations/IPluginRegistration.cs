@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
+using System.Linq.Expressions;
 
 namespace Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
@@ -7,7 +8,7 @@ public interface IPluginRegistration
     IPluginStepStageBuilder OnCreate<TEntity>(string stepId)
         where TEntity : Entity;
 
-    IPluginUpdateStepStageBuilder OnUpdate<TEntity>(string stepId)
+    IPluginUpdateStepStageBuilder<TEntity> OnUpdate<TEntity>(string stepId)
         where TEntity : Entity;
 
     IPluginStepStageBuilder OnDelete<TEntity>(string stepId)
@@ -28,13 +29,14 @@ public interface IPluginStepStageBuilder
     IPluginStepModeBuilder PostOperation();
 }
 
-public interface IPluginUpdateStepStageBuilder
+public interface IPluginUpdateStepStageBuilder<TEntity>
+    where TEntity : Entity
 {
-    IPluginUpdateStepModeBuilder PreValidation();
+    IPluginUpdateStepModeBuilder<TEntity> PreValidation();
 
-    IPluginUpdateStepModeBuilder PreOperation();
+    IPluginUpdateStepModeBuilder<TEntity> PreOperation();
 
-    IPluginUpdateStepModeBuilder PostOperation();
+    IPluginUpdateStepModeBuilder<TEntity> PostOperation();
 }
 
 public interface IPluginStepModeBuilder
@@ -44,11 +46,12 @@ public interface IPluginStepModeBuilder
     IPluginStepBuilder Asynchronous();
 }
 
-public interface IPluginUpdateStepModeBuilder
+public interface IPluginUpdateStepModeBuilder<TEntity>
+    where TEntity : Entity
 {
-    IPluginUpdateStepBuilder Synchronous();
+    IPluginUpdateStepBuilder<TEntity> Synchronous();
 
-    IPluginUpdateStepBuilder Asynchronous();
+    IPluginUpdateStepBuilder<TEntity> Asynchronous();
 }
 
 public interface IPluginStepBuilder
@@ -62,15 +65,22 @@ public interface IPluginStepBuilder
     IPluginStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All);
 }
 
-public interface IPluginUpdateStepBuilder : IPluginStepBuilder
+public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
+    where TEntity : Entity
 {
-    new IPluginUpdateStepBuilder Rank(int rank);
+    new IPluginUpdateStepBuilder<TEntity> Rank(int rank);
 
-    IPluginUpdateStepBuilder WhenChanged(params string[] attributes);
+    IPluginUpdateStepBuilder<TEntity> WhenChanged(params string[] attributes);
 
-    new IPluginUpdateStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
+    IPluginUpdateStepBuilder<TEntity> WhenChanged(params Expression<Func<TEntity, object>>[] attributes);
 
-    new IPluginUpdateStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
+    new IPluginUpdateStepBuilder<TEntity> WithPreImage(string imageId, string name, params string[] attributes);
 
-    new IPluginUpdateStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All);
+    IPluginUpdateStepBuilder<TEntity> WithPreImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+
+    new IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params string[] attributes);
+
+    IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+
+    new IPluginUpdateStepBuilder<TEntity> RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All);
 }
