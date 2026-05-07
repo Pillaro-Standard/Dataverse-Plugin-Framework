@@ -25,46 +25,45 @@ if exist "%PILLARO_DV_PROFILE_FILE%" (
 )
 
 :validate
-if "%PILLARO_DV_AUTH_TYPE%"=="" set "PILLARO_DV_AUTH_TYPE=PacCli"
 if "%PILLARO_DV_PAC_CLI%"=="" set "PILLARO_DV_PAC_CLI=pac"
+if "%PILLARO_DV_SDK_AUTH_TYPE%"=="" set "PILLARO_DV_SDK_AUTH_TYPE=ClientSecret"
 
-if /I "%PILLARO_DV_AUTH_TYPE%"=="PacCli" goto :success
-if /I "%PILLARO_DV_AUTH_TYPE%"=="ConnectionString" goto :validate_connection_string
-if /I "%PILLARO_DV_AUTH_TYPE%"=="ClientSecret" goto :validate_environment_url
-if /I "%PILLARO_DV_AUTH_TYPE%"=="Interactive" goto :validate_environment_url
+if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="ConnectionString" goto :validate_sdk_connection_string
+if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="ClientSecret" goto :validate_sdk_environment_url
+if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="Interactive" goto :validate_sdk_environment_url
 
-echo Unsupported PILLARO_DV_AUTH_TYPE: %PILLARO_DV_AUTH_TYPE%
-echo Supported values: PacCli, ClientSecret, ConnectionString, Interactive.
+echo Unsupported PILLARO_DV_SDK_AUTH_TYPE: %PILLARO_DV_SDK_AUTH_TYPE%
+echo Supported values: ClientSecret, ConnectionString, Interactive.
 exit /b 22
 
-:validate_environment_url
-if "%PILLARO_DV_URL%"=="" (
-    echo Missing PILLARO_DV_URL.
+:validate_sdk_environment_url
+if "%PILLARO_DV_SDK_ENVIRONMENT%"=="" (
+    echo Missing PILLARO_DV_SDK_ENVIRONMENT.
     echo Set it in local profile or as a secure pipeline variable.
     exit /b 21
 )
 
-if /I "%PILLARO_DV_AUTH_TYPE%"=="Interactive" goto :success
-goto :validate_client_secret
+if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="Interactive" goto :success
+goto :validate_sdk_client_secret
 
-:validate_connection_string
-if "%PILLARO_DV_CONNECTION_STRING%"=="" (
-    echo Missing PILLARO_DV_CONNECTION_STRING for ConnectionString authentication.
+:validate_sdk_connection_string
+if "%PILLARO_DV_SDK_CONNECTION_STRING%"=="" (
+    echo Missing PILLARO_DV_SDK_CONNECTION_STRING for ConnectionString authentication.
     exit /b 23
 )
 goto :success
 
-:validate_client_secret
-if "%PILLARO_DV_TENANT_ID%"=="" (
-    echo Missing PILLARO_DV_TENANT_ID for ClientSecret authentication.
+:validate_sdk_client_secret
+if "%PILLARO_DV_SDK_TENANT_ID%"=="" (
+    echo Missing PILLARO_DV_SDK_TENANT_ID for ClientSecret authentication.
     exit /b 24
 )
-if "%PILLARO_DV_CLIENT_ID%"=="" (
-    echo Missing PILLARO_DV_CLIENT_ID for ClientSecret authentication.
+if "%PILLARO_DV_SDK_CLIENT_ID%"=="" (
+    echo Missing PILLARO_DV_SDK_CLIENT_ID for ClientSecret authentication.
     exit /b 25
 )
-if "%PILLARO_DV_CLIENT_SECRET%"=="" (
-    echo Missing PILLARO_DV_CLIENT_SECRET for ClientSecret authentication.
+if "%PILLARO_DV_SDK_CLIENT_SECRET%"=="" (
+    echo Missing PILLARO_DV_SDK_CLIENT_SECRET for ClientSecret authentication.
     exit /b 26
 )
 goto :success
@@ -73,13 +72,13 @@ goto :success
 endlocal & (
     set "PILLARO_DV_PROFILE=%PILLARO_DV_PROFILE%"
     set "PILLARO_DV_PROFILE_FILE=%PILLARO_DV_PROFILE_FILE%"
-    set "PILLARO_DV_URL=%PILLARO_DV_URL%"
-    set "PILLARO_DV_AUTH_TYPE=%PILLARO_DV_AUTH_TYPE%"
-    set "PILLARO_DV_TENANT_ID=%PILLARO_DV_TENANT_ID%"
-    set "PILLARO_DV_CLIENT_ID=%PILLARO_DV_CLIENT_ID%"
-    set "PILLARO_DV_CLIENT_SECRET=%PILLARO_DV_CLIENT_SECRET%"
-    set "PILLARO_DV_CONNECTION_STRING=%PILLARO_DV_CONNECTION_STRING%"
     set "PILLARO_DV_PAC_AUTH_PROFILE=%PILLARO_DV_PAC_AUTH_PROFILE%"
     set "PILLARO_DV_PAC_CLI=%PILLARO_DV_PAC_CLI%"
+    set "PILLARO_DV_SDK_AUTH_TYPE=%PILLARO_DV_SDK_AUTH_TYPE%"
+    set "PILLARO_DV_SDK_ENVIRONMENT=%PILLARO_DV_SDK_ENVIRONMENT%"
+    set "PILLARO_DV_SDK_TENANT_ID=%PILLARO_DV_SDK_TENANT_ID%"
+    set "PILLARO_DV_SDK_CLIENT_ID=%PILLARO_DV_SDK_CLIENT_ID%"
+    set "PILLARO_DV_SDK_CLIENT_SECRET=%PILLARO_DV_SDK_CLIENT_SECRET%"
+    set "PILLARO_DV_SDK_CONNECTION_STRING=%PILLARO_DV_SDK_CONNECTION_STRING%"
 )
 exit /b 0
