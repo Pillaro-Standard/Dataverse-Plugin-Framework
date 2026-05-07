@@ -67,18 +67,6 @@ internal static class PluginDeployCommand
                 return 3;
             }
 
-            var pacPushErrors = pacPushOptions.ValidateForPacPush();
-            if (pacPushErrors.Count > 0)
-            {
-                Console.Error.WriteLine("PAC plugin push options are invalid:");
-                foreach (var error in pacPushErrors)
-                {
-                    Console.Error.WriteLine($"- {error}");
-                }
-
-                return 3;
-            }
-
             var pacAuthResult = await PacCliAuthService.EnsureSelectedAsync(connectionOptions, force: !pacPushOptions.SkipPacPush);
             if (pacAuthResult != 0)
             {
@@ -128,13 +116,33 @@ internal static class PluginDeployCommand
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
             Console.WriteLine();
 
+            var service = DataverseSdkConnectionFactory.Create(connectionOptions);
+
+            if (!pacPushOptions.SkipPacPush)
+            {
+                var pluginAssemblyId = await PluginAssemblyResolver.ResolvePluginAssemblyIdAsync(service, assemblyPath);
+                pacPushOptions = pacPushOptions.WithResolvedPluginId(pluginAssemblyId);
+                Console.WriteLine($"Resolved plugin assembly id: {pluginAssemblyId}");
+            }
+
+            var pacPushErrors = pacPushOptions.ValidateForPacPush();
+            if (pacPushErrors.Count > 0)
+            {
+                Console.Error.WriteLine("PAC plugin push options are invalid:");
+                foreach (var error in pacPushErrors)
+                {
+                    Console.Error.WriteLine($"- {error}");
+                }
+
+                return 3;
+            }
+
             var pacPushResult = await PacPluginPushService.PushAsync(connectionOptions, pacPushOptions, assemblyPath);
             if (pacPushResult != 0)
             {
                 return pacPushResult;
             }
 
-            var service = DataverseSdkConnectionFactory.Create(connectionOptions);
             var currentState = await DataverseRegistrationStateReader.ReadAsync(service, manifest);
             var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
             PluginRegistrationDiffWriter.Write(diff, includeUnchanged);
