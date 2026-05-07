@@ -10,26 +10,59 @@ internal static class DataverseRegistrationStateReader
         PluginManifestDocument manifest)
     {
         var state = new DataverseRegistrationState();
-        var stepIds = manifest.Plugins.SelectMany(plugin => plugin.Steps).Select(step => step.StepId).Distinct().ToArray();
-        var imageIds = manifest.Plugins.SelectMany(plugin => plugin.Steps).SelectMany(step => step.Images).Select(image => image.ImageId).Distinct().ToArray();
-
-        await ReadStepsAsync(service, state, stepIds);
-        await ReadImagesAsync(service, state, imageIds);
-
+        await ReadPluginTypesAsync(service, state, manifest);
+        await ReadStepsByPluginTypeAsync(service, state);
+        await ReadImagesByStepAsync(service, state);
         return state;
     }
 
-    private static async Task ReadStepsAsync(
+    private static async Task ReadPluginTypesAsync(
         IOrganizationServiceAsync2 service,
         DataverseRegistrationState state,
-        IReadOnlyCollection<Guid> stepIds)
+        PluginManifestDocument manifest)
     {
-        if (stepIds.Count == 0)
+        var typeNames = manifest.Plugins.Select(plugin => plugin.TypeName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        if (typeNames.Length == 0)
         {
             return;
         }
 
-        foreach (var batch in stepIds.Chunk(500))
+        foreach (var batch in typeNames.Chunk(500))
+        {
+            var query = new QueryExpression("plugintype")
+            {
+                ColumnSet = new ColumnSet("plugintypeid", "typename")
+            };
+            query.Criteria.AddCondition("typename", ConditionOperator.In, batch.Cast<object>().ToArray());
+
+            var response = await service.RetrieveMultipleAsync(query);
+            foreach (var entity in response.Entities)
+            {
+                var typeName = entity.GetAttributeValue<string>("typename");
+                if (!string.IsNullOrWhiteSpace(typeName))
+                {
+                    state.PluginTypeIdsByName[typeName] = entity.Id;
+                }
+            }
+        }
+
+        var missingTypes = typeNames.Where(typeName => !state.PluginTypeIdsByName.ContainsKey(typeName)).ToArray();
+        if (missingTypes.Length > 0)
+        {
+            throw new InvalidOperationException($"Plugin types were not found in Dataverse. Ensure PAC plugin push completed successfully: {string.Join(", ", missingTypes)}");
+        }
+    }
+
+    private static async Task ReadStepsByPluginTypeAsync(
+        IOrganizationServiceAsync2 service,
+        DataverseRegistrationState state)
+    {
+        if (state.PluginTypeIdsByName.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var pluginType in state.PluginTypeIdsByName)
         {
             var query = new QueryExpression("sdkmessageprocessingstep")
             {
@@ -40,11 +73,12 @@ internal static class DataverseRegistrationStateReader
                     "mode",
                     "rank",
                     "filteringattributes",
+                    "plugintypeid",
                     "sdkmessageid",
                     "sdkmessagefilterid")
             };
 
-            query.Criteria.AddCondition("sdkmessageprocessingstepid", ConditionOperator.In, batch.Cast<object>().ToArray());
+            query.Criteria.AddCondition("plugintypeid", ConditionOperator.Equal, pluginType.Value);
             query.LinkEntities.Add(new LinkEntity(
                 "sdkmessageprocessingstep",
                 "sdkmessage",
@@ -74,6 +108,8 @@ internal static class DataverseRegistrationStateReader
                 state.StepsById[stepId] = new DataverseStepState
                 {
                     StepId = stepId,
+                    PluginTypeId = pluginType.Value,
+                    PluginTypeName = pluginType.Key,
                     Name = entity.GetAttributeValue<string>("name"),
                     MessageName = GetAliasedString(entity, "message.name") ?? string.Empty,
                     EntityName = GetAliasedString(entity, "filter.primaryobjecttypecode"),
@@ -86,17 +122,17 @@ internal static class DataverseRegistrationStateReader
         }
     }
 
-    private static async Task ReadImagesAsync(
+    private static async Task ReadImagesByStepAsync(
         IOrganizationServiceAsync2 service,
-        DataverseRegistrationState state,
-        IReadOnlyCollection<Guid> imageIds)
+        DataverseRegistrationState state)
     {
-        if (imageIds.Count == 0)
+        var stepIds = state.StepsById.Keys.ToArray();
+        if (stepIds.Length == 0)
         {
             return;
         }
 
-        foreach (var batch in imageIds.Chunk(500))
+        foreach (var batch in stepIds.Chunk(500))
         {
             var query = new QueryExpression("sdkmessageprocessingstepimage")
             {
@@ -108,7 +144,7 @@ internal static class DataverseRegistrationStateReader
                     "attributes")
             };
 
-            query.Criteria.AddCondition("sdkmessageprocessingstepimageid", ConditionOperator.In, batch.Cast<object>().ToArray());
+            query.Criteria.AddCondition("sdkmessageprocessingstepid", ConditionOperator.In, batch.Cast<object>().ToArray());
 
             var response = await service.RetrieveMultipleAsync(query);
             foreach (var entity in response.Entities)
