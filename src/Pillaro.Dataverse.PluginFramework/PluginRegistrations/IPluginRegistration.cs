@@ -58,6 +58,8 @@ public interface IPluginStepBuilder
 {
     IPluginStepBuilder Rank(int rank);
 
+    IPluginStepBuilder InSolution(string solutionName);
+
     IPluginStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
 
     IPluginStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
@@ -69,6 +71,8 @@ public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
     where TEntity : Entity
 {
     new IPluginUpdateStepBuilder<TEntity> Rank(int rank);
+
+    new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName);
 
     IPluginUpdateStepBuilder<TEntity> WhenChanged(params string[] attributes);
 
