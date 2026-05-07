@@ -1,4 +1,6 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.EarlyBound;
@@ -14,6 +16,29 @@ internal static class EarlyBoundSolutionEntityReader
             return [];
         }
 
+        var metadataIds = await ReadSolutionEntityMetadataIdsAsync(service, solutionName);
+        if (metadataIds.Count == 0)
+        {
+            return [];
+        }
+
+        var metadataResponse = (RetrieveAllEntitiesResponse)await service.ExecuteAsync(new RetrieveAllEntitiesRequest
+        {
+            EntityFilters = EntityFilters.Entity,
+            RetrieveAsIfPublished = true,
+        });
+
+        return metadataResponse.EntityMetadata
+            .Where(entity => entity.MetadataId.HasValue && metadataIds.Contains(entity.MetadataId.Value))
+            .Select(entity => entity.LogicalName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    private static async Task<HashSet<Guid>> ReadSolutionEntityMetadataIdsAsync(IOrganizationServiceAsync2 service, string solutionName)
+    {
         var query = new QueryExpression("solutioncomponent")
         {
             ColumnSet = new ColumnSet("objectid", "componenttype")
@@ -29,44 +54,21 @@ internal static class EarlyBoundSolutionEntityReader
             JoinOperator.Inner)
         {
             EntityAlias = "solution",
-            Columns = new ColumnSet("uniquename")
+            Columns = new ColumnSet("uniquename"),
+            LinkCriteria =
+            {
+                Conditions =
+                {
+                    new ConditionExpression("uniquename", ConditionOperator.Equal, solutionName)
+                }
+            }
         });
 
-        query.Criteria.AddCondition("solution.uniquename", ConditionOperator.Equal, solutionName);
-
         var response = await service.RetrieveMultipleAsync(query);
-        var metadataIds = response.Entities
+        return response.Entities
             .Select(entity => entity.GetAttributeValue<Guid?>("objectid"))
             .Where(id => id.HasValue && id.Value != Guid.Empty)
             .Select(id => id!.Value)
-            .Distinct()
-            .ToArray();
-
-        if (metadataIds.Length == 0)
-        {
-            return [];
-        }
-
-        var entityNames = new List<string>();
-        foreach (var metadataId in metadataIds)
-        {
-            var metadataQuery = new QueryExpression("entity")
-            {
-                ColumnSet = new ColumnSet("logicalname", "metadataid")
-            };
-            metadataQuery.Criteria.AddCondition("metadataid", ConditionOperator.Equal, metadataId);
-
-            var metadataResponse = await service.RetrieveMultipleAsync(metadataQuery);
-            var logicalName = metadataResponse.Entities.FirstOrDefault()?.GetAttributeValue<string>("logicalname");
-            if (!string.IsNullOrWhiteSpace(logicalName))
-            {
-                entityNames.Add(logicalName);
-            }
-        }
-
-        return entityNames
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+            .ToHashSet();
     }
 }
