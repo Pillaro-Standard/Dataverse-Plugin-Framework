@@ -20,7 +20,7 @@ internal sealed class PillaroPluginSettings
 
 internal sealed class PillaroEarlyBoundSettings
 {
-    public string Solution { get; set; } = string.Empty;
+    public string? Solution { get; set; }
 
     public string Out { get; set; } = "src/Dataverse/Model";
 
@@ -29,8 +29,6 @@ internal sealed class PillaroEarlyBoundSettings
     public string ServiceContextName { get; set; } = "DataverseContext";
 
     public string Language { get; set; } = "en-US";
-
-    public bool IncludeSolutionEntities { get; set; } = true;
 
     public List<string> Entities { get; set; } = [];
 
