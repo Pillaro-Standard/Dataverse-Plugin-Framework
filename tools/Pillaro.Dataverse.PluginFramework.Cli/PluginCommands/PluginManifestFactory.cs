@@ -14,14 +14,15 @@ internal static class PluginManifestFactory
         }
 
         var assembly = Assembly.LoadFrom(fullPath);
-        var descriptors = PluginRegistrationDiscovery.DiscoverFromAssembly(assembly);
+        var discovery = PluginRegistrationDiscovery.DiscoverFromAssembly(assembly);
 
         return new PluginManifestDocument
         {
             AssemblyPath = fullPath,
             AssemblyName = assembly.GetName().Name,
             GeneratedUtc = DateTime.UtcNow,
-            Plugins = descriptors
+            PluginTypesWithoutRegistration = discovery.PluginTypesWithoutRegistration.ToList(),
+            Plugins = discovery.Registrations
                 .OrderBy(descriptor => descriptor.PluginType.FullName, StringComparer.OrdinalIgnoreCase)
                 .Select(descriptor => new PluginManifestPlugin
                 {
