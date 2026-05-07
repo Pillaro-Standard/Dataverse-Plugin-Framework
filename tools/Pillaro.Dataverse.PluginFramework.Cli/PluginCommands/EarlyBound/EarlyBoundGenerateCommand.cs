@@ -13,6 +13,8 @@ internal static class EarlyBoundGenerateCommand
             var settings = await PillaroSettingsLoader.LoadAsync(options);
             var connectionOptions = DataverseConnectionOptions.From(options);
 
+            CliLog.WriteHeader("earlybound generate", options, settings, connectionOptions);
+
             var sdkConnectionErrors = connectionOptions.ValidateSdk();
             if (sdkConnectionErrors.Count > 0)
             {
@@ -38,9 +40,9 @@ internal static class EarlyBoundGenerateCommand
                 return 4;
             }
 
-            var modelBuilderSettingsPath = await PillaroSettingsLoader.WritePacModelBuilderSettingsAsync(settings, entityNames);
+            var modelBuilderSettingsPath = await PillaroSettingsLoader.WritePacModelBuilderSettingsAsync(settings, options, entityNames);
             var pacCli = connectionOptions.PacCliPath ?? "pac";
-            var outDirectory = Path.GetFullPath(settings.EarlyBound.Out);
+            var outDirectory = PillaroSettingsLoader.ResolveConfiguredPath(settings.EarlyBound.Out);
             Directory.CreateDirectory(outDirectory);
 
             var arguments = $"modelbuilder build --outdirectory \"{outDirectory}\" --settingsTemplateFile \"{modelBuilderSettingsPath}\"";
