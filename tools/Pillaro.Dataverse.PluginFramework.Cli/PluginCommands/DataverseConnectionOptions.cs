@@ -16,7 +16,13 @@ internal sealed class DataverseConnectionOptions
 
     public string? ConnectionString { get; private init; }
 
+    public string? PacAuthProfile { get; private init; }
+
+    public string? PacCliPath { get; private init; }
+
     public string? SolutionName { get; private init; }
+
+    public bool UsesPacCli => string.Equals(AuthType, "PacCli", StringComparison.OrdinalIgnoreCase);
 
     public static DataverseConnectionOptions From(CommandLineOptions options)
     {
@@ -28,6 +34,8 @@ internal sealed class DataverseConnectionOptions
             ClientId = options.Get("client-id"),
             ClientSecret = options.Get("client-secret"),
             ConnectionString = options.Get("connection-string"),
+            PacAuthProfile = options.Get("pac-auth-profile"),
+            PacCliPath = options.Get("pac-cli") ?? "pac",
             SolutionName = options.Get("solution"),
         };
     }
@@ -46,6 +54,16 @@ internal sealed class DataverseConnectionOptions
             return errors;
         }
 
+        if (string.Equals(AuthType, "PacCli", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(PacCliPath))
+            {
+                errors.Add("Missing --pac-cli for PacCli authentication.");
+            }
+
+            return errors;
+        }
+
         if (string.IsNullOrWhiteSpace(EnvironmentUrl))
         {
             errors.Add("Missing --environment.");
@@ -58,7 +76,7 @@ internal sealed class DataverseConnectionOptions
 
         if (!string.Equals(AuthType, "ClientSecret", StringComparison.OrdinalIgnoreCase))
         {
-            errors.Add($"Unsupported --auth-type '{AuthType}'. Supported values: ClientSecret, ConnectionString, Interactive.");
+            errors.Add($"Unsupported --auth-type '{AuthType}'. Supported values: ClientSecret, ConnectionString, Interactive, PacCli.");
             return errors;
         }
 
