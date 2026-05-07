@@ -21,9 +21,14 @@ internal static class PluginDeployCommand
             var allowConfirmationRequired = options.HasFlag("confirm");
             var includeUnchanged = options.HasFlag("include-unchanged");
 
+            CliLog.WriteHeader("plugin deploy", options, settings, connectionOptions);
+            Console.WriteLine($"Resolved solution: {solutionName ?? "<empty>"}");
+            Console.WriteLine($"Resolved plugin assembly: {assemblyPath ?? "<empty>"}");
+            Console.WriteLine();
+
             if (string.IsNullOrWhiteSpace(solutionName))
             {
-                Console.Error.WriteLine("Missing solution. Set 'solution' in PillaroSettings.json or pass --solution.");
+                Console.Error.WriteLine("Missing solution. Set top-level 'solution' in PillaroSettings.json or pass --solution.");
                 return 3;
             }
 
