@@ -12,6 +12,7 @@ internal static class PluginDeployCommand
             var manifestPath = options.Require("manifest");
             var assemblyPath = options.Require("assembly");
             var connectionOptions = DataverseConnectionOptions.From(options);
+            var pacPushOptions = PacPluginPushOptions.From(options);
             var allowConfirmationRequired = options.HasFlag("confirm");
 
             if (!File.Exists(manifestPath))
@@ -31,6 +32,24 @@ internal static class PluginDeployCommand
             {
                 Console.Error.WriteLine("Dataverse connection options are invalid:");
                 foreach (var error in connectionErrors)
+                {
+                    Console.Error.WriteLine($"- {error}");
+                }
+
+                return 3;
+            }
+
+            if (!connectionOptions.UsesPacCli && !pacPushOptions.SkipPacPush)
+            {
+                Console.Error.WriteLine("PAC plugin push requires --auth-type PacCli. Use --skip-pac-push to skip PAC upload.");
+                return 3;
+            }
+
+            var pacPushErrors = pacPushOptions.ValidateForPacPush();
+            if (pacPushErrors.Count > 0)
+            {
+                Console.Error.WriteLine("PAC plugin push options are invalid:");
+                foreach (var error in pacPushErrors)
                 {
                     Console.Error.WriteLine($"- {error}");
                 }
@@ -81,7 +100,15 @@ internal static class PluginDeployCommand
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
             Console.WriteLine();
-            Console.WriteLine("Dataverse deploy is not implemented yet. Next step is to add assembly upload, step upsert, image upsert and solution membership.");
+
+            var pacPushResult = await PacPluginPushService.PushAsync(connectionOptions, pacPushOptions, assemblyPath);
+            if (pacPushResult != 0)
+            {
+                return pacPushResult;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Step/image metadata deploy is not implemented yet. Next step is to read Dataverse registration state and upsert steps/images from the manifest.");
 
             return 5;
         }
