@@ -1,15 +1,25 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
 
 internal static class DataverseRegistrationUpserter
 {
+    private const int StepComponentType = 92;
+    private const int ImageComponentType = 93;
+
     public static async Task ApplyAsync(
         IOrganizationServiceAsync2 service,
         PluginManifestDocument manifest,
-        PluginRegistrationDiff diff)
+        PluginRegistrationDiff diff,
+        string solutionName)
     {
+        if (string.IsNullOrWhiteSpace(solutionName))
+        {
+            throw new ArgumentException("Solution name is required.", nameof(solutionName));
+        }
+
         var pluginTypeIds = await LoadPluginTypeIdsAsync(service, manifest);
         var messageIds = await LoadMessageIdsAsync(service, manifest);
         var messageFilterIds = await LoadMessageFilterIdsAsync(service, manifest, messageIds);
@@ -30,6 +40,7 @@ internal static class DataverseRegistrationUpserter
             var step = plugin.Steps.Single(item => item.StepId == stepChange.StepId);
 
             await UpsertStepAsync(service, plugin, step, pluginTypeIds, messageIds, messageFilterIds, stepChange.Action);
+            await AddToSolutionAsync(service, solutionName, StepComponentType, step.StepId);
         }
 
         foreach (var imageChange in diff.ImageChanges.Where(change => change.Action is PluginDiffAction.Create or PluginDiffAction.Update))
@@ -38,7 +49,22 @@ internal static class DataverseRegistrationUpserter
             var image = step.Images.Single(item => item.ImageId == imageChange.ImageId);
 
             await UpsertImageAsync(service, step, image, imageChange.Action);
+            await AddToSolutionAsync(service, solutionName, ImageComponentType, image.ImageId);
         }
+    }
+
+    private static async Task AddToSolutionAsync(IOrganizationServiceAsync2 service, string solutionName, int componentType, Guid componentId)
+    {
+        var request = new AddSolutionComponentRequest
+        {
+            SolutionUniqueName = solutionName,
+            ComponentType = componentType,
+            ComponentId = componentId,
+            AddRequiredComponents = false,
+            DoNotIncludeSubcomponents = true,
+        };
+
+        await service.ExecuteAsync(request);
     }
 
     private static async Task<Dictionary<string, Guid>> LoadPluginTypeIdsAsync(IOrganizationServiceAsync2 service, PluginManifestDocument manifest)
