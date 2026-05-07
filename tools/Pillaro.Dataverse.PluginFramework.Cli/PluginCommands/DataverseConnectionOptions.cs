@@ -18,8 +18,8 @@ internal sealed class DataverseConnectionOptions
     {
         return new DataverseConnectionOptions
         {
-            SdkConnectionString = options.Get("sdk-connection-string") ?? options.Get("connection-string"),
-            PacAuthProfile = options.Get("pac-auth-profile"),
+            SdkConnectionString = options.Get("conn") ?? options.Get("sdk-connection-string") ?? options.Get("connection-string"),
+            PacAuthProfile = options.Get("pac-profile") ?? options.Get("pac-auth-profile"),
             PacCliPath = options.Get("pac-cli") ?? "pac",
             SolutionName = options.Get("solution"),
         };
@@ -31,7 +31,7 @@ internal sealed class DataverseConnectionOptions
 
         if (string.IsNullOrWhiteSpace(SdkConnectionString))
         {
-            errors.Add("Missing --sdk-connection-string.");
+            errors.Add("Missing --conn.");
         }
 
         return errors;
