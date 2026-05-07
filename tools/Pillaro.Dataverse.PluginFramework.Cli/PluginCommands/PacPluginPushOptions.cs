@@ -8,7 +8,7 @@ internal sealed class PacPluginPushOptions
 
     public string PluginType { get; private init; } = "Assembly";
 
-    public bool SkipPacPush { get; private init; } = true;
+    public bool SkipPacPush { get; private init; }
 
     public static PacPluginPushOptions From(CommandLineOptions options)
     {
@@ -16,7 +16,17 @@ internal sealed class PacPluginPushOptions
         {
             PluginId = options.Get("plugin-id"),
             PluginType = options.Get("plugin-type") ?? "Assembly",
-            SkipPacPush = !options.HasFlag("pac-push"),
+            SkipPacPush = options.HasFlag("skip-pac-push"),
+        };
+    }
+
+    public PacPluginPushOptions WithResolvedPluginId(Guid pluginId)
+    {
+        return new PacPluginPushOptions
+        {
+            PluginId = pluginId.ToString("D"),
+            PluginType = PluginType,
+            SkipPacPush = SkipPacPush,
         };
     }
 
@@ -31,17 +41,17 @@ internal sealed class PacPluginPushOptions
 
         if (string.IsNullOrWhiteSpace(PluginId))
         {
-            errors.Add("Missing --plugin-id. PAC plugin push requires an existing plugin assembly/package id. Default deployment skips PAC push and deploys step/image metadata only.");
+            errors.Add("Missing plugin assembly id. The CLI should resolve it automatically from Dataverse before PAC push.");
         }
         else if (!Guid.TryParse(PluginId, out var pluginId) || pluginId == Guid.Empty)
         {
-            errors.Add("--plugin-id must be a non-empty GUID.");
+            errors.Add("Plugin ID must be a non-empty GUID.");
         }
 
         if (!string.Equals(PluginType, "Assembly", StringComparison.OrdinalIgnoreCase)
             && !string.Equals(PluginType, "Package", StringComparison.OrdinalIgnoreCase))
         {
-            errors.Add("--plugin-type must be either Assembly or Package.");
+            errors.Add("Plugin type must be either Assembly or Package.");
         }
 
         return errors;
