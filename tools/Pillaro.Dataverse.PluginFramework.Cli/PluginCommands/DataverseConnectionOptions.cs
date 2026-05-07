@@ -13,7 +13,7 @@ internal sealed class DataverseConnectionOptions
 
     public string? SolutionName { get; private init; }
 
-    public bool UsesPacCli => !string.IsNullOrWhiteSpace(PacAuthProfile) || !string.IsNullOrWhiteSpace(PacCliPath);
+    public bool UsesPacCli => !string.IsNullOrWhiteSpace(PacAuthProfile);
 
     public static DataverseConnectionOptions From(CommandLineOptions options)
     {
@@ -60,7 +60,7 @@ internal sealed class DataverseConnectionOptions
     {
         var errors = new List<string>();
 
-        if (!required && string.IsNullOrWhiteSpace(PacAuthProfile))
+        if (!required)
         {
             return errors;
         }
