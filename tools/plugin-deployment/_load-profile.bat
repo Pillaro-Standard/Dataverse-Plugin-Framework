@@ -25,14 +25,16 @@ if exist "%PILLARO_DV_PROFILE_FILE%" (
 )
 
 :validate
-if "%PILLARO_DV_AUTH_TYPE%"=="" set "PILLARO_DV_AUTH_TYPE=ClientSecret"
+if "%PILLARO_DV_AUTH_TYPE%"=="" set "PILLARO_DV_AUTH_TYPE=PacCli"
+if "%PILLARO_DV_PAC_CLI%"=="" set "PILLARO_DV_PAC_CLI=pac"
 
+if /I "%PILLARO_DV_AUTH_TYPE%"=="PacCli" goto :success
 if /I "%PILLARO_DV_AUTH_TYPE%"=="ConnectionString" goto :validate_connection_string
 if /I "%PILLARO_DV_AUTH_TYPE%"=="ClientSecret" goto :validate_environment_url
 if /I "%PILLARO_DV_AUTH_TYPE%"=="Interactive" goto :validate_environment_url
 
 echo Unsupported PILLARO_DV_AUTH_TYPE: %PILLARO_DV_AUTH_TYPE%
-echo Supported values: ClientSecret, ConnectionString, Interactive.
+echo Supported values: PacCli, ClientSecret, ConnectionString, Interactive.
 exit /b 22
 
 :validate_environment_url
@@ -77,5 +79,7 @@ endlocal & (
     set "PILLARO_DV_CLIENT_ID=%PILLARO_DV_CLIENT_ID%"
     set "PILLARO_DV_CLIENT_SECRET=%PILLARO_DV_CLIENT_SECRET%"
     set "PILLARO_DV_CONNECTION_STRING=%PILLARO_DV_CONNECTION_STRING%"
+    set "PILLARO_DV_PAC_AUTH_PROFILE=%PILLARO_DV_PAC_AUTH_PROFILE%"
+    set "PILLARO_DV_PAC_CLI=%PILLARO_DV_PAC_CLI%"
 )
 exit /b 0
