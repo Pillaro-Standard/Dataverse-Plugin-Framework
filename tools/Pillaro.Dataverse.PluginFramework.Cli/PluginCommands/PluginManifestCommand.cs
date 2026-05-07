@@ -32,12 +32,30 @@ internal static class PluginManifestCommand
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
 
+            WriteDiscoveryWarnings(manifest);
+
             return 0;
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine(ex.Message);
             return 1;
+        }
+    }
+
+    private static void WriteDiscoveryWarnings(PluginManifestDocument manifest)
+    {
+        if (manifest.PluginTypesWithoutRegistration.Count == 0)
+        {
+            return;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Warnings:");
+        Console.WriteLine("- Some plugin types implement IPlugin but do not define public static Register(IPluginRegistration registration). They were skipped:");
+        foreach (var pluginType in manifest.PluginTypesWithoutRegistration)
+        {
+            Console.WriteLine($"  - {pluginType}");
         }
     }
 }
