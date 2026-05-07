@@ -6,7 +6,8 @@ internal sealed class PluginRegistrationDiff
 
     public List<PluginImageDiff> ImageChanges { get; } = [];
 
-    public bool HasChanges => StepChanges.Count > 0 || ImageChanges.Count > 0;
+    public bool HasChanges => StepChanges.Any(change => change.Action != PluginDiffAction.Unchanged)
+        || ImageChanges.Any(change => change.Action != PluginDiffAction.Unchanged);
 }
 
 internal sealed class PluginStepDiff
@@ -47,5 +48,6 @@ internal enum PluginDiffAction
 {
     Create,
     Update,
+    Delete,
     Unchanged,
 }
