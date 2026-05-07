@@ -29,11 +29,23 @@ internal static class PluginDeployCommand
                 return 2;
             }
 
-            var connectionErrors = connectionOptions.Validate();
-            if (connectionErrors.Count > 0)
+            var sdkConnectionErrors = connectionOptions.ValidateSdk();
+            if (sdkConnectionErrors.Count > 0)
             {
-                Console.Error.WriteLine("Dataverse connection options are invalid:");
-                foreach (var error in connectionErrors)
+                Console.Error.WriteLine("Dataverse SDK connection options are invalid:");
+                foreach (var error in sdkConnectionErrors)
+                {
+                    Console.Error.WriteLine($"- {error}");
+                }
+
+                return 3;
+            }
+
+            var pacConnectionErrors = connectionOptions.ValidatePac(required: !pacPushOptions.SkipPacPush);
+            if (pacConnectionErrors.Count > 0)
+            {
+                Console.Error.WriteLine("PAC CLI options are invalid:");
+                foreach (var error in pacConnectionErrors)
                 {
                     Console.Error.WriteLine($"- {error}");
                 }
@@ -89,7 +101,7 @@ internal static class PluginDeployCommand
             }
 
             Console.WriteLine("Plugin manifest is valid.");
-            Console.WriteLine($"Target environment: {GetTargetLabel(connectionOptions)}");
+            Console.WriteLine($"SDK target environment: {connectionOptions.SdkEnvironmentUrl ?? "<connection-string>"}");
             Console.WriteLine($"Assembly: {Path.GetFullPath(assemblyPath)}");
             Console.WriteLine($"Solution: {connectionOptions.SolutionName ?? "<not specified>"}");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
@@ -116,7 +128,7 @@ internal static class PluginDeployCommand
             }
 
             Console.WriteLine();
-            Console.WriteLine("Applying step/image metadata changes using Pillaro Dataverse SDK registration layer...");
+            Console.WriteLine("Applying step/image metadata changes using Pillaro registration layer...");
             await DataverseRegistrationUpserter.ApplyAsync(service, manifest, diff);
             Console.WriteLine("Step/image metadata deploy completed.");
 
@@ -127,17 +139,5 @@ internal static class PluginDeployCommand
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
-    }
-
-    private static string GetTargetLabel(DataverseConnectionOptions options)
-    {
-        if (options.UsesPacCli)
-        {
-            return string.IsNullOrWhiteSpace(options.PacAuthProfile)
-                ? "PAC CLI active profile"
-                : $"PAC CLI profile '{options.PacAuthProfile}'";
-        }
-
-        return options.EnvironmentUrl ?? "<connection-string>";
     }
 }
