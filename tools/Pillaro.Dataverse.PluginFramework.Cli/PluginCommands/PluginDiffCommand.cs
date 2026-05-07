@@ -20,29 +20,16 @@ internal static class PluginDiffCommand
                 return 2;
             }
 
-            var connectionErrors = connectionOptions.Validate();
-            if (connectionErrors.Count > 0)
+            var sdkConnectionErrors = connectionOptions.ValidateSdk();
+            if (sdkConnectionErrors.Count > 0)
             {
-                Console.Error.WriteLine("Dataverse connection options are invalid:");
-                foreach (var error in connectionErrors)
+                Console.Error.WriteLine("Dataverse SDK connection options are invalid:");
+                foreach (var error in sdkConnectionErrors)
                 {
                     Console.Error.WriteLine($"- {error}");
                 }
 
                 return 3;
-            }
-
-            var pacAuthResult = await PacCliAuthService.EnsureSelectedAsync(connectionOptions);
-            if (pacAuthResult != 0)
-            {
-                return pacAuthResult;
-            }
-
-            if (connectionOptions.UsesPacCli)
-            {
-                Console.Error.WriteLine("SDK-backed registration diff cannot currently reuse PAC CLI credentials directly.");
-                Console.Error.WriteLine("Use --auth-type ConnectionString or --auth-type ClientSecret for reading Dataverse step/image metadata.");
-                return 32;
             }
 
             var manifest = await PluginManifestSerializer.LoadAsync(manifestPath);
@@ -81,13 +68,6 @@ internal static class PluginDiffCommand
 
     private static string GetTargetLabel(DataverseConnectionOptions options)
     {
-        if (options.UsesPacCli)
-        {
-            return string.IsNullOrWhiteSpace(options.PacAuthProfile)
-                ? "PAC CLI active profile"
-                : $"PAC CLI profile '{options.PacAuthProfile}'";
-        }
-
-        return options.EnvironmentUrl ?? "<connection-string>";
+        return options.SdkEnvironmentUrl ?? "<connection-string>";
     }
 }
