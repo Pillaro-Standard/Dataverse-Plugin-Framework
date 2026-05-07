@@ -1,4 +1,5 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
+using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
@@ -32,6 +33,59 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
     )]
     public class ContactPlugin : PluginBase
     {
+        private const string SolutionName = "PillaroPluginFrameworkExamples";
+
+        public static void Register(IPluginRegistration registration)
+        {
+            registration
+                .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
+                .PreValidation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .Rank(1);
+
+            registration
+                .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+                .PreValidation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .Rank(1)
+                .WhenChanged("firstname", "lastname");
+
+            registration
+                .OnCreate<Contact>("4e72086e-1508-f111-8407-000d3ab261ac")
+                .PreOperation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .Rank(1);
+
+            registration
+                .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
+                .PreOperation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .Rank(1)
+                .WhenChanged(
+                    "firstname",
+                    "lastname",
+                    "address1_line1",
+                    "address1_line2",
+                    "address1_line3",
+                    "address1_city",
+                    "address1_postalcode",
+                    "address1_stateorprovince",
+                    "address1_country")
+                .WithPreImage(
+                    "d79f2630-9be7-4b0c-9fe3-bf5fc4d7d4f1",
+                    "image",
+                    "address1_line1",
+                    "address1_line2",
+                    "address1_line3",
+                    "address1_city",
+                    "address1_postalcode",
+                    "address1_stateorprovince",
+                    "address1_country");
+        }
 
         public ContactPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
