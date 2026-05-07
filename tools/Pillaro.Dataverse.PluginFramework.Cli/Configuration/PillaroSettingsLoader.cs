@@ -8,6 +8,14 @@ internal static class PillaroSettingsLoader
     public const string DefaultFileName = "PillaroSettings.json";
     public const string DefaultProfilesFileName = "dataverse-profiles.json";
 
+    private static readonly JsonSerializerOptions ReadOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        AllowTrailingCommas = true,
+    };
+
     public static async Task<PillaroSettings> LoadAsync(CommandLineOptions options)
     {
         var path = GetResolvedSettingsPath(options);
@@ -18,7 +26,7 @@ internal static class PillaroSettingsLoader
         }
 
         await using var stream = File.OpenRead(path);
-        var settings = await JsonSerializer.DeserializeAsync(stream, PillaroSettingsJsonContext.Default.PillaroSettings);
+        var settings = await JsonSerializer.DeserializeAsync<PillaroSettings>(stream, ReadOptions);
         return settings ?? throw new InvalidOperationException($"Pillaro settings file '{path}' is empty or invalid.");
     }
 
@@ -52,7 +60,7 @@ internal static class PillaroSettingsLoader
         }
 
         await using var stream = File.OpenRead(profilesPath);
-        var profilesDocument = await JsonSerializer.DeserializeAsync(stream, PillaroSettingsJsonContext.Default.DataverseProfilesDocument);
+        var profilesDocument = await JsonSerializer.DeserializeAsync<DataverseProfilesDocument>(stream, ReadOptions);
         if (profilesDocument == null)
         {
             return null;
