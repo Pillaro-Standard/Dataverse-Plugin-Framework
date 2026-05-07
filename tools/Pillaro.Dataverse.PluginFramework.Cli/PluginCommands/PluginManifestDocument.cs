@@ -12,6 +12,8 @@ internal sealed class PluginManifestDocument
 
     public DateTime GeneratedUtc { get; set; } = DateTime.UtcNow;
 
+    public List<string> PluginTypesWithoutRegistration { get; set; } = [];
+
     public List<PluginManifestPlugin> Plugins { get; set; } = [];
 }
 
