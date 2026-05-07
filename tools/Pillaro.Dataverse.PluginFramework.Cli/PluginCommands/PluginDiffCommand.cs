@@ -1,4 +1,5 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
+using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
@@ -11,6 +12,7 @@ internal static class PluginDiffCommand
             var options = CommandLineOptions.Parse(args);
             var manifestPath = options.Require("manifest");
             var connectionOptions = DataverseConnectionOptions.From(options);
+            var includeUnchanged = options.HasFlag("include-unchanged");
 
             if (!File.Exists(manifestPath))
             {
@@ -55,9 +57,16 @@ internal static class PluginDiffCommand
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
             Console.WriteLine();
-            Console.WriteLine("Dataverse diff is not implemented yet. Next step is to add Dataverse metadata reader and compare current state with manifest.");
 
-            return 5;
+            // TODO: Replace empty state with real Dataverse registration reader.
+            var currentState = new DataverseRegistrationState();
+            var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
+            PluginRegistrationDiffWriter.Write(diff, includeUnchanged);
+
+            Console.WriteLine();
+            Console.WriteLine("Current Dataverse state reader is not implemented yet. Diff currently treats all manifest records as missing in Dataverse.");
+
+            return diff.HasChanges ? 10 : 0;
         }
         catch (Exception ex)
         {
