@@ -10,10 +10,11 @@ internal static class PillaroSettingsLoader
 
     public static async Task<PillaroSettings> LoadAsync(CommandLineOptions options)
     {
-        var path = options.Get("settings") ?? DefaultFileName;
-        if (!File.Exists(path))
+        var configuredPath = options.Get("settings") ?? DefaultFileName;
+        var path = ResolveSettingsPath(configuredPath);
+        if (path == null)
         {
-            throw new FileNotFoundException($"Pillaro settings file was not found. Expected '{path}'.", path);
+            throw new FileNotFoundException($"Pillaro settings file was not found. Expected '{configuredPath}'.");
         }
 
         await using var stream = File.OpenRead(path);
@@ -97,5 +98,33 @@ internal static class PillaroSettingsLoader
         await using var stream = File.Create(path);
         await JsonSerializer.SerializeAsync(stream, modelBuilderSettings, PillaroSettingsJsonContext.Default.PacModelBuilderSettings);
         return path;
+    }
+
+    private static string? ResolveSettingsPath(string configuredPath)
+    {
+        if (Path.IsPathRooted(configuredPath))
+        {
+            return File.Exists(configuredPath) ? configuredPath : null;
+        }
+
+        var directPath = Path.GetFullPath(configuredPath);
+        if (File.Exists(directPath))
+        {
+            return directPath;
+        }
+
+        var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (directory != null)
+        {
+            var candidate = Path.Combine(directory.FullName, configuredPath);
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = directory.Parent;
+        }
+
+        return null;
     }
 }
