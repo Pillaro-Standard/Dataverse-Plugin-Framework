@@ -1,4 +1,5 @@
 ﻿using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
+using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
@@ -14,6 +15,7 @@ internal static class PluginDeployCommand
             var connectionOptions = DataverseConnectionOptions.From(options);
             var pacPushOptions = PacPluginPushOptions.From(options);
             var allowConfirmationRequired = options.HasFlag("confirm");
+            var includeUnchanged = options.HasFlag("include-unchanged");
 
             if (!File.Exists(manifestPath))
             {
@@ -43,6 +45,13 @@ internal static class PluginDeployCommand
             {
                 Console.Error.WriteLine("PAC plugin push requires --auth-type PacCli. Use --skip-pac-push to skip PAC upload.");
                 return 3;
+            }
+
+            if (connectionOptions.UsesPacCli)
+            {
+                Console.Error.WriteLine("Step/image metadata deploy currently requires direct Dataverse SDK connection. Use --auth-type ConnectionString or --auth-type ClientSecret.");
+                Console.Error.WriteLine("PAC CLI is still used for assembly/package push, but SDK credentials are required for registration metadata upsert.");
+                return 32;
             }
 
             var pacPushErrors = pacPushOptions.ValidateForPacPush();
@@ -107,10 +116,24 @@ internal static class PluginDeployCommand
                 return pacPushResult;
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Step/image metadata deploy is not implemented yet. Next step is to read Dataverse registration state and upsert steps/images from the manifest.");
+            var service = DataverseSdkConnectionFactory.Create(connectionOptions);
+            var currentState = await DataverseRegistrationStateReader.ReadAsync(service, manifest);
+            var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
+            PluginRegistrationDiffWriter.Write(diff, includeUnchanged);
 
-            return 5;
+            if (!diff.HasChanges)
+            {
+                Console.WriteLine();
+                Console.WriteLine("No step/image metadata changes to apply.");
+                return 0;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Applying step/image metadata changes...");
+            await DataverseRegistrationUpserter.ApplyAsync(service, manifest, diff);
+            Console.WriteLine("Step/image metadata deploy completed.");
+
+            return 0;
         }
         catch (Exception ex)
         {
