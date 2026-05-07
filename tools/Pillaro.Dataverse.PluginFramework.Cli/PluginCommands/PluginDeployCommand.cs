@@ -16,6 +16,7 @@ internal static class PluginDeployCommand
             var pacPushOptions = PacPluginPushOptions.From(options);
             var allowConfirmationRequired = options.HasFlag("confirm");
             var includeUnchanged = options.HasFlag("include-unchanged");
+            var allowSdkMetadataUpsert = options.HasFlag("allow-sdk-metadata-upsert");
 
             if (!File.Exists(manifestPath))
             {
@@ -41,17 +42,16 @@ internal static class PluginDeployCommand
                 return 3;
             }
 
-            if (!connectionOptions.UsesPacCli && !pacPushOptions.SkipPacPush)
+            if (!connectionOptions.UsesPacCli && !allowSdkMetadataUpsert)
             {
-                Console.Error.WriteLine("PAC plugin push requires --auth-type PacCli. Use --skip-pac-push to skip PAC upload.");
+                Console.Error.WriteLine("Direct SDK metadata upsert is disabled by default. Use --auth-type PacCli for PAC-first deployment, or pass --allow-sdk-metadata-upsert explicitly.");
                 return 3;
             }
 
-            if (connectionOptions.UsesPacCli)
+            if (!connectionOptions.UsesPacCli && !pacPushOptions.SkipPacPush)
             {
-                Console.Error.WriteLine("Step/image metadata deploy currently requires direct Dataverse SDK connection. Use --auth-type ConnectionString or --auth-type ClientSecret.");
-                Console.Error.WriteLine("PAC CLI is still used for assembly/package push, but SDK credentials are required for registration metadata upsert.");
-                return 32;
+                Console.Error.WriteLine("PAC plugin push requires --auth-type PacCli. Use --skip-pac-push to skip PAC upload when using SDK metadata mode.");
+                return 3;
             }
 
             var pacPushErrors = pacPushOptions.ValidateForPacPush();
@@ -116,6 +116,15 @@ internal static class PluginDeployCommand
                 return pacPushResult;
             }
 
+            if (connectionOptions.UsesPacCli && !allowSdkMetadataUpsert)
+            {
+                Console.WriteLine();
+                Console.WriteLine("PAC-first deployment completed for assembly/package upload.");
+                Console.WriteLine("Step/image metadata from the manifest was validated but not applied because PAC CLI does not currently expose a dedicated plugin step/image registration command in this CLI wrapper.");
+                Console.WriteLine("Use --allow-sdk-metadata-upsert with SDK credentials only if the team explicitly accepts the SDK fallback for metadata operations.");
+                return manifest.Plugins.SelectMany(plugin => plugin.Steps).Any() ? 20 : 0;
+            }
+
             var service = DataverseSdkConnectionFactory.Create(connectionOptions);
             var currentState = await DataverseRegistrationStateReader.ReadAsync(service, manifest);
             var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
@@ -129,7 +138,7 @@ internal static class PluginDeployCommand
             }
 
             Console.WriteLine();
-            Console.WriteLine("Applying step/image metadata changes...");
+            Console.WriteLine("Applying step/image metadata changes using explicit SDK fallback...");
             await DataverseRegistrationUpserter.ApplyAsync(service, manifest, diff);
             Console.WriteLine("Step/image metadata deploy completed.");
 
