@@ -28,6 +28,24 @@ internal static class PillaroSettingsLoader
         return ResolveSettingsPath(configuredPath);
     }
 
+    public static string GetSettingsDirectory(CommandLineOptions options)
+    {
+        var settingsPath = GetResolvedSettingsPath(options);
+        return settingsPath == null
+            ? Directory.GetCurrentDirectory()
+            : Path.GetDirectoryName(settingsPath) ?? Directory.GetCurrentDirectory();
+    }
+
+    public static string ResolvePathFromSettings(CommandLineOptions options, string configuredPath)
+    {
+        if (Path.IsPathRooted(configuredPath))
+        {
+            return Path.GetFullPath(configuredPath);
+        }
+
+        return Path.GetFullPath(Path.Combine(GetSettingsDirectory(options), configuredPath));
+    }
+
     public static async Task<DataverseProfile?> TryLoadProfileAsync(CommandLineOptions options, PillaroSettings? settings = null)
     {
         var explicitConnectionString = options.Get("conn") ?? options.Get("sdk-connection-string") ?? options.Get("connection-string");
@@ -79,7 +97,7 @@ internal static class PillaroSettingsLoader
         return Path.Combine(userProfile, ".pillaro", DefaultProfilesFileName);
     }
 
-    public static async Task<string> WritePacModelBuilderSettingsAsync(PillaroSettings settings, IReadOnlyCollection<string> entityNames)
+    public static async Task<string> WritePacModelBuilderSettingsAsync(PillaroSettings settings, CommandLineOptions options, IReadOnlyCollection<string> entityNames)
     {
         var earlyBound = settings.EarlyBound;
         var modelBuilderSettings = new PacModelBuilderSettings
@@ -98,7 +116,7 @@ internal static class PillaroSettingsLoader
             EmitVirtualAttributes = earlyBound.EmitVirtualAttributes,
         };
 
-        var artifactsDirectory = Path.GetFullPath("artifacts");
+        var artifactsDirectory = ResolvePathFromSettings(options, "artifacts");
         Directory.CreateDirectory(artifactsDirectory);
         var path = Path.Combine(artifactsDirectory, "pac-modelbuilder-settings.json");
         await using var stream = File.Create(path);
