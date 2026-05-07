@@ -11,7 +11,7 @@ internal static class PluginDiffCommand
         {
             var options = CommandLineOptions.Parse(args);
             var manifestPath = options.Require("manifest");
-            var connectionOptions = DataverseConnectionOptions.From(options);
+            var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options);
             var includeUnchanged = options.HasFlag("include-unchanged");
 
             if (!File.Exists(manifestPath))
@@ -46,7 +46,7 @@ internal static class PluginDiffCommand
             }
 
             Console.WriteLine("Plugin manifest is valid.");
-            Console.WriteLine("Target environment: <from sdk connection string>");
+            Console.WriteLine("Target environment: <from profile/connection string>");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
