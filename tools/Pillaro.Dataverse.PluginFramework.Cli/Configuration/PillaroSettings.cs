@@ -68,7 +68,10 @@ internal sealed class DataverseProfile
 [JsonSerializable(typeof(PillaroSettings))]
 [JsonSerializable(typeof(DataverseProfilesDocument))]
 [JsonSerializable(typeof(PacModelBuilderSettings))]
-[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSourceGenerationOptions(
+    WriteIndented = true,
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    PropertyNameCaseInsensitive = true)]
 internal sealed partial class PillaroSettingsJsonContext : JsonSerializerContext;
 
 internal sealed class PacModelBuilderSettings
