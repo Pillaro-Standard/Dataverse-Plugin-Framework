@@ -71,10 +71,10 @@ internal static class EarlyBoundGenerateCommand
     {
         var names = new HashSet<string>(settings.EarlyBound.Entities.Where(entity => !string.IsNullOrWhiteSpace(entity)), StringComparer.OrdinalIgnoreCase);
 
-        if (settings.EarlyBound.IncludeSolutionEntities)
+        if (!string.IsNullOrWhiteSpace(settings.EarlyBound.Solution))
         {
             var service = DataverseSdkConnectionFactory.Create(connectionOptions);
-            var solutionEntityNames = await EarlyBoundSolutionEntityReader.ReadEntityLogicalNamesAsync(service, settings.Solution);
+            var solutionEntityNames = await EarlyBoundSolutionEntityReader.ReadEntityLogicalNamesAsync(service, settings.EarlyBound.Solution);
             foreach (var entityName in solutionEntityNames)
             {
                 names.Add(entityName);
