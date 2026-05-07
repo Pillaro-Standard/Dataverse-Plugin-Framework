@@ -13,7 +13,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         where TEntity : Entity => CreateStep(stepId, DataverseMessages.Create, GetEntityLogicalName<TEntity>(), isUpdate: false);
 
     public IPluginUpdateStepStageBuilder OnUpdate<TEntity>(string stepId)
-        where TEntity : Entity => (IPluginUpdateStepStageBuilder)CreateStep(stepId, DataverseMessages.Update, GetEntityLogicalName<TEntity>(), isUpdate: true);
+        where TEntity : Entity => CreateStep(stepId, DataverseMessages.Update, GetEntityLogicalName<TEntity>(), isUpdate: true);
 
     public IPluginStepStageBuilder OnDelete<TEntity>(string stepId)
         where TEntity : Entity => CreateStep(stepId, DataverseMessages.Delete, GetEntityLogicalName<TEntity>(), isUpdate: false);
@@ -49,7 +49,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         return logicalNameAttribute.LogicalName;
     }
 
-    private sealed class StepBuilder : IPluginUpdateStepStageBuilder, IPluginStepModeBuilder, IPluginUpdateStepBuilder
+    private sealed class StepBuilder : IPluginUpdateStepStageBuilder, IPluginStepModeBuilder, IPluginUpdateStepModeBuilder, IPluginUpdateStepBuilder
     {
         private readonly bool _isUpdate;
         private readonly List<string> _filteringAttributes = [];
@@ -73,40 +73,25 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
 
         private string? EntityName { get; }
 
-        public IPluginStepModeBuilder PreValidation()
-        {
-            _stage = PluginStage.Prevalidation;
-            return this;
-        }
+        IPluginStepModeBuilder IPluginStepStageBuilder.PreValidation() => SetStage(PluginStage.Prevalidation);
 
-        public IPluginStepModeBuilder PreOperation()
-        {
-            _stage = PluginStage.Preoperation;
-            return this;
-        }
+        IPluginStepModeBuilder IPluginStepStageBuilder.PreOperation() => SetStage(PluginStage.Preoperation);
 
-        public IPluginStepModeBuilder PostOperation()
-        {
-            _stage = PluginStage.Postoperation;
-            return this;
-        }
+        IPluginStepModeBuilder IPluginStepStageBuilder.PostOperation() => SetStage(PluginStage.Postoperation);
 
-        public IPluginStepBuilder Synchronous()
-        {
-            _mode = PluginMode.Synchronous;
-            return this;
-        }
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.PreValidation() => SetStage(PluginStage.Prevalidation);
 
-        public IPluginStepBuilder Asynchronous()
-        {
-            _mode = PluginMode.Asynchronous;
-            return this;
-        }
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.PreOperation() => SetStage(PluginStage.Preoperation);
 
-        IPluginUpdateStepBuilder IPluginUpdateStepBuilder.WhenChanged(params string[] attributes)
-        {
-            return WhenChanged(attributes);
-        }
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.PostOperation() => SetStage(PluginStage.Postoperation);
+
+        IPluginStepBuilder IPluginStepModeBuilder.Synchronous() => SetMode(PluginMode.Synchronous);
+
+        IPluginStepBuilder IPluginStepModeBuilder.Asynchronous() => SetMode(PluginMode.Asynchronous);
+
+        IPluginUpdateStepBuilder IPluginUpdateStepModeBuilder.Synchronous() => SetMode(PluginMode.Synchronous);
+
+        IPluginUpdateStepBuilder IPluginUpdateStepModeBuilder.Asynchronous() => SetMode(PluginMode.Asynchronous);
 
         public IPluginUpdateStepBuilder WhenChanged(params string[] attributes)
         {
@@ -119,37 +104,51 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             return this;
         }
 
-        public IPluginStepBuilder Rank(int rank)
+        public IPluginUpdateStepBuilder Rank(int rank)
         {
-            if (rank <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(rank), rank, "Rank must be greater than zero.");
-            }
-
-            _rank = rank;
+            SetRank(rank);
             return this;
         }
 
-        public IPluginStepBuilder WithPreImage(string imageId, string name, params string[] attributes)
+        IPluginStepBuilder IPluginStepBuilder.Rank(int rank)
+        {
+            SetRank(rank);
+            return this;
+        }
+
+        public IPluginUpdateStepBuilder WithPreImage(string imageId, string name, params string[] attributes)
         {
             AddImage(imageId, PluginImageType.PreImage, name, attributes);
             return this;
         }
 
-        public IPluginStepBuilder WithPostImage(string imageId, string name, params string[] attributes)
+        IPluginStepBuilder IPluginStepBuilder.WithPreImage(string imageId, string name, params string[] attributes)
+        {
+            AddImage(imageId, PluginImageType.PreImage, name, attributes);
+            return this;
+        }
+
+        public IPluginUpdateStepBuilder WithPostImage(string imageId, string name, params string[] attributes)
         {
             AddImage(imageId, PluginImageType.PostImage, name, attributes);
             return this;
         }
 
-        public IPluginStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All)
+        IPluginStepBuilder IPluginStepBuilder.WithPostImage(string imageId, string name, params string[] attributes)
         {
-            _deploymentPolicy = new PluginDeploymentPolicyDescriptor(
-                RequiresConfirmation: true,
-                Risk: risk,
-                Reason: RequireValue(reason, nameof(reason)),
-                Scope: scope);
+            AddImage(imageId, PluginImageType.PostImage, name, attributes);
+            return this;
+        }
 
+        public IPluginUpdateStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All)
+        {
+            SetDeploymentPolicy(risk, reason, scope);
+            return this;
+        }
+
+        IPluginStepBuilder IPluginStepBuilder.RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope)
+        {
+            SetDeploymentPolicy(risk, reason, scope);
             return this;
         }
 
@@ -178,6 +177,28 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 _deploymentPolicy);
         }
 
+        private StepBuilder SetStage(PluginStage stage)
+        {
+            _stage = stage;
+            return this;
+        }
+
+        private StepBuilder SetMode(PluginMode mode)
+        {
+            _mode = mode;
+            return this;
+        }
+
+        private void SetRank(int rank)
+        {
+            if (rank <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rank), rank, "Rank must be greater than zero.");
+            }
+
+            _rank = rank;
+        }
+
         private void AddImage(string imageId, PluginImageType type, string name, string[] attributes)
         {
             _images.Add(new PluginImageRegistrationDescriptor(
@@ -185,6 +206,15 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 type,
                 RequireValue(name, nameof(name)),
                 NormalizeAttributes(attributes, nameof(attributes)).ToArray()));
+        }
+
+        private void SetDeploymentPolicy(PluginRisk risk, string reason, PluginDeploymentScope scope)
+        {
+            _deploymentPolicy = new PluginDeploymentPolicyDescriptor(
+                RequiresConfirmation: true,
+                Risk: risk,
+                Reason: RequireValue(reason, nameof(reason)),
+                Scope: scope);
         }
 
         private static Guid ParseGuid(string value, string parameterName)
