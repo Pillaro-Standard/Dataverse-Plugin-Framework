@@ -18,6 +18,10 @@ internal static class PluginRegistrationDiffWriter
 
         var changes = diff.StepChanges
             .Where(change => includeUnchanged || change.Action != PluginDiffAction.Unchanged)
+            .OrderBy(change => change.PluginTypeName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(change => change.Action)
+            .ThenBy(change => change.MessageName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(change => change.EntityName, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         if (changes.Count == 0)
@@ -28,10 +32,10 @@ internal static class PluginRegistrationDiffWriter
 
         foreach (var change in changes)
         {
-            Console.WriteLine($"  {change.Action}: {change.StepId} {change.MessageName} {change.EntityName ?? "<none>"} {change.StageName} {change.ModeName}");
+            Console.WriteLine($"  {GetActionLabel(change.Action),-6} {change.StepId} {change.PluginTypeName} {change.MessageName} {change.EntityName ?? "<none>"} {change.StageName} {change.ModeName}");
             foreach (var reason in change.Reasons)
             {
-                Console.WriteLine($"    - {reason}");
+                Console.WriteLine($"         - {reason}");
             }
         }
     }
@@ -42,6 +46,9 @@ internal static class PluginRegistrationDiffWriter
 
         var changes = diff.ImageChanges
             .Where(change => includeUnchanged || change.Action != PluginDiffAction.Unchanged)
+            .OrderBy(change => change.StepId)
+            .ThenBy(change => change.Action)
+            .ThenBy(change => change.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         if (changes.Count == 0)
@@ -52,11 +59,23 @@ internal static class PluginRegistrationDiffWriter
 
         foreach (var change in changes)
         {
-            Console.WriteLine($"  {change.Action}: {change.ImageId} {change.Type} '{change.Name}' on step {change.StepId}");
+            Console.WriteLine($"  {GetActionLabel(change.Action),-6} {change.ImageId} {change.Type} '{change.Name}' on step {change.StepId}");
             foreach (var reason in change.Reasons)
             {
-                Console.WriteLine($"    - {reason}");
+                Console.WriteLine($"         - {reason}");
             }
         }
+    }
+
+    private static string GetActionLabel(PluginDiffAction action)
+    {
+        return action switch
+        {
+            PluginDiffAction.Create => "CREATE",
+            PluginDiffAction.Update => "UPDATE",
+            PluginDiffAction.Delete => "DELETE",
+            PluginDiffAction.Unchanged => "OK",
+            _ => action.ToString().ToUpperInvariant(),
+        };
     }
 }
