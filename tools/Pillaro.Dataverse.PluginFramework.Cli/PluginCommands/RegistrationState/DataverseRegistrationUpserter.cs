@@ -14,6 +14,16 @@ internal static class DataverseRegistrationUpserter
         var messageIds = await LoadMessageIdsAsync(service, manifest);
         var messageFilterIds = await LoadMessageFilterIdsAsync(service, manifest, messageIds);
 
+        foreach (var imageChange in diff.ImageChanges.Where(change => change.Action == PluginDiffAction.Delete))
+        {
+            await service.DeleteAsync("sdkmessageprocessingstepimage", imageChange.ImageId);
+        }
+
+        foreach (var stepChange in diff.StepChanges.Where(change => change.Action == PluginDiffAction.Delete))
+        {
+            await service.DeleteAsync("sdkmessageprocessingstep", stepChange.StepId);
+        }
+
         foreach (var stepChange in diff.StepChanges.Where(change => change.Action is PluginDiffAction.Create or PluginDiffAction.Update))
         {
             var plugin = manifest.Plugins.Single(item => item.TypeName == stepChange.PluginTypeName);
