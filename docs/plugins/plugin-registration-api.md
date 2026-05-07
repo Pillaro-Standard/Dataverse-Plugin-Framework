@@ -60,7 +60,7 @@ public sealed class ContactPlugin : PluginBase
                 Contact.Fields.Address1_StateOrProvince,
                 Contact.Fields.Address1_Country)
             .WithPreImage(
-                "00000000-0000-0000-0000-000000000001",
+                "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
                 "image",
                 Contact.Fields.Address1_Line1,
                 Contact.Fields.Address1_Line2,
@@ -88,12 +88,12 @@ registration
     .Synchronous()
     .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName)
     .WithPreImage(
-        "00000000-0000-0000-0000-000000000001",
+        "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
         "PreImage",
         Contact.Fields.FirstName,
         Contact.Fields.LastName)
     .WithPostImage(
-        "00000000-0000-0000-0000-000000000002",
+        "c7876278-a6f7-4b87-a47c-0e9ecb391002",
         "PostImage",
         Contact.Fields.FirstName,
         Contact.Fields.LastName);
@@ -131,10 +131,23 @@ Or scan a whole assembly:
 var descriptors = PluginRegistrationDiscovery.DiscoverFromAssembly(typeof(ContactPlugin).Assembly);
 ```
 
-## Notes
+## Validation Rules
+
+The deployment manifest validator enforces basic safety rules:
 
 - `stepId` must be a non-empty GUID and should be the Dataverse `SdkMessageProcessingStepId`.
 - image IDs must be non-empty GUIDs and should be Dataverse `SdkMessageProcessingStepImageId` values.
+- placeholder-looking GUIDs such as `00000000-0000-0000-0000-000000000001` are rejected.
+- synchronous Update steps on an entity must define filtering attributes using `WhenChanged(...)`.
+- filtering attributes are allowed only for Update steps.
+- image names must be unique within a step.
+- image IDs must be unique across the manifest.
+- images should be used only in PreOperation or PostOperation stages.
+- Create steps cannot define pre-images.
+- Delete steps cannot define post-images.
+
+## Notes
+
 - a step can define multiple pre-images and/or post-images when the Dataverse step supports them.
 - entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes.
 - custom API and custom action messages can be registered with `OnMessage(...)`.
