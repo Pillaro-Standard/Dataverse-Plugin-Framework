@@ -41,6 +41,7 @@ internal static class PluginManifestFactory
                             Mode = (int)step.Mode,
                             ModeName = step.Mode.ToString(),
                             Rank = step.Rank,
+                            SolutionName = step.SolutionName,
                             FilteringAttributes = step.FilteringAttributes.OrderBy(attribute => attribute, StringComparer.OrdinalIgnoreCase).ToList(),
                             Images = step.Images
                                 .OrderBy(image => image.Name, StringComparer.OrdinalIgnoreCase)

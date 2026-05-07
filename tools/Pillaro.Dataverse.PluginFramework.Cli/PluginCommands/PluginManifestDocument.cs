@@ -40,6 +40,8 @@ internal sealed class PluginManifestStep
 
     public int Rank { get; set; }
 
+    public string SolutionName { get; set; } = string.Empty;
+
     public List<string> FilteringAttributes { get; set; } = [];
 
     public List<PluginManifestImage> Images { get; set; } = [];
