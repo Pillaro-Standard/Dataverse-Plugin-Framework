@@ -4,9 +4,14 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
 internal static class PacCliAuthService
 {
-    public static async Task<int> EnsureSelectedAsync(DataverseConnectionOptions options)
+    public static Task<int> EnsureSelectedAsync(DataverseConnectionOptions options)
     {
-        if (!options.UsesPacCli)
+        return EnsureSelectedAsync(options, force: false);
+    }
+
+    public static async Task<int> EnsureSelectedAsync(DataverseConnectionOptions options, bool force)
+    {
+        if (!force && !options.UsesPacCli)
         {
             return 0;
         }
