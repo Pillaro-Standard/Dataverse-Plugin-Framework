@@ -10,8 +10,17 @@ if "%PILLARO_DV_CLI%"=="" set "PILLARO_DV_CLI=pillaro-dv"
 call "%SCRIPT_DIR%_load-profile.bat"
 if errorlevel 1 exit /b %errorlevel%
 
+if /I "%PILLARO_DV_AUTH_TYPE%"=="PacCli" (
+    if "%PILLARO_DV_PAC_AUTH_PROFILE%"=="" (
+        "%PILLARO_DV_CLI%" %* --auth-type PacCli --pac-cli "%PILLARO_DV_PAC_CLI%"
+    ) else (
+        "%PILLARO_DV_CLI%" %* --auth-type PacCli --pac-cli "%PILLARO_DV_PAC_CLI%" --pac-auth-profile "%PILLARO_DV_PAC_AUTH_PROFILE%"
+    )
+    exit /b %errorlevel%
+)
+
 if /I "%PILLARO_DV_AUTH_TYPE%"=="ConnectionString" (
-    "%PILLARO_DV_CLI%" %* --connection-string "%PILLARO_DV_CONNECTION_STRING%"
+    "%PILLARO_DV_CLI%" %* --auth-type ConnectionString --connection-string "%PILLARO_DV_CONNECTION_STRING%"
     exit /b %errorlevel%
 )
 
