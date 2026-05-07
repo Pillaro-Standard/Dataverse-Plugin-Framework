@@ -10,16 +10,22 @@ internal static class PillaroSettingsLoader
 
     public static async Task<PillaroSettings> LoadAsync(CommandLineOptions options)
     {
-        var configuredPath = options.Get("settings") ?? DefaultFileName;
-        var path = ResolveSettingsPath(configuredPath);
+        var path = GetResolvedSettingsPath(options);
         if (path == null)
         {
+            var configuredPath = options.Get("settings") ?? DefaultFileName;
             throw new FileNotFoundException($"Pillaro settings file was not found. Expected '{configuredPath}'.");
         }
 
         await using var stream = File.OpenRead(path);
         var settings = await JsonSerializer.DeserializeAsync(stream, PillaroSettingsJsonContext.Default.PillaroSettings);
         return settings ?? throw new InvalidOperationException($"Pillaro settings file '{path}' is empty or invalid.");
+    }
+
+    public static string? GetResolvedSettingsPath(CommandLineOptions options)
+    {
+        var configuredPath = options.Get("settings") ?? DefaultFileName;
+        return ResolveSettingsPath(configuredPath);
     }
 
     public static async Task<DataverseProfile?> TryLoadProfileAsync(CommandLineOptions options, PillaroSettings? settings = null)
