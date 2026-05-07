@@ -5,6 +5,7 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.Configuration;
 internal sealed class PillaroSettings
 {
     public PillaroEarlyBoundSettings EarlyBound { get; set; } = new();
+    public string Solution { get; set; } = string.Empty;
 }
 
 internal sealed class PillaroEarlyBoundSettings

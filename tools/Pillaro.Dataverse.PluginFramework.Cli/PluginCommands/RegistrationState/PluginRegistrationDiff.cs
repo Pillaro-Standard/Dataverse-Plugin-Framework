@@ -12,7 +12,7 @@ internal sealed class PluginRegistrationDiff
 
 internal sealed class PluginStepDiff
 {
-    public PluginDiffAction Action { get; init; }
+    public PluginDiffAction Action { get; set; }
 
     public Guid StepId { get; init; }
 
@@ -31,7 +31,7 @@ internal sealed class PluginStepDiff
 
 internal sealed class PluginImageDiff
 {
-    public PluginDiffAction Action { get; init; }
+    public PluginDiffAction Action { get; set; }
 
     public Guid ImageId { get; init; }
 
