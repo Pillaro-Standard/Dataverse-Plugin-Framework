@@ -31,14 +31,8 @@ internal static class PluginDeployCommand
             if (string.IsNullOrWhiteSpace(solutionName))
             {
                 Console.Error.WriteLine("Missing solution. Set top-level 'solution' in PillaroSettings.json or pass --solution.");
-                Console.Error.WriteLine("Note: earlyBound.solution is used only as fallback for now. Preferred config is top-level 'solution'.");
+                Console.Error.WriteLine("earlyBound.solution is used only by early-bound generation and is not used for plugin deployment.");
                 return 3;
-            }
-
-            if (string.IsNullOrWhiteSpace(settings.Solution) && !string.IsNullOrWhiteSpace(settings.EarlyBound.Solution))
-            {
-                Console.WriteLine("Warning: using earlyBound.solution as plugin deployment solution fallback. Move it to top-level 'solution'.");
-                Console.WriteLine();
             }
 
             if (string.IsNullOrWhiteSpace(assemblyPath) || !File.Exists(assemblyPath))
@@ -176,8 +170,7 @@ internal static class PluginDeployCommand
     private static string? ResolveSolutionName(CommandLineOptions options, PillaroSettings settings)
     {
         return options.Get("solution")
-            ?? NullIfWhiteSpace(settings.Solution)
-            ?? NullIfWhiteSpace(settings.EarlyBound.Solution);
+            ?? NullIfWhiteSpace(settings.Solution);
     }
 
     private static string? NullIfWhiteSpace(string? value)
