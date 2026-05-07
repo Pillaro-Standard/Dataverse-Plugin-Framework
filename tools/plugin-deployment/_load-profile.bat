@@ -25,21 +25,25 @@ if exist "%PILLARO_DV_PROFILE_FILE%" (
 )
 
 :validate
+if "%PILLARO_DV_AUTH_TYPE%"=="" set "PILLARO_DV_AUTH_TYPE=ClientSecret"
+
+if /I "%PILLARO_DV_AUTH_TYPE%"=="ConnectionString" goto :validate_connection_string
+if /I "%PILLARO_DV_AUTH_TYPE%"=="ClientSecret" goto :validate_environment_url
+if /I "%PILLARO_DV_AUTH_TYPE%"=="Interactive" goto :validate_environment_url
+
+echo Unsupported PILLARO_DV_AUTH_TYPE: %PILLARO_DV_AUTH_TYPE%
+echo Supported values: ClientSecret, ConnectionString, Interactive.
+exit /b 22
+
+:validate_environment_url
 if "%PILLARO_DV_URL%"=="" (
     echo Missing PILLARO_DV_URL.
     echo Set it in local profile or as a secure pipeline variable.
     exit /b 21
 )
 
-if "%PILLARO_DV_AUTH_TYPE%"=="" set "PILLARO_DV_AUTH_TYPE=ClientSecret"
-
-if /I "%PILLARO_DV_AUTH_TYPE%"=="ConnectionString" goto :validate_connection_string
-if /I "%PILLARO_DV_AUTH_TYPE%"=="ClientSecret" goto :validate_client_secret
 if /I "%PILLARO_DV_AUTH_TYPE%"=="Interactive" goto :success
-
-echo Unsupported PILLARO_DV_AUTH_TYPE: %PILLARO_DV_AUTH_TYPE%
-echo Supported values: ClientSecret, ConnectionString, Interactive.
-exit /b 22
+goto :validate_client_secret
 
 :validate_connection_string
 if "%PILLARO_DV_CONNECTION_STRING%"=="" (
