@@ -4,36 +4,24 @@ setlocal EnableExtensions
 rem ============================================================
 rem Local smoke runner for Pillaro Dataverse CLI development build.
 rem
-rem Expected location:
-rem   tools\Pillaro.Dataverse.PluginFramework.Cli\bin\run-examples-smoke.bat
+rem Manifest source:
+rem   examples\Pillaro.Dataverse.PluginFramework.Examples.Logic\bin\Debug\Pillaro.Dataverse.PluginFramework.Examples.Logic.dll
 rem
-rem Expected CLI build:
-rem   tools\Pillaro.Dataverse.PluginFramework.Cli\bin\Debug\net8.0\pillaro-dv.exe
+rem Deployment assembly:
+rem   examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\bin\Debug\Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll
 rem
-rem Usage:
-rem   run-examples-smoke.bat manifest
-rem   run-examples-smoke.bat validate
-rem   run-examples-smoke.bat diff
-rem   run-examples-smoke.bat deploy
-rem   run-examples-smoke.bat all
-rem
-rem Required for diff/deploy:
-rem   set "DV_CONN=AuthType=ClientSecret;Url=...;ClientId=...;ClientSecret=...;TenantId=..."
-rem
-rem Required for deploy when PAC push is enabled:
-rem   set "DV_PAC=YourPacProfileName"
-rem   set "DV_PLUGIN_ID=Existing Dataverse plugin assembly id"
-rem
-rem Optional:
-rem   set "DV_SKIP_PAC_PUSH=1"
+rem Reason:
+rem   The deployable plugin assembly is ILMerged. Manifest discovery must read the logic assembly,
+rem   where framework type identity is still clean and Register(IPluginRegistration) can be invoked.
 rem ============================================================
 
 set "SCRIPT_DIR=%~dp0"
 set "ROOT_DIR=%SCRIPT_DIR%..\..\..\"
 set "CLI=%SCRIPT_DIR%Debug\net8.0\pillaro-dv.exe"
-set "EXAMPLES_PLUGIN_PROJECT=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\Pillaro.Dataverse.PluginFramework.Examples.Plugins.csproj"
-set "EXAMPLES_PLUGIN_DLL_DEBUG=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\bin\Debug\Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
-set "EXAMPLES_PLUGIN_DLL_RELEASE=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\bin\Release\Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
+set "MANIFEST_SOURCE_DLL_DEBUG=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Logic\bin\Debug\Pillaro.Dataverse.PluginFramework.Examples.Logic.dll"
+set "MANIFEST_SOURCE_DLL_RELEASE=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Logic\bin\Release\Pillaro.Dataverse.PluginFramework.Examples.Logic.dll"
+set "DEPLOY_PLUGIN_DLL_DEBUG=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\bin\Debug\Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
+set "DEPLOY_PLUGIN_DLL_RELEASE=%ROOT_DIR%examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins\bin\Release\Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
 set "ARTIFACTS_DIR=%ROOT_DIR%artifacts\examples"
 set "MANIFEST=%ARTIFACTS_DIR%\examples-plugin-manifest.json"
 
@@ -50,27 +38,41 @@ if not exist "%CLI%" (
     exit /b 2
 )
 
-if exist "%EXAMPLES_PLUGIN_DLL_DEBUG%" (
-    set "PLUGIN_DLL=%EXAMPLES_PLUGIN_DLL_DEBUG%"
-) else if exist "%EXAMPLES_PLUGIN_DLL_RELEASE%" (
-    set "PLUGIN_DLL=%EXAMPLES_PLUGIN_DLL_RELEASE%"
+if exist "%MANIFEST_SOURCE_DLL_DEBUG%" (
+    set "MANIFEST_SOURCE_DLL=%MANIFEST_SOURCE_DLL_DEBUG%"
+) else if exist "%MANIFEST_SOURCE_DLL_RELEASE%" (
+    set "MANIFEST_SOURCE_DLL=%MANIFEST_SOURCE_DLL_RELEASE%"
 ) else (
-    echo Examples plugin assembly was not found.
+    echo Manifest source assembly was not found.
     echo Expected one of:
-    echo   %EXAMPLES_PLUGIN_DLL_DEBUG%
-    echo   %EXAMPLES_PLUGIN_DLL_RELEASE%
-    echo Build examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins in Visual Studio first.
+    echo   %MANIFEST_SOURCE_DLL_DEBUG%
+    echo   %MANIFEST_SOURCE_DLL_RELEASE%
+    echo Build examples\Pillaro.Dataverse.PluginFramework.Examples.Logic in Visual Studio first.
     exit /b 3
+)
+
+if exist "%DEPLOY_PLUGIN_DLL_DEBUG%" (
+    set "DEPLOY_PLUGIN_DLL=%DEPLOY_PLUGIN_DLL_DEBUG%"
+) else if exist "%DEPLOY_PLUGIN_DLL_RELEASE%" (
+    set "DEPLOY_PLUGIN_DLL=%DEPLOY_PLUGIN_DLL_RELEASE%"
+) else (
+    echo Deploy plugin assembly was not found.
+    echo Expected one of:
+    echo   %DEPLOY_PLUGIN_DLL_DEBUG%
+    echo   %DEPLOY_PLUGIN_DLL_RELEASE%
+    echo Build examples\Pillaro.Dataverse.PluginFramework.Examples.Plugins in Visual Studio first.
+    exit /b 4
 )
 
 if not exist "%ARTIFACTS_DIR%" mkdir "%ARTIFACTS_DIR%"
 
 echo.
 echo === Pillaro Dataverse Plugin Framework smoke runner ===
-echo CLI:      %CLI%
-echo Plugin:   %PLUGIN_DLL%
-echo Manifest: %MANIFEST%
-echo Command:  %COMMAND%
+echo CLI:             %CLI%
+echo Manifest source: %MANIFEST_SOURCE_DLL%
+echo Deploy plugin:   %DEPLOY_PLUGIN_DLL%
+echo Manifest:        %MANIFEST%
+echo Command:         %COMMAND%
 echo.
 
 if /I "%COMMAND%"=="manifest" goto :manifest
@@ -94,7 +96,7 @@ exit /b %errorlevel%
 :manifest
 echo.
 echo --- Generate manifest ---
-"%CLI%" plugin manifest --assembly "%PLUGIN_DLL%" --output "%MANIFEST%"
+"%CLI%" plugin manifest --assembly "%MANIFEST_SOURCE_DLL%" --output "%MANIFEST%"
 exit /b %errorlevel%
 
 :validate
@@ -144,5 +146,5 @@ if "%DV_SKIP_PAC_PUSH%"=="1" (
     set "PUSH_ARGS=--plugin-id "%DV_PLUGIN_ID%" --plugin-type Assembly"
 )
 
-"%CLI%" plugin deploy --manifest "%MANIFEST%" --assembly "%PLUGIN_DLL%" --conn "%DV_CONN%" %PAC_ARGS% %PUSH_ARGS% --confirm --include-unchanged
+"%CLI%" plugin deploy --manifest "%MANIFEST%" --assembly "%DEPLOY_PLUGIN_DLL%" --conn "%DV_CONN%" %PAC_ARGS% %PUSH_ARGS% --confirm --include-unchanged
 exit /b %errorlevel%
