@@ -46,7 +46,7 @@ internal static class PluginDiffCommand
             }
 
             Console.WriteLine("Plugin manifest is valid.");
-            Console.WriteLine($"Target environment: {GetTargetLabel(connectionOptions)}");
+            Console.WriteLine("Target environment: <from sdk connection string>");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
@@ -64,10 +64,5 @@ internal static class PluginDiffCommand
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
-    }
-
-    private static string GetTargetLabel(DataverseConnectionOptions options)
-    {
-        return options.SdkEnvironmentUrl ?? "<connection-string>";
     }
 }
