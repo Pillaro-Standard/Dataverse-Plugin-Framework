@@ -68,6 +68,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         private PluginStage? _stage;
         private PluginMode? _mode;
         private int _rank = 1;
+        private string? _solutionName;
         private PluginDeploymentPolicyDescriptor? _deploymentPolicy;
 
         public StepBuilder(string stepId, string messageName, string? entityName, bool isUpdate)
@@ -97,6 +98,12 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public IPluginStepBuilder Rank(int rank)
         {
             SetRank(rank);
+            return this;
+        }
+
+        public IPluginStepBuilder InSolution(string solutionName)
+        {
+            SetSolution(solutionName);
             return this;
         }
 
@@ -130,6 +137,11 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 throw new InvalidOperationException($"Plugin step '{StepId}' must define an execution mode.");
             }
 
+            if (string.IsNullOrWhiteSpace(_solutionName))
+            {
+                throw new InvalidOperationException($"Plugin step '{StepId}' must define solution name using InSolution(...).");
+            }
+
             return new PluginStepRegistrationDescriptor(
                 StepId,
                 pluginType,
@@ -138,6 +150,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 _stage.Value,
                 _mode.Value,
                 _rank,
+                _solutionName,
                 _filteringAttributes.Distinct(StringComparer.OrdinalIgnoreCase).ToArray(),
                 _images.ToArray(),
                 _deploymentPolicy);
@@ -173,6 +186,11 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             }
 
             _rank = rank;
+        }
+
+        protected void SetSolution(string solutionName)
+        {
+            _solutionName = RequireValue(solutionName, nameof(solutionName));
         }
 
         protected void AddImage(string imageId, PluginImageType type, string name, string[] attributes)
@@ -290,6 +308,12 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public new IPluginUpdateStepBuilder<TEntity> Rank(int rank)
         {
             SetRank(rank);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName)
+        {
+            SetSolution(solutionName);
             return this;
         }
 
