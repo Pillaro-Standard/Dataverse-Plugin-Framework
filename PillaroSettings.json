@@ -3,7 +3,7 @@
   "plugins": {
     "assembly": "bin/Release/net462/Contoso.Plugins.dll",
     "manifest": "artifacts/plugin-manifest.json",
-    "pluginId": "00000000-0000-0000-0000-000000000000",
+    "pluginId": "",
     "pluginType": "Assembly"
   },
   "earlyBound": {
