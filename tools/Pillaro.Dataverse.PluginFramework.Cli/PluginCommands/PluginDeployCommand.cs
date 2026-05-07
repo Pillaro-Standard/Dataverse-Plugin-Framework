@@ -38,6 +38,12 @@ internal static class PluginDeployCommand
                 return 3;
             }
 
+            var pacAuthResult = await PacCliAuthService.EnsureSelectedAsync(connectionOptions);
+            if (pacAuthResult != 0)
+            {
+                return pacAuthResult;
+            }
+
             var manifest = await PluginManifestSerializer.LoadAsync(manifestPath);
             var manifestErrors = PluginManifestValidator.Validate(manifest);
             if (manifestErrors.Count > 0)
@@ -68,7 +74,7 @@ internal static class PluginDeployCommand
             }
 
             Console.WriteLine("Plugin manifest is valid.");
-            Console.WriteLine($"Target environment: {connectionOptions.EnvironmentUrl ?? "<connection-string>"}");
+            Console.WriteLine($"Target environment: {GetTargetLabel(connectionOptions)}");
             Console.WriteLine($"Assembly: {Path.GetFullPath(assemblyPath)}");
             Console.WriteLine($"Solution: {connectionOptions.SolutionName ?? "<not specified>"}");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
@@ -84,5 +90,17 @@ internal static class PluginDeployCommand
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
+    }
+
+    private static string GetTargetLabel(DataverseConnectionOptions options)
+    {
+        if (options.UsesPacCli)
+        {
+            return string.IsNullOrWhiteSpace(options.PacAuthProfile)
+                ? "PAC CLI active profile"
+                : $"PAC CLI profile '{options.PacAuthProfile}'";
+        }
+
+        return options.EnvironmentUrl ?? "<connection-string>";
     }
 }
