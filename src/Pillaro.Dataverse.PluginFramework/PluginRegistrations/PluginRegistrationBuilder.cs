@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 using System.Linq.Expressions;
 using System.Reflection;
