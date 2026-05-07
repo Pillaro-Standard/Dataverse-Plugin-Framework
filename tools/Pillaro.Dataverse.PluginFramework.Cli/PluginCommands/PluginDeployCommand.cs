@@ -1,29 +1,33 @@
-﻿using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
+﻿using Pillaro.Dataverse.PluginFramework.Cli.Configuration;
+using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
 using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
 internal static class PluginDeployCommand
 {
+    private const string InternalManifestPath = "artifacts/plugin-manifest.json";
+
     public static async Task<int> RunAsync(string[] args)
     {
         try
         {
             var options = CommandLineOptions.Parse(args);
-            var manifestPath = options.Require("manifest");
-            var assemblyPath = options.Require("assembly");
-            var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options);
+            var settings = await PillaroSettingsLoader.LoadAsync(options);
+            var assemblyPath = options.Get("assembly") ?? settings.Plugins.Assembly;
+            var solutionName = options.Get("solution") ?? settings.Solution;
+            var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options, settings);
             var pacPushOptions = PacPluginPushOptions.From(options);
             var allowConfirmationRequired = options.HasFlag("confirm");
             var includeUnchanged = options.HasFlag("include-unchanged");
 
-            if (!File.Exists(manifestPath))
+            if (string.IsNullOrWhiteSpace(solutionName))
             {
-                Console.Error.WriteLine($"Manifest was not found: {manifestPath}");
-                return 2;
+                Console.Error.WriteLine("Missing solution. Set 'solution' in PillaroSettings.json or pass --solution.");
+                return 3;
             }
 
-            if (!File.Exists(assemblyPath))
+            if (string.IsNullOrWhiteSpace(assemblyPath) || !File.Exists(assemblyPath))
             {
                 Console.Error.WriteLine($"Assembly was not found: {assemblyPath}");
                 return 2;
@@ -71,7 +75,7 @@ internal static class PluginDeployCommand
                 return pacAuthResult;
             }
 
-            var manifest = await PluginManifestSerializer.LoadAsync(manifestPath);
+            var manifest = PluginManifestFactory.CreateFromAssembly(assemblyPath);
             var manifestErrors = PluginManifestValidator.Validate(manifest);
             if (manifestErrors.Count > 0)
             {
@@ -83,6 +87,9 @@ internal static class PluginDeployCommand
 
                 return 4;
             }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(InternalManifestPath)!);
+            await PluginManifestSerializer.SaveAsync(manifest, InternalManifestPath);
 
             var confirmationRequiredSteps = manifest.Plugins
                 .SelectMany(plugin => plugin.Steps)
@@ -103,7 +110,8 @@ internal static class PluginDeployCommand
             Console.WriteLine("Plugin manifest is valid.");
             Console.WriteLine("SDK target environment: <from profile/connection string>");
             Console.WriteLine($"Assembly: {Path.GetFullPath(assemblyPath)}");
-            Console.WriteLine($"Solutions: {string.Join(", ", GetSolutions(manifest))}");
+            Console.WriteLine($"Solution: {solutionName}");
+            Console.WriteLine($"Manifest: {Path.GetFullPath(InternalManifestPath)}");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
@@ -129,7 +137,7 @@ internal static class PluginDeployCommand
 
             Console.WriteLine();
             Console.WriteLine("Applying step/image metadata changes using Pillaro registration layer...");
-            await DataverseRegistrationUpserter.ApplyAsync(service, manifest, diff);
+            await DataverseRegistrationUpserter.ApplyAsync(service, manifest, diff, solutionName);
             Console.WriteLine("Step/image metadata deploy completed.");
 
             return 0;
@@ -139,16 +147,5 @@ internal static class PluginDeployCommand
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
-    }
-
-    private static IReadOnlyCollection<string> GetSolutions(PluginManifestDocument manifest)
-    {
-        return manifest.Plugins
-            .SelectMany(plugin => plugin.Steps)
-            .Select(step => step.SolutionName)
-            .Where(solution => !string.IsNullOrWhiteSpace(solution))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(solution => solution, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
     }
 }
