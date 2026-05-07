@@ -14,7 +14,8 @@ internal static class PluginDeployCommand
         {
             var options = CommandLineOptions.Parse(args);
             var settings = await PillaroSettingsLoader.LoadAsync(options);
-            var assemblyPath = options.Get("assembly") ?? settings.Plugins.Assembly;
+            var configuredAssemblyPath = options.Get("assembly") ?? settings.Plugins.Assembly;
+            var assemblyPath = ResolveAssemblyPath(options, configuredAssemblyPath);
             var solutionName = ResolveSolutionName(options, settings);
             var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options, settings);
             var pacPushOptions = PacPluginPushOptions.From(options);
@@ -23,6 +24,7 @@ internal static class PluginDeployCommand
 
             CliLog.WriteHeader("plugin deploy", options, settings, connectionOptions);
             Console.WriteLine($"Resolved solution: {solutionName ?? "<empty>"}");
+            Console.WriteLine($"Configured plugin assembly: {configuredAssemblyPath ?? "<empty>"}");
             Console.WriteLine($"Resolved plugin assembly: {assemblyPath ?? "<empty>"}");
             Console.WriteLine();
 
@@ -42,6 +44,7 @@ internal static class PluginDeployCommand
             if (string.IsNullOrWhiteSpace(assemblyPath) || !File.Exists(assemblyPath))
             {
                 Console.Error.WriteLine($"Assembly was not found: {assemblyPath}");
+                Console.Error.WriteLine("Relative paths from PillaroSettings.json are resolved from the settings file directory.");
                 Console.Error.WriteLine("Set plugins.assembly in PillaroSettings.json or pass --assembly.");
                 return 2;
             }
@@ -101,8 +104,9 @@ internal static class PluginDeployCommand
                 return 4;
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(InternalManifestPath)!);
-            await PluginManifestSerializer.SaveAsync(manifest, InternalManifestPath);
+            var manifestPath = PillaroSettingsLoader.ResolvePathFromSettings(options, InternalManifestPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(manifestPath)!);
+            await PluginManifestSerializer.SaveAsync(manifest, manifestPath);
 
             var confirmationRequiredSteps = manifest.Plugins
                 .SelectMany(plugin => plugin.Steps)
@@ -124,7 +128,7 @@ internal static class PluginDeployCommand
             Console.WriteLine("SDK target environment: <from profile/connection string>");
             Console.WriteLine($"Assembly: {Path.GetFullPath(assemblyPath)}");
             Console.WriteLine($"Solution: {solutionName}");
-            Console.WriteLine($"Manifest: {Path.GetFullPath(InternalManifestPath)}");
+            Console.WriteLine($"Manifest: {manifestPath}");
             Console.WriteLine($"Plugins: {manifest.Plugins.Count}");
             Console.WriteLine($"Steps: {manifest.Plugins.Sum(plugin => plugin.Steps.Count)}");
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
@@ -160,6 +164,13 @@ internal static class PluginDeployCommand
             Console.Error.WriteLine(ex.Message);
             return 1;
         }
+    }
+
+    private static string? ResolveAssemblyPath(CommandLineOptions options, string? configuredAssemblyPath)
+    {
+        return string.IsNullOrWhiteSpace(configuredAssemblyPath)
+            ? null
+            : PillaroSettingsLoader.ResolvePathFromSettings(options, configuredAssemblyPath);
     }
 
     private static string? ResolveSolutionName(CommandLineOptions options, PillaroSettings settings)
