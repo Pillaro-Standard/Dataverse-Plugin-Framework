@@ -2,6 +2,8 @@
 
 internal sealed class DataverseRegistrationState
 {
+    public Dictionary<string, Guid> PluginTypeIdsByName { get; } = new(StringComparer.OrdinalIgnoreCase);
+
     public Dictionary<Guid, DataverseStepState> StepsById { get; } = [];
 
     public Dictionary<Guid, DataverseImageState> ImagesById { get; } = [];
@@ -10,6 +12,10 @@ internal sealed class DataverseRegistrationState
 internal sealed class DataverseStepState
 {
     public Guid StepId { get; init; }
+
+    public Guid PluginTypeId { get; init; }
+
+    public string PluginTypeName { get; init; } = string.Empty;
 
     public string? Name { get; init; }
 
