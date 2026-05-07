@@ -1,4 +1,5 @@
-﻿using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
+﻿using Pillaro.Dataverse.PluginFramework.Cli.Configuration;
+using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
@@ -25,13 +26,31 @@ internal sealed class DataverseConnectionOptions
         };
     }
 
+    public static async Task<DataverseConnectionOptions> ResolveAsync(CommandLineOptions options, PillaroSettings? settings = null)
+    {
+        var profile = await PillaroSettingsLoader.TryLoadProfileAsync(options, settings);
+
+        return new DataverseConnectionOptions
+        {
+            SdkConnectionString = options.Get("conn")
+                ?? options.Get("sdk-connection-string")
+                ?? options.Get("connection-string")
+                ?? profile?.ConnectionString,
+            PacAuthProfile = options.Get("pac-profile")
+                ?? options.Get("pac-auth-profile")
+                ?? profile?.PacProfile,
+            PacCliPath = options.Get("pac-cli") ?? "pac",
+            SolutionName = options.Get("solution"),
+        };
+    }
+
     public IReadOnlyCollection<string> ValidateSdk()
     {
         var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(SdkConnectionString))
         {
-            errors.Add("Missing --conn.");
+            errors.Add("Missing Dataverse connection string. Use --conn or configure a profile in %USERPROFILE%\\.pillaro\\dataverse-profiles.json.");
         }
 
         return errors;
