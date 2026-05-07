@@ -8,6 +8,7 @@ The goal is to keep plugin registration readable for developers while preserving
 
 - registration is visible directly in the plugin class
 - one plugin class can define multiple Dataverse steps
+- one Dataverse step can define multiple images
 - step and image IDs are explicit and match Dataverse IDs
 - IntelliSense guides the developer through valid registration order
 - update filtering attributes are available only for Update steps
@@ -76,6 +77,30 @@ public sealed class ContactPlugin : PluginBase
 }
 ```
 
+## Multiple Images Per Step
+
+A step can have multiple images. Each image has its own Dataverse `SdkMessageProcessingStepImageId`.
+
+```csharp
+registration
+    .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName)
+    .WithPreImage(
+        "00000000-0000-0000-0000-000000000001",
+        "PreImage",
+        Contact.Fields.FirstName,
+        Contact.Fields.LastName)
+    .WithPostImage(
+        "00000000-0000-0000-0000-000000000002",
+        "PostImage",
+        Contact.Fields.FirstName,
+        Contact.Fields.LastName);
+```
+
+The fluent chain keeps every image attached to the exact step where it is declared. No additional linking attribute or registration ID is needed.
+
 ## Runtime vs Deployment Metadata
 
 The constructor remains responsible for runtime task registration:
@@ -110,5 +135,6 @@ var descriptors = PluginRegistrationDiscovery.DiscoverFromAssembly(typeof(Contac
 
 - `stepId` must be a non-empty GUID and should be the Dataverse `SdkMessageProcessingStepId`.
 - image IDs must be non-empty GUIDs and should be Dataverse `SdkMessageProcessingStepImageId` values.
+- a step can define multiple pre-images and/or post-images when the Dataverse step supports them.
 - entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes.
 - custom API and custom action messages can be registered with `OnMessage(...)`.
