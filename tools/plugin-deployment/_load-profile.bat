@@ -26,47 +26,12 @@ if exist "%PILLARO_DV_PROFILE_FILE%" (
 
 :validate
 if "%PILLARO_DV_PAC_CLI%"=="" set "PILLARO_DV_PAC_CLI=pac"
-if "%PILLARO_DV_SDK_AUTH_TYPE%"=="" set "PILLARO_DV_SDK_AUTH_TYPE=ClientSecret"
 
-if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="ConnectionString" goto :validate_sdk_connection_string
-if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="ClientSecret" goto :validate_sdk_environment_url
-if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="Interactive" goto :validate_sdk_environment_url
-
-echo Unsupported PILLARO_DV_SDK_AUTH_TYPE: %PILLARO_DV_SDK_AUTH_TYPE%
-echo Supported values: ClientSecret, ConnectionString, Interactive.
-exit /b 22
-
-:validate_sdk_environment_url
-if "%PILLARO_DV_SDK_ENVIRONMENT%"=="" (
-    echo Missing PILLARO_DV_SDK_ENVIRONMENT.
-    echo Set it in local profile or as a secure pipeline variable.
-    exit /b 21
-)
-
-if /I "%PILLARO_DV_SDK_AUTH_TYPE%"=="Interactive" goto :success
-goto :validate_sdk_client_secret
-
-:validate_sdk_connection_string
 if "%PILLARO_DV_SDK_CONNECTION_STRING%"=="" (
-    echo Missing PILLARO_DV_SDK_CONNECTION_STRING for ConnectionString authentication.
+    echo Missing PILLARO_DV_SDK_CONNECTION_STRING.
+    echo Put the complete Dataverse SDK connection string into the local profile or secure pipeline variable.
     exit /b 23
 )
-goto :success
-
-:validate_sdk_client_secret
-if "%PILLARO_DV_SDK_TENANT_ID%"=="" (
-    echo Missing PILLARO_DV_SDK_TENANT_ID for ClientSecret authentication.
-    exit /b 24
-)
-if "%PILLARO_DV_SDK_CLIENT_ID%"=="" (
-    echo Missing PILLARO_DV_SDK_CLIENT_ID for ClientSecret authentication.
-    exit /b 25
-)
-if "%PILLARO_DV_SDK_CLIENT_SECRET%"=="" (
-    echo Missing PILLARO_DV_SDK_CLIENT_SECRET for ClientSecret authentication.
-    exit /b 26
-)
-goto :success
 
 :success
 endlocal & (
@@ -74,11 +39,6 @@ endlocal & (
     set "PILLARO_DV_PROFILE_FILE=%PILLARO_DV_PROFILE_FILE%"
     set "PILLARO_DV_PAC_AUTH_PROFILE=%PILLARO_DV_PAC_AUTH_PROFILE%"
     set "PILLARO_DV_PAC_CLI=%PILLARO_DV_PAC_CLI%"
-    set "PILLARO_DV_SDK_AUTH_TYPE=%PILLARO_DV_SDK_AUTH_TYPE%"
-    set "PILLARO_DV_SDK_ENVIRONMENT=%PILLARO_DV_SDK_ENVIRONMENT%"
-    set "PILLARO_DV_SDK_TENANT_ID=%PILLARO_DV_SDK_TENANT_ID%"
-    set "PILLARO_DV_SDK_CLIENT_ID=%PILLARO_DV_SDK_CLIENT_ID%"
-    set "PILLARO_DV_SDK_CLIENT_SECRET=%PILLARO_DV_SDK_CLIENT_SECRET%"
     set "PILLARO_DV_SDK_CONNECTION_STRING=%PILLARO_DV_SDK_CONNECTION_STRING%"
 )
 exit /b 0
