@@ -36,19 +36,25 @@ public static class PluginRegistrationDiscovery
             .Invoke(builder, null)!;
     }
 
-    public static IReadOnlyCollection<PluginRegistrationDescriptor> DiscoverFromAssembly(Assembly assembly)
+    public static PluginRegistrationDiscoveryResult DiscoverFromAssembly(Assembly assembly)
     {
         if (assembly == null)
         {
             throw new ArgumentNullException(nameof(assembly));
         }
 
-        return assembly
+        var pluginTypes = assembly
             .GetTypes()
             .Where(type => !type.IsAbstract && typeof(IPlugin).IsAssignableFrom(type))
-            .Where(HasRegisterMethod)
-            .Select(Discover)
+            .OrderBy(type => type.FullName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
+
+        var registeredPluginTypes = pluginTypes.Where(HasRegisterMethod).ToArray();
+        var skippedPluginTypes = pluginTypes.Except(registeredPluginTypes).Select(type => type.FullName ?? type.Name).ToArray();
+
+        return new PluginRegistrationDiscoveryResult(
+            registeredPluginTypes.Select(Discover).ToArray(),
+            skippedPluginTypes);
     }
 
     private static MethodInfo GetRegisterMethod(Type pluginType)
@@ -82,3 +88,7 @@ public static class PluginRegistrationDiscovery
             && parameters[0].ParameterType == typeof(IPluginRegistration);
     }
 }
+
+public sealed record PluginRegistrationDiscoveryResult(
+    IReadOnlyCollection<PluginRegistrationDescriptor> Registrations,
+    IReadOnlyCollection<string> PluginTypesWithoutRegistration);
