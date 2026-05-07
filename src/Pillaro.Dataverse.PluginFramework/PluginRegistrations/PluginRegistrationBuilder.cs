@@ -201,10 +201,23 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
 
         private void AddImage(string imageId, PluginImageType type, string name, string[] attributes)
         {
+            var parsedImageId = ParseGuid(imageId, nameof(imageId));
+            var normalizedName = RequireValue(name, nameof(name));
+
+            if (_images.Any(image => image.ImageId == parsedImageId))
+            {
+                throw new InvalidOperationException($"Plugin step '{StepId}' already contains image with ID '{parsedImageId}'.");
+            }
+
+            if (_images.Any(image => string.Equals(image.Name, normalizedName, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException($"Plugin step '{StepId}' already contains image named '{normalizedName}'. Image names must be unique within one step.");
+            }
+
             _images.Add(new PluginImageRegistrationDescriptor(
-                ParseGuid(imageId, nameof(imageId)),
+                parsedImageId,
                 type,
-                RequireValue(name, nameof(name)),
+                normalizedName,
                 NormalizeAttributes(attributes, nameof(attributes)).ToArray()));
         }
 
