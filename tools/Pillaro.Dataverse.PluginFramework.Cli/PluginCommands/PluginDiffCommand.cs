@@ -38,6 +38,13 @@ internal static class PluginDiffCommand
                 return pacAuthResult;
             }
 
+            if (connectionOptions.UsesPacCli)
+            {
+                Console.Error.WriteLine("SDK-backed registration diff cannot currently reuse PAC CLI credentials directly.");
+                Console.Error.WriteLine("Use --auth-type ConnectionString or --auth-type ClientSecret for reading Dataverse step/image metadata.");
+                return 32;
+            }
+
             var manifest = await PluginManifestSerializer.LoadAsync(manifestPath);
             var manifestErrors = PluginManifestValidator.Validate(manifest);
             if (manifestErrors.Count > 0)
@@ -58,13 +65,10 @@ internal static class PluginDiffCommand
             Console.WriteLine($"Images: {manifest.Plugins.SelectMany(plugin => plugin.Steps).Sum(step => step.Images.Count)}");
             Console.WriteLine();
 
-            // TODO: Replace empty state with real Dataverse registration reader.
-            var currentState = new DataverseRegistrationState();
+            var service = DataverseSdkConnectionFactory.Create(connectionOptions);
+            var currentState = await DataverseRegistrationStateReader.ReadAsync(service, manifest);
             var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
             PluginRegistrationDiffWriter.Write(diff, includeUnchanged);
-
-            Console.WriteLine();
-            Console.WriteLine("Current Dataverse state reader is not implemented yet. Diff currently treats all manifest records as missing in Dataverse.");
 
             return diff.HasChanges ? 10 : 0;
         }
