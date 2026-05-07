@@ -6,7 +6,22 @@ internal sealed class PillaroSettings
 {
     public string Profile { get; set; } = string.Empty;
 
+    public string Solution { get; set; } = string.Empty;
+
+    public PillaroPluginSettings Plugins { get; set; } = new();
+
     public PillaroEarlyBoundSettings EarlyBound { get; set; } = new();
+}
+
+internal sealed class PillaroPluginSettings
+{
+    public string Assembly { get; set; } = string.Empty;
+
+    public string Manifest { get; set; } = "artifacts/plugin-manifest.json";
+
+    public string PluginId { get; set; } = string.Empty;
+
+    public string PluginType { get; set; } = "Assembly";
 }
 
 internal sealed class PillaroEarlyBoundSettings
