@@ -1,6 +1,6 @@
 # Plugin Deployment Batch Scripts
 
-These scripts provide a Windows-friendly developer and pipeline entry point for plugin registration deployment.
+These scripts provide a Windows-friendly developer and pipeline entry point for Dataverse plugin registration deployment.
 
 They follow the same practical idea as spkl scripts:
 
@@ -8,17 +8,51 @@ They follow the same practical idea as spkl scripts:
 - CI/CD pipelines can pass credentials through secure environment variables,
 - Visual Studio and DevOps can call the same commands.
 
+## Deployment Behavior
+
+Plugin deployment synchronizes Dataverse registration metadata with the C# registration manifest.
+
+For every plugin type discovered from the deployed assembly:
+
+```text
+Dataverse registration state for plugin type == C# Register(...) manifest for plugin type
+```
+
+This means:
+
+- steps defined in C# and missing in Dataverse are created,
+- steps defined in both places but different are updated,
+- steps existing in Dataverse but no longer defined in C# are deleted,
+- images defined in C# and missing in Dataverse are created,
+- images defined in both places but different are updated,
+- images existing in Dataverse for in-scope steps but no longer defined in C# are deleted.
+
+Delete operations are scoped to plugin types discovered from the deployed assembly. The scripts must not affect other plugin types or unrelated manually registered plugins.
+
 ## Scripts
 
 | Script | Purpose |
 |---|---|
 | `plugin-manifest.bat` | Generates plugin deployment manifest from compiled plugin assembly. |
 | `plugin-validate.bat` | Validates plugin manifest. |
-| `plugin-diff.bat` | Compares manifest with Dataverse. |
-| `plugin-deploy.bat` | Deploys assembly and plugin registration metadata. |
+| `plugin-diff.bat` | Compares manifest with Dataverse and shows create/update/delete changes. |
+| `plugin-deploy.bat` | Deploys assembly and synchronizes scoped plugin registration metadata. |
 | `_load-profile.bat` | Internal credential/profile loader. |
 | `_run-pillaro-dv.bat` | Internal CLI runner. |
 | `local-profile.template.cmd` | Template for local developer credentials. |
+
+## Recommended Local Flow
+
+Use this flow during local development:
+
+```bat
+call tools\plugin-deployment\plugin-manifest.bat src\Contoso.Plugins\bin\Debug\net462\Contoso.Plugins.dll artifacts\plugin-manifest.json
+call tools\plugin-deployment\plugin-validate.bat artifacts\plugin-manifest.json
+call tools\plugin-deployment\plugin-diff.bat artifacts\plugin-manifest.json
+call tools\plugin-deployment\plugin-deploy.bat src\Contoso.Plugins\bin\Debug\net462\Contoso.Plugins.dll artifacts\plugin-manifest.json ContosoCore
+```
+
+Do not skip `plugin-diff.bat` when removing or renaming steps/images. The diff is the review point before Dataverse is synchronized.
 
 ## Local Developer Setup
 
@@ -94,21 +128,21 @@ tools\plugin-deployment\plugin-deploy.bat src\Contoso.Plugins\bin\Debug\net462\C
 
 ```bat
 call "$(SolutionDir)tools\plugin-deployment\plugin-manifest.bat" "$(TargetPath)" "$(SolutionDir)artifacts\plugin-manifest.json"
+call "$(SolutionDir)tools\plugin-deployment\plugin-diff.bat" "$(SolutionDir)artifacts\plugin-manifest.json"
 call "$(SolutionDir)tools\plugin-deployment\plugin-deploy.bat" "$(TargetPath)" "$(SolutionDir)artifacts\plugin-manifest.json" "ContosoCore"
 ```
 
 ## Pipeline Usage
 
-In CI/CD, do not use local profiles. Set:
+In CI/CD, do not use local profiles. Set Dataverse connection values through secure pipeline variables.
 
-```bat
-set PILLARO_DV_AUTH_MODE=pipeline
-set PILLARO_DV_URL=https://org.crm4.dynamics.com
-set PILLARO_DV_AUTH_TYPE=ClientSecret
-set PILLARO_DV_TENANT_ID=00000000-0000-0000-0000-000000000000
-set PILLARO_DV_CLIENT_ID=00000000-0000-0000-0000-000000000000
-set PILLARO_DV_CLIENT_SECRET=***
-set PILLARO_DV_SOLUTION=ContosoCore
+Required pipeline variables depend on the selected authentication mode. At minimum, configure:
+
+```text
+PILLARO_DV_AUTH_MODE
+PILLARO_DV_AUTH_TYPE
+PILLARO_DV_URL
+PILLARO_DV_SOLUTION
 ```
 
 Then call the same scripts:
@@ -123,15 +157,6 @@ call tools\plugin-deployment\plugin-deploy.bat src\Contoso.Plugins\bin\Release\n
 ## Azure DevOps YAML Example
 
 ```yaml
-variables:
-  PILLARO_DV_AUTH_MODE: pipeline
-  PILLARO_DV_AUTH_TYPE: ClientSecret
-  PILLARO_DV_URL: $(DataverseUrl)
-  PILLARO_DV_TENANT_ID: $(DataverseTenantId)
-  PILLARO_DV_CLIENT_ID: $(DataverseClientId)
-  PILLARO_DV_CLIENT_SECRET: $(DataverseClientSecret)
-  PILLARO_DV_SOLUTION: $(DataverseSolutionName)
-
 steps:
 - script: dotnet build src/Contoso.Plugins/Contoso.Plugins.csproj -c Release
   displayName: Build plugins
