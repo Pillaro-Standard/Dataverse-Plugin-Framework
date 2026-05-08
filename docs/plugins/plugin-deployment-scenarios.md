@@ -1,4 +1,4 @@
-﻿# Plugin Deployment Acceptance Scenarios
+# Plugin Deployment Acceptance Scenarios
 
 This document defines the expected end-to-end behavior for Dataverse plugin deployment from the framework developer perspective.
 
@@ -12,7 +12,7 @@ The package provides deployment tooling under a `tools` folder, including a simp
 DeployPlugins.bat
 ```
 
-The developer configures local Dataverse access through a short local profile outside the repository:
+The developer configures local Dataverse access through a local profile outside the repository:
 
 ```bat
 set "DV_PAC=ContosoDev"
@@ -32,10 +32,12 @@ The script should:
 3. generate the manifest,
 4. validate the manifest,
 5. push the plugin assembly/package through PAC CLI when configured,
-6. read the current Dataverse registration state,
-7. compare Dataverse state with the manifest,
-8. apply the required create/update/delete operations,
-9. write a clear deployment log.
+6. resolve Dataverse plugin types from the pushed assembly,
+7. read all current Dataverse steps for those plugin types,
+8. read all images for those steps,
+9. compare Dataverse state with the manifest,
+10. apply all required create, update and delete operations,
+11. write a clear deployment log.
 
 ## Source of Truth
 
@@ -64,9 +66,11 @@ public sealed class ContactPlugin : PluginBase
 
 All Dataverse registration records for this plugin type must match this definition.
 
-## One-to-One Rule
+## One-to-One Synchronization Rule
 
-For every plugin type discovered from the assembly:
+Plugin deployment is a synchronization process, not only an incremental create/update operation.
+
+For every plugin type discovered from the deployed assembly:
 
 ```text
 Dataverse registration state for plugin type == C# Register(...) manifest for plugin type
@@ -74,25 +78,27 @@ Dataverse registration state for plugin type == C# Register(...) manifest for pl
 
 This means:
 
-- a step present in C# but missing in Dataverse must be created,
-- a step present in both but different must be updated,
-- a step present in Dataverse for the same plugin type but missing in C# must be deleted,
-- an image present in C# but missing in Dataverse must be created,
-- an image present in both but different must be updated,
-- an image present in Dataverse for a managed step but missing in C# must be deleted.
+- a step present in C# but missing in Dataverse is created,
+- a step present in both but different is updated,
+- a step present in Dataverse for the same plugin type but missing in C# is deleted,
+- an image present in C# but missing in Dataverse is created,
+- an image present in both but different is updated,
+- an image present in Dataverse for an in-scope step but missing in C# is deleted.
 
-## Cleanup Scope
+This keeps Dataverse aligned with source code and prevents stale plugin registrations from surviving after code changes.
 
-Cleanup must be strictly scoped.
+## Deployment Scope
 
-The deployment tool may delete only records that belong to plugin types discovered from the deployed assembly and managed by the framework manifest.
+Cleanup is part of the synchronization model, but it is strictly scoped.
+
+The deployment tool may delete only records that belong to plugin types discovered from the deployed assembly and managed by the framework registration manifest.
 
 The deployment tool must not delete:
 
 - plugin steps for other plugin types,
 - plugin steps for plugin types not present in the current assembly,
-- plugin steps without framework ownership evidence,
-- unrelated manually registered Dataverse plugins outside the current deployment scope.
+- unrelated manually registered Dataverse plugins outside the current deployment scope,
+- solution components outside plugin steps and images managed by the current manifest.
 
 ## Plugin Type Boundary
 
@@ -100,7 +106,7 @@ The deployment boundary is the Dataverse `plugintype` record that corresponds to
 
 The tool must resolve the `plugintype` by `typename` after PAC plugin push has completed.
 
-For every resolved plugin type, the tool must read all existing Dataverse steps connected to that plugin type, not only steps that are already known by manifest IDs.
+For every resolved plugin type, the tool must read all existing Dataverse steps connected to that plugin type, not only steps already known by manifest IDs.
 
 This is required to detect stale steps that were removed from C#.
 
@@ -108,16 +114,14 @@ This is required to detect stale steps that were removed from C#.
 
 A Dataverse step is considered in scope when:
 
-- its `plugintypeid` matches a plugin type discovered from the assembly, and
+- its `plugintypeid` matches a plugin type discovered from the deployed assembly, and
 - the plugin type has a valid `Register(IPluginRegistration registration)` method.
 
 Optional future hardening: add a framework marker into supported metadata/configuration if Dataverse offers a reliable place for it.
 
 ## Image Ownership
 
-A Dataverse image is considered in scope when:
-
-- it belongs to an in-scope Dataverse step.
+A Dataverse image is considered in scope when it belongs to an in-scope Dataverse step.
 
 Images are not independently owned. Their lifecycle follows the owning step.
 
@@ -154,6 +158,8 @@ The tool must fail before applying changes when:
 - step/image IDs look like placeholders,
 - confirmation policy requires confirmation and `--confirm` is missing.
 
+Delete operations are allowed only inside the plugin type deployment scope described above.
+
 ## NuGet Tooling Expectation
 
 The NuGet package should include deployment tooling in a predictable location.
@@ -171,22 +177,23 @@ Expected shape:
 
 It should call the lower-level scripts internally.
 
-## Current Implementation Gap
+## Current Implementation Status
 
-The current implementation already supports:
+The current implementation supports:
 
 - registration API,
 - manifest generation,
 - manifest validation,
 - PAC plugin push integration,
-- reading Dataverse state by manifest IDs,
-- create/update step and image metadata.
+- resolving plugin types by `typename`,
+- reading all existing steps by plugin type,
+- reading images for in-scope steps,
+- create/update/delete diff calculation,
+- create/update/delete step and image metadata,
+- final log formatting using CREATE/UPDATE/DELETE/OK terminology.
 
 The current implementation still needs:
 
 - friendly `DeployPlugins.bat`,
 - NuGet packaging of tools,
-- reading all existing steps by plugin type,
-- delete detection for stale steps/images,
-- applying delete operations in plugin-type scope,
-- final log formatting using CREATE/UPDATE/DELETE/OK terminology.
+- final validation of the end-to-end developer experience from a clean machine.
