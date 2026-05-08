@@ -1,10 +1,53 @@
-﻿# Plugin Deployment Flow
+# Plugin Deployment Flow
 
-This document describes how the static plugin registration API can be used for Dataverse deployment.
+This document describes how the static plugin registration API is used for Dataverse deployment.
 
-The registration API itself does not deploy anything. It produces deterministic deployment metadata that a deployment tool can validate, compare with Dataverse and apply.
+The registration API itself does not deploy anything. It produces deterministic deployment metadata that the deployment tool can validate, compare with Dataverse and apply.
 
-## Core Principle: PAC First
+## Core Principle: Scoped Synchronization
+
+Plugin deployment is a scoped synchronization between source code and Dataverse.
+
+The source of truth is the static registration method on each plugin type:
+
+```csharp
+public static void Register(IPluginRegistration registration)
+```
+
+For every plugin type discovered from the deployed assembly, the deployment tool makes Dataverse match the manifest generated from C#:
+
+```text
+Dataverse registration state for plugin type == C# Register(...) manifest for plugin type
+```
+
+This means:
+
+- missing steps are created,
+- changed steps are updated,
+- stale steps are deleted,
+- missing images are created,
+- changed images are updated,
+- stale images are deleted.
+
+Delete operations are intentionally part of deployment, but only inside the current plugin type scope.
+
+## Deployment Scope
+
+The deployment boundary is the Dataverse `plugintype` record that corresponds to the C# plugin implementation type.
+
+The tool may modify only:
+
+- plugin steps connected to plugin types discovered from the deployed assembly,
+- plugin images connected to those in-scope steps.
+
+The tool must not modify:
+
+- plugin steps for other plugin types,
+- plugin steps for plugin types not present in the current assembly,
+- unrelated manually registered Dataverse plugins outside the current deployment scope,
+- unrelated solution components.
+
+## PAC First
 
 The deployment tooling must not duplicate logic already provided by Microsoft Power Platform CLI.
 
@@ -23,7 +66,7 @@ Use Pillaro CLI only for framework-specific behavior:
 - generating the plugin registration manifest,
 - validating Pillaro registration policy,
 - calculating the registration diff,
-- applying step and image changes that are not directly covered by `pac`,
+- applying scoped step and image synchronization,
 - producing reviewable deployment output for developers and pipelines.
 
 ## High-Level Flow
@@ -39,7 +82,7 @@ pillaro-dv plugin diff
   ↓
 pac plugin push / pac solution ... where applicable
   ↓
-pillaro-dv applies only missing step/image metadata
+pillaro-dv synchronizes scoped step/image metadata
 ```
 
 ## Source of Truth
@@ -69,17 +112,20 @@ The image ID is expected to match Dataverse `SdkMessageProcessingStepImageId`.
 
 ## Deployment Tool Responsibilities
 
-The Pillaro deployment tool should be responsible for:
+The Pillaro deployment tool is responsible for:
 
 1. loading the compiled plugin assembly,
 2. discovering all static `Register(IPluginRegistration registration)` methods,
 3. building a manifest from descriptors,
 4. validating the manifest,
 5. delegating auth and supported deployment operations to `pac`,
-6. loading current registration metadata from Dataverse only when `pac` does not expose the needed operation,
-7. calculating a diff,
-8. applying only the missing registration metadata,
-9. writing deployment logs.
+6. resolving Dataverse plugin types by `typename`,
+7. reading all existing steps for every in-scope plugin type,
+8. reading all images for every in-scope step,
+9. calculating a scoped diff,
+10. applying create/update/delete operations for steps and images,
+11. adding created/updated components to the configured solution,
+12. writing deployment logs.
 
 ## Recommended CLI Commands
 
@@ -163,18 +209,22 @@ Pillaro CLI should only fall back to Dataverse SDK calls for registration metada
 
 ## Deployment Order
 
-The deploy flow should apply changes in this order:
+The deploy flow applies changes in this order:
 
 1. verify PAC auth profile,
 2. generate/validate manifest,
 3. push plugin assembly/package through `pac plugin push` when applicable,
-4. calculate registration diff,
-5. create/update sdk message processing steps,
-6. create/update step images,
-7. add solution components through `pac solution ...` when possible,
-8. optional cleanup of unmanaged records that are no longer present in the manifest.
+4. resolve plugin types by `typename`,
+5. read all existing Dataverse steps for in-scope plugin types,
+6. read all images for in-scope steps,
+7. calculate registration diff,
+8. delete stale images,
+9. delete stale steps,
+10. create/update sdk message processing steps,
+11. create/update step images,
+12. add created/updated components to the configured solution.
 
-Cleanup should be explicit and never enabled by default.
+Images are deleted before steps so Dataverse step dependencies are removed safely.
 
 ## Dataverse Tables
 
@@ -190,25 +240,24 @@ Avoid direct custom handling of authentication, solution packaging, solution imp
 
 ## Diff Rules
 
-The diff should identify:
+The diff identifies:
 
 - whether PAC assembly/package push is required,
 - plugin type presence after PAC push,
-- step create/update,
-- image create/update,
+- step create/update/delete,
+- image create/update/delete,
 - missing Dataverse records,
-- unmanaged records that are not present in the manifest,
-- destructive changes that require confirmation.
+- stale Dataverse records inside the current plugin type scope,
+- deployment policy steps that require confirmation.
 
 ## Safe Defaults
 
 Recommended defaults:
 
 - `diff` is read-only,
-- `deploy` does not delete anything,
-- `cleanup` requires explicit command,
-- production deploy must go through CI/CD approvals,
-- destructive changes require confirmation,
+- `deploy` synchronizes in-scope steps and images,
+- delete operations are allowed only inside the resolved plugin type scope,
+- production deploy should go through CI/CD approvals,
 - steps with `RequiresConfirmation` cannot be deployed silently,
 - local authentication should default to PAC CLI profile instead of storing secrets in repository files.
 
@@ -223,7 +272,7 @@ A CI/CD pipeline should:
 5. publish the manifest as a build artifact,
 6. run a Dataverse diff,
 7. delegate assembly/package push to PAC CLI,
-8. deploy only missing registration metadata through Pillaro CLI,
+8. synchronize scoped registration metadata through Pillaro CLI,
 9. deploy to TEST/UAT/PROD only through approvals.
 
 Example pipeline shape:
@@ -279,7 +328,6 @@ The first deploy implementation should support:
 - validation of duplicate step IDs and image IDs,
 - PAC CLI authentication profile verification,
 - assembly/package push delegated to PAC CLI where possible,
-- Dataverse diff for existing steps and images,
-- create/update step,
-- create/update images,
-- no cleanup by default.
+- Dataverse diff for all in-scope plugin type steps and images,
+- create/update/delete step synchronization,
+- create/update/delete image synchronization.
