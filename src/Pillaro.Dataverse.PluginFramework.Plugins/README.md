@@ -73,27 +73,22 @@ Plugin registration is defined directly on plugin classes using `CrmPluginRegist
 
 Each attribute represents a Dataverse plugin step.
 
-Step identification can be handled in two ways:
+Step identification:
 
 * **Explicit ID (recommended)**
   * Define a fixed GUID using the `Id` property
   * Ensures stable and predictable deployments
 
-* **SPKL-managed ID**
-  * Omit the `Id` in code
-  * Use `spkl instrumentplugin` (Plugin.bat) to pull the ID from Dataverse and inject it into the code
-
 Key rules:
 
 * Each step must have a **stable unique ID across deployments**
 * This ensures **idempotent deployments** and prevents duplicate step creation
-* SPKL is used to deploy the plugin assembly and synchronize registration into Dataverse
 
 ## Build & Deployment
 
 * Plugins must be built using a **strong name key (`.snk`)**
-* SPKL configuration is defined in `spkl.json`
-* Early bound types are generated via `EarlyBoundTypes.cs`
+* Deployment settings are defined in `PillaroSettings.json`
+* Early-bound types are generated using PAC modelbuilder (`pac modelbuilder build`)
 
 ## Adding a New Plugin
 
@@ -102,7 +97,7 @@ Key rules:
 3. Register a Task in the plugin constructor using `RegisterTask<TTask>(...)`
 4. Implement the task in `Tasks/`
 5. Add supporting logic into `Features/<FeatureName>/`
-6. Deploy using SPKL
+6. Deploy using `pillaro-dv plugin deploy` or the Plugin Registration Tool
 
 ## Example
 
