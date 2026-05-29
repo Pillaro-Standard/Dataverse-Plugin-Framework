@@ -23,7 +23,6 @@
     <PillaroEarlyBoundSettingsFile>$(PillaroEarlyBoundDir)EarlyBoundSettings.json</PillaroEarlyBoundSettingsFile>
 
     <!-- Feature toggles -->
-    <PillaroGenerateDeploymentTools Condition="'$(PillaroGenerateDeploymentTools)' == ''">false</PillaroGenerateDeploymentTools>
     <PillaroGenerateEarlyBoundTools Condition="'$(PillaroGenerateEarlyBoundTools)' == ''">true</PillaroGenerateEarlyBoundTools>
     <PillaroIncludeGeneratedEarlyBoundSources Condition="'$(PillaroIncludeGeneratedEarlyBoundSources)' == ''">true</PillaroIncludeGeneratedEarlyBoundSources>
     <PillaroUpdateManagedToolFiles Condition="'$(PillaroUpdateManagedToolFiles)' == ''">true</PillaroUpdateManagedToolFiles>
@@ -56,11 +55,11 @@
   </Target>
 
   <!-- ============================================================
-       Scaffold deployment tools (opt-in)
+       Scaffold deployment tools
        ============================================================ -->
   <Target Name="PillaroScaffoldDeployment"
           AfterTargets="Build"
-          Condition="'$(PillaroGenerateDeploymentTools)' == 'true' AND '$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+          Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
 
     <MakeDir Directories="$(PillaroDeploymentDir)" Condition="!Exists('$(PillaroDeploymentDir)')" />
 

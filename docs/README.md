@@ -16,6 +16,7 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
+| 🚚 [Deployment Plugins](#-deployment-plugins)              | Deploy plugins locally, from Visual Studio/Battleboard, and from Azure DevOps |
 | 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
 | 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
@@ -52,8 +53,6 @@ Use this section when you are building Dataverse plugins with the framework.
 | [Architecture](./plugins/architecture.md) | High-level plugin architecture and project structure | ✅ |
 | [Plugin Model](./plugins/plugin-model.md) | Plugin responsibilities and registration approach | ✅ |
 | [Plugin Registration API](./plugins/plugin-registration-api.md) | Fluent static registration metadata API | ✅ |
-| [Plugin Deployment Flow](./plugins/plugin-deployment-flow.md) | SDK-based plugin deployment command and settings | ✅ |
-| [Plugin Deployment Scenarios](./plugins/plugin-deployment-scenarios.md) | Acceptance scenarios for end-to-end plugin deployment | ✅ |
 | [Task Model](./plugins/task-model.md) | Task lifecycle, structure, and responsibilities | ✅ |
 | [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | ✅ |
 | [Execution Pipeline](./plugins/execution-pipeline.md) | Plugin execution flow and task orchestration | ✅ |
@@ -73,6 +72,20 @@ Use this section when you are building Dataverse plugins with the framework.
 | [Autonumbering](./plugins/autonumbering.md) | Number sequence generation and related patterns | ✅ |
 | [Logging](./plugins/logging.md) | Runtime logging and diagnostics | ✅ |
 | [Error Handling](./plugins/error-handling.md) | Exceptions, validation failures, and runtime behavior | ✅ |
+
+---
+
+## 🚚 Deployment Plugins
+
+Use this section when you need to deploy Dataverse plugin assemblies and plugin registration metadata.
+
+| Document | Description | Status |
+|---|---|---|
+| [Deployment Plugins](./plugins/deployment-plugins.md) | Main deployment guide for local development, Visual Studio/Battleboard, PowerShell, and Azure DevOps | ✅ |
+
+> [!NOTE]
+> The plugin deployment flow is intentionally separated from plugin development.
+> Development documentation explains how to build plugin code; this chapter explains how the built assembly and registration metadata get deployed.
 
 ---
 
@@ -144,9 +157,9 @@ Repository-level policies and contribution guidance.
 
 | Document | Description | Status |
 |---|---|---|
-| [Contributing](../CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
-| [Security](../SECURITY.md) | Vulnerability reporting and security handling | ✅ |
-| [Code of Conduct](../CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
+| [Contributing](./CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
+| [Security](./SECURITY.md) | Vulnerability reporting and security handling | ✅ |
+| [Code of Conduct](./CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
 | [License](../LICENSE) | Repository license | ✅ |
 
 ---
@@ -164,6 +177,12 @@ Repository-level policies and contribution guidance.
 7. [Data Access](./plugins/data-access.md)
 8. [DataService](./plugins/data-service.md)
 
+### I want to deploy plugins
+
+1. [Deployment Plugins](./plugins/deployment-plugins.md)
+2. [Plugin Registration API](./plugins/plugin-registration-api.md)
+3. [CI/CD Pipelines](./ci-cd-pipelines.md)
+
 ### I want to build tests
 
 1. [Testing Overview](./tests/testing.md)
@@ -180,10 +199,10 @@ Repository-level policies and contribution guidance.
 
 ### I want to contribute
 
-1. [Contributing](../CONTRIBUTING.md)
+1. [Contributing](./CONTRIBUTING.md)
 2. [CI/CD Pipelines](./ci-cd-pipelines.md)
-3. [Code of Conduct](../CODE_OF_CONDUCT.md)
-4. [Security](../SECURITY.md)
+3. [Code of Conduct](./CODE_OF_CONDUCT.md)
+4. [Security](./SECURITY.md)
 5. [License](../LICENSE)
 
 ---
