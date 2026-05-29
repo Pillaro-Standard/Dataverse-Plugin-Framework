@@ -161,8 +161,8 @@ After signing and post-build configuration, the project produces a single merged
 
 Recommended tools:
 
-- Plugin Registration Tool  
-- spkl
+- Plugin Registration Tool
+- Pillaro CLI (`pillaro-dv plugin deploy`)
 
 ---
 

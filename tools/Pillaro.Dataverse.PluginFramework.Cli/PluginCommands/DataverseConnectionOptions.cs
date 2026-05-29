@@ -15,6 +15,14 @@ internal sealed class DataverseConnectionOptions
 
     public bool UsesPacCli => !string.IsNullOrWhiteSpace(PacAuthProfile);
 
+    public static DataverseConnectionOptions FromSdkConnectionString(string connectionString)
+    {
+        return new DataverseConnectionOptions
+        {
+            SdkConnectionString = connectionString,
+        };
+    }
+
     public static DataverseConnectionOptions From(CommandLineOptions options)
     {
         return new DataverseConnectionOptions

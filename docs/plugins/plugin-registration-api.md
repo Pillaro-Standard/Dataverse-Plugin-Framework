@@ -7,6 +7,7 @@ The goal is to keep plugin registration readable for developers while preserving
 ## Design Goals
 
 - registration is visible directly in the plugin class
+- every framework plugin must implement `Register(IPluginRegistration registration)`
 - one plugin class can define multiple Dataverse steps
 - one Dataverse step can define multiple images
 - step and image IDs are explicit and match Dataverse IDs
@@ -30,7 +31,7 @@ public sealed class ContactPlugin : PluginBase
         RegisterTask<UpdateAddressLabel>(PluginStage.Preoperation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
     }
 
-    public static void Register(IPluginRegistration registration)
+    public override void Register(IPluginRegistration registration)
     {
         registration
             .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
@@ -154,13 +155,15 @@ The constructor remains responsible for runtime task registration:
 RegisterTask<UpdateAddressLabel>(PluginStage.Preoperation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
 ```
 
-The static `Register` method is deployment metadata only:
+The plugin `Register` method is responsible for deployment metadata only:
 
 ```csharp
-public static void Register(IPluginRegistration registration)
+public override void Register(IPluginRegistration registration)
+{
+}
 ```
 
-Deployment tooling can discover this method through reflection and build a deterministic manifest without executing plugin runtime logic.
+Deployment tooling discovers framework plugins from `PluginBase`, calls `Register(...)`, and builds a deterministic manifest without executing the plugin pipeline.
 
 ## Discovery
 

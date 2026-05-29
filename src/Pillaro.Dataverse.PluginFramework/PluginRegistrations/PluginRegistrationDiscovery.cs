@@ -1,19 +1,18 @@
-﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk;
+using Pillaro.Dataverse.PluginFramework.Plugins;
 using System.Reflection;
 
 namespace Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
 public static class PluginRegistrationDiscovery
 {
-    private const string RegisterMethodName = "Register";
-
-    public static PluginRegistrationDescriptor Discover<TPlugin>()
+    public static PluginRegistrationDescriptor? Discover<TPlugin>()
         where TPlugin : IPlugin
     {
         return Discover(typeof(TPlugin));
     }
 
-    public static PluginRegistrationDescriptor Discover(Type pluginType)
+    public static PluginRegistrationDescriptor? Discover(Type pluginType)
     {
         if (pluginType == null)
         {
@@ -28,12 +27,39 @@ public static class PluginRegistrationDiscovery
         var builderType = typeof(PluginRegistrationBuilder<>).MakeGenericType(pluginType);
         var builder = (IPluginRegistration)Activator.CreateInstance(builderType)!;
 
-        var registerMethod = GetRegisterMethod(pluginType);
-        registerMethod.Invoke(null, [builder]);
+        var plugin = CreatePluginInstance(pluginType);
 
-        return (PluginRegistrationDescriptor)builderType
-            .GetMethod(nameof(PluginRegistrationBuilder<IPlugin>.Build), BindingFlags.Instance | BindingFlags.Public)!
-            .Invoke(builder, null)!;
+        try
+        {
+            plugin.Register(builder);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Plugin '{pluginType.FullName}': Register(IPluginRegistration) threw an exception: {UnwrapMessage(ex)}",
+                Unwrap(ex));
+        }
+
+        PluginRegistrationDescriptor descriptor;
+        try
+        {
+            descriptor = (PluginRegistrationDescriptor)builderType
+                .GetMethod(nameof(PluginRegistrationBuilder<IPlugin>.Build), BindingFlags.Instance | BindingFlags.Public)!
+                .Invoke(builder, null)!;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Plugin '{pluginType.FullName}': registration build failed: {UnwrapMessage(ex)}",
+                Unwrap(ex));
+        }
+
+        if (descriptor.Steps == null || descriptor.Steps.Count == 0)
+        {
+            return null;
+        }
+
+        return descriptor;
     }
 
     public static PluginRegistrationDiscoveryResult DiscoverFromAssembly(Assembly assembly)
@@ -49,43 +75,76 @@ public static class PluginRegistrationDiscovery
             .OrderBy(type => type.FullName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        var registeredPluginTypes = pluginTypes.Where(HasRegisterMethod).ToArray();
-        var skippedPluginTypes = pluginTypes.Except(registeredPluginTypes).Select(type => type.FullName ?? type.Name).ToArray();
+        var descriptors = new List<PluginRegistrationDescriptor>();
+        var skipped = new List<string>();
 
-        return new PluginRegistrationDiscoveryResult(
-            registeredPluginTypes.Select(Discover).ToArray(),
-            skippedPluginTypes);
+        foreach (var type in pluginTypes)
+        {
+            // If plugin does not have required ctor, skip it
+            if (!HasRegistrationMethod(type))
+            {
+                skipped.Add(type.FullName ?? type.Name);
+                continue;
+            }
+
+            try
+            {
+                var descriptor = Discover(type);
+                if (descriptor != null)
+                    descriptors.Add(descriptor);
+                else
+                    skipped.Add(type.FullName ?? type.Name);
+            }
+            catch (Exception ex)
+            {
+                // Don't let a single failing plugin discovery stop the whole assembly discovery.
+                Console.WriteLine($"[WARN] Failed to discover plugin '{type.FullName}': {UnwrapMessage(ex)}");
+                skipped.Add(type.FullName ?? type.Name);
+            }
+        }
+
+        return new PluginRegistrationDiscoveryResult(descriptors.ToArray(), skipped.ToArray());
     }
 
-    private static MethodInfo GetRegisterMethod(Type pluginType)
+    private static PluginBase CreatePluginInstance(Type pluginType)
     {
-        var method = pluginType.GetMethod(RegisterMethodName, BindingFlags.Public | BindingFlags.Static);
-        if (method == null)
+        if (!typeof(PluginBase).IsAssignableFrom(pluginType))
         {
-            throw new InvalidOperationException($"Plugin type '{pluginType.FullName}' must define public static void {RegisterMethodName}({nameof(IPluginRegistration)} registration).");
+            throw new InvalidOperationException($"Plugin type '{pluginType.FullName}' must inherit '{typeof(PluginBase).FullName}' and implement Register(IPluginRegistration registration).");
         }
 
-        var parameters = method.GetParameters();
-        if (method.ReturnType != typeof(void) || parameters.Length != 1 || parameters[0].ParameterType != typeof(IPluginRegistration))
+        var constructor = pluginType.GetConstructor([typeof(string), typeof(string)]);
+        if (constructor == null)
         {
-            throw new InvalidOperationException($"Plugin type '{pluginType.FullName}' has invalid registration method signature. Expected public static void {RegisterMethodName}({nameof(IPluginRegistration)} registration).");
+            throw new InvalidOperationException($"Plugin type '{pluginType.FullName}' must have a public constructor with string unsecureConfig and string secureConfig.");
         }
 
-        return method;
+        return (PluginBase)constructor.Invoke([string.Empty, string.Empty]);
     }
 
-    private static bool HasRegisterMethod(Type pluginType)
+    private static bool HasRegistrationMethod(Type pluginType)
     {
-        var method = pluginType.GetMethod(RegisterMethodName, BindingFlags.Public | BindingFlags.Static);
-        if (method == null)
-        {
-            return false;
-        }
+        return typeof(PluginBase).IsAssignableFrom(pluginType)
+            && pluginType.GetConstructor([typeof(string), typeof(string)]) != null;
+    }
 
-        var parameters = method.GetParameters();
-        return method.ReturnType == typeof(void)
-            && parameters.Length == 1
-            && parameters[0].ParameterType == typeof(IPluginRegistration);
+    private static Exception Unwrap(Exception ex)
+    {
+        while (ex is TargetInvocationException { InnerException: not null } tie)
+            ex = tie.InnerException;
+        return ex;
+    }
+
+    private static string UnwrapMessage(Exception ex)
+    {
+        ex = Unwrap(ex);
+        var messages = new List<string>();
+        for (var e = ex; e != null; e = e.InnerException)
+        {
+            if (!string.IsNullOrWhiteSpace(e.Message))
+                messages.Add(e.Message);
+        }
+        return string.Join(" → ", messages.Distinct(StringComparer.Ordinal));
     }
 }
 

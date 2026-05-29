@@ -30,10 +30,22 @@ internal static class CliLog
 
         if (settings != null)
         {
-            Console.WriteLine($"Profile: {settings.Profile}");
+            var activeProfileName = TryGetActiveProfileName(options, settings);
+            Console.WriteLine($"Profile: {activeProfileName ?? "<none>"}");
             Console.WriteLine($"Solution: {settings.Solution}");
-            Console.WriteLine($"Plugins assembly: {settings.Plugins.Assembly}");
-            Console.WriteLine($"Early-bound solution: {settings.EarlyBound.Solution ?? "<not specified>"}");
+            Console.WriteLine($"Dataverse connection env: {PillaroSettingsLoader.ResolveConnectionStringEnvironmentVariable(settings)}");
+
+            if (activeProfileName != null && settings.Profiles.TryGetValue(activeProfileName, out var profile))
+            {
+                var resolvedPath = PillaroSettingsLoader.GetResolvedSettingsPath(options);
+                var settingsDir = resolvedPath != null
+                    ? Path.GetDirectoryName(Path.GetFullPath(resolvedPath))!
+                    : Directory.GetCurrentDirectory();
+                var resolvedAssembly = string.IsNullOrWhiteSpace(profile.PluginAssemblyPath)
+                    ? "<not set>"
+                    : PillaroSettingsLoader.ResolveConfiguredPath(profile.PluginAssemblyPath, settingsDir);
+                Console.WriteLine($"Plugin assembly: {resolvedAssembly}");
+            }
         }
 
         if (connectionOptions != null)
@@ -43,6 +55,18 @@ internal static class CliLog
         }
 
         Console.WriteLine();
+    }
+
+    private static string? TryGetActiveProfileName(CommandLineOptions options, PillaroSettings settings)
+    {
+        try
+        {
+            return PillaroSettingsLoader.ResolveActiveProfileName(options, settings);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static void WriteSettingsDiagnostics(string settingsPath)

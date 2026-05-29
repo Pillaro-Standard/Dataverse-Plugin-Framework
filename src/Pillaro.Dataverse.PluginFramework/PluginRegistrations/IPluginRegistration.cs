@@ -26,6 +26,8 @@ public interface IPluginStepStageBuilder
 
     IPluginStepModeBuilder PreOperation();
 
+    IPluginStepModeBuilder MainOperation();
+
     IPluginStepModeBuilder PostOperation();
 }
 
@@ -35,6 +37,8 @@ public interface IPluginUpdateStepStageBuilder<TEntity>
     IPluginUpdateStepModeBuilder<TEntity> PreValidation();
 
     IPluginUpdateStepModeBuilder<TEntity> PreOperation();
+
+    IPluginUpdateStepModeBuilder<TEntity> MainOperation();
 
     IPluginUpdateStepModeBuilder<TEntity> PostOperation();
 }
@@ -60,11 +64,15 @@ public interface IPluginStepBuilder
 
     IPluginStepBuilder InSolution(string solutionName);
 
+    IPluginStepBuilder WithName(string name);
+
+    IPluginStepBuilder WithFilteringAttributes(params string[] attributes);
+
+    IPluginStepBuilder WithUnsecureConfiguration(string unsecureConfiguration);
+
     IPluginStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
 
     IPluginStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
-
-    IPluginStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All);
 }
 
 public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
@@ -73,6 +81,12 @@ public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
     new IPluginUpdateStepBuilder<TEntity> Rank(int rank);
 
     new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName);
+
+    new IPluginUpdateStepBuilder<TEntity> WithName(string name);
+
+    new IPluginUpdateStepBuilder<TEntity> WithFilteringAttributes(params string[] attributes);
+
+    new IPluginUpdateStepBuilder<TEntity> WithUnsecureConfiguration(string unsecureConfiguration);
 
     IPluginUpdateStepBuilder<TEntity> WhenChanged(params string[] attributes);
 
@@ -86,5 +100,4 @@ public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
 
     IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
 
-    new IPluginUpdateStepBuilder<TEntity> RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All);
 }

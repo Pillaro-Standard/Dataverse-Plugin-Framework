@@ -3,6 +3,7 @@ using Pillaro.Dataverse.PluginFramework.Exceptions;
 using Pillaro.Dataverse.PluginFramework.Logging.Enums;
 using Pillaro.Dataverse.PluginFramework.Logging;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
+using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Tasks;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -15,10 +16,14 @@ public abstract class PluginBase : IPlugin
     private readonly string _secureConfig;
     private readonly string _unsecureConfig;
 
-    public PluginBase(string unsecureConfig, string secureConfig)
+    protected PluginBase(string unsecureConfig, string secureConfig)
     {
         _secureConfig = secureConfig;
         _unsecureConfig = unsecureConfig;
+    }
+
+    public virtual void Register(IPluginRegistration registration)
+    {
     }
 
     public void Execute(IServiceProvider serviceProvider)

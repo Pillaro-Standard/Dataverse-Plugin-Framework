@@ -51,9 +51,22 @@
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.dll" target="lib\net8.0" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.xml" target="lib\net8.0" />
 
-		<file src="bin\$configuration$\net462\Tools\ILMerge\ILMerge.exe" target="Content\tools\ILMerge\ILMerge.exe" />
-		<file src="bin\$configuration$\net462\Tools\ILMerge\System.Compiler.dll" target="Content\tools\ILMerge\System.Compiler.dll" />
-		<file src="bin\$configuration$\net462\Tools\ILMerge\PostBuildAction-logic_plugin-projects.txt" target="Content\tools\CrmTools\PostBuildAction-logic_plugin-projects.txt" />
-		<file src="bin\$configuration$\net462\Tools\ILMerge\PostBuildAction-single-project.txt" target="Content\tools\CrmTools\PostBuildAction-single-project.txt" />
+		<!-- ILMerge tooling – copied to consuming project Tools/ILMerge -->
+		<file src="bin\$configuration$\net462\Tools\ILMerge\**" target="tools\ILMerge" />
+		<file src="Tools\ILMerge\README.md" target="tools\ILMerge\README.md" />
+
+		<!-- CLI binaries – hidden inside the NuGet package -->
+		<file src="..\..\tools\Pillaro.Dataverse.PluginFramework.Cli\bin\$configuration$\net8.0\publish\**" target="tools\Deployment\pillaro-dv" />
+
+		<!-- Deployment templates and README – to be copied/templated into consuming project -->
+		<file src="Tools\Deployment\README.md" target="tools\Deployment\README.md" />
+		<file src="Tools\Deployment\DeployPlugins.bat.template" target="tools\Deployment\DeployPlugins.bat.template" />
+		<file src="Tools\Deployment\DeployPlugins.ps1.template" target="tools\Deployment\DeployPlugins.ps1.template" />
+
+		<!-- Early-bound support – static files to be copied into consuming project -->
+		<file src="Tools\EarlyBoundSupport\**" target="tools\EarlyBoundSupport" />
+
+		<!-- MSBuild .targets file – auto-imported by NuGet to scaffold wrapper scripts -->
+		<file src="Tools\Deployment\Pillaro.Dataverse.PluginFramework.targets" target="build\Pillaro.Dataverse.PluginFramework.targets" />
 	</files>
 </package>

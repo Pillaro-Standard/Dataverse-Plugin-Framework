@@ -38,9 +38,11 @@ public sealed record PluginStepRegistrationDescriptor(
     PluginMode Mode,
     int Rank,
     string SolutionName,
+    string? Name,
     IReadOnlyCollection<string> FilteringAttributes,
     IReadOnlyCollection<PluginImageRegistrationDescriptor> Images,
-    PluginDeploymentPolicyDescriptor? DeploymentPolicy);
+    PluginDeploymentPolicyDescriptor? DeploymentPolicy,
+    string? UnsecureConfiguration);
 
 public sealed record PluginImageRegistrationDescriptor(
     Guid ImageId,
@@ -49,7 +51,6 @@ public sealed record PluginImageRegistrationDescriptor(
     IReadOnlyCollection<string> Attributes);
 
 public sealed record PluginDeploymentPolicyDescriptor(
-    bool RequiresConfirmation,
     PluginRisk Risk,
     string Reason,
     PluginDeploymentScope Scope);

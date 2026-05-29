@@ -70,7 +70,9 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         private PluginMode? _mode;
         private int _rank = 1;
         private string? _solutionName;
+        private string? _name;
         private PluginDeploymentPolicyDescriptor? _deploymentPolicy;
+        private string? _unsecureConfiguration;
 
         public StepBuilder(string stepId, string messageName, string? entityName, bool isUpdate)
         {
@@ -90,6 +92,8 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
 
         public IPluginStepModeBuilder PreOperation() => SetStage(PluginStage.Preoperation);
 
+        public IPluginStepModeBuilder MainOperation() => SetStage(PluginStage.Mainoperation);
+
         public IPluginStepModeBuilder PostOperation() => SetStage(PluginStage.Postoperation);
 
         public IPluginStepBuilder Synchronous() => SetMode(PluginMode.Synchronous);
@@ -108,6 +112,24 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             return this;
         }
 
+        public IPluginStepBuilder WithName(string name)
+        {
+            SetName(name);
+            return this;
+        }
+
+        public IPluginStepBuilder WithFilteringAttributes(params string[] attributes)
+        {
+            AddFilteringAttributes(NormalizeAttributes(attributes, nameof(attributes)));
+            return this;
+        }
+
+        public IPluginStepBuilder WithUnsecureConfiguration(string unsecureConfiguration)
+        {
+            SetUnsecureConfiguration(unsecureConfiguration);
+            return this;
+        }
+
         public IPluginStepBuilder WithPreImage(string imageId, string name, params string[] attributes)
         {
             AddImage(imageId, PluginImageType.PreImage, name, attributes);
@@ -117,12 +139,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public IPluginStepBuilder WithPostImage(string imageId, string name, params string[] attributes)
         {
             AddImage(imageId, PluginImageType.PostImage, name, attributes);
-            return this;
-        }
-
-        public IPluginStepBuilder RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All)
-        {
-            SetDeploymentPolicy(risk, reason, scope);
             return this;
         }
 
@@ -152,9 +168,11 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 _mode.Value,
                 _rank,
                 _solutionName,
+                _name,
                 _filteringAttributes.Distinct(StringComparer.OrdinalIgnoreCase).ToArray(),
                 _images.ToArray(),
-                _deploymentPolicy);
+                _deploymentPolicy,
+                _unsecureConfiguration);
         }
 
         protected StepBuilder SetStage(PluginStage stage)
@@ -171,11 +189,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
 
         protected void AddFilteringAttributes(IReadOnlyCollection<string> attributes)
         {
-            if (!_isUpdate)
-            {
-                throw new InvalidOperationException("Filtering attributes can be configured only for Update message steps.");
-            }
-
             _filteringAttributes.AddRange(attributes);
         }
 
@@ -194,6 +207,16 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             _solutionName = RequireValue(solutionName, nameof(solutionName));
         }
 
+        protected void SetName(string name)
+        {
+            _name = RequireValue(name, nameof(name));
+        }
+
+        protected void SetUnsecureConfiguration(string unsecureConfiguration)
+        {
+            _unsecureConfiguration = string.IsNullOrWhiteSpace(unsecureConfiguration) ? null : unsecureConfiguration.Trim();
+        }
+
         protected void AddImage(string imageId, PluginImageType type, string name, string[] attributes)
         {
             AddImage(imageId, type, name, NormalizeAttributes(attributes, nameof(attributes)));
@@ -209,9 +232,9 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 throw new InvalidOperationException($"Plugin step '{StepId}' already contains image with ID '{parsedImageId}'.");
             }
 
-            if (_images.Any(image => string.Equals(image.Name, normalizedName, StringComparison.OrdinalIgnoreCase)))
+            if (_images.Any(image => string.Equals(image.Name, normalizedName, StringComparison.OrdinalIgnoreCase) && image.Type == type))
             {
-                throw new InvalidOperationException($"Plugin step '{StepId}' already contains image named '{normalizedName}'. Image names must be unique within one step.");
+                throw new InvalidOperationException($"Plugin step '{StepId}' already contains {type} image named '{normalizedName}'. Image names must be unique per type within one step.");
             }
 
             _images.Add(new PluginImageRegistrationDescriptor(
@@ -224,8 +247,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         protected void SetDeploymentPolicy(PluginRisk risk, string reason, PluginDeploymentScope scope)
         {
             _deploymentPolicy = new PluginDeploymentPolicyDescriptor(
-                RequiresConfirmation: true,
-                Risk: risk,
+                Risk: risk, 
                 Reason: RequireValue(reason, nameof(reason)),
                 Scope: scope);
         }
@@ -288,6 +310,12 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             return this;
         }
 
+        IPluginUpdateStepModeBuilder<TEntity> IPluginUpdateStepStageBuilder<TEntity>.MainOperation()
+        {
+            SetStage(PluginStage.Mainoperation);
+            return this;
+        }
+
         IPluginUpdateStepModeBuilder<TEntity> IPluginUpdateStepStageBuilder<TEntity>.PostOperation()
         {
             SetStage(PluginStage.Postoperation);
@@ -315,6 +343,24 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName)
         {
             SetSolution(solutionName);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder<TEntity> WithName(string name)
+        {
+            SetName(name);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder<TEntity> WithFilteringAttributes(params string[] attributes)
+        {
+            AddFilteringAttributes(NormalizeAttributes(attributes, nameof(attributes)));
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder<TEntity> WithUnsecureConfiguration(string unsecureConfiguration)
+        {
+            SetUnsecureConfiguration(unsecureConfiguration);
             return this;
         }
 
@@ -351,12 +397,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes)
         {
             AddImage(imageId, PluginImageType.PostImage, name, TypedAttributeSelector.GetLogicalNames(attributes));
-            return this;
-        }
-
-        public new IPluginUpdateStepBuilder<TEntity> RequiresConfirmation(PluginRisk risk, string reason, PluginDeploymentScope scope = PluginDeploymentScope.All)
-        {
-            SetDeploymentPolicy(risk, reason, scope);
             return this;
         }
     }

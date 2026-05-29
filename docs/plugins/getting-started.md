@@ -295,9 +295,9 @@ Create `Plugins/PluginBase.cs` in the `Logic` project.
 
 Example:
 
-    public class PluginBase : PluginFramework.Plugins.PluginBase
+    public abstract class PluginBase : PluginFramework.Plugins.PluginBase
     {
-        public PluginBase(string unsecureConfig, string secureConfig)
+        protected PluginBase(string unsecureConfig, string secureConfig)
             : base(unsecureConfig, secureConfig)
         {
         }
@@ -364,7 +364,9 @@ Recommended location:
     YourSolution.Logic/Plugins/
 
 Example:
-    
+
+    using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
+
     public class TaskPlugin : PluginBase
     {
         public TaskPlugin(string unsecureConfig, string secureConfig)
@@ -376,14 +378,29 @@ Example:
                 Task.EntityLogicalName,
                 PluginMode.Synchronous);
         }
+
+        public override void Register(IPluginRegistration registration)
+        {
+            registration
+                .OnCreate<Task>("8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
+                .PreOperation()
+                .Synchronous()
+                .Rank(1)
+                .InSolution("YourSolution");
+        }
     }
-    
+
 
 This example shows the basic plugin pattern:
 
 - inherit from your solution `PluginBase`
+- optionally override `Register(IPluginRegistration registration)` for registration API
 - register one or more tasks
 - keep plugin classes focused on orchestration
+
+> [!NOTE]
+> The `Register` method is optional. If you don't need to use the registration API for automatic step registration, you can leave it empty or not override it at all.
+> When the `Register` method is empty, a log message will be generated indicating no steps were registered via the registration API.
 
 > [!NOTE]
 > A plugin usually targets one entity or one functional area.
@@ -419,10 +436,6 @@ Deploy the final merged plugin assembly using your standard Dataverse deployment
 > [!NOTE]
 > The framework does not require a specific deployment tool.
 > Use the deployment process your team already uses.
-
-> [!TIP]
-> In this repository, SPKL is used in some places as an implementation choice.
-> It is not a required part of the framework usage model.
 
 ---
 

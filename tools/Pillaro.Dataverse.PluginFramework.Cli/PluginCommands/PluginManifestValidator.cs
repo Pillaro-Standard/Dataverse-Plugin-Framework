@@ -19,6 +19,11 @@ internal static class PluginManifestValidator
             errors.Add("Manifest does not contain any plugins.");
         }
 
+        foreach (var pluginType in manifest.PluginTypesWithoutRegistration)
+        {
+            _ = pluginType; // reported later in deployment output
+        }
+
         var stepIds = new Dictionary<Guid, string>();
         var imageIds = new Dictionary<Guid, string>();
 
@@ -40,11 +45,6 @@ internal static class PluginManifestValidator
 
                 ValidateStep(step, stepLabel, stepIds, errors);
                 ValidateImages(step, imageIds, errors);
-
-                if (step.DeploymentPolicy != null && step.DeploymentPolicy.RequiresConfirmation && string.IsNullOrWhiteSpace(step.DeploymentPolicy.Reason))
-                {
-                    errors.Add($"Step '{step.StepId}' requires confirmation but does not define a reason.");
-                }
             }
         }
 
@@ -84,11 +84,6 @@ internal static class PluginManifestValidator
             errors.Add($"Rank must be greater than zero for step '{step.StepId}'.");
         }
 
-        if (!IsUpdate(step) && step.FilteringAttributes.Count > 0)
-        {
-            errors.Add($"Filtering attributes can be used only for Update steps. Step '{step.StepId}' uses message '{step.MessageName}'.");
-        }
-
         if (IsUpdate(step) && step.Mode == SynchronousMode && !string.IsNullOrWhiteSpace(step.EntityName) && step.FilteringAttributes.Count == 0)
         {
             errors.Add($"Synchronous Update step '{step.StepId}' on entity '{step.EntityName}' must define filtering attributes using WhenChanged(...). Use an explicit confirmation policy only after narrowing the trigger scope.");
@@ -105,7 +100,7 @@ internal static class PluginManifestValidator
             errors.Add($"Step '{step.StepId}' defines images in PreValidation stage. Images should be used only in PreOperation or PostOperation stages.");
         }
 
-        var imageNamesInStep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var imageNameTypeInStep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var image in step.Images)
         {
             var imageLabel = $"{step.StepId} / {image.Name}";
@@ -131,9 +126,13 @@ internal static class PluginManifestValidator
             {
                 errors.Add($"Image name is required for step '{step.StepId}'.");
             }
-            else if (!imageNamesInStep.Add(image.Name))
+            else
             {
-                errors.Add($"Duplicate image name '{image.Name}' in step '{step.StepId}'.");
+                var imageNameTypeKey = $"{image.Name}:{image.Type}";
+                if (!imageNameTypeInStep.Add(imageNameTypeKey))
+                {
+                    errors.Add($"Duplicate {image.Type} image named '{image.Name}' in step '{step.StepId}'.");
+                }
             }
 
             if (image.Attributes.Count == 0)

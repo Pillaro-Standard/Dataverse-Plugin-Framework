@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Pillaro Dataverse Plugin Framework - MSBuild scaffolding target.
+    Copies package-managed tooling files into consuming projects.
+    Minimal templating for deployment wrappers that need resolved CLI path.
+  -->
+
+  <PropertyGroup>
+    <!-- Resolved paths to package content -->
+    <PillaroToolsRoot>$(MSBuildThisFileDirectory)..\tools\</PillaroToolsRoot>
+    <PillaroCliDll>$(PillaroToolsRoot)Deployment\pillaro-dv\pillaro-dv.dll</PillaroCliDll>
+
+    <!-- Destination folders in consuming project -->
+    <PillaroProjectToolsDir>$(MSBuildProjectDirectory)\Tools\</PillaroProjectToolsDir>
+    <PillaroDeploymentDir>$(PillaroProjectToolsDir)Deployment\</PillaroDeploymentDir>
+    <PillaroEarlyBoundDir>$(PillaroProjectToolsDir)EarlyBound\</PillaroEarlyBoundDir>
+    <PillaroIlMergeDir>$(PillaroProjectToolsDir)ILMerge\</PillaroIlMergeDir>
+
+    <!-- User settings files -->
+    <PillaroSettingsFile>$(MSBuildProjectDirectory)\PillaroSettings.json</PillaroSettingsFile>
+    <PillaroEarlyBoundSettingsFile>$(PillaroEarlyBoundDir)EarlyBoundSettings.json</PillaroEarlyBoundSettingsFile>
+
+    <!-- Feature toggles -->
+    <PillaroGenerateDeploymentTools Condition="'$(PillaroGenerateDeploymentTools)' == ''">false</PillaroGenerateDeploymentTools>
+    <PillaroGenerateEarlyBoundTools Condition="'$(PillaroGenerateEarlyBoundTools)' == ''">true</PillaroGenerateEarlyBoundTools>
+    <PillaroIncludeGeneratedEarlyBoundSources Condition="'$(PillaroIncludeGeneratedEarlyBoundSources)' == ''">true</PillaroIncludeGeneratedEarlyBoundSources>
+    <PillaroUpdateManagedToolFiles Condition="'$(PillaroUpdateManagedToolFiles)' == ''">true</PillaroUpdateManagedToolFiles>
+  </PropertyGroup>
+
+  <!-- Include generated C# early-bound sources -->
+  <ItemGroup Condition="'$(PillaroIncludeGeneratedEarlyBoundSources)' == 'true'">
+    <Compile Include="EarlyBound\**\*.cs" Condition="Exists('EarlyBound')" />
+  </ItemGroup>
+
+  <!-- ============================================================
+       Copy ILMerge tooling (always)
+       ============================================================ -->
+  <Target Name="PillaroCopyILMerge"
+          AfterTargets="Build"
+          Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+
+    <MakeDir Directories="$(PillaroIlMergeDir)" Condition="!Exists('$(PillaroIlMergeDir)')" />
+
+    <ItemGroup>
+      <_ILMergeFiles Include="$(PillaroToolsRoot)ILMerge\**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_ILMergeFiles)"
+          DestinationFolder="$(PillaroIlMergeDir)%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true"
+          Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroIlMergeDir)%(RecursiveDir)%(Filename)%(Extension)'))" />
+
+  </Target>
+
+  <!-- ============================================================
+       Scaffold deployment tools (opt-in)
+       ============================================================ -->
+  <Target Name="PillaroScaffoldDeployment"
+          AfterTargets="Build"
+          Condition="'$(PillaroGenerateDeploymentTools)' == 'true' AND '$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+
+    <MakeDir Directories="$(PillaroDeploymentDir)" Condition="!Exists('$(PillaroDeploymentDir)')" />
+
+    <!-- Copy README -->
+    <Copy SourceFiles="$(PillaroToolsRoot)Deployment\README.md"
+          DestinationFiles="$(PillaroDeploymentDir)README.md"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true"
+          Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroDeploymentDir)README.md'))" />
+
+    <!-- Template DeployPlugins.bat -->
+    <PropertyGroup>
+      <_BatTemplate>$([System.IO.File]::ReadAllText('$(PillaroToolsRoot)Deployment\DeployPlugins.bat.template'))</_BatTemplate>
+      <_BatContent>$(_BatTemplate.Replace('__PILLARO_CLI_DLL__', '$(PillaroCliDll)'))</_BatContent>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PillaroDeploymentDir)DeployPlugins.bat"
+                      Lines="$(_BatContent)"
+                      Overwrite="true"
+                      Encoding="ASCII"
+                      WriteOnlyWhenDifferent="true"
+                      Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroDeploymentDir)DeployPlugins.bat'))" />
+
+    <!-- Template DeployPlugins.ps1 -->
+    <PropertyGroup>
+      <_Ps1Template>$([System.IO.File]::ReadAllText('$(PillaroToolsRoot)Deployment\DeployPlugins.ps1.template'))</_Ps1Template>
+      <_Ps1Content>$(_Ps1Template.Replace('__PILLARO_CLI_DLL__', '$(PillaroCliDll)'))</_Ps1Content>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PillaroDeploymentDir)DeployPlugins.ps1"
+                      Lines="$(_Ps1Content)"
+                      Overwrite="true"
+                      Encoding="UTF-8"
+                      WriteOnlyWhenDifferent="true"
+                      Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroDeploymentDir)DeployPlugins.ps1'))" />
+
+    <!-- Create PillaroSettings.json only if missing -->
+    <PropertyGroup>
+      <_CiAssemblyPath>${BUILD_BINARIESDIRECTORY}/$(AssemblyName).dll</_CiAssemblyPath>
+      <_SettingsContent>{
+  "schemaVersion": 1,
+  "solution": "MyDataverseSolution",
+  "dataverse": {
+    "connectionStringEnvironmentVariable": "DV_CONN"
+  },
+  "defaultProfile": "debug",
+  "profiles": {
+    "debug": {
+      "pluginAssemblyPath": "bin/Debug/$(AssemblyName).dll"
+    },
+    "release": {
+      "pluginAssemblyPath": "bin/Release/$(AssemblyName).dll"
+    },
+    "ci": {
+      "pluginAssemblyPath": "$(_CiAssemblyPath)"
+    }
+  }
+}
+</_SettingsContent>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PillaroSettingsFile)"
+                      Lines="$(_SettingsContent)"
+                      Overwrite="false"
+                      Encoding="UTF-8"
+                      Condition="!Exists('$(PillaroSettingsFile)')" />
+
+  </Target>
+
+  <!-- ============================================================
+       Scaffold early-bound tools (default enabled)
+       ============================================================ -->
+  <Target Name="PillaroScaffoldEarlyBound"
+          AfterTargets="Build"
+          Condition="'$(PillaroGenerateEarlyBoundTools)' == 'true' AND '$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+
+    <MakeDir Directories="$(PillaroEarlyBoundDir)" Condition="!Exists('$(PillaroEarlyBoundDir)')" />
+
+    <!-- Copy README -->
+    <Copy SourceFiles="$(PillaroToolsRoot)EarlyBoundSupport\README.md"
+          DestinationFiles="$(PillaroEarlyBoundDir)README.md"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true"
+          Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroEarlyBoundDir)README.md'))" />
+
+    <!-- Copy GenerateEarlyBound.bat -->
+    <Copy SourceFiles="$(PillaroToolsRoot)EarlyBoundSupport\GenerateEarlyBound.bat"
+          DestinationFiles="$(PillaroEarlyBoundDir)GenerateEarlyBound.bat"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true"
+          Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroEarlyBoundDir)GenerateEarlyBound.bat'))" />
+
+    <!-- Create EarlyBoundSettings.json only if missing -->
+    <PropertyGroup>
+      <_EarlyBoundSettingsContent>{
+  "emitEntityETC": false,
+  "emitFieldsClasses": true,
+  "entityNamesFilter": [
+    "account",
+    "contact",
+    "systemuser"
+  ],
+  "entityTypesFolder": "Entities",
+  "generateSdkMessages": false,
+  "language": "CS",
+  "messageNamesFilter": [],
+  "messagesTypesFolder": "Messages",
+  "namespace": "$(RootNamespace).EarlyBound",
+  "optionSetsTypesFolder": "OptionSets",
+  "serviceContextName": "ServiceContext",
+  "suppressINotifyPattern": true
+}</_EarlyBoundSettingsContent>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PillaroEarlyBoundSettingsFile)"
+                      Lines="$(_EarlyBoundSettingsContent)"
+                      Overwrite="false"
+                      Encoding="UTF-8"
+                      Condition="!Exists('$(PillaroEarlyBoundSettingsFile)')" />
+
+  </Target>
+
+</Project>

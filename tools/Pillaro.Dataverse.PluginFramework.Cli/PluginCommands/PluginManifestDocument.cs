@@ -44,7 +44,11 @@ internal sealed class PluginManifestStep
 
     public string SolutionName { get; set; } = string.Empty;
 
+    public string? Name { get; set; }
+
     public List<string> FilteringAttributes { get; set; } = [];
+
+    public string? UnsecureConfiguration { get; set; }
 
     public List<PluginManifestImage> Images { get; set; } = [];
 
@@ -64,8 +68,6 @@ internal sealed class PluginManifestImage
 
 internal sealed class PluginManifestDeploymentPolicy
 {
-    public bool RequiresConfirmation { get; set; }
-
     public string Risk { get; set; } = string.Empty;
 
     public string Reason { get; set; } = string.Empty;

@@ -41,6 +41,9 @@ variables:
   - name: testingNuspecPath
     value: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
 
+  - name: cliProjectPath
+    value: tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj
+
   - name: changelogPath
     value: CHANGELOG.md
 
@@ -319,6 +322,19 @@ jobs:
           mergeTestResults: true
           failTaskOnFailedTests: true
           testRunTitle: 'Unit Tests'
+
+      - task: DotNetCoreCLI@2
+        displayName: Publish CLI for packaging
+        inputs:
+          command: publish
+          projects: $(cliProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --framework net8.0
+            --no-self-contained
+            --output "$(Build.SourcesDirectory)\tools\Pillaro.Dataverse.PluginFramework.Cli\bin\$(configuration)\net8.0\publish"
+          publishWebProjects: false
+          zipAfterPublish: false
 
       - script: >
           nuget pack "$(frameworkNuspecPath)"

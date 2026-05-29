@@ -38,7 +38,7 @@ internal static class PluginManifestCommand
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex.Message);
+            Console.Error.WriteLine(ex);
             return 1;
         }
     }

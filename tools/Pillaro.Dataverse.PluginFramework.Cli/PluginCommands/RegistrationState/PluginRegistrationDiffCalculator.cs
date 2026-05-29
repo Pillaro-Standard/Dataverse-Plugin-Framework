@@ -29,13 +29,13 @@ internal static class PluginRegistrationDiffCalculator
             {
                 Action = PluginDiffAction.Delete,
                 StepId = currentStep.StepId,
+                Name = currentStep.Name,
                 PluginTypeName = currentStep.PluginTypeName,
                 MessageName = currentStep.MessageName,
                 EntityName = currentStep.EntityName,
                 StageName = currentStep.Stage.ToString(),
                 ModeName = currentStep.Mode.ToString(),
             };
-            deleteStep.Reasons.Add("Step exists in Dataverse for managed plugin type but is missing in C# registration manifest.");
             diff.StepChanges.Add(deleteStep);
         }
 
@@ -49,7 +49,6 @@ internal static class PluginRegistrationDiffCalculator
                 Name = currentImage.Name,
                 Type = currentImage.Type,
             };
-            deleteImage.Reasons.Add("Image exists in Dataverse for managed step but is missing in C# registration manifest.");
             diff.ImageChanges.Add(deleteImage);
         }
 
@@ -61,23 +60,36 @@ internal static class PluginRegistrationDiffCalculator
         PluginManifestStep desired,
         DataverseRegistrationState currentState)
     {
+        if (!currentState.StepsById.TryGetValue(desired.StepId, out var current))
+        {
+            return new PluginStepDiff
+            {
+                Action = PluginDiffAction.Create,
+                StepId = desired.StepId,
+                Name = desired.Name,
+                PluginTypeName = plugin.TypeName,
+                MessageName = desired.MessageName,
+                EntityName = desired.EntityName,
+                StageName = desired.StageName,
+                ModeName = desired.ModeName,
+                UnsecureConfigurationDiff = BuildFieldDiff(null, desired.UnsecureConfiguration),
+            };
+        }
+
+        var unsecureDiff = BuildFieldDiff(current.UnsecureConfiguration, desired.UnsecureConfiguration);
+
         var result = new PluginStepDiff
         {
             Action = PluginDiffAction.Unchanged,
             StepId = desired.StepId,
+            Name = desired.Name,
             PluginTypeName = plugin.TypeName,
             MessageName = desired.MessageName,
             EntityName = desired.EntityName,
             StageName = desired.StageName,
             ModeName = desired.ModeName,
+            UnsecureConfigurationDiff = unsecureDiff,
         };
-
-        if (!currentState.StepsById.TryGetValue(desired.StepId, out var current))
-        {
-            result.Action = PluginDiffAction.Create;
-            result.Reasons.Add("Step does not exist in Dataverse.");
-            return result;
-        }
 
         AddDifference(result.Reasons, "PluginType", current.PluginTypeName, plugin.TypeName);
         AddDifference(result.Reasons, "Message", current.MessageName, desired.MessageName);
@@ -85,7 +97,13 @@ internal static class PluginRegistrationDiffCalculator
         AddDifference(result.Reasons, "Stage", current.Stage.ToString(), desired.Stage.ToString());
         AddDifference(result.Reasons, "Mode", current.Mode.ToString(), desired.Mode.ToString());
         AddDifference(result.Reasons, "Rank", current.Rank.ToString(), desired.Rank.ToString());
+        AddNameDifference(result.Reasons, "Name", current.Name, desired.Name);
         AddCollectionDifference(result.Reasons, "FilteringAttributes", current.FilteringAttributes, desired.FilteringAttributes);
+
+        if (unsecureDiff.Action != PluginDiffAction.Unchanged)
+        {
+            result.Reasons.Add($"UnsecureConfiguration changed.");
+        }
 
         if (result.Reasons.Count > 0)
         {
@@ -112,16 +130,15 @@ internal static class PluginRegistrationDiffCalculator
         if (!currentState.ImagesById.TryGetValue(desired.ImageId, out var current))
         {
             result.Action = PluginDiffAction.Create;
-            result.Reasons.Add("Image does not exist in Dataverse.");
             return result;
         }
 
-        AddDifference(result.Reasons, "StepId", current.StepId.ToString(), step.StepId.ToString());
-        AddDifference(result.Reasons, "Name", current.Name, desired.Name);
-        AddDifference(result.Reasons, "Type", current.Type, desired.Type);
-        AddCollectionDifference(result.Reasons, "Attributes", current.Attributes, desired.Attributes);
+        var hasChanges = !string.Equals(current.StepId.ToString(), step.StepId.ToString(), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(Normalize(current.Name), Normalize(desired.Name), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(Normalize(current.Type), Normalize(desired.Type), StringComparison.OrdinalIgnoreCase)
+            || !NormalizeCollection(current.Attributes).SequenceEqual(NormalizeCollection(desired.Attributes), StringComparer.OrdinalIgnoreCase);
 
-        if (result.Reasons.Count > 0)
+        if (hasChanges)
         {
             result.Action = PluginDiffAction.Update;
         }
@@ -135,11 +152,55 @@ internal static class PluginRegistrationDiffCalculator
             && managedPluginTypes.Contains(step.PluginTypeName);
     }
 
+    private static PluginFieldDiff BuildFieldDiff(string? currentValue, string? desiredValue)
+    {
+        var currentNorm = Normalize(currentValue);
+        var desiredNorm = Normalize(desiredValue);
+
+        if (string.IsNullOrEmpty(currentNorm) && string.IsNullOrEmpty(desiredNorm))
+        {
+            return new PluginFieldDiff { Action = PluginDiffAction.Unchanged, DisplayValue = "(not set)" };
+        }
+
+        if (string.IsNullOrEmpty(currentNorm))
+        {
+            return new PluginFieldDiff { Action = PluginDiffAction.Create, DisplayValue = desiredValue! };
+        }
+
+        if (string.IsNullOrEmpty(desiredNorm))
+        {
+            return new PluginFieldDiff { Action = PluginDiffAction.Delete, DisplayValue = currentValue! };
+        }
+
+        if (!string.Equals(currentNorm, desiredNorm, StringComparison.OrdinalIgnoreCase))
+        {
+            return new PluginFieldDiff { Action = PluginDiffAction.Update, DisplayValue = $"'{currentValue}' -> '{desiredValue}'" };
+        }
+
+        return new PluginFieldDiff { Action = PluginDiffAction.Unchanged, DisplayValue = currentValue! };
+    }
+
     private static void AddDifference(List<string> reasons, string fieldName, string? currentValue, string? desiredValue)
     {
         if (!string.Equals(Normalize(currentValue), Normalize(desiredValue), StringComparison.OrdinalIgnoreCase))
         {
             reasons.Add($"{fieldName}: '{currentValue ?? "<null>"}' -> '{desiredValue ?? "<null>"}'.");
+        }
+    }
+
+    private static void AddNameDifference(
+        List<string> reasons,
+        string fieldName,
+        string? currentName,
+        string? desiredName)
+    {
+        // If WithName() was not explicitly set, do not manage the name - leave it as-is in Dataverse.
+        if (string.IsNullOrWhiteSpace(desiredName))
+            return;
+
+        if (!string.Equals(Normalize(currentName), Normalize(desiredName), StringComparison.OrdinalIgnoreCase))
+        {
+            reasons.Add($"{fieldName}: '{currentName ?? "<null>"}' -> '{desiredName}'.");
         }
     }
 

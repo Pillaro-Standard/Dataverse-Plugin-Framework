@@ -8,10 +8,22 @@ internal static class DataverseRegistrationStateReader
 {
     public static async Task<DataverseRegistrationState> ReadAsync(
         IOrganizationServiceAsync2 service,
-        PluginManifestDocument manifest)
+        PluginManifestDocument manifest,
+        IReadOnlyDictionary<string, Guid>? pluginTypeIdsByName = null)
     {
         var state = new DataverseRegistrationState();
-        await ReadPluginTypesAsync(service, state, manifest);
+        if (pluginTypeIdsByName == null)
+        {
+            await ReadPluginTypesAsync(service, state, manifest);
+        }
+        else
+        {
+            foreach (var pluginType in pluginTypeIdsByName)
+            {
+                state.PluginTypeIdsByName[pluginType.Key] = pluginType.Value;
+            }
+        }
+
         await ReadStepsByPluginTypeAsync(service, state);
         await ReadImagesByStepAsync(service, state);
         return state;
@@ -50,7 +62,7 @@ internal static class DataverseRegistrationStateReader
         var missingTypes = typeNames.Where(typeName => !state.PluginTypeIdsByName.ContainsKey(typeName)).ToArray();
         if (missingTypes.Length > 0)
         {
-            throw new InvalidOperationException($"Plugin types were not found in Dataverse. Ensure PAC plugin push completed successfully: {string.Join(", ", missingTypes)}");
+            throw new InvalidOperationException($"Plugin types were not found in Dataverse. Ensure the plugin assembly/type deployment completed successfully: {string.Join(", ", missingTypes)}");
         }
     }
 
@@ -74,6 +86,8 @@ internal static class DataverseRegistrationStateReader
                     "mode",
                     "rank",
                     "filteringattributes",
+                    "configuration",
+                    "sdkmessageprocessingstepsecureconfigid",
                     "plugintypeid",
                     "sdkmessageid",
                     "sdkmessagefilterid")
@@ -102,6 +116,17 @@ internal static class DataverseRegistrationStateReader
                 Columns = new ColumnSet("primaryobjecttypecode")
             });
 
+            query.LinkEntities.Add(new LinkEntity(
+                "sdkmessageprocessingstep",
+                "sdkmessageprocessingstepsecureconfig",
+                "sdkmessageprocessingstepsecureconfigid",
+                "sdkmessageprocessingstepsecureconfigid",
+                JoinOperator.LeftOuter)
+            {
+                EntityAlias = "secureconfig",
+                Columns = new ColumnSet("secureconfig")
+            });
+
             var response = await service.RetrieveMultipleAsync(query);
             foreach (var entity in response.Entities)
             {
@@ -118,6 +143,7 @@ internal static class DataverseRegistrationStateReader
                     Mode = entity.GetAttributeValue<OptionSetValue>("mode")?.Value ?? 0,
                     Rank = entity.GetAttributeValue<int?>("rank") ?? 0,
                     FilteringAttributes = SplitAttributes(entity.GetAttributeValue<string>("filteringattributes")),
+                    UnsecureConfiguration = entity.GetAttributeValue<string>("configuration"),
                 };
             }
         }

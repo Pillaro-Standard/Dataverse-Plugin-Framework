@@ -169,6 +169,7 @@ A good task tells you **what business logic is being executed**.
 
 Minimal example:
 
+    using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
     using Pillaro.Dataverse.PluginFramework.Plugins;
 
     public class TaskPlugin : PluginBase
@@ -182,11 +183,23 @@ Minimal example:
                 Task.EntityLogicalName,
                 PluginMode.Synchronous);
         }
+
+        public override void Register(IPluginRegistration registration)
+        {
+            registration
+                .OnCreate<Task>("8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
+                .PreOperation()
+                .Synchronous()
+                .InSolution("MySolution")
+                .WithName("My Custom Step Name")
+                .Rank(1);
+        }
     }
 
 This example shows the intended shape:
 
 - the plugin inherits from `PluginBase`
+- deployment metadata is declared in `Register(IPluginRegistration registration)`
 - the constructor registers tasks
 - the plugin stays thin
 - the business logic is delegated to the task

@@ -30,6 +30,8 @@ internal sealed class DataverseStepState
     public int Rank { get; init; }
 
     public IReadOnlyCollection<string> FilteringAttributes { get; init; } = [];
+
+    public string? UnsecureConfiguration { get; init; }
 }
 
 internal sealed class DataverseImageState

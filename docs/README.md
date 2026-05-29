@@ -51,6 +51,9 @@ Use this section when you are building Dataverse plugins with the framework.
 |---|---|---|
 | [Architecture](./plugins/architecture.md) | High-level plugin architecture and project structure | ✅ |
 | [Plugin Model](./plugins/plugin-model.md) | Plugin responsibilities and registration approach | ✅ |
+| [Plugin Registration API](./plugins/plugin-registration-api.md) | Fluent static registration metadata API | ✅ |
+| [Plugin Deployment Flow](./plugins/plugin-deployment-flow.md) | SDK-based plugin deployment command and settings | ✅ |
+| [Plugin Deployment Scenarios](./plugins/plugin-deployment-scenarios.md) | Acceptance scenarios for end-to-end plugin deployment | ✅ |
 | [Task Model](./plugins/task-model.md) | Task lifecycle, structure, and responsibilities | ✅ |
 | [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | ✅ |
 | [Execution Pipeline](./plugins/execution-pipeline.md) | Plugin execution flow and task orchestration | ✅ |

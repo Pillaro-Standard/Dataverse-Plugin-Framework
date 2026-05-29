@@ -10,11 +10,19 @@ internal sealed class PluginRegistrationDiff
         || ImageChanges.Any(change => change.Action != PluginDiffAction.Unchanged);
 }
 
+internal sealed class PluginFieldDiff
+{
+    public PluginDiffAction Action { get; init; }
+    public string DisplayValue { get; init; } = string.Empty;
+}
+
 internal sealed class PluginStepDiff
 {
     public PluginDiffAction Action { get; set; }
 
     public Guid StepId { get; init; }
+
+    public string? Name { get; init; }
 
     public string PluginTypeName { get; init; } = string.Empty;
 
@@ -25,6 +33,8 @@ internal sealed class PluginStepDiff
     public string StageName { get; init; } = string.Empty;
 
     public string ModeName { get; init; } = string.Empty;
+
+    public PluginFieldDiff? UnsecureConfigurationDiff { get; init; }
 
     public List<string> Reasons { get; } = [];
 }
@@ -40,8 +50,6 @@ internal sealed class PluginImageDiff
     public string Name { get; init; } = string.Empty;
 
     public string Type { get; init; } = string.Empty;
-
-    public List<string> Reasons { get; } = [];
 }
 
 internal enum PluginDiffAction

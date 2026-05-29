@@ -1,6 +1,4 @@
-﻿using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.EarlyBound;
-
-namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
+﻿namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 
 internal static class PluginCommandRouter
 {
@@ -15,12 +13,6 @@ internal static class PluginCommandRouter
         if (string.Equals(args[0], "plugin", StringComparison.OrdinalIgnoreCase))
         {
             return await RunPluginCommandAsync(args);
-        }
-
-        if (string.Equals(args[0], "earlybound", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(args[0], "eb", StringComparison.OrdinalIgnoreCase))
-        {
-            return await RunEarlyBoundCommandAsync(args);
         }
 
         Console.Error.WriteLine($"Unknown command '{args[0]}'.");
@@ -49,35 +41,10 @@ internal static class PluginCommandRouter
         };
     }
 
-    private static async Task<int> RunEarlyBoundCommandAsync(string[] args)
-    {
-        if (args.Length == 1 || IsHelp(args[1]))
-        {
-            PrintEarlyBoundHelp();
-            return 0;
-        }
-
-        var command = args[1];
-        var commandArgs = args.Skip(2).ToArray();
-
-        return command.ToLowerInvariant() switch
-        {
-            "generate" => await EarlyBoundGenerateCommand.RunAsync(commandArgs),
-            _ => UnknownEarlyBoundCommand(command)
-        };
-    }
-
     private static int UnknownPluginCommand(string command)
     {
         Console.Error.WriteLine($"Unknown plugin command '{command}'.");
         PrintPluginHelp();
-        return 2;
-    }
-
-    private static int UnknownEarlyBoundCommand(string command)
-    {
-        Console.Error.WriteLine($"Unknown early-bound command '{command}'.");
-        PrintEarlyBoundHelp();
         return 2;
     }
 
@@ -92,12 +59,8 @@ internal static class PluginCommandRouter
         Console.WriteLine();
         Console.WriteLine("Usage:");
         Console.WriteLine("  pillaro-dv plugin <command> [options]");
-        Console.WriteLine("  pillaro-dv earlybound <command> [options]");
-        Console.WriteLine("  pillaro-dv eb <command> [options]");
         Console.WriteLine();
         PrintPluginHelp();
-        Console.WriteLine();
-        PrintEarlyBoundHelp();
     }
 
     private static void PrintPluginHelp()
@@ -107,15 +70,13 @@ internal static class PluginCommandRouter
         Console.WriteLine("  validate   Validate plugin manifest.");
         Console.WriteLine("  diff       Compare manifest with Dataverse.");
         Console.WriteLine("  deploy     Deploy plugin manifest to Dataverse.");
-    }
-
-    private static void PrintEarlyBoundHelp()
-    {
-        Console.WriteLine("Early-bound commands:");
-        Console.WriteLine("  generate   Generate early-bound classes through PAC modelbuilder.");
         Console.WriteLine();
-        Console.WriteLine("Examples:");
-        Console.WriteLine("  pillaro-dv eb generate --conn %DV_CONN%");
-        Console.WriteLine("  pillaro-dv eb generate --settings PillaroSettings.json --conn %DV_CONN%");
+        Console.WriteLine("Deploy options:");
+        Console.WriteLine("  --settings <path>    Path to PillaroSettings.json. Default: PillaroSettings.json in current or parent directory.");
+        Console.WriteLine("  --profile <name>     Profile to use from PillaroSettings.json profiles section. Overrides defaultProfile.");
+        Console.WriteLine("  --assembly <path>    Explicit plugin assembly path. Overrides profile pluginAssemblyPath.");
+        Console.WriteLine("  --solution <name>    Dataverse solution name. Overrides solution in PillaroSettings.json.");
+        Console.WriteLine("  --just-assembly      Deploy only assembly without updating step/image registration.");
+        Console.WriteLine("                       Useful for fast developer workflow when only code changed.");
     }
 }

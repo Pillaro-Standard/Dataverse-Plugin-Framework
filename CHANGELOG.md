@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.0.3-rc
+
+### Pillaro.Dataverse.PluginFramework
+- Changed unsecure configuration handling from automatic JSON parsing to raw string access and added unsecure configuration details to logs.
+- Changed `Register(IPluginRegistration registration)` method from abstract to virtual with empty default implementation, making it optional for plugin classes.
+- Added logging when `Register` method is empty or not overridden, indicating no steps were registered via registration API.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+
 ### 1.0.2-rc
 
 ### Pillaro.Dataverse.PluginFramework

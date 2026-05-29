@@ -55,7 +55,7 @@ internal static class PluginDiffCommand
             var service = DataverseSdkConnectionFactory.Create(connectionOptions);
             var currentState = await DataverseRegistrationStateReader.ReadAsync(service, manifest);
             var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
-            PluginRegistrationDiffWriter.Write(diff, includeUnchanged);
+            PluginRegistrationDiffWriter.Write(diff, manifest);
 
             return diff.HasChanges ? 10 : 0;
         }
