@@ -1,6 +1,6 @@
 # ILMerge Tooling
 
-This folder contains build tooling used to merge Dataverse plugin assemblies into a single deployable DLL.
+This folder contains build tooling used to merge Dataverse plugin assemblies into a single deployable DLL. These tools and templates are provided in-source for example and packaging purposes. In this repository the Files under `tools/ILMerge` are maintained in-source and are not dynamically restored from NuGet for the examples. When the framework is consumed as a NuGet package, equivalent tooling may be packaged differently.
 
 ## Why ILMerge is used
 

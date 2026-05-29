@@ -90,6 +90,22 @@ Key rules:
 * Deployment settings are defined in `PillaroSettings.json`
 * Early-bound types are generated using PAC modelbuilder (`pac modelbuilder build`)
 
+### Local tooling vs packaged behavior
+
+Note: In this repository, the helper tooling under `Tools/` (deployment wrappers, ILMerge, early-bound helpers) is included and managed in-source for examples and local development. When the framework is consumed as a NuGet package by another project, equivalent wrapper files are generated from package templates and may reference the CLI inside the package rather than the local tools folder.
+
+For local development the recommended deploy flow is:
+
+1. Build the CLI tool:
+
+    dotnet build tools\Pillaro.Dataverse.PluginFramework.Cli -c Debug
+
+2. Run the wrapper or invoke the built DLL directly:
+
+    dotnet "tools\Pillaro.Dataverse.PluginFramework.Cli\bin\Debug\net8.0\pillaro-dv.dll" plugin deploy --settings "PillaroSettings.json" --profile "debug"
+
+Do not hardcode user-specific NuGet paths in documentation (for example `C:\Users\...\.nuget\packages\...`). If you need to document both scenarios, clearly separate the local development flow (use build output) and the NuGet consumer flow (package-provided wrappers).
+
 ## Adding a New Plugin
 
 1. Create a new plugin class in `Plugins/`
