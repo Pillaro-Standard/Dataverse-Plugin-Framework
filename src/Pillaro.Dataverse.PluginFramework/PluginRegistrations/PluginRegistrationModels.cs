@@ -33,16 +33,16 @@ public sealed record PluginStepRegistrationDescriptor(
     Guid StepId,
     Type PluginType,
     string MessageName,
-    string? EntityName,
+    string EntityName,
     PluginStage Stage,
     PluginMode Mode,
     int Rank,
     string SolutionName,
-    string? Name,
+    string Name,
     IReadOnlyCollection<string> FilteringAttributes,
     IReadOnlyCollection<PluginImageRegistrationDescriptor> Images,
-    PluginDeploymentPolicyDescriptor? DeploymentPolicy,
-    string? UnsecureConfiguration);
+    PluginDeploymentPolicyDescriptor DeploymentPolicy,
+    string UnsecureConfiguration);
 
 public sealed record PluginImageRegistrationDescriptor(
     Guid ImageId,

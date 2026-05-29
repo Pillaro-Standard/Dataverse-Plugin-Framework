@@ -37,7 +37,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             _steps.Select(step => step.Build(typeof(TPlugin))).ToArray());
     }
 
-    private StepBuilder CreateStep(string stepId, string messageName, string? entityName, bool isUpdate)
+    private StepBuilder CreateStep(string stepId, string messageName, string entityName, bool isUpdate)
     {
         var builder = new StepBuilder(stepId, messageName, entityName, isUpdate);
         _steps.Add(builder);
@@ -69,12 +69,12 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         private PluginStage? _stage;
         private PluginMode? _mode;
         private int _rank = 1;
-        private string? _solutionName;
-        private string? _name;
-        private PluginDeploymentPolicyDescriptor? _deploymentPolicy;
-        private string? _unsecureConfiguration;
+        private string _solutionName;
+        private string _name;
+        private PluginDeploymentPolicyDescriptor _deploymentPolicy;
+        private string _unsecureConfiguration;
 
-        public StepBuilder(string stepId, string messageName, string? entityName, bool isUpdate)
+        public StepBuilder(string stepId, string messageName, string entityName, bool isUpdate)
         {
             StepId = ParseGuid(stepId, nameof(stepId));
             MessageName = RequireValue(messageName, nameof(messageName));
@@ -86,7 +86,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
 
         private string MessageName { get; }
 
-        private string? EntityName { get; }
+        private string EntityName { get; }
 
         public IPluginStepModeBuilder PreValidation() => SetStage(PluginStage.Prevalidation);
 
@@ -167,7 +167,7 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 _stage.Value,
                 _mode.Value,
                 _rank,
-                _solutionName,
+                _solutionName!,
                 _name,
                 _filteringAttributes.Distinct(StringComparer.OrdinalIgnoreCase).ToArray(),
                 _images.ToArray(),

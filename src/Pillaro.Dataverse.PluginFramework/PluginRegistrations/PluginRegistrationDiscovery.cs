@@ -1,4 +1,4 @@
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 using System.Reflection;
 
@@ -6,13 +6,13 @@ namespace Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
 public static class PluginRegistrationDiscovery
 {
-    public static PluginRegistrationDescriptor? Discover<TPlugin>()
+    public static PluginRegistrationDescriptor Discover<TPlugin>()
         where TPlugin : IPlugin
     {
         return Discover(typeof(TPlugin));
     }
 
-    public static PluginRegistrationDescriptor? Discover(Type pluginType)
+    public static PluginRegistrationDescriptor Discover(Type pluginType)
     {
         if (pluginType == null)
         {
@@ -131,7 +131,7 @@ public static class PluginRegistrationDiscovery
     private static Exception Unwrap(Exception ex)
     {
         while (ex is TargetInvocationException { InnerException: not null } tie)
-            ex = tie.InnerException;
+            ex = tie.InnerException!;
         return ex;
     }
 

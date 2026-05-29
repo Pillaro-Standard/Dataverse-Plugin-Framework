@@ -43,7 +43,7 @@ internal static class TypedAttributeSelector
         return attribute.LogicalName;
     }
 
-    private static MemberExpression? GetMemberExpression(Expression expression)
+    private static MemberExpression GetMemberExpression(Expression expression)
     {
         if (expression is MemberExpression memberExpression)
         {
