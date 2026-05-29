@@ -1,8 +1,8 @@
-﻿namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
+namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
-    public class PluginBase : PluginFramework.Plugins.PluginBase
+    public abstract class PluginBase : PluginFramework.Plugins.PluginBase
     {
-        public PluginBase(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
+        protected PluginBase(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
         }
 

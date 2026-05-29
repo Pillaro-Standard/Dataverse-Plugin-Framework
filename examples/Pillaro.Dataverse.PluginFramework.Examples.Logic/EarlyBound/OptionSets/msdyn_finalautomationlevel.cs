@@ -14,29 +14,17 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 	
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-	public enum msdyn_actiontype
+	public enum msdyn_finalautomationlevel
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Proposeaknowledgearticle = 100000000,
+		Disabled = 1,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Resolvecase = 100000001,
+		Shadow = 2,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Sendnextfollowup = 100000002,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Replytocustomer = 100000003,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Replytocustomer1 = 100000004,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Suggestaresolution = 100000005,
-		
-		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Updatedcasestatus = 100000007,
+		Full = 3,
 	}
 }
 #pragma warning restore CS1591

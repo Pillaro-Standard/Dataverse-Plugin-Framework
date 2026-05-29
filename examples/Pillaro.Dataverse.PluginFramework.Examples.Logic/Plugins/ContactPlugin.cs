@@ -1,54 +1,37 @@
-﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
+using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
-    [CrmPluginRegistration("Create", 
-    "contact", StageEnum.PreValidation, ExecutionModeEnum.Synchronous,
-    "firstname,lastname","Pillaro Examples PreVal Create Contact", 1, 
-    IsolationModeEnum.Sandbox 
-    ,Id = "4e56ef4c-0e08-f111-8407-000d3ab261ac" 
-    )]
-    [CrmPluginRegistration("Update", 
-    "contact", StageEnum.PreValidation, ExecutionModeEnum.Synchronous,
-    "firstname,lastname","Pillaro Examples PreVal Update Contact", 1, 
-    IsolationModeEnum.Sandbox 
-    ,Id = "5056ef4c-0e08-f111-8407-000d3ab261ac" 
-    )]
-    [CrmPluginRegistration("Create", 
-    "contact", StageEnum.PreOperation, ExecutionModeEnum.Synchronous,
-    "firstname,lastname,address1_line1,address1_line2,address1_line3,address1_city,address1_postalcode,address1_stateorprovince,address1_country","Pillaro Examples Pre Create Contact", 1, 
-    IsolationModeEnum.Sandbox 
-    ,Id = "4e72086e-1508-f111-8407-000d3ab261ac" 
-    )]
-    [CrmPluginRegistration("Update", 
-    "contact", StageEnum.PreOperation, ExecutionModeEnum.Synchronous,
-    "firstname,lastname,address1_line1,address1_line2,address1_line3,address1_city,address1_postalcode,address1_stateorprovince,address1_country","Pillaro Examples Pre Update Contact", 1, 
-    IsolationModeEnum.Sandbox
-    , Image1Type = ImageTypeEnum.PreImage
-    , Image1Name = "image"
-    , Image1Attributes = "address1_line1,address1_line2,address1_line3,address1_city,address1_postalcode,address1_stateorprovince,address1_country"
-    , Id = "5072086e-1508-f111-8407-000d3ab261ac" 
-    )]
     public class ContactPlugin : PluginBase
     {
         private const string SolutionName = "PillaroPluginFrameworkExamples";
 
-        public static void Register(IPluginRegistration registration)
+        public ContactPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
+        {
+            RegisterTask<ValidateNames>(PluginStage.Prevalidation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
+            RegisterTask<UpdateAddressLabel>(PluginStage.Preoperation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
+        }
+
+        public override void Register(IPluginRegistration registration)
         {
             registration
                 .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
                 .InSolution(SolutionName)
-                .Rank(1);
+                .WithName("Pillaro Examples PreVal Create Contact")
+                .Rank(1)
+                .WithFilteringAttributes("firstname", "lastname")
+                ;
 
             registration
                 .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
                 .InSolution(SolutionName)
+                .WithName("Pillaro Examples PreVal Update Contact")
                 .Rank(1)
                 .WhenChanged("firstname", "lastname");
 
@@ -57,13 +40,25 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .PreOperation()
                 .Synchronous()
                 .InSolution(SolutionName)
-                .Rank(1);
+                .WithName("Pillaro Examples Pre Create Contact")
+                .Rank(1)
+                .WithFilteringAttributes(
+                    "firstname",
+                    "lastname",
+                    "address1_line1",
+                    "address1_line2",
+                    "address1_line3",
+                    "address1_city",
+                    "address1_postalcode",
+                    "address1_stateorprovince",
+                    "address1_country");
 
             registration
                 .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
                 .PreOperation()
                 .Synchronous()
                 .InSolution(SolutionName)
+                .WithName("Pillaro Examples Pre Update Contact")
                 .Rank(1)
                 .WhenChanged(
                     "firstname",
@@ -85,16 +80,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                     "address1_postalcode",
                     "address1_stateorprovince",
                     "address1_country");
-        }
-
-        public ContactPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
-        {
-            //PreVal
-            RegisterTask<ValidateNames>(PluginStage.Prevalidation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
-
-
-            //Pre
-            RegisterTask<UpdateAddressLabel>(PluginStage.Preoperation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
         }
     }
 }

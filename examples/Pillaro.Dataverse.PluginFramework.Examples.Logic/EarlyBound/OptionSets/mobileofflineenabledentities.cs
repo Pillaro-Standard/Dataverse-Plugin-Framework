@@ -514,6 +514,15 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		msdyn_recommendedactionsourceagentconfig = 11582,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		ScreenRecordingLink = 11597,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		BulkHarvestRunLog = 11598,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		HarvestWorkItem = 11600,
 	}
 }
 #pragma warning restore CS1591

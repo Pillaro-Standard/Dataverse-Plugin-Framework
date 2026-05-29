@@ -1,0 +1,28 @@
+﻿{
+  "suppressINotifyPattern": true,
+  "suppressGeneratedCodeAttribute": true,
+  "language": "CS",
+  "logLevel": "Off",
+
+  "namespace": "Pillaro.Dataverse.PluginFramework.Examples.Logic",
+  "serviceContextName": "ServiceContext",
+
+  "generateSdkMessages": false,
+  "generateGlobalOptionSets": true,
+
+  "emitFieldsClasses": true,
+  "emitEntityETC": false,
+  "emitVirtualAttributes": false,
+
+  "entityTypesFolder": "Entities",
+  "messagesTypesFolder": "Messages",
+  "optionSetsTypesFolder": "OptionSets",
+
+  "entityNamesFilter": [
+    "contact",
+    "task",
+    "account"
+  ],
+
+  "messageNamesFilter": []
+}
