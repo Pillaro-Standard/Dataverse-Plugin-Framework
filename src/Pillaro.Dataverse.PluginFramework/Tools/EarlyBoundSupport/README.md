@@ -47,7 +47,7 @@ Example to enable messages:
 Note: messageNamesFilter must not contain an empty string.
 
 ## Generated output
-Generated C# files are written to EarlyBound/ in the project root. When enabled, EarlyBound/**/*.cs are included as Compile items.
+Generated C# files are written to `EarlyBound/` in the project root. Classic projects can include these files through the package target. SDK-style projects usually include generated `.cs` files automatically through default compile items.
 
 ## PAC prerequisites
 Install pac and authenticate before running generation:

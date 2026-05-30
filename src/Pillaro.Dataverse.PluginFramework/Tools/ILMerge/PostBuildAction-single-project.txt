@@ -6,13 +6,12 @@ REM - merge plugin assembly with its dependencies into a single DLL
 REM - required for Dataverse plugin deployment
 REM
 REM How to use:
-REM - replace {LOGIC_ASSEMBLY} with your actual logic project output
-REM   example: Pillaro.Plugins.Examples.Logic.dll
+REM - use this variant when plugin code and business logic are in a single project
+REM - update the dependency list when adding/removing references
 REM
 REM Notes:
 REM - all assemblies must exist in $(TargetDir)
-REM - keep Logic assembly at the END of the merge list
-REM - update dependencies when adding/removing references
+REM - this variant does not merge a separate Logic assembly
 REM ============================================================
 
 rename "$(TargetDir)$(TargetFileName)" "ForMerge$(TargetFileName)"

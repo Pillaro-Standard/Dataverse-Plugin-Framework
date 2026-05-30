@@ -21,7 +21,8 @@ The final output is a single merged plugin assembly.
 ## Files
 
 - `ILMerge.exe` – merge tool used during build
-- `PostBuildAction.txt` – template for post-build merge command
+- `PostBuildAction-logic_plugin-projects.txt` - template for post-build merge command when logic is in a separate project
+- `PostBuildAction-single-project.txt` – template for post-build merge command when logic is in the same project
 - `README.md` – this documentation
 
 ---
