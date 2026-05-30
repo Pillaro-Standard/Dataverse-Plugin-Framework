@@ -43,7 +43,7 @@ Unsecure configuration is suitable for non-sensitive values such as:
 public override void Register(IPluginRegistration registration)
 {
     registration
-        .OnCreate<Contact>("step-guid")
+        .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
         .PreOperation()
         .Synchronous()
         .InSolution("MySolution")
@@ -101,7 +101,7 @@ If secure configuration were set in code:
 public override void Register(IPluginRegistration registration)
 {
     registration
-        .OnCreate<Lead>("guid")
+        .OnCreate<Lead>("00000000-0000-0000-0000-000000000000")
         .PostOperation()
         .Asynchronous()
         .InSolution("MySolution")
@@ -181,7 +181,7 @@ public class LeadIntegration : TaskBase<Lead>
 public override void Register(IPluginRegistration registration)
 {
     registration
-        .OnUpdate<Account>("guid")
+        .OnUpdate<Account>("00000000-0000-0000-0000-000000000000")
         .PreOperation()
         .Synchronous()
         .InSolution("MySolution")
@@ -224,7 +224,7 @@ public class AccountValidation : TaskBase<Account>
 public override void Register(IPluginRegistration registration)
 {
     registration
-        .OnCreate<Lead>("guid")
+        .OnCreate<Lead>("00000000-0000-0000-0000-000000000000")
         .PostOperation()
         .Asynchronous()
         .InSolution("MySolution")

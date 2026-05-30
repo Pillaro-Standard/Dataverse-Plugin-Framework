@@ -122,7 +122,7 @@ Determines version suffix and target audience:
 ### Execution Flow
 
 1. **Checkout**: Fetches full repository history (`fetchDepth: 0`)
-2. **SDK Installation**: Installs .NET SDK 10.x
+2. **SDK Installation**: Installs .NET SDK 8.x
 3. **Version Calculation**: Determines package and assembly versions
 4. **Build**: Builds framework and testing projects
 5. **Pack**: Creates NuGet packages (`.nupkg` files)

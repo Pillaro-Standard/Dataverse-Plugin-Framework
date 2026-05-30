@@ -33,14 +33,14 @@ public sealed class ContactPlugin : PluginBase
     public override void Register(IPluginRegistration registration)
     {
         registration
-            .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
+            .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
             .PreValidation()
             .Synchronous()
             .Rank(1)
             .InSolution("MyDataverseSolution");
 
         registration
-            .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+            .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
             .PreValidation()
             .Synchronous()
             .Rank(1)
@@ -48,7 +48,7 @@ public sealed class ContactPlugin : PluginBase
             .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 
         registration
-            .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
+            .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
             .PreOperation()
             .Synchronous()
             .Rank(1)
@@ -64,7 +64,7 @@ public sealed class ContactPlugin : PluginBase
                 Contact.Fields.Address1_StateOrProvince,
                 Contact.Fields.Address1_Country)
             .WithPreImage(
-                "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
+                "00000000-0000-0000-0000-000000000000",
                 "image",
                 Contact.Fields.Address1_Line1,
                 Contact.Fields.Address1_Line2,
@@ -89,7 +89,7 @@ Use this mode when you already have generated logical-name constants or when you
 
 ```csharp
 registration
-    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
     .InSolution("MyDataverseSolution")
@@ -97,7 +97,7 @@ registration
         Contact.Fields.FirstName,
         Contact.Fields.LastName)
     .WithPreImage(
-        "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
+        "00000000-0000-0000-0000-000000000000",
         "PreImage",
         Contact.Fields.FirstName,
         Contact.Fields.LastName);
@@ -109,7 +109,7 @@ Use this mode when you want IntelliSense over the early-bound entity type. The r
 
 ```csharp
 registration
-    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
     .InSolution("MyDataverseSolution")
@@ -117,7 +117,7 @@ registration
         c => c.FirstName,
         c => c.LastName)
     .WithPreImage(
-        "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
+        "00000000-0000-0000-0000-000000000000",
         "PreImage",
         c => c.FirstName,
         c => c.LastName);
@@ -133,7 +133,7 @@ For Create steps, use `WithFilteringAttributes(...)`:
 
 ```csharp
 registration
-    .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
+    .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreValidation()
     .Synchronous()
     .Rank(1)
@@ -145,7 +145,7 @@ For Update steps, use `WhenChanged(...)` or `WithFilteringAttributes(...)`. `Whe
 
 ```csharp
 registration
-    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
     .InSolution("MyDataverseSolution")
@@ -158,18 +158,18 @@ A step can have multiple images. Each image has its own Dataverse `SdkMessagePro
 
 ```csharp
 registration
-    .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
+    .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
     .InSolution("MyDataverseSolution")
     .WhenChanged(c => c.FirstName, c => c.LastName)
     .WithPreImage(
-        "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
+        "00000000-0000-0000-0000-000000000000",
         "PreImage",
         c => c.FirstName,
         c => c.LastName)
     .WithPostImage(
-        "c7876278-a6f7-4b87-a47c-0e9ecb391002",
+        "00000000-0000-0000-0000-000000000000",
         "PostImage",
         c => c.FirstName,
         c => c.LastName);
@@ -191,7 +191,7 @@ The plugin `Register` method is responsible for deployment metadata only:
 public override void Register(IPluginRegistration registration)
 {
     registration
-        .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+        .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
         .PreOperation()
         .Synchronous()
         .InSolution("MyDataverseSolution")

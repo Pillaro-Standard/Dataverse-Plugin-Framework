@@ -161,12 +161,30 @@ Assign roles based on user responsibilities:
 
 ### Logging Configuration by Environment
 
-Configure `MinimalSeverityLevel` runtime setting appropriately for each environment:
+Configure the `MinimalSeverityLevel` runtime setting according to how broad the saved logging should be.
 
-- **Development/Test environments** — set to `1` (Debug) or `2` (Info) for full diagnostic visibility
-- **Production environments** — set to `3` (Warning) or `4` (Error) depending on volume of generated messages
+The value is cumulative. Higher values save more log severities.
 
-Higher logging levels in production reduce performance impact and storage consumption while maintaining visibility of critical issues.
+| MinimalSeverityLevel | Saved severities | Typical use |
+|---:|---|---|
+| `1` or lower | `Debug` | Basic debug-level diagnostics. Useful for development, testing, initial setup, or environments where debug-level diagnostic logs should be stored. |
+| `2` | `Debug`, `Info` | Development or test environments where informational execution details are useful. |
+| `3` | `Debug`, `Info`, `Warning` | Recommended default for production environments when warnings should be retained without enabling full logging. |
+| `4` or higher | `Debug`, `Info`, `Warning`, `Error` | Full logging, including errors. Use only when complete diagnostic visibility is required. |
+
+Recommended defaults:
+
+- **Development/Test environments** — use `0` when basic diagnostic visibility is sufficient.
+- **Production environments** — use `3` as the recommended default.
+- **Temporary production diagnostics** — use `4` or higher only when full diagnostic visibility is required for investigation.
+- **Error retention** — use `4` or higher if error logs must be saved.
+
+> [!WARNING]
+> Full logging (`MinimalSeverityLevel = 4` or higher) can generate a large amount of diagnostic data.
+> In production environments, this may negatively affect performance and increase Dataverse storage usage.
+> Full logging is not recommended for normal production operation. Enable it only temporarily when detailed diagnostics are required, and reduce the level again after the investigation is finished.
+
+Be aware that higher values increase log volume and storage usage because more severities are retained.
 
 ### Use Logs Instead of Debugging
 
