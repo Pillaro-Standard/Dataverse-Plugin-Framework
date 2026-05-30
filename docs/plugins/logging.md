@@ -189,49 +189,30 @@ This makes it possible to separate:
 
 ## ⚠️ Production logging recommendations
 
-`Debug` is not recommended for normal production environments.
+`MinimalSeverityLevel` controls how broad the saved logging should be.
 
-Why:
+The value is cumulative. Higher values save more log severities.
 
-- it increases log volume
-- it affects environment performance
-- it increases storage usage
-- it creates noise in diagnostics
+| MinimalSeverityLevel | Saved severities | Typical use |
+|---:|---|---|
+| `1` or lower | `Debug` | Basic debug-level diagnostics. Useful for development, testing, initial setup, or environments where debug-level diagnostic logs should be stored. |
+| `2` | `Debug`, `Info` | Development or test environments where informational execution details are useful. |
+| `3` | `Debug`, `Info`, `Warning` | Recommended default for production environments when warnings should be retained without enabling full logging. |
+| `4` or higher | `Debug`, `Info`, `Warning`, `Error` | Full logging, including errors. Use only when complete diagnostic visibility is required. |
 
-For production environments, the usual recommendation is to log only:
+Recommended defaults:
 
-- `Warning`
-- `Error`
+- **Development/Test environments** — use `0` when basic diagnostic visibility is sufficient.
+- **Production environments** — use `3` as the recommended default.
+- **Temporary production diagnostics** — use `4` or higher only when full diagnostic visibility is required for investigation.
+- **Error retention** — use `4` or higher if error logs must be saved.
 
-In some cases, `Info` may also be acceptable.
+> [!WARNING]
+> Full logging (`MinimalSeverityLevel = 4` or higher) can generate a large amount of diagnostic data.
+> In production environments, this may negatively affect performance and increase Dataverse storage usage.
+> Full logging is not recommended for normal production operation. Enable it only temporarily when detailed diagnostics are required, and reduce the level again after the investigation is finished.
 
-The runtime setting `MinimalSeverityLevel` is configured as the minimum numeric severity value that should be logged.
-
-Current severity mapping:
-
-- `Debug = 1`
-- `Info = 2`
-- `Warning = 3`
-- `Error = 4`
-
-Example:
-
-- `MinimalSeverityLevel = 3` → only `Warning` and `Error` are logged
-- `MinimalSeverityLevel = 4` → only `Error` is logged
-
-> [!IMPORTANT]
-> Logging has both runtime and storage cost.
-> The configured minimum severity level should be chosen intentionally, especially in larger or more active environments.
-
-Framework logs should also be cleaned regularly.
-
-The framework does not currently provide built-in automated log cleanup.
-
-If log retention needs to be controlled, cleanup should be implemented separately, for example through:
-
-- Power Automate flow
-- custom cleanup automation
-- environment-specific retention process
+Be aware that higher values increase log volume and storage usage because more severities are retained.
 
 ---
 

@@ -253,7 +253,8 @@ public class LogService(IPluginExecutionContext pluginExecutionContext, IOrganiz
             return false;
 
         var minimalSeverityLevel = TryGetMinimalSeverityLevel();
-        return (int)severity >= minimalSeverityLevel;
+        var maxSeverityLevelToSave = Math.Max(1, minimalSeverityLevel);
+        return (int)severity <= maxSeverityLevelToSave;
     }
 
     private int TryGetMinimalSeverityLevel()

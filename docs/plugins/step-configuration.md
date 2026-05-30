@@ -60,7 +60,7 @@ public class MyTask : TaskBase<Contact>
 {
     protected override void DoExecute()
     {
-        string config = Context.UnsecureConfig; // "timeout=30;retryCount=3"
+        string config = TaskContext.UnsecureConfig; // "timeout=30;retryCount=3"
 
         // Parse configuration
         var settings = ParseConfig(config);
@@ -131,8 +131,8 @@ public class LeadIntegration : TaskBase<Lead>
 {
     protected override void DoExecute()
     {
-        string endpoint = ExtractValue(Context.UnsecureConfig, "apiEndpoint");
-        string apiKey = Context.SecureConfig; // Set manually in Plugin Registration Tool
+        string endpoint = ExtractValue(TaskContext.UnsecureConfig, "apiEndpoint");
+        string apiKey = TaskContext.SecureConfig; // Set manually in Plugin Registration Tool
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -141,7 +141,7 @@ public class LeadIntegration : TaskBase<Lead>
                 "Please set it via Plugin Registration Tool.");
         }
 
-        CallExternalApi(endpoint, apiKey, Target);
+        CallExternalApi(endpoint, apiKey, ContextEntity);
     }
 }
 ~~~
@@ -197,12 +197,12 @@ public class AccountValidation : TaskBase<Account>
 {
     protected override void DoExecute()
     {
-        var config = ParseConfig(Context.UnsecureConfig);
+        var config = ParseConfig(TaskContext.UnsecureConfig);
 
         if (config.GetValueOrDefault("enableNewValidation") == "true")
         {
             int minValue = int.Parse(config.GetValueOrDefault("minValue", "0"));
-            ValidateRevenue(Target.Revenue, minValue);
+            ValidateRevenue(ContextEntity.Revenue, minValue);
         }
     }
 
@@ -240,10 +240,10 @@ public class LeadIntegration : TaskBase<Lead>
 {
     protected override void DoExecute()
     {
-        var config = ParseConfig(Context.UnsecureConfig);
+        var config = ParseConfig(TaskContext.UnsecureConfig);
         string endpoint = config.GetValueOrDefault("apiEndpoint");
         int timeout = int.Parse(config.GetValueOrDefault("timeout", "30"));
-        string apiKey = Context.SecureConfig;
+        string apiKey = TaskContext.SecureConfig;
 
         if (string.IsNullOrWhiteSpace(endpoint))
         {
@@ -257,7 +257,7 @@ public class LeadIntegration : TaskBase<Lead>
                 "Please configure it via Plugin Registration Tool.");
         }
 
-        CallExternalApi(endpoint, apiKey, timeout, Target);
+        CallExternalApi(endpoint, apiKey, timeout, ContextEntity);
     }
 }
 ~~~

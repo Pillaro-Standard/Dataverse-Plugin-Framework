@@ -37,7 +37,7 @@ These views support troubleshooting, performance analysis, and audit requirement
 Runtime Settings allow you to configure plugin behavior without redeploying code.
 
 - **Centralized Configuration** — manage settings from a single location
-- **Dynamic Loading** — plugins can read settings at runtime using `IConfigurationService`
+- **Dynamic Loading** — plugins can read settings at runtime using `SettingsService`
 - **Environment-Specific** — maintain different settings per environment (Dev, Test, Production)
 
 Common use cases:
@@ -150,7 +150,7 @@ Assign roles based on user responsibilities:
 
 ## Related Documentation
 
-- [Runtime Configuration](../plugins/configuration.md) — how to use `IConfigurationService` in plugins
+- [Runtime Configuration](../plugins/configuration.md) — how to use `SettingsService` in plugins
 - [Autonumbering](../plugins/autonumbering.md) — detailed autonumbering setup and patterns
 - [Logging](../plugins/logging.md) — plugin logging capabilities and log levels
 - [Error Handling](../plugins/error-handling.md) — exception handling and validation failures
