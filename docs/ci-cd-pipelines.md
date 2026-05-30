@@ -34,7 +34,7 @@ Validates all test projects against a real Dataverse environment to detect integ
 ### Execution Flow
 
 1. **Checkout**: Fetches latest code (shallow clone, depth 1)
-2. **SDK Installation**: Installs .NET SDK 10.x
+2. **SDK Installation**: Installs .NET SDK 8.x
 3. **Restore**: Restores all NuGet packages for test projects
 4. **Build**: Builds all test projects in Release configuration
 5. **Test Execution**: Runs all tests with code coverage collection

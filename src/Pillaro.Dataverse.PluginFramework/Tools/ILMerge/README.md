@@ -27,11 +27,17 @@ The final output is a single merged plugin assembly.
 
 ---
 
-## PostBuildAction.txt
+## Post-build action templates
 
-This file contains the template used to merge plugin assemblies into a single deployable DLL.
+This folder contains two post-build action templates:
 
-### Placeholder
+- `PostBuildAction-logic_plugin-projects.txt`
+  Use this when business logic is in a separate Logic project.
+
+- `PostBuildAction-single-project.txt`
+  Use this when plugin entry points and business logic are in one project.
+
+### Placeholder in `PostBuildAction-logic_plugin-projects.txt`
 
 - `{LOGIC_ASSEMBLY}` must be replaced with the actual logic project output  
 - Example:  

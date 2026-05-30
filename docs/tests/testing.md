@@ -289,7 +289,7 @@ Create a base class for all test classes:
 
 ~~~csharp
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace YourSolution.Tests.Tests;
 
@@ -321,7 +321,6 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 using Xunit;
-using Xunit.Abstractions;
 using YourSolution.Tests.Data.Repositories;
 
 namespace YourSolution.Tests.Tests.Contact;

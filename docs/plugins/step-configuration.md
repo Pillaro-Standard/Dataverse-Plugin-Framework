@@ -58,7 +58,7 @@ public override void Register(IPluginRegistration registration)
 ~~~csharp
 public class MyTask : TaskBase<Contact>
 {
-    protected override void Execute()
+    protected override void DoExecute()
     {
         string config = Context.UnsecureConfig; // "timeout=30;retryCount=3"
 
@@ -129,7 +129,7 @@ public override void Register(IPluginRegistration registration)
 ~~~csharp
 public class LeadIntegration : TaskBase<Lead>
 {
-    protected override void Execute()
+    protected override void DoExecute()
     {
         string endpoint = ExtractValue(Context.UnsecureConfig, "apiEndpoint");
         string apiKey = Context.SecureConfig; // Set manually in Plugin Registration Tool
@@ -195,7 +195,7 @@ public override void Register(IPluginRegistration registration)
 ~~~csharp
 public class AccountValidation : TaskBase<Account>
 {
-    protected override void Execute()
+    protected override void DoExecute()
     {
         var config = ParseConfig(Context.UnsecureConfig);
 
@@ -238,7 +238,7 @@ public override void Register(IPluginRegistration registration)
 ~~~csharp
 public class LeadIntegration : TaskBase<Lead>
 {
-    protected override void Execute()
+    protected override void DoExecute()
     {
         var config = ParseConfig(Context.UnsecureConfig);
         string endpoint = config.GetValueOrDefault("apiEndpoint");

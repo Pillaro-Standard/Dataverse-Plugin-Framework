@@ -244,8 +244,11 @@ Configuration is loaded dynamically from Dataverse.
 
 ## Getting Started
 
-> 🚧 TODO  
-> Detailed setup and usage guide will be added soon.
+Start with the implementation guide:
+
+- [Getting Started](docs/plugins/getting-started.md)
+- [Plugin Registration API](docs/plugins/plugin-registration-api.md)
+- [Deployment Plugins](docs/plugins/deployment-plugins.md)
 
 ---
 

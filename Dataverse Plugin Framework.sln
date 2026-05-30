@@ -37,6 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginFra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}"
 	ProjectSection(SolutionItems) = preProject
+		docs\ci-cd-pipelines.md = docs\ci-cd-pipelines.md
 		docs\CODE_OF_CONDUCT.md = docs\CODE_OF_CONDUCT.md
 		docs\CONTRIBUTING.md = docs\CONTRIBUTING.md
 		docs\limitations.md = docs\limitations.md
@@ -57,6 +58,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{04AD
 		docs\plugins\getting-started.md = docs\plugins\getting-started.md
 		docs\plugins\logging.md = docs\plugins\logging.md
 		docs\plugins\plugin-model.md = docs\plugins\plugin-model.md
+		docs\plugins\plugin-registration-api.md = docs\plugins\plugin-registration-api.md
+		docs\plugins\step-configuration.md = docs\plugins\step-configuration.md
 		docs\plugins\task-model.md = docs\plugins\task-model.md
 		docs\plugins\validation.md = docs\plugins\validation.md
 	EndProjectSection
