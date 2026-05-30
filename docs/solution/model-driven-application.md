@@ -161,30 +161,30 @@ Assign roles based on user responsibilities:
 
 ### Logging Configuration by Environment
 
-Configure the `MinimalSeverityLevel` runtime setting according to how broad the saved logging should be.
+Configure the `MinimalSeverityLevel` runtime setting according to the minimum severity that should be saved.
 
-The value is cumulative. Higher values save more log severities.
+The value works as a threshold. The configured severity and all higher severities are saved.
 
 | MinimalSeverityLevel | Saved severities | Typical use |
 |---:|---|---|
-| `1` or lower | `Debug` | Basic debug-level diagnostics. Useful for development, testing, initial setup, or environments where debug-level diagnostic logs should be stored. |
-| `2` | `Debug`, `Info` | Development or test environments where informational execution details are useful. |
-| `3` | `Debug`, `Info`, `Warning` | Recommended default for production environments when warnings should be retained without enabling full logging. |
-| `4` or higher | `Debug`, `Info`, `Warning`, `Error` | Full logging, including errors. Use only when complete diagnostic visibility is required. |
+| `1` or lower | `Debug`, `Info`, `Warning`, `Error` | Full diagnostic logging. Useful for development, testing, initial setup, or temporary deep diagnostics. |
+| `2` | `Info`, `Warning`, `Error` | Informational logging without Debug details. Useful for test or controlled support scenarios. |
+| `3` | `Warning`, `Error` | Recommended default for production environments. |
+| `4` | `Error` | Error-only logging. Useful when production log volume must be kept minimal. |
 
 Recommended defaults:
 
-- **Development/Test environments** — use `0` when basic diagnostic visibility is sufficient.
+- **Development/Test environments** — use `0` or `1` when full diagnostic visibility is needed.
 - **Production environments** — use `3` as the recommended default.
-- **Temporary production diagnostics** — use `4` or higher only when full diagnostic visibility is required for investigation.
-- **Error retention** — use `4` or higher if error logs must be saved.
+- **High-volume production environments** — use `4` if only errors should be retained.
+- **Temporary production diagnostics** — use `0` or `1` only when full diagnostic visibility is required for investigation.
 
 > [!WARNING]
-> Full logging (`MinimalSeverityLevel = 4` or higher) can generate a large amount of diagnostic data.
+> Full logging (`MinimalSeverityLevel = 0` or `1`) can generate a large amount of diagnostic data.
 > In production environments, this may negatively affect performance and increase Dataverse storage usage.
-> Full logging is not recommended for normal production operation. Enable it only temporarily when detailed diagnostics are required, and reduce the level again after the investigation is finished.
+> Full logging is not recommended for normal production operation. Enable it only temporarily when detailed diagnostics are required, and increase the level again after the investigation is finished.
 
-Be aware that higher values increase log volume and storage usage because more severities are retained.
+Use only values from `0` to `4` for normal configuration. Values higher than `4` are not recommended because no standard framework severity is higher than `Error`.
 
 ### Use Logs Instead of Debugging
 

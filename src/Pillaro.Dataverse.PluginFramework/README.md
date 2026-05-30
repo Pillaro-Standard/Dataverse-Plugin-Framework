@@ -56,9 +56,11 @@ The application can be found in the project repository under the `power-platform
 
 To enable logging, configure the following setting in Dataverse:
 
-- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0` or `1` to enable debug-level framework logs.
+- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0` or `1` to enable full debug-level framework logging.
 
-`MinimalSeverityLevel` is cumulative: higher values save more severities. `MinimalSeverityLevel = 4` or higher enables full logging and should not be used permanently in production.
+`MinimalSeverityLevel` is a minimum severity threshold. `0` or `1` saves all severities, `2` saves Info and higher, `3` saves Warning and Error, and `4` saves Error only.
+
+For production environments, `3` is the recommended default. Full logging (`0` or `1`) should be enabled only temporarily when detailed diagnostics are required.
 
 ---
 

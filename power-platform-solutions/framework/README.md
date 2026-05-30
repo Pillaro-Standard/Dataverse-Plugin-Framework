@@ -8,9 +8,9 @@ All versions and release changes are documented in the [changelog.md](./changelo
 
 ## Required runtime setting
 
-- **MinimalSeverityLevel** (Int) = `0` — enables debug-level framework logging.
+- **MinimalSeverityLevel** (Int) = `0` — enables full debug-level framework logging.
 
-Higher values save more severities. Use `3` as the recommended production default. Use `4` or higher only temporarily when full diagnostics are required.
+`MinimalSeverityLevel` is a minimum severity threshold. Use `3` as the recommended production default. Use `0` or `1` only temporarily in production when full diagnostics are required.
 
 ## Security roles
 
@@ -27,7 +27,7 @@ Ensure that users or service accounts executing plugins have at least one of the
 ## Minimal deployment checklist
 
 - Import or install the solution into Dataverse and register plugins.
-- Configure the `MinimalSeverityLevel` runtime setting to `0` for debug-level logging, or `3` for the recommended production default.
+- Configure the `MinimalSeverityLevel` runtime setting to `0` or `1` for full debug-level logging, or `3` for the recommended production default.
 - Ensure appropriate security roles are assigned to users or service accounts.
 
 > Note: The repository examples and plugins will not behave as intended until the framework is deployed and the runtime setting above is applied.
