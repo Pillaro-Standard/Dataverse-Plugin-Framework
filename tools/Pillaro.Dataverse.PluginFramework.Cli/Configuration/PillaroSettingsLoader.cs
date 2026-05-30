@@ -7,8 +7,6 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.Configuration;
 internal static class PillaroSettingsLoader
 {
     public const string DefaultFileName = "PillaroSettings.json";
-    public const string DefaultProfilesFileName = "dataverse-profiles.json";
-
     private static readonly JsonSerializerOptions ReadOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -84,13 +82,6 @@ internal static class PillaroSettingsLoader
             return cliAssembly;
         }
 
-        if (!string.IsNullOrWhiteSpace(settings.Plugins?.Assembly))
-        {
-            throw new InvalidOperationException(
-                "The top-level 'plugins.assembly' configuration is no longer supported. " +
-                "Migrate to 'profiles.<name>.pluginAssemblyPath' in PillaroSettings.json.");
-        }
-
         var profile = ResolveActiveProfile(options, settings);
         return profile.PluginAssemblyPath;
     }
@@ -128,58 +119,6 @@ internal static class PillaroSettingsLoader
     {
         var expanded = ExpandEnvironmentTokens(path);
         return Path.GetFullPath(expanded);
-    }
-
-    // Kept for non-deploy commands that load connection via ~/.pillaro/dataverse-profiles.json.
-    public static async Task<DataverseProfile?> TryLoadProfileAsync(CommandLineOptions options, PillaroSettings? settings = null)
-    {
-        var explicitConnectionString = options.Get("conn") ?? options.Get("sdk-connection-string") ?? options.Get("connection-string");
-        if (!string.IsNullOrWhiteSpace(explicitConnectionString))
-        {
-            return new DataverseProfile
-            {
-                ConnectionString = explicitConnectionString,
-                PacProfile = options.Get("pac-profile") ?? options.Get("pac-auth-profile") ?? string.Empty,
-            };
-        }
-
-        var profilesPath = GetProfilesPath(options);
-        if (!File.Exists(profilesPath))
-        {
-            return null;
-        }
-
-        await using var stream = File.OpenRead(profilesPath);
-        var profilesDocument = await JsonSerializer.DeserializeAsync<DataverseProfilesDocument>(stream, ReadOptions);
-        if (profilesDocument == null)
-        {
-            return null;
-        }
-
-        var profileName = options.Get("profile")
-            ?? settings?.DefaultProfile
-            ?? profilesDocument.DefaultProfile;
-
-        if (string.IsNullOrWhiteSpace(profileName))
-        {
-            return null;
-        }
-
-        return profilesDocument.Profiles.TryGetValue(profileName, out var profile)
-            ? profile
-            : null;
-    }
-
-    public static string GetProfilesPath(CommandLineOptions options)
-    {
-        var configuredPath = options.Get("profiles");
-        if (!string.IsNullOrWhiteSpace(configuredPath))
-        {
-            return Path.GetFullPath(configuredPath);
-        }
-
-        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        return Path.Combine(userProfile, ".pillaro", DefaultProfilesFileName);
     }
 
     private static string ExpandEnvironmentTokens(string value)

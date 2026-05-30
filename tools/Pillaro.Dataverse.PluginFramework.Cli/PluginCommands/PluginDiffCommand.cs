@@ -11,7 +11,7 @@ internal static class PluginDiffCommand
         {
             var options = CommandLineOptions.Parse(args);
             var manifestPath = options.Require("manifest");
-            var connectionOptions = await DataverseConnectionOptions.ResolveAsync(options);
+            var connectionOptions = DataverseConnectionOptions.From(options);
             var includeUnchanged = options.HasFlag("include-unchanged");
 
             if (!File.Exists(manifestPath))
