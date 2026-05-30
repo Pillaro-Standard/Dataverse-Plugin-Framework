@@ -33,7 +33,7 @@ jobs:
         displayName: Install .NET SDK
         inputs:
           packageType: sdk
-          version: '10.x'
+          version: '8.x'
 
       - task: DotNetCoreCLI@2
         displayName: Restore test projects

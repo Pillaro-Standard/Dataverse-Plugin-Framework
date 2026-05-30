@@ -86,7 +86,7 @@ internal static class PluginManifestValidator
 
         if (IsUpdate(step) && step.Mode == SynchronousMode && !string.IsNullOrWhiteSpace(step.EntityName) && step.FilteringAttributes.Count == 0)
         {
-            errors.Add($"Synchronous Update step '{step.StepId}' on entity '{step.EntityName}' must define filtering attributes using WhenChanged(...). Use an explicit confirmation policy only after narrowing the trigger scope.");
+            errors.Add($"Synchronous Update step '{step.StepId}' on entity '{step.EntityName}' should define filtering attributes using WhenChanged(...) to avoid unnecessarily broad execution.");
         }
     }
 

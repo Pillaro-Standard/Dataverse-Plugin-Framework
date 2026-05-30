@@ -8,11 +8,11 @@
 - Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
 - Clarified documentation for Create and Update filtering attributes, generated deployment tooling, and SDK-style early-bound source inclusion.
 - Aligned package dependency metadata and deployment documentation with the current build and packaging behavior.
-- Fixed Sharp #25, where the NuGet package build had incorrect changelog content.
+- Fixed issue #25, where the NuGet package build had incorrect changelog content.
 
 ### Pillaro.Dataverse.PluginFramework.Testing
 - Aligned package dependencies and package metadata for configuration, environment variable, memory cache, and Dataverse testing support.
-- Fixed Sharp #25, where the NuGet package build had incorrect changelog content.
+- Fixed issue #25, where the NuGet package build had incorrect changelog content.
 
 ### 1.0.2-rc
 

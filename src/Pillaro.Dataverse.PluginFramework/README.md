@@ -80,7 +80,7 @@ public class PluginBase : PluginFramework.Plugins.PluginBase
     {
     }
 
-    public override string GetSolutionVersion() => "1.0";
+    public override string GetVersion() => "1.0";
 }
 ~~~
 
@@ -108,14 +108,13 @@ public class ValidateContactTask : TaskBase<Logic.Contact>
     public ValidateContactTask(IServiceProvider services, TaskContext ctx)
         : base(services, ctx) { }
 
-    protected override ICompleteValidation AddValidations(IBasicModeValidation v)
+    protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
     {
         return validator
             .WithMode(PluginMode.Synchronous)
             .WithStage(PluginStage.Preoperation)
             .WithMessages(new[] { "Create", "Update" })
-            .ForEntity(ContextEntity.LogicalName)
-            .EntityWithAtLeastOneAttribute(ContextEntity, nameof(ContextEntity.FirstName), nameof(ContextEntity.LastName));
+            .ForEntity(ContextEntity.LogicalName);
     }
 
     protected override void DoExecute()
