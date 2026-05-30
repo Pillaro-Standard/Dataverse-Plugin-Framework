@@ -20,7 +20,7 @@
 			Testing support package for integration and end-to-end testing of solutions built with Pillaro Dataverse Plugin Framework.
 		</description>
 
-		<releaseNotes>$releaseNotes$</releaseNotes>
+		<releaseNotes>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/CHANGELOG.md</releaseNotes>
 
 		<tags>dataverse dynamics365 plugin testing integration-testing</tags>
 

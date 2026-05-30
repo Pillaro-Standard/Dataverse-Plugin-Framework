@@ -22,7 +22,7 @@
 			logging and consistent plugin architecture.
 		</description>
 
-		<releaseNotes>$releaseNotes$</releaseNotes>
+		<releaseNotes>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/CHANGELOG.md</releaseNotes>
 
 		<tags>dataverse dynamics crm plugin framework xrm</tags>
 
