@@ -1,19 +1,18 @@
 ﻿# Plugin Registration API
 
-This document describes the proposed fluent registration API for Dataverse plugin deployment metadata.
+This document describes the fluent registration API for Dataverse plugin deployment metadata.
 
 The goal is to keep plugin registration readable for developers while preserving deterministic 1:1 identifiers with Dataverse records.
 
 ## Design Goals
 
 - registration is visible directly in the plugin class
-- every framework plugin must implement `Register(IPluginRegistration registration)`
+- framework plugins can override `Register(IPluginRegistration registration)` to provide deployment metadata
 - one plugin class can define multiple Dataverse steps
 - one Dataverse step can define multiple images
 - step and image IDs are explicit and match Dataverse IDs
 - IntelliSense guides the developer through valid registration order
 - update filtering attributes are available only for Update steps
-- deployment confirmation policy is attached directly to the step it belongs to
 - attributes can be selected either by logical-name constants or by typed early-bound entity properties
 
 ## Example
@@ -37,13 +36,15 @@ public sealed class ContactPlugin : PluginBase
             .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
             .PreValidation()
             .Synchronous()
-            .Rank(1);
+            .Rank(1)
+            .InSolution("MyDataverseSolution");
 
         registration
             .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
             .PreValidation()
             .Synchronous()
             .Rank(1)
+            .InSolution("MyDataverseSolution")
             .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 
         registration
@@ -51,6 +52,7 @@ public sealed class ContactPlugin : PluginBase
             .PreOperation()
             .Synchronous()
             .Rank(1)
+            .InSolution("MyDataverseSolution")
             .WhenChanged(
                 Contact.Fields.FirstName,
                 Contact.Fields.LastName,
@@ -70,14 +72,12 @@ public sealed class ContactPlugin : PluginBase
                 Contact.Fields.Address1_City,
                 Contact.Fields.Address1_PostalCode,
                 Contact.Fields.Address1_StateOrProvince,
-                Contact.Fields.Address1_Country)
-            .RequiresConfirmation(
-                PluginRisk.Medium,
-                "Synchronous contact update step with pre-image.",
-                PluginDeploymentScope.TestAndProduction);
+                Contact.Fields.Address1_Country);
     }
 }
 ```
+
+`RegisterTask(...)` calls in the constructor are runtime task registration. `Register(IPluginRegistration registration)` is deployment metadata only. Both are intentionally separate: the constructor tells the framework what task to execute at runtime, while `Register(...)` tells deployment tooling which Dataverse steps and images should exist. Developers must keep these two declarations aligned.
 
 ## Attribute Selection Modes
 
@@ -92,6 +92,7 @@ registration
     .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
     .PreOperation()
     .Synchronous()
+    .InSolution("MyDataverseSolution")
     .WhenChanged(
         Contact.Fields.FirstName,
         Contact.Fields.LastName)
@@ -111,6 +112,7 @@ registration
     .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
     .PreOperation()
     .Synchronous()
+    .InSolution("MyDataverseSolution")
     .WhenChanged(
         c => c.FirstName,
         c => c.LastName)
@@ -132,6 +134,7 @@ registration
     .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
     .PreOperation()
     .Synchronous()
+    .InSolution("MyDataverseSolution")
     .WhenChanged(c => c.FirstName, c => c.LastName)
     .WithPreImage(
         "7f8a44bb-4d4f-4cd9-9e22-efb1472a1001",
@@ -160,10 +163,18 @@ The plugin `Register` method is responsible for deployment metadata only:
 ```csharp
 public override void Register(IPluginRegistration registration)
 {
+    registration
+        .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+        .PreOperation()
+        .Synchronous()
+        .InSolution("MyDataverseSolution")
+        .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 }
 ```
 
 Deployment tooling discovers framework plugins from `PluginBase`, calls `Register(...)`, and builds a deterministic manifest without executing the plugin pipeline.
+
+These declarations are intentionally separate because they serve different Dataverse concerns. `RegisterTask(...)` controls runtime dispatch inside the plugin execution pipeline. `Register(IPluginRegistration registration)` controls deployment metadata for assemblies, steps, images, filtering attributes, configuration, and solution membership. The framework does not automatically infer one from the other, so keep runtime task registration and deployment metadata aligned when adding, removing, or changing steps.
 
 ## Discovery
 

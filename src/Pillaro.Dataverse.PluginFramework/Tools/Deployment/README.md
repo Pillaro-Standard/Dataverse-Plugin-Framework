@@ -22,6 +22,10 @@ Or using PowerShell with a specific profile:
 
     .\Tools\Deployment\DeployPlugins.ps1 -Profile release
 
+The generated wrappers default to the `debug` profile. The batch wrapper accepts an optional profile as its first argument, for example:
+
+    .\Tools\Deployment\DeployPlugins.bat release
+
 > [!IMPORTANT]
 > Do not store connection strings or secrets in committed files.
 
@@ -51,6 +55,8 @@ Example profile structure:
   }
 }
 ~~~
+
+Set each `pluginAssemblyPath` to the DLL path produced by your project. Classic .NET Framework plugin projects commonly use `bin/Debug/<assembly>.dll`; SDK-style projects may include a target framework folder such as `bin/Debug/net462/<assembly>.dll`.
 
 Local development (preferred):
 

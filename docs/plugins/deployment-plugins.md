@@ -63,10 +63,10 @@ Required values:
 |---|---|
 | `solution` | Dataverse solution unique name. Deployed plugin components are added to this solution. |
 | `dataverse.connectionStringEnvironmentVariable` | Name of the environment variable containing the Dataverse connection string. |
-| `defaultProfile` | Profile used when no profile is passed to the script. |
+| `defaultProfile` | Profile used by direct CLI runs when `--profile` is omitted. The generated wrapper scripts default to the `debug` profile unless a profile is passed. |
 | `profiles.<name>.pluginAssemblyPath` | Path to the built plugin DLL for the selected profile. |
 
-Use `debug` for local development, `release` for local release-build verification, and `ci` for Azure DevOps.
+Use `debug` for local development, `release` for local release-build verification, and `ci` for Azure DevOps. Set each `pluginAssemblyPath` to the DLL path produced by your project. Classic .NET Framework plugin projects commonly use `bin/Debug/<assembly>.dll`; SDK-style projects may include a target framework folder such as `bin/Debug/net462/<assembly>.dll`.
 
 ---
 
@@ -103,6 +103,12 @@ From the plugin project root, run:
 
 ```bat
 .\Tools\Deployment\DeployPlugins.bat
+```
+
+The batch wrapper accepts an optional profile as the first argument and defaults to `debug`:
+
+```bat
+.\Tools\Deployment\DeployPlugins.bat release
 ```
 
 Or run the PowerShell wrapper:
