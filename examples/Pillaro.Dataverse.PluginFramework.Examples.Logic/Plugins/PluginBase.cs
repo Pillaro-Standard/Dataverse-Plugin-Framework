@@ -1,11 +1,7 @@
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
-    public abstract class PluginBase : PluginFramework.Plugins.PluginBase
+    public abstract class PluginBase(string unsecureConfig, string secureConfig) : PluginFramework.Plugins.PluginBase(unsecureConfig, secureConfig)
     {
-        protected PluginBase(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
-        {
-        }
-
         public override string GetVersion()
         {
             return "1.0";

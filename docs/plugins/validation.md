@@ -296,4 +296,4 @@ Continue with:
 - [Task Model](./task-model.md)
 - [Data Access](./data-access.md)
 - [Execution Pipeline](../execution-pipeline.md)
-- [Architecture](../architecture.md)
+- [Architecture](./architecture.md)

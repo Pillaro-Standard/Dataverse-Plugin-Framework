@@ -6,6 +6,8 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState
 
 internal static class DataverseRegistrationUpserter
 {
+    internal sealed record ImageUpsertOperation(PluginManifestStep Step, PluginManifestImage Image, PluginDiffAction Action);
+
     public static async Task ApplyAsync(
         IOrganizationServiceAsync2 service,
         PluginManifestDocument manifest,
@@ -39,14 +41,43 @@ internal static class DataverseRegistrationUpserter
             var plugin = manifest.Plugins.Single(item => item.TypeName == stepChange.PluginTypeName);
             var step = plugin.Steps.Single(item => item.StepId == stepChange.StepId);
             await UpsertStepAsync(service, plugin, step, pluginTypeIds, messageIds, messageFilterIds, stepChange.Action);
-
-            var stepImages = diff.ImageChanges.Where(ic => ic.StepId == step.StepId && ic.Action is PluginDiffAction.Create or PluginDiffAction.Update).ToList();
-            foreach (var imageChange in stepImages)
-            {
-                var image = step.Images.Single(item => item.ImageId == imageChange.ImageId);
-                await UpsertImageAsync(service, step, image, imageChange.Action);
-            }
         }
+
+        foreach (var imageOperation in BuildImageUpsertPlan(manifest, diff.ImageChanges))
+        {
+            await UpsertImageAsync(service, imageOperation.Step, imageOperation.Image, imageOperation.Action);
+        }
+    }
+
+    internal static IReadOnlyList<ImageUpsertOperation> BuildImageUpsertPlan(
+        PluginManifestDocument manifest,
+        IEnumerable<PluginImageDiff> imageChanges)
+    {
+        var desiredStepsById = manifest.Plugins
+            .SelectMany(plugin => plugin.Steps)
+            .ToDictionary(step => step.StepId);
+        var plannedImageIds = new HashSet<Guid>();
+        var operations = new List<ImageUpsertOperation>();
+
+        foreach (var imageChange in imageChanges.Where(change => change.Action is PluginDiffAction.Create or PluginDiffAction.Update))
+        {
+            if (!desiredStepsById.TryGetValue(imageChange.StepId, out var step))
+            {
+                throw new InvalidOperationException($"Image change '{imageChange.ImageId}' references step '{imageChange.StepId}', but the step is not present in the desired manifest.");
+            }
+
+            var image = step.Images.SingleOrDefault(item => item.ImageId == imageChange.ImageId)
+                ?? throw new InvalidOperationException($"Image change '{imageChange.ImageId}' references step '{imageChange.StepId}', but the image is not present in the desired manifest.");
+
+            if (!plannedImageIds.Add(imageChange.ImageId))
+            {
+                throw new InvalidOperationException($"Image '{imageChange.ImageId}' has multiple create/update changes and would be upserted more than once.");
+            }
+
+            operations.Add(new ImageUpsertOperation(step, image, imageChange.Action));
+        }
+
+        return operations;
     }
 
     public static async Task EnsureDesiredSolutionMembershipAsync(

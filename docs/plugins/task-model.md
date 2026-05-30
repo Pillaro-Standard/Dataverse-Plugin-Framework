@@ -311,7 +311,7 @@ Continue with:
 - [Plugin Model](./plugin-model.md)
 - [Validation Model](./validation.md)
 - [Data Access](./data-access.md)
-- [Architecture](../architecture.md)
+- [Architecture](./architecture.md)
 - [Execution Pipeline](../execution-pipeline.md)
 - [Data Access](./data-access.md)
 - [DataService](./data-service.md)

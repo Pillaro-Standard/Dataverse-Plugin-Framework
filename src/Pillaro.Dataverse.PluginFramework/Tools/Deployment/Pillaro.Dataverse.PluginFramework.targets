@@ -28,8 +28,11 @@
     <PillaroUpdateManagedToolFiles Condition="'$(PillaroUpdateManagedToolFiles)' == ''">true</PillaroUpdateManagedToolFiles>
   </PropertyGroup>
 
-  <!-- Include generated C# early-bound sources -->
-  <ItemGroup Condition="'$(PillaroIncludeGeneratedEarlyBoundSources)' == 'true'">
+  <!--
+    Include generated C# early-bound sources for classic projects.
+    SDK-style projects include .cs files by default, so skip the explicit include unless default compile items are disabled.
+  -->
+  <ItemGroup Condition="'$(PillaroIncludeGeneratedEarlyBoundSources)' == 'true' AND ('$(UsingMicrosoftNETSdk)' != 'true' OR '$(EnableDefaultCompileItems)' == 'false')">
     <Compile Include="EarlyBound\**\*.cs" Condition="Exists('EarlyBound')" />
   </ItemGroup>
 

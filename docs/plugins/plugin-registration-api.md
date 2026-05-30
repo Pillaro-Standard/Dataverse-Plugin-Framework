@@ -12,7 +12,7 @@ The goal is to keep plugin registration readable for developers while preserving
 - one Dataverse step can define multiple images
 - step and image IDs are explicit and match Dataverse IDs
 - IntelliSense guides the developer through valid registration order
-- update filtering attributes are available only for Update steps
+- filtering attributes can be declared for Create and Update steps
 - attributes can be selected either by logical-name constants or by typed early-bound entity properties
 
 ## Example
@@ -125,6 +125,33 @@ registration
 
 Typed selection is available for `OnUpdate<TEntity>(...)` steps. It keeps the entity type from `OnUpdate<Contact>(...)` through the fluent chain, so only properties from `Contact` are offered by IntelliSense.
 
+## Filtering Attributes
+
+Filtering attributes can be declared for Create and Update steps in this framework registration metadata.
+
+For Create steps, use `WithFilteringAttributes(...)`:
+
+```csharp
+registration
+    .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreValidation()
+    .Synchronous()
+    .Rank(1)
+    .InSolution("MyDataverseSolution")
+    .WithFilteringAttributes(Contact.Fields.FirstName, Contact.Fields.LastName);
+```
+
+For Update steps, use `WhenChanged(...)` or `WithFilteringAttributes(...)`. `WhenChanged(...)` is preferred for readability and keeps the entity-specific fluent flow:
+
+```csharp
+registration
+    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution")
+    .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
+```
+
 ## Multiple Images Per Step
 
 A step can have multiple images. Each image has its own Dataverse `SdkMessageProcessingStepImageId`.
@@ -197,8 +224,8 @@ The deployment manifest validator enforces basic safety rules:
 - `stepId` must be a non-empty GUID and should be the Dataverse `SdkMessageProcessingStepId`.
 - image IDs must be non-empty GUIDs and should be Dataverse `SdkMessageProcessingStepImageId` values.
 - placeholder-looking GUIDs such as `00000000-0000-0000-0000-000000000001` are rejected.
-- synchronous Update steps on an entity must define filtering attributes using `WhenChanged(...)`.
-- filtering attributes are allowed only for Update steps.
+- synchronous Update steps on an entity should define filtering attributes; `WhenChanged(...)` is preferred for readability and typed update flow.
+- filtering attributes are supported for Create and Update steps. Use `WithFilteringAttributes(...)` for Create steps; use `WhenChanged(...)` or `WithFilteringAttributes(...)` for Update steps.
 - image names must be unique within a step.
 - image IDs must be unique across the manifest.
 - images should be used only in PreOperation or PostOperation stages.

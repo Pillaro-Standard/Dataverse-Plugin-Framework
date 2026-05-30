@@ -135,10 +135,10 @@ The key file should be placed in the plugin project root and used during build a
 
 6. Configure post-build action for assembly merge.
 
-Post-build actions are available in:
+Post-build actions are generated after rebuild and are available in:
 
 ~~~text
-Tools/CrmTools/
+Tools/ILMerge/
 ~~~
 
 There are two variants:
@@ -155,14 +155,14 @@ Choose the variant that matches your project structure.
 
 7. Build the plugin project.
 
-After signing and post-build configuration, the project produces a single merged assembly ready for deployment.
+After signing and post-build configuration, the project produces a single merged assembly ready for deployment. The package also generates deployment helpers in `Tools/Deployment/` and a `PillaroSettings.json` file in the plugin project root.
 
 8. Deploy the plugin assembly.
 
 Recommended tools:
 
 - Plugin Registration Tool
-- Pillaro CLI (`pillaro-dv plugin deploy`)
+- generated `Tools/Deployment/DeployPlugins.bat` or `Tools/Deployment/DeployPlugins.ps1`
 
 ---
 

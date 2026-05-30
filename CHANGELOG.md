@@ -5,12 +5,14 @@
 ### Pillaro.Dataverse.PluginFramework
 - Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing, and added unsecure configuration details to logs.
 - Added logging when `Register` method is empty or not overridden, indicating no steps were registered via registration API.
+- Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
+- Clarified documentation for Create and Update filtering attributes, generated deployment tooling, and SDK-style early-bound source inclusion.
 - Aligned package dependency metadata and deployment documentation with the current build and packaging behavior.
-- Fixed issue #25, where the NuGet package build had incorrect changelog content.
+- Fixed Sharp #25, where the NuGet package build had incorrect changelog content.
 
 ### Pillaro.Dataverse.PluginFramework.Testing
 - Aligned package dependencies and package metadata for configuration, environment variable, memory cache, and Dataverse testing support.
-- Fixed issue #25, where the NuGet package build had incorrect changelog content.
+- Fixed Sharp #25, where the NuGet package build had incorrect changelog content.
 
 ### 1.0.2-rc
 

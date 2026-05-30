@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\tools\Pillaro.Dataverse.PluginFramework.Cli\Pillaro.Dataverse.PluginFramework.Cli.csproj" />
 		<ProjectReference Include="..\..\src\Pillaro.Dataverse.PluginFramework.Testing\Pillaro.Dataverse.PluginFramework.Testing.csproj" />
 	</ItemGroup>
 

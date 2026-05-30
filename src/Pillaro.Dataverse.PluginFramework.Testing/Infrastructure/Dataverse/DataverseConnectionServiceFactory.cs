@@ -24,7 +24,7 @@ internal class DataverseConnectionServiceFactory(IConfiguration configuration, I
             return new ServiceClient(connectionString);
 
         var cacheKey = GetBaseCacheKey(connectionString);
-        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
+        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient? cachedClient) && cachedClient is { IsReady: true })
             return cachedClient;
 
         var client = new ServiceClient(connectionString);
@@ -44,7 +44,7 @@ internal class DataverseConnectionServiceFactory(IConfiguration configuration, I
             return CreateCallerClient(connectionString, callerId);
 
         var cacheKey = GetCallerCacheKey(connectionString, callerId);
-        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
+        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient? cachedClient) && cachedClient != null && cachedClient.IsReady)
             return cachedClient;
 
         var client = CreateCallerClient(connectionString, callerId);

@@ -266,7 +266,7 @@ Continue with:
 - [Task Model](./task-model.md)
 - [Validation Model](./validation.md)
 - [Getting Started](./getting-started.md)
-- [Architecture](../architecture.md)
+- [Architecture](./architecture.md)
 - [DataService](./data-service.md)
 
 Planned next topic:

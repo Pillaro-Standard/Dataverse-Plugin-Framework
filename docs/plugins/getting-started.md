@@ -20,7 +20,7 @@
 - [3. Create the `Logic` project](#3-create-the-logic-project)
 - [4. Create the `Plugins` project](#4-create-the-plugins-project)
 - [5. Enable signing](#5-enable-signing)
-- [6. Configure the prepared post-build action](#6-configure-the-prepared-post-build-action)
+- [6. Review the generated tooling](#6-review-the-generated-tooling)
 - [7. Create your solution `PluginBase`](#7-create-your-solution-pluginbase)
 - [8. Create your first task](#8-create-your-first-task)
 - [9. Create your first plugin](#9-create-your-first-plugin)
@@ -209,19 +209,27 @@ Or use Visual Studio signing support.
 
 ---
 
-## 6. Configure the prepared post-build action
+## 6. Review the generated tooling
 
-After installing the plugin package into the `Plugins` project, prepared resources are available in that project:
+After installing the plugin package into the `Plugins` project and rebuilding it, package-managed resources are generated in that project:
 
-    tools/CrmTools/
-    tools/ILMerge/
+    Tools/Deployment/
+    Tools/ILMerge/
+    Tools/EarlyBound/
+    PillaroSettings.json
 
 These resources are added by the package and include:
 
-- prepared post-build action templates in `tools/CrmTools/`
-- ILMerge binaries in `tools/ILMerge/`
+- deployment wrappers and deployment README in `Tools/Deployment/`
+- ILMerge binaries and post-build action templates in `Tools/ILMerge/`
+- early-bound generation helper files in `Tools/EarlyBound/`
+- deployment settings in `PillaroSettings.json`
 
-### 6.1 Choose the correct post-build action
+> [!NOTE]
+> The generated files are created by the package targets after rebuild.
+> If Visual Studio does not show them immediately, enable **Show All Files** and include the generated `Tools` folder and `PillaroSettings.json` if you want them tracked with your plugin project.
+
+### 6.1 Choose the correct ILMerge post-build action
 
 Two prepared post-build actions are available for two different situations:
 
@@ -235,7 +243,7 @@ Use this when:
 
 Use:
 
-    tools/CrmTools/PostBuildAction-logic_plugin-projects.txt
+    Tools/ILMerge/PostBuildAction-logic_plugin-projects.txt
 
 This action merges:
 
@@ -272,7 +280,7 @@ Use this when:
 
 Use:
 
-    tools/CrmTools/PostBuildAction-single-project.txt
+    Tools/ILMerge/PostBuildAction-single-project.txt
 
 ### 6.2 What the merge step is for
 
@@ -431,11 +439,23 @@ Expected result:
 
 ## 11. Deploy to Dataverse
 
-Deploy the final merged plugin assembly using your standard Dataverse deployment process.
+The package generates deployment wrappers in the plugin project after rebuild:
+
+    Tools/Deployment/DeployPlugins.bat
+    Tools/Deployment/DeployPlugins.ps1
+
+Configure `PillaroSettings.json` in the plugin project root. The default connection string environment variable is `DV_CONN`.
+
+For local debug deployment:
+
+    .\Tools\Deployment\DeployPlugins.bat
+
+For local release deployment:
+
+    .\Tools\Deployment\DeployPlugins.ps1 -Profile release
 
 > [!NOTE]
-> The framework does not require a specific deployment tool.
-> Use the deployment process your team already uses.
+> See [Deployment Plugins](./deployment-plugins.md) for the full generated deployment script flow and CI example.
 
 ---
 
@@ -491,9 +511,10 @@ Continue with:
 - [Task Model](./task-model.md)
 - [Validation Model](./validation.md)
 - [Data Access](./data-access.md)
-- [Security Contexts](./security-contexts.md)
-- [Architecture](../architecture.md)
-- [Packaging and Deployment](../packaging-and-deployment.md)
+- [Configuration](./configuration.md)
+- [Step Configuration](./step-configuration.md)
+- [Architecture](./architecture.md)
+- [Deployment Plugins](./deployment-plugins.md)
 - [Testing Overview](../tests/testing.md)
 
 > [!NOTE]
