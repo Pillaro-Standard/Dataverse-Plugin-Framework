@@ -93,15 +93,18 @@ jobs:
             tests/**/*.Tests.csproj
             examples/**/*.Tests.csproj
 
-      - task: DotNetCoreCLI@2
+      - task: VSBuild@1
         displayName: Build test projects
         inputs:
-          command: build
-          projects: |
-            tests/**/*.Tests.csproj
-            examples/**/*.Tests.csproj
-          arguments: >
-            --configuration $(configuration)
+          solution: |
+            tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+            examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          platform: Any CPU
+          configuration: $(configuration)
+          msbuildArgs: >
+            /restore
+          clean: false
+          maximumCpuCount: true
 
       - task: DotNetCoreCLI@2
         displayName: Run tests
