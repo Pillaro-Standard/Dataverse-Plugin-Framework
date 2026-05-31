@@ -312,6 +312,5 @@ Continue with:
 - [Validation Model](./validation.md)
 - [Data Access](./data-access.md)
 - [Architecture](./architecture.md)
-- [Execution Pipeline](../execution-pipeline.md)
-- [Data Access](./data-access.md)
+- [Execution Pipeline](./execution-pipeline.md)
 - [DataService](./data-service.md)

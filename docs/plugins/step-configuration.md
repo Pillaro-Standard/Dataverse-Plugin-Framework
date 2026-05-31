@@ -175,6 +175,8 @@ public class LeadIntegration : TaskBase<Lead>
 
 ## 💻 Examples
 
+The examples above use `Guid.Empty` placeholders intentionally. Replace them with real non-empty Dataverse step and image IDs before running deployment validation.
+
 ### Example 1: Feature flag with unsecure config
 
 ~~~csharp

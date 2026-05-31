@@ -17,6 +17,8 @@ The goal is to keep plugin registration readable for developers while preserving
 
 ## Example
 
+The examples above use `Guid.Empty` placeholders intentionally. Replace them with real non-empty Dataverse step and image IDs before running deployment validation.
+
 ```csharp
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
