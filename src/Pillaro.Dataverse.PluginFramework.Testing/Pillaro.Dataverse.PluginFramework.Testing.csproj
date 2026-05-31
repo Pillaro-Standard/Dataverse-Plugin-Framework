@@ -6,13 +6,18 @@
 
 		<OutputType>Library</OutputType>
 		<IsTestProject>false</IsTestProject>
+		<Deterministic>true</Deterministic>
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
 		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 		<Optimize>false</Optimize>
 		<OutputPath>bin\Debug\</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -22,7 +27,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-		<DebugType>pdbonly</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
 		<Optimize>true</Optimize>
 		<OutputPath>bin\Release\</OutputPath>
 		<DefineConstants>TRACE</DefineConstants>
@@ -47,6 +53,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
 		<PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.2.10" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
 		
 		<PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2">
 			<PrivateAssets>all</PrivateAssets>

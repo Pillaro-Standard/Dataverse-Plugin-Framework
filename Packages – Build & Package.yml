@@ -118,9 +118,25 @@ jobs:
           targetType: inline
           script: |
             $file = "$(Build.SourcesDirectory)/$(frameworkConstantsPath)"
-            $content = Get-Content $file -Raw
-            $updated = $content -replace '(FrameworkVersion\s*=\s*")[^"]*(")', "`${1}$(PACKAGE_VERSION)`${2}"
-            Set-Content $file -Value $updated -NoNewline
+            $packageVersion = "$(PACKAGE_VERSION)"
+            $utf8 = New-Object System.Text.UTF8Encoding -ArgumentList $false
+            $content = [System.IO.File]::ReadAllText($file, [System.Text.Encoding]::UTF8)
+            $pattern = '(FrameworkVersion\s*=\s*")[^"]*(")'
+
+            if (-not [regex]::IsMatch($content, $pattern)) {
+              throw "FrameworkVersion constant was not found in '$file'."
+            }
+
+            $updated = [regex]::Replace($content, $pattern, "`${1}$packageVersion`${2}", 1)
+            [System.IO.File]::WriteAllText($file, $updated, $utf8)
+
+            $line = [regex]::Match($updated, '.*FrameworkVersion\s*=.*').Value.Trim()
+            Write-Host "Updated $line"
+
+            $expected = "FrameworkVersion = `"$packageVersion`""
+            if ($updated -notlike "*$expected*") {
+              throw "FrameworkVersion stamping failed. Expected '$expected' in '$file'."
+            }
 
       - task: DotNetCoreCLI@2
         displayName: Restore framework project
@@ -141,6 +157,12 @@ jobs:
             /p:AssemblyVersion=$(ASSEMBLY_VERSION)
             /p:FileVersion=$(FILE_VERSION)
             /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
             /p:IncludeSourceRevisionInInformationalVersion=false
             /p:GeneratePackageOnBuild=false
 
@@ -163,6 +185,12 @@ jobs:
             /p:AssemblyVersion=$(ASSEMBLY_VERSION)
             /p:FileVersion=$(FILE_VERSION)
             /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
             /p:IncludeSourceRevisionInInformationalVersion=false
             /p:GeneratePackageOnBuild=false
 
@@ -179,7 +207,21 @@ jobs:
         inputs:
           solution: tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
           configuration: $(configuration)
-          msbuildArgs: /restore
+          msbuildArgs: >
+            /restore
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
           clean: false
           maximumCpuCount: true
 
@@ -188,7 +230,21 @@ jobs:
         inputs:
           solution: examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
           configuration: $(configuration)
-          msbuildArgs: /restore
+          msbuildArgs: >
+            /restore
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
           clean: false
           maximumCpuCount: true
 
@@ -221,6 +277,12 @@ jobs:
           testRunTitle: 'Unit Tests'
 
       - task: DotNetCoreCLI@2
+        displayName: Restore CLI project
+        inputs:
+          command: restore
+          projects: $(cliProjectPath)
+
+      - task: DotNetCoreCLI@2
         displayName: Publish CLI for packaging
         inputs:
           command: publish
@@ -228,10 +290,159 @@ jobs:
           arguments: >
             --configuration $(configuration)
             --framework net8.0
+            --no-restore
             --no-self-contained
             --output "$(Build.SourcesDirectory)\tools\Pillaro.Dataverse.PluginFramework.Cli\bin\$(configuration)\net8.0\publish"
+            /p:Version=$(PACKAGE_VERSION)
+            /p:PackageVersion=$(PACKAGE_VERSION)
+            /p:AssemblyVersion=$(ASSEMBLY_VERSION)
+            /p:FileVersion=$(FILE_VERSION)
+            /p:InformationalVersion=$(INFORMATIONAL_VERSION)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
           publishWebProjects: false
           zipAfterPublish: false
+          modifyOutputPath: false
+
+      - task: PowerShell@2
+        displayName: Verify package DLL metadata
+        inputs:
+          targetType: inline
+          script: |
+            $expectedAssemblyVersion = [version]"$(ASSEMBLY_VERSION)"
+            $packageVersion = "$(PACKAGE_VERSION)"
+            $dlls = @(
+              @{ Path = "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework\bin\$(configuration)\net462\Pillaro.Dataverse.PluginFramework.dll"; Optional = $false },
+              @{ Path = "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework\bin\$(configuration)\net8.0\Pillaro.Dataverse.PluginFramework.dll"; Optional = $false },
+              @{ Path = "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework.Testing\bin\$(configuration)\net8.0\Pillaro.Dataverse.PluginFramework.Testing.dll"; Optional = $false },
+              @{ Path = "$(Build.SourcesDirectory)\tools\Pillaro.Dataverse.PluginFramework.Cli\bin\$(configuration)\net8.0\publish\Pillaro.Dataverse.PluginFramework.dll"; Optional = $true },
+              @{ Path = "$(Build.SourcesDirectory)\tools\Pillaro.Dataverse.PluginFramework.Cli\bin\$(configuration)\net8.0\publish\pillaro-dv.dll"; Optional = $true }
+            )
+
+            function Test-PortablePdb {
+              param(
+                [string] $Path
+              )
+
+              $stream = [System.IO.File]::OpenRead($Path)
+              try {
+                if ($stream.Length -lt 4) {
+                  return $false
+                }
+
+                $signature = New-Object byte[] 4
+                [void]$stream.Read($signature, 0, 4)
+                return $signature[0] -eq 0x42 -and $signature[1] -eq 0x53 -and $signature[2] -eq 0x4A -and $signature[3] -eq 0x42
+              }
+              finally {
+                $stream.Dispose()
+              }
+            }
+
+            foreach ($dll in $dlls) {
+              $path = $dll.Path
+              $pdbPath = [System.IO.Path]::ChangeExtension($path, ".pdb")
+
+              if (-not (Test-Path $path)) {
+                if ($dll.Optional) {
+                  Write-Host "Skipping optional DLL metadata check because file was not found: $path"
+                  continue
+                }
+
+                throw "Required DLL was not found for metadata verification: $path"
+              }
+
+              $assemblyVersion = [System.Reflection.AssemblyName]::GetAssemblyName($path).Version
+              $fileInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($path)
+
+              Write-Host "DLL metadata: $path"
+              Write-Host "  AssemblyName.Version: $assemblyVersion"
+              Write-Host "  FileVersion: $($fileInfo.FileVersion)"
+              Write-Host "  ProductVersion: $($fileInfo.ProductVersion)"
+              Write-Host "  PDB: $pdbPath"
+
+              if ($assemblyVersion -ne $expectedAssemblyVersion) {
+                throw "AssemblyName.Version for '$path' was '$assemblyVersion', expected '$expectedAssemblyVersion'."
+              }
+
+              if ([string]::IsNullOrWhiteSpace($fileInfo.ProductVersion) -or $fileInfo.ProductVersion -notlike "*$packageVersion*") {
+                throw "ProductVersion/InformationalVersion for '$path' was '$($fileInfo.ProductVersion)', expected it to contain '$packageVersion'."
+              }
+
+              if (-not (Test-Path $pdbPath)) {
+                throw "PDB for packaged DLL '$path' was not found at '$pdbPath'."
+              }
+
+              if (-not (Test-PortablePdb -Path $pdbPath)) {
+                throw "PDB for packaged DLL '$path' is not a portable PDB: $pdbPath"
+              }
+            }
+
+      - task: PowerShell@2
+        displayName: Validate ILMerge README encoding
+        inputs:
+          targetType: inline
+          script: |
+            $readme = "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework\Tools\ILMerge\README.md"
+            $bytes = [System.IO.File]::ReadAllBytes($readme)
+            $utf8 = New-Object System.Text.UTF8Encoding -ArgumentList $false, $true
+
+            try {
+              $content = $utf8.GetString($bytes)
+            }
+            catch {
+              throw "ILMerge README is not valid UTF-8: $readme. $($_.Exception.Message)"
+            }
+
+            if ($content.Contains([string][char]0xFFFD)) {
+              throw "ILMerge README contains the Unicode replacement character U+FFFD: $readme"
+            }
+
+            Write-Host "ILMerge README is valid UTF-8 and contains no replacement characters: $readme"
+
+      - task: PowerShell@2
+        displayName: Validate SourceLink PDBs
+        inputs:
+          targetType: inline
+          script: |
+            $toolPath = "$(Agent.TempDirectory)\sourcelink-tool"
+            $pdbs = @(
+              "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework\bin\$(configuration)\net462\Pillaro.Dataverse.PluginFramework.pdb",
+              "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework\bin\$(configuration)\net8.0\Pillaro.Dataverse.PluginFramework.pdb",
+              "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework.Testing\bin\$(configuration)\net8.0\Pillaro.Dataverse.PluginFramework.Testing.pdb",
+              "$(Build.SourcesDirectory)\tools\Pillaro.Dataverse.PluginFramework.Cli\bin\$(configuration)\net8.0\publish\pillaro-dv.pdb"
+            )
+
+            try {
+              dotnet tool install dotnet-sourcelink --tool-path $toolPath
+
+              if ($LASTEXITCODE -ne 0) {
+                throw "dotnet-sourcelink tool install failed with exit code $LASTEXITCODE."
+              }
+
+              foreach ($pdb in $pdbs) {
+                if (-not (Test-Path $pdb)) {
+                  Write-Warning "Skipping SourceLink validation because PDB was not found: $pdb"
+                  continue
+                }
+
+                Write-Host "Validating SourceLink for $pdb"
+                & "$toolPath\sourcelink.exe" test $pdb
+
+                if ($LASTEXITCODE -ne 0) {
+                  Write-Warning "SourceLink validation reported issues for '$pdb'. This is informational; PDB existence and portable PDB validation remain hard requirements."
+                }
+              }
+            }
+            catch {
+              Write-Warning "SourceLink validation could not run. This is informational because SourceLink testing may require external network access. $($_.Exception.Message)"
+            }
 
       - script: >
           nuget pack "$(frameworkNuspecPath)"
@@ -248,6 +459,139 @@ jobs:
           -OutputDirectory "$(Build.ArtifactStagingDirectory)"
           -NonInteractive
         displayName: Pack testing package
+
+      - task: PowerShell@2
+        displayName: Verify generated NuGet packages
+        inputs:
+          targetType: inline
+          script: |
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+            $packageVersion = "$(PACKAGE_VERSION)"
+            $packages = Get-ChildItem "$(Build.ArtifactStagingDirectory)" -Filter *.nupkg
+
+            if (-not $packages) {
+              throw "No .nupkg files were found in $(Build.ArtifactStagingDirectory)."
+            }
+
+            function Read-ZipEntryText {
+              param(
+                [System.IO.Compression.ZipArchiveEntry] $Entry
+              )
+
+              $stream = $Entry.Open()
+              try {
+                $reader = New-Object System.IO.StreamReader -ArgumentList $stream, ([System.Text.Encoding]::UTF8), $true
+                try {
+                  return $reader.ReadToEnd()
+                }
+                finally {
+                  $reader.Dispose()
+                }
+              }
+              finally {
+                $stream.Dispose()
+              }
+            }
+
+            function Assert-PackageEntry {
+              param(
+                [System.IO.Compression.ZipArchive] $Zip,
+                [string] $PackageName,
+                [string] $EntryPath
+              )
+
+              if (-not ($Zip.Entries | Where-Object { $_.FullName -eq $EntryPath })) {
+                throw "Package '$PackageName' does not contain required file '$EntryPath'."
+              }
+            }
+
+            foreach ($package in $packages) {
+              Write-Host "Verifying NuGet package: $($package.FullName)"
+              $zip = [System.IO.Compression.ZipFile]::OpenRead($package.FullName)
+
+              try {
+                $entries = $zip.Entries
+                $nuspecEntry = $entries | Where-Object { $_.FullName -like "*.nuspec" } | Select-Object -First 1
+
+                if (-not $nuspecEntry) {
+                  throw "Package '$($package.Name)' does not contain a .nuspec file."
+                }
+
+                [xml]$nuspec = Read-ZipEntryText -Entry $nuspecEntry
+                $id = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='id']").InnerText
+                $version = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='version']").InnerText
+
+                Write-Host "  PackageId: $id"
+                Write-Host "  Version: $version"
+
+                if ($version -ne $packageVersion) {
+                  throw "Package '$($package.Name)' has nuspec version '$version', expected '$packageVersion'."
+                }
+
+                if ($id -eq "Pillaro.Dataverse.PluginFramework") {
+                  $requiredEntries = @(
+                    "lib/net462/Pillaro.Dataverse.PluginFramework.dll",
+                    "lib/net462/Pillaro.Dataverse.PluginFramework.pdb",
+                    "lib/net8.0/Pillaro.Dataverse.PluginFramework.dll",
+                    "lib/net8.0/Pillaro.Dataverse.PluginFramework.pdb",
+                    "tools/Deployment/pillaro-dv/pillaro-dv.dll",
+                    "tools/Deployment/pillaro-dv/pillaro-dv.pdb",
+                    "tools/Deployment/pillaro-dv/Pillaro.Dataverse.PluginFramework.dll",
+                    "tools/Deployment/pillaro-dv/Pillaro.Dataverse.PluginFramework.pdb"
+                  )
+
+                  foreach ($entryPath in $requiredEntries) {
+                    Assert-PackageEntry -Zip $zip -PackageName $package.Name -EntryPath $entryPath
+                  }
+
+                  $readmeEntry = $entries | Where-Object { $_.FullName -eq "tools/ILMerge/README.md" } | Select-Object -First 1
+
+                  if (-not $readmeEntry) {
+                    throw "Package '$($package.Name)' does not contain tools/ILMerge/README.md."
+                  }
+
+                  $readme = Read-ZipEntryText -Entry $readmeEntry
+                  if ($readme.Contains([string][char]0xFFFD)) {
+                    throw "Package '$($package.Name)' contains tools/ILMerge/README.md with U+FFFD replacement characters."
+                  }
+
+                  $expectedCli = "tools/Deployment/pillaro-dv/pillaro-dv.dll"
+                  if (-not ($entries | Where-Object { $_.FullName -eq $expectedCli })) {
+                    throw "Package '$($package.Name)' does not contain expected CLI file '$expectedCli'."
+                  }
+
+                  $unexpectedCliEntries = $entries | Where-Object {
+                    $_.FullName -match '^tools/Deployment/.+Pillaro\.Dataverse\.PluginFramework\.Cli/.+'
+                  }
+
+                  if ($unexpectedCliEntries) {
+                    $paths = ($unexpectedCliEntries | Select-Object -ExpandProperty FullName) -join ', '
+                    throw "Package '$($package.Name)' contains CLI files under unexpected nested project folder(s): $paths"
+                  }
+
+                  Write-Host "  Framework package content checks passed."
+                }
+                elseif ($id -eq "Pillaro.Dataverse.PluginFramework.Testing") {
+                  $requiredEntries = @(
+                    "lib/net8.0/Pillaro.Dataverse.PluginFramework.Testing.dll",
+                    "lib/net8.0/Pillaro.Dataverse.PluginFramework.Testing.pdb"
+                  )
+
+                  foreach ($entryPath in $requiredEntries) {
+                    Assert-PackageEntry -Zip $zip -PackageName $package.Name -EntryPath $entryPath
+                  }
+
+                  Write-Host "  Testing package content checks passed."
+                }
+                else {
+                  Write-Host "  No framework-specific content checks required for '$id'."
+                }
+              }
+              finally {
+                $zip.Dispose()
+              }
+            }
 
       - task: PublishPipelineArtifact@1
         displayName: Upload NuGet artifacts

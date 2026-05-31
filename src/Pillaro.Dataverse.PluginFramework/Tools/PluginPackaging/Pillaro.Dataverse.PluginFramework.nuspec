@@ -46,9 +46,11 @@
 		<file src="README.md" target="docs\" />
 
 		<file src="bin\$configuration$\net462\Pillaro.Dataverse.PluginFramework.dll" target="lib\net462" />
+		<file src="bin\$configuration$\net462\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net462" />
 		<file src="bin\$configuration$\net462\Pillaro.Dataverse.PluginFramework.xml" target="lib\net462" />
 
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.dll" target="lib\net8.0" />
+		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.pdb" target="lib\net8.0" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.xml" target="lib\net8.0" />
 
 		<!-- ILMerge tooling – copied to consuming project Tools/ILMerge -->

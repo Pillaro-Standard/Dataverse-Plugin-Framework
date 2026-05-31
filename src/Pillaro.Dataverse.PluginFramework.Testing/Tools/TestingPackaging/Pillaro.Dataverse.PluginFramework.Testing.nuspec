@@ -42,6 +42,7 @@
 		<file src="..\..\LICENSE" target="LICENSE" />
 		<file src="README.md" target="docs\" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.dll" target="lib\net8.0" />
+		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.pdb" target="lib\net8.0" />
 		<file src="bin\$configuration$\net8.0\Pillaro.Dataverse.PluginFramework.Testing.xml" target="lib\net8.0" />
 	</files>
 </package>
