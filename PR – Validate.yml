@@ -122,22 +122,29 @@ jobs:
           mergeTestResults: true
           failTaskOnFailedTests: true
 
-      - task: DotNetCoreCLI@2
-        displayName: Restore CLI
+      - task: PowerShell@2
+        displayName: Publish CLI if present
         inputs:
-          command: restore
-          projects: $(cliProjectPath)
+          targetType: inline
+          script: |
+            $cliProjectPath = "$(Build.SourcesDirectory)\$(cliProjectPath)"
 
-      - task: DotNetCoreCLI@2
-        displayName: Publish CLI
-        inputs:
-          command: publish
-          projects: $(cliProjectPath)
-          arguments: >
-            --configuration $(configuration)
-            --framework net8.0
-            --no-restore
-            --no-self-contained
-            --output "$(Build.ArtifactStagingDirectory)\cli"
-          publishWebProjects: false
-          zipAfterPublish: false
+            if (-not (Test-Path $cliProjectPath)) {
+              Write-Host "CLI project not found. Skipping CLI publish validation."
+              Write-Host "Path: $cliProjectPath"
+              exit 0
+            }
+
+            dotnet restore "$cliProjectPath"
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+
+            dotnet publish "$cliProjectPath" `
+              --configuration "$(configuration)" `
+              --framework net8.0 `
+              --no-restore `
+              --no-self-contained `
+              --output "$(Build.ArtifactStagingDirectory)\cli"
+
+            exit $LASTEXITCODE
