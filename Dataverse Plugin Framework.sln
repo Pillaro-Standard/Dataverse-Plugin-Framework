@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		Nightly – Tests Only.yml = Nightly – Tests Only.yml
 		NuGet.config = NuGet.config
 		Packages – Build & Package.yml = Packages – Build & Package.yml
+		PR – Validate.yml = PR – Validate.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
