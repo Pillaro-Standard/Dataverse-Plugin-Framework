@@ -1,16 +1,22 @@
 # Changelog
 
-### 1.0.3-rc
+## 1.1.0-rc
 
 ### Pillaro.Dataverse.PluginFramework
-- Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing, and added unsecure configuration details to logs.
-- Added logging when `Register` method is empty or not overridden, indicating no steps were registered via registration API.
+
+- Added code-first plugin registration metadata API through `Register(IPluginRegistration registration)`.
+- Added deployment CLI support for Dataverse plugin assembly deployment and plugin step/image synchronization.
+- Added generated deployment tooling for consuming plugin projects, including `PillaroSettings.json`, deployment wrappers, and deployment documentation.
 - Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
-- Clarified documentation for Create and Update filtering attributes, generated deployment tooling, and SDK-style early-bound source inclusion.
+- Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing.
+- Added unsecure configuration details to logs and masked secure configuration values by logging only that secure configuration is registered.
+- Added logging when `Register` method is empty or not overridden, indicating no steps were registered via registration API.
+- Clarified documentation for Create and Update filtering attributes, generated deployment tooling, SDK-style early-bound source inclusion, and `MinimalSeverityLevel`.
 - Aligned package dependency metadata and deployment documentation with the current build and packaging behavior.
 - Fixed issue #25, where the NuGet package build had incorrect changelog content.
 
 ### Pillaro.Dataverse.PluginFramework.Testing
+
 - Aligned package dependencies and package metadata for configuration, environment variable, memory cache, and Dataverse testing support.
 - Fixed issue #25, where the NuGet package build had incorrect changelog content.
 
