@@ -35,6 +35,9 @@ jobs:
           packageType: sdk
           version: '8.x'
 
+      - task: NuGetToolInstaller@1
+        displayName: Setup NuGet
+
       - task: DotNetCoreCLI@2
         displayName: Restore test projects
         inputs:
@@ -43,16 +46,23 @@ jobs:
             tests/**/*.Tests.csproj
             examples/**/*.Tests.csproj
 
-      - task: DotNetCoreCLI@2
-        displayName: Build test projects
+      - task: VSBuild@1
+        displayName: Build framework test project
         inputs:
-          command: build
-          projects: |
-            tests/**/*.Tests.csproj
-            examples/**/*.Tests.csproj
-          arguments: >
-            --configuration $(configuration)
-            --no-restore
+          solution: tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          configuration: $(configuration)
+          msbuildArgs: /restore
+          clean: false
+          maximumCpuCount: true
+
+      - task: VSBuild@1
+        displayName: Build example test project
+        inputs:
+          solution: examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          configuration: $(configuration)
+          msbuildArgs: /restore
+          clean: false
+          maximumCpuCount: true
 
       - task: DotNetCoreCLI@2
         displayName: Run all tests
