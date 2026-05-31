@@ -39,7 +39,7 @@ try {
         exit 1
     }
 
-    dotnet "$cliDll" plugin deploy --settings "$settings" --profile "$Profile"
+    dotnet "$cliDll" deploy --settings "$settings" --profile "$Profile"
 
     exit $LASTEXITCODE
 }
