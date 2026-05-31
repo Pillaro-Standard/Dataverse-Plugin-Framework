@@ -27,6 +27,9 @@ variables:
   - name: cliProjectPath
     value: tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj
 
+  - name: solutionPath
+    value: Dataverse Plugin Framework.sln
+
 jobs:
   - job: Validate
     displayName: Validate build and tests
@@ -45,6 +48,12 @@ jobs:
 
       - task: NuGetToolInstaller@1
         displayName: Setup NuGet
+
+      - task: NuGetCommand@2
+        displayName: Restore solution NuGet packages
+        inputs:
+          command: restore
+          restoreSolution: $(solutionPath)
 
       - task: DotNetCoreCLI@2
         displayName: Restore framework project
@@ -93,7 +102,6 @@ jobs:
             examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
-            --no-restore
 
       - task: DotNetCoreCLI@2
         displayName: Run tests
