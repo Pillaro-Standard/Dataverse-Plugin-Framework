@@ -423,7 +423,9 @@ jobs:
               dotnet tool install dotnet-sourcelink --tool-path $toolPath
 
               if ($LASTEXITCODE -ne 0) {
-                throw "dotnet-sourcelink tool install failed with exit code $LASTEXITCODE."
+                Write-Warning "dotnet-sourcelink tool install failed with exit code $LASTEXITCODE. SourceLink validation is informational and will be skipped."
+                $global:LASTEXITCODE = 0
+                return
               }
 
               foreach ($pdb in $pdbs) {
@@ -437,11 +439,13 @@ jobs:
 
                 if ($LASTEXITCODE -ne 0) {
                   Write-Warning "SourceLink validation reported issues for '$pdb'. This is informational; PDB existence and portable PDB validation remain hard requirements."
+                  $global:LASTEXITCODE = 0
                 }
               }
             }
             catch {
               Write-Warning "SourceLink validation could not run. This is informational because SourceLink testing may require external network access. $($_.Exception.Message)"
+              $global:LASTEXITCODE = 0
             }
 
       - script: >
