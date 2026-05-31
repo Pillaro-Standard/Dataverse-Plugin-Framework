@@ -41,7 +41,7 @@ jobs:
         displayName: Install .NET SDK
         inputs:
           packageType: sdk
-          version: '10.x'
+          version: '8.x'
 
       - task: NuGetToolInstaller@1
         displayName: Setup NuGet
