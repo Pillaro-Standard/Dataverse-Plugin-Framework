@@ -31,7 +31,7 @@ if not exist "%CLI_DLL%" (
     endlocal & exit /b 1
 )
 
-dotnet "%CLI_DLL%" plugin deploy --settings "%SETTINGS%" --profile "%PROFILE%"
+dotnet "%CLI_DLL%" deploy --settings "%SETTINGS%" --profile "%PROFILE%"
 
 set "EXIT_CODE=%ERRORLEVEL%"
 endlocal & exit /b %EXIT_CODE%

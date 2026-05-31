@@ -17,7 +17,7 @@ if (-not (Test-Path $cliDll)) {
 $projectRoot = Split-Path -Parent (Resolve-Path $Settings)
 Push-Location $projectRoot
 try {
-    dotnet "$cliDll" plugin deploy --settings "$Settings" --profile "$Profile"
+    dotnet "$cliDll" deploy --settings "$Settings" --profile "$Profile"
 } finally {
     Pop-Location
 }

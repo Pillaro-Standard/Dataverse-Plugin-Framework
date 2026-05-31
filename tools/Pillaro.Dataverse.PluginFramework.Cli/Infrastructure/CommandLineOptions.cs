@@ -12,6 +12,13 @@ internal sealed class CommandLineOptions
         for (var i = 0; i < args.Length; i++)
         {
             var arg = args[i];
+            if (string.Equals(arg, "-h", StringComparison.Ordinal))
+            {
+                options._flags.Add("help");
+                options._values["help"] = null;
+                continue;
+            }
+
             if (!arg.StartsWith("--", StringComparison.Ordinal))
             {
                 throw new ArgumentException($"Unexpected argument '{arg}'. Options must start with --.");
@@ -23,7 +30,7 @@ internal sealed class CommandLineOptions
                 throw new ArgumentException("Option name is required.");
             }
 
-            if (i + 1 >= args.Length || args[i + 1].StartsWith("--", StringComparison.Ordinal))
+            if (i + 1 >= args.Length || args[i + 1].StartsWith("-", StringComparison.Ordinal))
             {
                 options._flags.Add(name);
                 options._values[name] = null;
@@ -37,6 +44,8 @@ internal sealed class CommandLineOptions
     }
 
     public bool HasFlag(string name) => _flags.Contains(name);
+
+    public IEnumerable<string> Names => _values.Keys;
 
     public string? Get(string name)
     {

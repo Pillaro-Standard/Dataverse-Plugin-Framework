@@ -125,6 +125,8 @@ For a release build:
 
 The script deploys the plugin assembly and synchronizes plugin registration metadata defined in code.
 
+The generated wrappers are the recommended entry point. Direct CLI usage is `pillaro-dv deploy [options]` and is configured by `PillaroSettings.json`; supported options are `--settings`, `--profile`, `--just-assembly`, and `-h`/`--help`. The solution unique name comes from `solution`, the plugin assembly path comes from `profiles.<profile>.pluginAssemblyPath`, and the Dataverse connection string variable comes from `dataverse.connectionStringEnvironmentVariable`.
+
 ---
 
 ## 5. Deploy from Azure DevOps

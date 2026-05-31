@@ -12,7 +12,7 @@ set PROFILE=%1
 if "%PROFILE%"=="" set PROFILE=debug
 
 pushd "%~dp0..\.."
-dotnet "__PILLARO_CLI_DLL__" plugin deploy --settings "%SETTINGS%" --profile "%PROFILE%"
+dotnet "__PILLARO_CLI_DLL__" deploy --settings "%SETTINGS%" --profile "%PROFILE%"
 set EXITCODE=%ERRORLEVEL%
 popd
 

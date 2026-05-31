@@ -72,16 +72,10 @@ internal static class PillaroSettingsLoader
     }
 
     /// <summary>
-    /// Resolves the plugin assembly path.
-    /// Priority: --assembly CLI flag → active profile pluginAssemblyPath.
+    /// Resolves the plugin assembly path from the active profile in PillaroSettings.json.
     /// </summary>
     public static string ResolveAssembly(CommandLineOptions options, PillaroSettings settings)
     {
-        if (options.Get("assembly") is { } cliAssembly && !string.IsNullOrWhiteSpace(cliAssembly))
-        {
-            return cliAssembly;
-        }
-
         var profile = ResolveActiveProfile(options, settings);
         return profile.PluginAssemblyPath;
     }
@@ -109,16 +103,6 @@ internal static class PillaroSettingsLoader
         return Path.IsPathRooted(expanded)
             ? Path.GetFullPath(expanded)
             : Path.GetFullPath(Path.Combine(settingsDirectory, expanded));
-    }
-
-    /// <summary>
-    /// Resolves a path supplied directly on the command line (e.g. --assembly).
-    /// Relative paths are resolved against the current working directory.
-    /// </summary>
-    public static string ResolveCommandLinePath(string path)
-    {
-        var expanded = ExpandEnvironmentTokens(path);
-        return Path.GetFullPath(expanded);
     }
 
     private static string ExpandEnvironmentTokens(string value)

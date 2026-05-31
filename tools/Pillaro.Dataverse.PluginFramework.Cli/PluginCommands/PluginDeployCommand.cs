@@ -14,6 +14,20 @@ internal static class PluginDeployCommand
         try
         {
             var options = CommandLineOptions.Parse(args);
+            if (options.HasFlag("help"))
+            {
+                PrintHelp();
+                return 0;
+            }
+
+            var unsupportedOptions = GetUnsupportedOptionNames(options).ToArray();
+            if (unsupportedOptions.Length > 0)
+            {
+                Console.Error.WriteLine($"Error: Unsupported option(s): {string.Join(", ", unsupportedOptions.Select(option => "--" + option))}");
+                Console.Error.WriteLine("Run 'pillaro-dv deploy --help' for supported options.");
+                return 2;
+            }
+
             var settingsPath = PillaroSettingsLoader.GetResolvedSettingsPath(options);
             if (settingsPath == null)
             {
@@ -26,8 +40,8 @@ internal static class PluginDeployCommand
             var settingsDirectory = Path.GetDirectoryName(Path.GetFullPath(settingsPath))!;
             var activeProfileName = PillaroSettingsLoader.ResolveActiveProfileName(options, settings);
             var configuredAssemblyPath = PillaroSettingsLoader.ResolveAssembly(options, settings);
-            var assemblyPath = ResolveAssemblyPath(options, configuredAssemblyPath, settingsDirectory);
-            var solutionName = ResolveSolutionName(options, settings);
+            var assemblyPath = ResolveAssemblyPath(configuredAssemblyPath, settingsDirectory);
+            var solutionName = ResolveSolutionName(settings);
             var connectionStringEnvironmentVariableName = PillaroSettingsLoader.ResolveConnectionStringEnvironmentVariable(settings);
             var connectionString = Environment.GetEnvironmentVariable(connectionStringEnvironmentVariableName);
             var justAssembly = options.HasFlag("just-assembly");
@@ -164,27 +178,19 @@ internal static class PluginDeployCommand
         return errors;
     }
 
-    private static string? ResolveAssemblyPath(CommandLineOptions options, string? configuredAssemblyPath, string settingsDirectory)
+    private static string? ResolveAssemblyPath(string? configuredAssemblyPath, string settingsDirectory)
     {
         if (string.IsNullOrWhiteSpace(configuredAssemblyPath))
         {
             return null;
         }
 
-        // --assembly on the command line is resolved against CWD, not the settings file directory.
-        if (options.Get("assembly") is { } cliAssembly && !string.IsNullOrWhiteSpace(cliAssembly))
-        {
-            return PillaroSettingsLoader.ResolveCommandLinePath(configuredAssemblyPath);
-        }
-
-        // Values from PillaroSettings.json profiles are resolved relative to the settings file directory.
         return PillaroSettingsLoader.ResolveConfiguredPath(configuredAssemblyPath, settingsDirectory);
     }
 
-    private static string? ResolveSolutionName(CommandLineOptions options, PillaroSettings settings)
+    private static string? ResolveSolutionName(PillaroSettings settings)
     {
-        return options.Get("solution")
-            ?? NullIfWhiteSpace(settings.Solution);
+        return NullIfWhiteSpace(settings.Solution);
     }
 
     private static string? NullIfWhiteSpace(string? value)
@@ -192,9 +198,39 @@ internal static class PluginDeployCommand
         return string.IsNullOrWhiteSpace(value) ? null : value;
     }
 
+    private static IEnumerable<string> GetUnsupportedOptionNames(CommandLineOptions options)
+    {
+        var supported = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "settings",
+            "profile",
+            "just-assembly",
+            "help",
+        };
+
+        return options.Names.Where(name => !supported.Contains(name));
+    }
+
     private static string GetCliVersion()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         return version == null ? "dev" : $"{version.Major}.{version.Minor}.{version.Build}";
+    }
+
+    private static void PrintHelp()
+    {
+        Console.WriteLine("Usage:");
+        Console.WriteLine("  pillaro-dv deploy [options]");
+        Console.WriteLine();
+        Console.WriteLine("Options:");
+        Console.WriteLine("  --settings <path>     Path to PillaroSettings.json. Defaults to PillaroSettings.json discovered from the current directory or parent directories.");
+        Console.WriteLine("  --profile <name>      Deployment profile from PillaroSettings.json. Defaults to defaultProfile.");
+        Console.WriteLine("  --just-assembly       Deploy only the plugin assembly and skip step/image synchronization.");
+        Console.WriteLine("  -h, --help            Show help.");
+        Console.WriteLine();
+        Console.WriteLine("Configuration:");
+        Console.WriteLine("  solution is read from PillaroSettings.json.");
+        Console.WriteLine("  plugin assembly path is read from profiles.<profile>.pluginAssemblyPath.");
+        Console.WriteLine("  Dataverse connection string is read from dataverse.connectionStringEnvironmentVariable.");
     }
 }

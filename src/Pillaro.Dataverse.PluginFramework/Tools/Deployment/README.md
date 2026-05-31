@@ -64,6 +64,39 @@ The deployment script:
 6. Deploys the plugin assembly.
 7. Synchronizes Dataverse plugin steps and images.
 
+## CLI help
+
+Normal usage should go through the generated wrappers:
+
+```bat
+.\Tools\Deployment\DeployPlugins.bat
+```
+
+```powershell
+.\Tools\Deployment\DeployPlugins.ps1 -Profile release
+```
+
+Configuration is stored in `PillaroSettings.json`. Direct CLI deployment uses:
+
+```text
+pillaro-dv deploy [options]
+```
+
+The supported direct CLI options are only:
+
+| Option | Description |
+|---|---|
+| `--settings <path>` | Path to `PillaroSettings.json`. |
+| `--profile <name>` | Deployment profile from `PillaroSettings.json`. |
+| `--just-assembly` | Deploy only the plugin assembly and skip step/image synchronization. |
+| `-h`, `--help` | Show help. |
+
+The solution unique name and plugin assembly path are not CLI arguments.
+
+- solution unique name comes from `solution`
+- plugin assembly path comes from `profiles.<profile>.pluginAssemblyPath`
+- Dataverse connection string variable comes from `dataverse.connectionStringEnvironmentVariable`
+
 ## Configuration
 
 `PillaroSettings.json` lives in the plugin project root.
