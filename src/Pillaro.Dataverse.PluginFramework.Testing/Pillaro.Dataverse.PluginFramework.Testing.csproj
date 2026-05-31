@@ -43,17 +43,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="9.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
+		<PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.2.10" />
 		
-		<PackageReference Include="FluentAssertions" Version="8.9.0">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-
-		<PackageReference Include="xunit.v3.assert" Version="3.2.2">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-
 		<PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>

@@ -37,7 +37,7 @@ These views support troubleshooting, performance analysis, and audit requirement
 Runtime Settings allow you to configure plugin behavior without redeploying code.
 
 - **Centralized Configuration** — manage settings from a single location
-- **Dynamic Loading** — plugins can read settings at runtime using `IConfigurationService`
+- **Dynamic Loading** — plugins can read settings at runtime using `SettingsService`
 - **Environment-Specific** — maintain different settings per environment (Dev, Test, Production)
 
 Common use cases:
@@ -150,7 +150,7 @@ Assign roles based on user responsibilities:
 
 ## Related Documentation
 
-- [Runtime Configuration](../plugins/configuration.md) — how to use `IConfigurationService` in plugins
+- [Runtime Configuration](../plugins/configuration.md) — how to use `SettingsService` in plugins
 - [Autonumbering](../plugins/autonumbering.md) — detailed autonumbering setup and patterns
 - [Logging](../plugins/logging.md) — plugin logging capabilities and log levels
 - [Error Handling](../plugins/error-handling.md) — exception handling and validation failures
@@ -161,12 +161,30 @@ Assign roles based on user responsibilities:
 
 ### Logging Configuration by Environment
 
-Configure `MinimalSeverityLevel` runtime setting appropriately for each environment:
+Configure the `MinimalSeverityLevel` runtime setting according to the minimum severity that should be saved.
 
-- **Development/Test environments** — set to `1` (Debug) or `2` (Info) for full diagnostic visibility
-- **Production environments** — set to `3` (Warning) or `4` (Error) depending on volume of generated messages
+The value works as a threshold. The configured severity and all higher severities are saved.
 
-Higher logging levels in production reduce performance impact and storage consumption while maintaining visibility of critical issues.
+| MinimalSeverityLevel | Saved severities | Typical use |
+|---:|---|---|
+| `1` or lower | `Debug`, `Info`, `Warning`, `Error` | Full diagnostic logging. Useful for development, testing, initial setup, or temporary deep diagnostics. |
+| `2` | `Info`, `Warning`, `Error` | Informational logging without Debug details. Useful for test or controlled support scenarios. |
+| `3` | `Warning`, `Error` | Recommended default for production environments. |
+| `4` | `Error` | Error-only logging. Useful when production log volume must be kept minimal. |
+
+Recommended defaults:
+
+- **Development/Test environments** — use `0` or `1` when full diagnostic visibility is needed.
+- **Production environments** — use `3` as the recommended default.
+- **High-volume production environments** — use `4` if only errors should be retained.
+- **Temporary production diagnostics** — use `0` or `1` only when full diagnostic visibility is required for investigation.
+
+> [!WARNING]
+> Full logging (`MinimalSeverityLevel = 0` or `1`) can generate a large amount of diagnostic data.
+> In production environments, this may negatively affect performance and increase Dataverse storage usage.
+> Full logging is not recommended for normal production operation. Enable it only temporarily when detailed diagnostics are required, and increase the level again after the investigation is finished.
+
+Use only values from `0` to `4` for normal configuration. Values higher than `4` are not recommended because no standard framework severity is higher than `Error`.
 
 ### Use Logs Instead of Debugging
 

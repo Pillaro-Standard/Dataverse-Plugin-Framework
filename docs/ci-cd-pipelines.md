@@ -34,7 +34,7 @@ Validates all test projects against a real Dataverse environment to detect integ
 ### Execution Flow
 
 1. **Checkout**: Fetches latest code (shallow clone, depth 1)
-2. **SDK Installation**: Installs .NET SDK 10.x
+2. **SDK Installation**: Installs .NET SDK 8.x
 3. **Restore**: Restores all NuGet packages for test projects
 4. **Build**: Builds all test projects in Release configuration
 5. **Test Execution**: Runs all tests with code coverage collection
@@ -122,12 +122,11 @@ Determines version suffix and target audience:
 ### Execution Flow
 
 1. **Checkout**: Fetches full repository history (`fetchDepth: 0`)
-2. **SDK Installation**: Installs .NET SDK 10.x
+2. **SDK Installation**: Installs .NET SDK 8.x
 3. **Version Calculation**: Determines package and assembly versions
-4. **CHANGELOG Injection**: Reads latest release notes from `CHANGELOG.md`
-5. **Build**: Builds framework and testing projects
-6. **Pack**: Creates NuGet packages (`.nupkg` files)
-7. **Publish**: Uploads packages as pipeline artifacts
+4. **Build**: Builds framework and testing projects
+5. **Pack**: Creates NuGet packages (`.nupkg` files)
+6. **Publish**: Uploads packages as pipeline artifacts
 
 ### Packages Produced
 
@@ -144,15 +143,9 @@ Determines version suffix and target audience:
 
 #### Release Notes
 
-Release notes are automatically extracted from `CHANGELOG.md` and injected into each package's `.nuspec` file.
+NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file.
 
-The pipeline:
-
-1. Reads latest release section from `CHANGELOG.md`
-2. Extracts section for each package
-3. Injects content into corresponding `.nuspec` file
-
-This ensures package metadata is always synchronized with the changelog.
+This keeps package metadata simple while the detailed release history stays in one maintained place.
 
 ### Environment Variables
 

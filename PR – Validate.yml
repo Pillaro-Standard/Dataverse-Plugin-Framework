@@ -18,15 +18,6 @@ variables:
   - name: configuration
     value: Release
 
-  - name: frameworkProjectPath
-    value: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
-
-  - name: testingProjectPath
-    value: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
-
-  - name: cliProjectPath
-    value: tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj
-
 jobs:
   - job: Validate
     displayName: Validate build and tests
@@ -35,46 +26,16 @@ jobs:
 
     steps:
       - checkout: self
-        fetchDepth: 0
+        fetchDepth: 1
 
       - task: UseDotNet@2
         displayName: Install .NET SDK
         inputs:
           packageType: sdk
-          version: '10.x'
+          version: '8.x'
 
       - task: NuGetToolInstaller@1
         displayName: Setup NuGet
-
-      - task: DotNetCoreCLI@2
-        displayName: Restore framework project
-        inputs:
-          command: restore
-          projects: $(frameworkProjectPath)
-
-      - task: DotNetCoreCLI@2
-        displayName: Build framework project
-        inputs:
-          command: build
-          projects: $(frameworkProjectPath)
-          arguments: >
-            --configuration $(configuration)
-            --no-restore
-
-      - task: DotNetCoreCLI@2
-        displayName: Restore testing project
-        inputs:
-          command: restore
-          projects: $(testingProjectPath)
-
-      - task: DotNetCoreCLI@2
-        displayName: Build testing project
-        inputs:
-          command: build
-          projects: $(testingProjectPath)
-          arguments: >
-            --configuration $(configuration)
-            --no-restore
 
       - task: DotNetCoreCLI@2
         displayName: Restore test projects
@@ -84,19 +45,26 @@ jobs:
             tests/**/*.Tests.csproj
             examples/**/*.Tests.csproj
 
-      - task: DotNetCoreCLI@2
-        displayName: Build test projects
+      - task: VSBuild@1
+        displayName: Build framework test project
         inputs:
-          command: build
-          projects: |
-            tests/**/*.Tests.csproj
-            examples/**/*.Tests.csproj
-          arguments: >
-            --configuration $(configuration)
-            --no-restore
+          solution: tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          configuration: $(configuration)
+          msbuildArgs: /restore
+          clean: false
+          maximumCpuCount: true
+
+      - task: VSBuild@1
+        displayName: Build example test project
+        inputs:
+          solution: examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          configuration: $(configuration)
+          msbuildArgs: /restore
+          clean: false
+          maximumCpuCount: true
 
       - task: DotNetCoreCLI@2
-        displayName: Run tests
+        displayName: Run all tests
         inputs:
           command: test
           projects: |
@@ -108,6 +76,7 @@ jobs:
             --no-restore
             --logger trx
             --results-directory "$(Agent.TempDirectory)\TestResults"
+            --collect "XPlat Code Coverage"
           publishTestResults: false
         env:
           ConnectionStrings__Dataverse: $(DataverseConnectionString)
@@ -121,30 +90,11 @@ jobs:
           searchFolder: '$(Agent.TempDirectory)\TestResults'
           mergeTestResults: true
           failTaskOnFailedTests: true
+          testRunTitle: 'PR Validate Tests'
 
-      - task: PowerShell@2
-        displayName: Publish CLI if present
+      - task: PublishCodeCoverageResults@2
+        displayName: Publish code coverage
+        condition: succeededOrFailed()
         inputs:
-          targetType: inline
-          script: |
-            $cliProjectPath = "$(Build.SourcesDirectory)\$(cliProjectPath)"
-
-            if (-not (Test-Path $cliProjectPath)) {
-              Write-Host "CLI project not found. Skipping CLI publish validation."
-              Write-Host "Path: $cliProjectPath"
-              exit 0
-            }
-
-            dotnet restore "$cliProjectPath"
-            if ($LASTEXITCODE -ne 0) {
-              exit $LASTEXITCODE
-            }
-
-            dotnet publish "$cliProjectPath" `
-              --configuration "$(configuration)" `
-              --framework net8.0 `
-              --no-restore `
-              --no-self-contained `
-              --output "$(Build.ArtifactStagingDirectory)\cli"
-
-            exit $LASTEXITCODE
+          summaryFileLocation: '$(Agent.TempDirectory)\TestResults\**\coverage.cobertura.xml'
+          failIfCoverageEmpty: false

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>pillaro-dv</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>pillaro-dv</ToolCommandName>
+    <PackageId>Pillaro.Dataverse.PluginFramework.Cli</PackageId>
+    <Title>Pillaro Dataverse CLI</Title>
+    <Description>CLI for Pillaro Dataverse Plugin Framework deployment metadata.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.2.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Pillaro.Dataverse.PluginFramework\Pillaro.Dataverse.PluginFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Pillaro.Dataverse.PluginFramework.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

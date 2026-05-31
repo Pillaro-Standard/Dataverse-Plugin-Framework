@@ -209,10 +209,7 @@ Example changelog structure:
     ### Pillaro.Dataverse.PluginFramework.Testing
     - Testing-specific changes
 
-During the build process:
-
-* each package receives only its relevant section
-* NuGet metadata is populated automatically from the changelog
+NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file.
 
 ---
 

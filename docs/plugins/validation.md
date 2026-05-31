@@ -295,5 +295,5 @@ Continue with:
 - [Plugin Model](./plugin-model.md)
 - [Task Model](./task-model.md)
 - [Data Access](./data-access.md)
-- [Execution Pipeline](../execution-pipeline.md)
-- [Architecture](../architecture.md)
+- [Execution Pipeline](./execution-pipeline.md)
+- [Architecture](./architecture.md)

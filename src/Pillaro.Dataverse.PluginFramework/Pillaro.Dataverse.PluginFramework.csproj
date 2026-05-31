@@ -12,6 +12,7 @@
 		<Nullable>disable</Nullable>
 		<NoWarn>$(NoWarn);CA1510</NoWarn>
 		<NoWarn>$(NoWarn);IDE0016</NoWarn>
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net462'">

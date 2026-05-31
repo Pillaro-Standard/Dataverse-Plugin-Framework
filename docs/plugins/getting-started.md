@@ -20,7 +20,7 @@
 - [3. Create the `Logic` project](#3-create-the-logic-project)
 - [4. Create the `Plugins` project](#4-create-the-plugins-project)
 - [5. Enable signing](#5-enable-signing)
-- [6. Configure the prepared post-build action](#6-configure-the-prepared-post-build-action)
+- [6. Review the generated tooling](#6-review-the-generated-tooling)
 - [7. Create your solution `PluginBase`](#7-create-your-solution-pluginbase)
 - [8. Create your first task](#8-create-your-first-task)
 - [9. Create your first plugin](#9-create-your-first-plugin)
@@ -209,19 +209,27 @@ Or use Visual Studio signing support.
 
 ---
 
-## 6. Configure the prepared post-build action
+## 6. Review the generated tooling
 
-After installing the plugin package into the `Plugins` project, prepared resources are available in that project:
+After installing the plugin package into the `Plugins` project and rebuilding it, package-managed resources are generated in that project:
 
-    tools/CrmTools/
-    tools/ILMerge/
+    Tools/Deployment/
+    Tools/ILMerge/
+    Tools/EarlyBound/
+    PillaroSettings.json
 
 These resources are added by the package and include:
 
-- prepared post-build action templates in `tools/CrmTools/`
-- ILMerge binaries in `tools/ILMerge/`
+- deployment wrappers and deployment README in `Tools/Deployment/`
+- ILMerge binaries and post-build action templates in `Tools/ILMerge/`
+- early-bound generation helper files in `Tools/EarlyBound/`
+- deployment settings in `PillaroSettings.json`
 
-### 6.1 Choose the correct post-build action
+> [!NOTE]
+> The generated files are created by the package targets after rebuild.
+> If Visual Studio does not show them immediately, enable **Show All Files** and include the generated `Tools` folder and `PillaroSettings.json` if you want them tracked with your plugin project.
+
+### 6.1 Choose the correct ILMerge post-build action
 
 Two prepared post-build actions are available for two different situations:
 
@@ -235,7 +243,7 @@ Use this when:
 
 Use:
 
-    tools/CrmTools/PostBuildAction-logic_plugin-projects.txt
+    Tools/ILMerge/PostBuildAction-logic_plugin-projects.txt
 
 This action merges:
 
@@ -272,7 +280,7 @@ Use this when:
 
 Use:
 
-    tools/CrmTools/PostBuildAction-single-project.txt
+    Tools/ILMerge/PostBuildAction-single-project.txt
 
 ### 6.2 What the merge step is for
 
@@ -295,9 +303,9 @@ Create `Plugins/PluginBase.cs` in the `Logic` project.
 
 Example:
 
-    public class PluginBase : PluginFramework.Plugins.PluginBase
+    public abstract class PluginBase : PluginFramework.Plugins.PluginBase
     {
-        public PluginBase(string unsecureConfig, string secureConfig)
+        protected PluginBase(string unsecureConfig, string secureConfig)
             : base(unsecureConfig, secureConfig)
         {
         }
@@ -364,7 +372,9 @@ Recommended location:
     YourSolution.Logic/Plugins/
 
 Example:
-    
+
+    using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
+
     public class TaskPlugin : PluginBase
     {
         public TaskPlugin(string unsecureConfig, string secureConfig)
@@ -376,14 +386,29 @@ Example:
                 Task.EntityLogicalName,
                 PluginMode.Synchronous);
         }
+
+        public override void Register(IPluginRegistration registration)
+        {
+            registration
+                .OnCreate<Task>("8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
+                .PreOperation()
+                .Synchronous()
+                .Rank(1)
+                .InSolution("YourSolution");
+        }
     }
-    
+
 
 This example shows the basic plugin pattern:
 
 - inherit from your solution `PluginBase`
+- optionally override `Register(IPluginRegistration registration)` for registration API
 - register one or more tasks
 - keep plugin classes focused on orchestration
+
+> [!NOTE]
+> The `Register` method is optional. If you don't need to use the registration API for automatic step registration, you can leave it empty or not override it at all.
+> When the `Register` method is empty, a log message will be generated indicating no steps were registered via the registration API.
 
 > [!NOTE]
 > A plugin usually targets one entity or one functional area.
@@ -414,15 +439,23 @@ Expected result:
 
 ## 11. Deploy to Dataverse
 
-Deploy the final merged plugin assembly using your standard Dataverse deployment process.
+The package generates deployment wrappers in the plugin project after rebuild:
+
+    Tools/Deployment/DeployPlugins.bat
+    Tools/Deployment/DeployPlugins.ps1
+
+Configure `PillaroSettings.json` in the plugin project root. The default connection string environment variable is `DV_CONN`.
+
+For local debug deployment:
+
+    .\Tools\Deployment\DeployPlugins.bat
+
+For local release deployment:
+
+    .\Tools\Deployment\DeployPlugins.ps1 -Profile release
 
 > [!NOTE]
-> The framework does not require a specific deployment tool.
-> Use the deployment process your team already uses.
-
-> [!TIP]
-> In this repository, SPKL is used in some places as an implementation choice.
-> It is not a required part of the framework usage model.
+> See [Deployment Plugins](./deployment-plugins.md) for the full generated deployment script flow and CI example.
 
 ---
 
@@ -478,9 +511,10 @@ Continue with:
 - [Task Model](./task-model.md)
 - [Validation Model](./validation.md)
 - [Data Access](./data-access.md)
-- [Security Contexts](./security-contexts.md)
-- [Architecture](../architecture.md)
-- [Packaging and Deployment](../packaging-and-deployment.md)
+- [Configuration](./configuration.md)
+- [Step Configuration](./step-configuration.md)
+- [Architecture](./architecture.md)
+- [Deployment Plugins](./deployment-plugins.md)
 - [Testing Overview](../tests/testing.md)
 
 > [!NOTE]

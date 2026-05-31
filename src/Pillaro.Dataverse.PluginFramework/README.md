@@ -56,9 +56,11 @@ The application can be found in the project repository under the `power-platform
 
 To enable logging, configure the following setting in Dataverse:
 
-- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0`(int)
+- In the **Runtime Setting** entity, set `MinimalSeverityLevel` to `0` or `1` to enable full debug-level framework logging.
 
-Without this configuration, logs may not be recorded.
+`MinimalSeverityLevel` is a minimum severity threshold. `0` or `1` saves all severities, `2` saves Info and higher, `3` saves Warning and Error, and `4` saves Error only.
+
+For production environments, `3` is the recommended default. Full logging (`0` or `1`) should be enabled only temporarily when detailed diagnostics are required.
 
 ---
 
@@ -80,7 +82,7 @@ public class PluginBase : PluginFramework.Plugins.PluginBase
     {
     }
 
-    public override string GetSolutionVersion() => "1.0";
+    public override string GetVersion() => "1.0";
 }
 ~~~
 
@@ -108,14 +110,13 @@ public class ValidateContactTask : TaskBase<Logic.Contact>
     public ValidateContactTask(IServiceProvider services, TaskContext ctx)
         : base(services, ctx) { }
 
-    protected override ICompleteValidation AddValidations(IBasicModeValidation v)
+    protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
     {
         return validator
             .WithMode(PluginMode.Synchronous)
             .WithStage(PluginStage.Preoperation)
             .WithMessages(new[] { "Create", "Update" })
-            .ForEntity(ContextEntity.LogicalName)
-            .EntityWithAtLeastOneAttribute(ContextEntity, nameof(ContextEntity.FirstName), nameof(ContextEntity.LastName));
+            .ForEntity(ContextEntity.LogicalName);
     }
 
     protected override void DoExecute()
@@ -135,10 +136,10 @@ The key file should be placed in the plugin project root and used during build a
 
 6. Configure post-build action for assembly merge.
 
-Post-build actions are available in:
+Post-build actions are generated after rebuild and are available in:
 
 ~~~text
-Tools/CrmTools/
+Tools/ILMerge/
 ~~~
 
 There are two variants:
@@ -155,14 +156,14 @@ Choose the variant that matches your project structure.
 
 7. Build the plugin project.
 
-After signing and post-build configuration, the project produces a single merged assembly ready for deployment.
+After signing and post-build configuration, the project produces a single merged assembly ready for deployment. The package also generates deployment helpers in `Tools/Deployment/` and a `PillaroSettings.json` file in the plugin project root.
 
 8. Deploy the plugin assembly.
 
 Recommended tools:
 
-- Plugin Registration Tool  
-- spkl
+- Plugin Registration Tool
+- generated `Tools/Deployment/DeployPlugins.bat` or `Tools/Deployment/DeployPlugins.ps1`
 
 ---
 
