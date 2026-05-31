@@ -1,0 +1,99 @@
+name: PR Validate
+
+trigger:
+  branches:
+    include:
+      - develop
+      - main
+
+pr:
+  branches:
+    include:
+      - develop
+      - main
+
+variables:
+  - group: dataverse-test-secrets
+
+  - name: configuration
+    value: Release
+
+  - name: solutionPath
+    value: Dataverse Plugin Framework.sln
+
+  - name: cliProjectPath
+    value: tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj
+
+jobs:
+  - job: Validate
+    displayName: Validate build and tests
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 0
+
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: '8.x'
+
+      - task: NuGetToolInstaller@1
+        displayName: Setup NuGet
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore solution
+        inputs:
+          command: restore
+          projects: $(solutionPath)
+
+      - task: DotNetCoreCLI@2
+        displayName: Build solution
+        inputs:
+          command: build
+          projects: $(solutionPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+
+      - task: DotNetCoreCLI@2
+        displayName: Run tests
+        inputs:
+          command: test
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-build
+            --no-restore
+            --logger trx
+            --results-directory "$(Agent.TempDirectory)\TestResults"
+          publishTestResults: false
+        env:
+          ConnectionStrings__Dataverse: $(DataverseConnectionString)
+
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        condition: always()
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/*.trx'
+          searchFolder: '$(Agent.TempDirectory)\TestResults'
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+
+      - task: DotNetCoreCLI@2
+        displayName: Publish CLI
+        inputs:
+          command: publish
+          projects: $(cliProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --framework net8.0
+            --no-self-contained
+            --output "$(Build.ArtifactStagingDirectory)\cli"
+          publishWebProjects: false
+          zipAfterPublish: false
