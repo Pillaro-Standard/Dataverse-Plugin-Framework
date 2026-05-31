@@ -18,8 +18,11 @@ variables:
   - name: configuration
     value: Release
 
-  - name: solutionPath
-    value: Dataverse Plugin Framework.sln
+  - name: frameworkProjectPath
+    value: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
+
+  - name: testingProjectPath
+    value: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
 
   - name: cliProjectPath
     value: tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj
@@ -44,16 +47,50 @@ jobs:
         displayName: Setup NuGet
 
       - task: DotNetCoreCLI@2
-        displayName: Restore solution
+        displayName: Restore framework project
         inputs:
           command: restore
-          projects: $(solutionPath)
+          projects: $(frameworkProjectPath)
 
       - task: DotNetCoreCLI@2
-        displayName: Build solution
+        displayName: Build framework project
         inputs:
           command: build
-          projects: $(solutionPath)
+          projects: $(frameworkProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore testing project
+        inputs:
+          command: restore
+          projects: $(testingProjectPath)
+
+      - task: DotNetCoreCLI@2
+        displayName: Build testing project
+        inputs:
+          command: build
+          projects: $(testingProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore test projects
+        inputs:
+          command: restore
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+
+      - task: DotNetCoreCLI@2
+        displayName: Build test projects
+        inputs:
+          command: build
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
           arguments: >
             --configuration $(configuration)
             --no-restore
@@ -86,6 +123,12 @@ jobs:
           failTaskOnFailedTests: true
 
       - task: DotNetCoreCLI@2
+        displayName: Restore CLI
+        inputs:
+          command: restore
+          projects: $(cliProjectPath)
+
+      - task: DotNetCoreCLI@2
         displayName: Publish CLI
         inputs:
           command: publish
@@ -93,6 +136,7 @@ jobs:
           arguments: >
             --configuration $(configuration)
             --framework net8.0
+            --no-restore
             --no-self-contained
             --output "$(Build.ArtifactStagingDirectory)\cli"
           publishWebProjects: false
