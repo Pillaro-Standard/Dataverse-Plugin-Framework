@@ -24,7 +24,7 @@
 - [7. Create your first integration test](#7-create-your-first-integration-test)
 - [8. Run and verify](#8-run-and-verify)
 - [✅ Recommendations](#-recommendations)
-- [➡️ Next steps](#️-next-steps)
+- [➡️ Related documents](#️-related-documents)
 
 ---
 
@@ -423,7 +423,7 @@ After execution:
 
 ---
 
-## ➡️ Next steps
+## ➡️ Related documents
 
 - [Test Architecture](./test-architecture.md)
 - [Test Execution Flow](./test-execution-flow.md)
@@ -433,3 +433,5 @@ After execution:
 For plugin development, see:
 
 - [Getting Started](../plugins/getting-started.md)
+- [Plugin Registration API](../plugins/plugin-registration-api.md)
+- [Deployment Plugins](../plugins/deployment-plugins.md)

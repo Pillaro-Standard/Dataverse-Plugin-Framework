@@ -148,15 +148,6 @@ Assign roles based on user responsibilities:
 
 ---
 
-## Related Documentation
-
-- [Runtime Configuration](../plugins/configuration.md) — how to use `SettingsService` in plugins
-- [Autonumbering](../plugins/autonumbering.md) — detailed autonumbering setup and patterns
-- [Logging](../plugins/logging.md) — plugin logging capabilities and log levels
-- [Error Handling](../plugins/error-handling.md) — exception handling and validation failures
-
----
-
 ## Best Practices
 
 ### Logging Configuration by Environment
@@ -205,3 +196,10 @@ For questions, issues, or feature requests related to the Pillaro Plugin Framewo
 
 - 💬 [Discussions](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions)
 - 🐛 [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues)
+
+## ➡️ Related documents
+
+- [Runtime Configuration](../plugins/configuration.md) — how to use `SettingsService` in plugins
+- [Autonumbering](../plugins/autonumbering.md) — detailed autonumbering setup and patterns
+- [Logging](../plugins/logging.md) — plugin logging capabilities and log levels
+- [Error Handling](../plugins/error-handling.md) — exception handling and validation failures

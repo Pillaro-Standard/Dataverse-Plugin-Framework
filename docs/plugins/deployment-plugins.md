@@ -10,6 +10,18 @@ The goal is simple: install the framework package, rebuild the plugin project, c
 
 ---
 
+## Prerequisites
+
+Before deploying plugins, make sure that plugin registration attributes are configured in code.
+
+The deployment process uses these attributes as the source of truth for plugin step registration. If the attributes are missing or incomplete, the deployment tool cannot correctly create or update plugin steps in Dataverse.
+
+The deployment process reads registration metadata such as message, stage, mode, entity name, filtering attributes, images, rank, configuration, and solution membership from the plugin registration attributes.
+
+See [Plugin Registration API](./plugin-registration-api.md) for details about how to configure plugin registration attributes.
+
+---
+
 ## 1. Install the Package
 
 Install `Pillaro.Dataverse.PluginFramework` into the Dataverse plugin project.
@@ -157,3 +169,9 @@ The `ci` profile should point to the plugin DLL produced by the pipeline build.
 | Assembly not found | Check `pluginAssemblyPath` for the selected profile and rebuild the plugin project. |
 | Connection string not found | Check that the environment variable name matches `dataverse.connectionStringEnvironmentVariable`. |
 | Visual Studio cannot see the variable | Restart Visual Studio after setting a user-level environment variable. |
+
+## ➡️ Related documents
+
+- [Plugin Registration API](./plugin-registration-api.md) - Configure plugin registration metadata in code.
+- [Getting Started](./getting-started.md) - Build the first deployable plugin assembly.
+- [CI/CD Pipelines](../ci-cd-pipelines.md) - Run build, package, and deployment automation from pipelines.

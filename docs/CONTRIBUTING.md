@@ -20,7 +20,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our [Code of Conduct](../CODE_OF_CONDUCT.md). Please read it before contributing.
+By participating in this project, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md). Please read it before contributing.
 
 ---
 
@@ -234,3 +234,10 @@ Include the following information:
 ---
 
 Thank you for contributing to Pillaro Dataverse Plugin Framework!
+
+## ➡️ Related documents
+
+- [Code of Conduct](./CODE_OF_CONDUCT.md) - Community behavior expectations.
+- [Security](./SECURITY.md) - Vulnerability reporting and security considerations.
+- [CI/CD Pipelines](./ci-cd-pipelines.md) - Build, test, and packaging automation.
+- [Versioning Strategy](./versioning.md) - Release and version management.
