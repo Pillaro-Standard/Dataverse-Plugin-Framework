@@ -448,6 +448,49 @@ jobs:
               $global:LASTEXITCODE = 0
             }
 
+      - task: PowerShell@2
+        displayName: Set release notes URL
+        inputs:
+          targetType: inline
+          script: |
+            Add-Type -AssemblyName System.Xml
+
+            $releaseNotesUrl = "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/$(Build.SourceVersion)/CHANGELOG.md"
+            $nuspecPaths = @(
+              "$(Build.SourcesDirectory)/$(frameworkNuspecPath)",
+              "$(Build.SourcesDirectory)/$(testingNuspecPath)"
+            )
+
+            foreach ($nuspecPath in $nuspecPaths) {
+              if (-not (Test-Path $nuspecPath)) {
+                throw "Nuspec file was not found: $nuspecPath"
+              }
+
+              [xml]$nuspec = Get-Content -LiteralPath $nuspecPath -Raw
+              $metadata = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']")
+
+              if (-not $metadata) {
+                throw "Metadata node was not found in nuspec file: $nuspecPath"
+              }
+
+              $releaseNotesNode = $metadata.SelectSingleNode("*[local-name()='releaseNotes']")
+
+              if (-not $releaseNotesNode) {
+                $releaseNotesNode = $nuspec.CreateElement("releaseNotes", $nuspec.DocumentElement.NamespaceURI)
+                [void]$metadata.AppendChild($releaseNotesNode)
+              }
+
+              if (-not $releaseNotesNode) {
+                throw "releaseNotes node could not be created or updated in nuspec file: $nuspecPath"
+              }
+
+              $releaseNotesNode.InnerText = $releaseNotesUrl
+              $nuspec.Save($nuspecPath)
+              Write-Host "Updated releaseNotes in $nuspecPath"
+            }
+
+            Write-Host "Final release notes URL: $releaseNotesUrl"
+
       - script: >
           nuget pack "$(frameworkNuspecPath)"
           -BasePath "$(Build.SourcesDirectory)\src\Pillaro.Dataverse.PluginFramework"
@@ -472,6 +515,7 @@ jobs:
             Add-Type -AssemblyName System.IO.Compression.FileSystem
 
             $packageVersion = "$(PACKAGE_VERSION)"
+            $expectedReleaseNotes = "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/$(Build.SourceVersion)/CHANGELOG.md"
             $packages = Get-ChildItem "$(Build.ArtifactStagingDirectory)" -Filter *.nupkg
 
             if (-not $packages) {
@@ -525,12 +569,30 @@ jobs:
                 [xml]$nuspec = Read-ZipEntryText -Entry $nuspecEntry
                 $id = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='id']").InnerText
                 $version = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='version']").InnerText
+                $releaseNotesNode = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='releaseNotes']")
 
                 Write-Host "  PackageId: $id"
                 Write-Host "  Version: $version"
 
                 if ($version -ne $packageVersion) {
                   throw "Package '$($package.Name)' has nuspec version '$version', expected '$packageVersion'."
+                }
+
+                if (-not $releaseNotesNode) {
+                  throw "Package '$($package.Name)' does not contain a releaseNotes element in the embedded nuspec."
+                }
+
+                $actualReleaseNotes = $releaseNotesNode.InnerText
+                Write-Host "  ReleaseNotes: $actualReleaseNotes"
+
+                foreach ($blockedSegment in @('/blob/main/', '/blob/develop/', '/blob/release/')) {
+                  if ($actualReleaseNotes -like "*$blockedSegment*") {
+                    throw "Package '$($package.Name)' has invalid releaseNotes '$actualReleaseNotes'. It must point to the source commit URL and not a branch URL containing '$blockedSegment'."
+                  }
+                }
+
+                if ($actualReleaseNotes -ne $expectedReleaseNotes) {
+                  throw "Package '$($package.Name)' has releaseNotes '$actualReleaseNotes', expected '$expectedReleaseNotes'."
                 }
 
                 if ($id -eq "Pillaro.Dataverse.PluginFramework") {
