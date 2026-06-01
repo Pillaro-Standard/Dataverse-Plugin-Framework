@@ -18,7 +18,7 @@
 - [💻 Example](#-example)
 - [⚠️ User-facing business failures](#-user-facing-business-failures)
 - [✅ Design recommendations](#-design-recommendations)
-- [➡️ Related documents](#-related-documents)
+- [➡️ Related documents](#️-related-documents)
 
 ---
 

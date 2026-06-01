@@ -1,4 +1,4 @@
-﻿# Pillaro Dataverse Plugin Framework — Documentation
+# Pillaro Dataverse Plugin Framework — Documentation
 
 > [!IMPORTANT]
 > The root [README](../README.md) helps you decide whether the framework is relevant for your solution.
@@ -16,7 +16,7 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
-| 🚚 [Deployment Plugins](#-deployment-plugins)              | Deploy plugins locally, from Visual Studio/Battleboard, and from Azure DevOps |
+| 🚚 [Deployment Plugins](#-deployment-plugins)              | Deploy plugins precisely, repeatably, and without accidental duplicates      |
 | 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
 | 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
@@ -40,13 +40,13 @@
 
 Use this section when you are building Dataverse plugins with the framework.
 
-### Start
+### Plugin Start
 
 | Document | Description | Status |
 |---|---|---|
 | [Getting Started](./plugins/getting-started.md) | First setup, first plugin, and first deployable assembly | ✅ |
 
-### Core Concepts
+### Plugin Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
@@ -57,7 +57,7 @@ Use this section when you are building Dataverse plugins with the framework.
 | [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | ✅ |
 | [Execution Pipeline](./plugins/execution-pipeline.md) | Plugin execution flow and task orchestration | ✅ |
 
-### Data Access
+### Plugin Data Access
 
 | Document | Description | Status |
 |---|---|---|
@@ -77,15 +77,19 @@ Use this section when you are building Dataverse plugins with the framework.
 
 ## 🚚 Deployment Plugins
 
-Use this section when you need to deploy Dataverse plugin assemblies and plugin registration metadata.
+Use this section when you need to deploy Dataverse plugin assemblies and plugin registration metadata in an exact, repeatable way.
+
+The framework deployment process uses registration metadata defined in code as the source of truth. It is designed to create or update the intended plugin assemblies, plugin steps, filtering attributes, images, and related registration metadata without accidental duplicates.
+
+Developers can run the generated deployment tooling locally, and teams can use the same process from Azure DevOps pipelines or other DevOps automation.
 
 | Document | Description | Status |
 |---|---|---|
-| [Deployment Plugins](./plugins/deployment-plugins.md) | Main deployment guide for local development, Visual Studio/Battleboard, PowerShell, and Azure DevOps | ✅ |
+| [Deployment Plugins](./plugins/deployment-plugins.md) | Main deployment guide for exact local and automated plugin deployment | ✅ |
 
 > [!NOTE]
 > The plugin deployment flow is intentionally separated from plugin development.
-> Development documentation explains how to build plugin code; this chapter explains how the built assembly and registration metadata get deployed.
+> Development documentation explains how to build plugin code; this chapter explains how the built assembly and registration metadata get deployed precisely and repeatably.
 
 ---
 
@@ -103,13 +107,13 @@ Use this section to learn about the Pillaro Plugin Framework included with the f
 
 Use this section when you are building programmatic tests for Dataverse solutions.
 
-### Start
+### Test Start
 
 | Document | Description | Status |
 |---|---|---|
 | [Testing Overview](./tests/testing.md) | Entry point for test setup and test usage | ✅ |
 
-### Core Concepts
+### Test Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
@@ -117,7 +121,7 @@ Use this section when you are building programmatic tests for Dataverse solution
 | [Test Execution Flow](./tests/test-execution-flow.md) | How test setup, execution, assertion, and cleanup work | ✅ |
 | [Test Data Lifecycle](./tests/test-data-lifecycle.md) | Creating, using, and removing test data safely | ✅ |
 
-### Data Access
+### Test Data Access
 
 | Document | Description | Status |
 |---|---|---|
@@ -208,3 +212,10 @@ Repository-level policies and contribution guidance.
 ---
 
 **Questions?** Open a [Discussion](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions) or check [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues)
+
+## ➡️ Related documents
+
+- [Getting Started](./plugins/getting-started.md) - Start building Dataverse plugins with the framework.
+- [Plugin Registration API](./plugins/plugin-registration-api.md) - Configure plugin registration metadata in code.
+- [Deployment Plugins](./plugins/deployment-plugins.md) - Deploy plugin assemblies and plugin steps into Dataverse.
+- [Testing Overview](./tests/testing.md) - Build integration tests against Dataverse.

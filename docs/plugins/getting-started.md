@@ -28,7 +28,7 @@
 - [11. Deploy to Dataverse](#11-deploy-to-dataverse)
 - [12. Verify the result](#12-verify-the-result)
 - [✅ Recommendations](#-recommendations)
-- [➡️ Next steps](#️-next-steps)
+- [➡️ Related documents](#️-related-documents)
 
 ---
 
@@ -503,7 +503,7 @@ This separation reduces confusion and helps the solution scale more cleanly.
 
 ---
 
-## ➡️ Next steps
+## ➡️ Related documents
 
 Continue with:
 
@@ -514,6 +514,7 @@ Continue with:
 - [Configuration](./configuration.md)
 - [Step Configuration](./step-configuration.md)
 - [Architecture](./architecture.md)
+- [Plugin Registration API](./plugin-registration-api.md)
 - [Deployment Plugins](./deployment-plugins.md)
 - [Testing Overview](../tests/testing.md)
 
