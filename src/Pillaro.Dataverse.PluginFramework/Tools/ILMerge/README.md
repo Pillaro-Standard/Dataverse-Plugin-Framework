@@ -12,8 +12,8 @@ When plugin logic is split across multiple projects or uses additional runtime d
 
 Typical structure:
 
-- `Plugin.dll` — Dataverse plugin entry point
-- `Logic.dll` — business logic shared with tests
+- `Plugin.dll` - Dataverse plugin entry point
+- `Logic.dll` - business logic shared with tests
 - framework/runtime dependencies
 - final merged plugin assembly
 
@@ -25,10 +25,10 @@ The final output should be one deployable DLL registered in Dataverse.
 
 This folder contains:
 
-- `ILMerge.exe` — merge tool used during build
-- `PostBuildAction-logic_plugin-projects.txt` — post-build template for solutions with separate Plugin and Logic projects
-- `PostBuildAction-single-project.txt` — post-build template for solutions where plugin entry points and business logic are in one project
-- `README.md` — this documentation
+- `ILMerge.exe` - merge tool used during build
+- `PostBuildAction-logic_plugin-projects.txt` - post-build template for solutions with separate Plugin and Logic projects
+- `PostBuildAction-single-project.txt` - post-build template for solutions where plugin entry points and business logic are in one project
+- `README.md` - this documentation
 
 ---
 
