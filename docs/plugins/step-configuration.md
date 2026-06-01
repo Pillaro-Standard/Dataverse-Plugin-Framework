@@ -318,6 +318,8 @@ After deploying your plugin, create a checklist for configuring secure values:
 
 ## ➡️ Related documents
 
+- [Plugin Registration API](./plugin-registration-api.md) - Configure plugin step metadata in code.
+- [Deployment Plugins](./deployment-plugins.md) - Deploy plugin assemblies and synchronized plugin steps.
 - [Configuration](configuration.md) - Framework runtime settings (alternative to plugin configuration)
 - [Getting Started](getting-started.md) - Creating your first plugin
 - [Task Model](task-model.md) - Understanding task context and accessing configuration

@@ -1,4 +1,4 @@
-﻿# Versioning Strategy
+# Versioning Strategy
 
 > Versioning model for Pillaro Dataverse Plugin Framework packages and releases.
 
@@ -337,3 +337,9 @@ For MAJOR version upgrades, migration guides are provided in:
 
 > [!IMPORTANT]
 > We aim to minimize breaking changes and provide clear migration paths when they are necessary.
+
+## ➡️ Related documents
+
+- [Changelog](../CHANGELOG.md) - Release notes and change history.
+- [CI/CD Pipelines](./ci-cd-pipelines.md) - Build and package automation.
+- [Contributing](./CONTRIBUTING.md) - Contribution workflow and release expectations.

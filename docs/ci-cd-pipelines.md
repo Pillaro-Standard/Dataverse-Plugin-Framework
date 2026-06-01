@@ -20,7 +20,7 @@ All pipelines are defined in YAML files at the repository root.
 
 **File**: `Nightly – Tests Only.yml`
 
-### Purpose
+### Nightly Purpose
 
 Validates all test projects against a real Dataverse environment to detect integration issues and regressions early.
 
@@ -31,7 +31,7 @@ Validates all test projects against a real Dataverse environment to detect integ
 - **Branches**: `main` and `develop`
 - **Trigger**: Scheduled (runs even if no changes were made)
 
-### Execution Flow
+### Nightly Execution Flow
 
 1. **Checkout**: Fetches latest code (shallow clone, depth 1)
 2. **SDK Installation**: Installs .NET SDK 8.x
@@ -91,7 +91,7 @@ Running tests on a schedule (rather than on every commit) provides:
 
 **File**: `Packages – Build & Package.yml`
 
-### Purpose
+### Package Purpose
 
 Builds and packages NuGet packages for distribution.
 
@@ -119,7 +119,7 @@ Determines version suffix and target audience:
 | `rc` | `1.0.0-rc.{buildId}` | Release candidate builds |
 | `release` | `1.0.0` | Stable production release |
 
-### Execution Flow
+### Package Execution Flow
 
 1. **Checkout**: Fetches full repository history (`fetchDepth: 0`)
 2. **SDK Installation**: Installs .NET SDK 8.x
@@ -155,9 +155,10 @@ Stored in Azure DevOps variable group `dataverse-test-secrets`:
 
 ---
 
-## Related Documentation
+## ➡️ Related documents
 
 - [Contributing Guidelines](CONTRIBUTING.md) — Contribution workflow and testing requirements
 - [Testing Overview](tests/testing.md) — Framework testing infrastructure
-- [Versioning Strategy](VERSIONING.md) — Release and version management
+- [Deployment Plugins](plugins/deployment-plugins.md) — Deploy plugin assemblies and registration metadata
+- [Versioning Strategy](versioning.md) — Release and version management
 

@@ -12,9 +12,13 @@ Pillaro Framework provides a structured and production-proven approach to develo
 
 For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://www.pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
 
-It introduces a task-based execution model with explicit validation and execution phases, enabling:
+It introduces a task-based execution model with explicit validation and execution phases, together with a precise deployment model for plugin assemblies, plugin steps, images, filtering attributes, and related registration metadata.
+
+This enables:
 
 - predictable and deterministic behavior
+- exact and repeatable plugin deployment
+- plugin step synchronization without accidental duplicates
 - strict separation of concerns
 - fully testable plugin logic
 - long-term maintainability at scale
@@ -49,12 +53,17 @@ Standard plugin development often leads to:
 - multiple responsibilities in a single class
 - lack of testability
 - duplicated patterns across projects
+- manual or inconsistent plugin registration
+- duplicate plugin steps after repeated deployments
+- deployment that is hard to reproduce across environments
 
 This framework introduces a consistent structure:
 
 - each functionality = single task
 - validation is separated from execution
 - behavior is deterministic and explicit
+- plugin registration metadata is defined in code
+- deployment can precisely create or update the intended Dataverse plugin components
 - built-in testing support
 - built-in diagnostic logging
 
@@ -79,6 +88,26 @@ Each plugin is composed of independent tasks:
 - fail-fast validation that prevents execution of invalid tasks while allowing the pipeline to continue
 - consistent handling of validation and execution errors with clear and traceable outcomes
 - automatic logging of validation failures with detailed reasons
+
+---
+
+### Exact Plugin Deployment
+
+The framework treats plugin deployment as a repeatable engineering process, not a manual registration exercise.
+
+Plugin registration metadata is defined in code and used by the deployment tooling to synchronize Dataverse plugin assemblies, steps, filtering attributes, images, rank, configuration, and solution membership with high precision.
+
+This solves one of the most common operational problems in Dataverse plugin delivery:
+
+- deployments are deterministic and repeatable
+- plugin steps are created or updated intentionally
+- duplicate plugin steps are avoided
+- registration metadata stays close to the plugin implementation
+- local developer deployment and automated DevOps deployment use the same source of truth
+
+Developers can deploy from the generated local tooling during implementation, while teams can run the same deployment process from Azure DevOps pipelines or any other DevOps automation capable of building the plugin assembly and executing the deployment script.
+
+See [Plugin Registration API](docs/plugins/plugin-registration-api.md) and [Deployment Plugins](docs/plugins/deployment-plugins.md) for the registration and deployment workflow.
 
 ---
 

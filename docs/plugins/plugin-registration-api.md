@@ -1,4 +1,4 @@
-﻿# Plugin Registration API
+# Plugin Registration API
 
 This document describes the fluent registration API for Dataverse plugin deployment metadata.
 
@@ -205,6 +205,14 @@ Deployment tooling discovers framework plugins from `PluginBase`, calls `Registe
 
 These declarations are intentionally separate because they serve different Dataverse concerns. `RegisterTask(...)` controls runtime dispatch inside the plugin execution pipeline. `Register(IPluginRegistration registration)` controls deployment metadata for assemblies, steps, images, filtering attributes, configuration, and solution membership. The framework does not automatically infer one from the other, so keep runtime task registration and deployment metadata aligned when adding, removing, or changing steps.
 
+## Deployment connection
+
+Plugin registration attributes describe how plugin steps should be registered in Dataverse. They define registration metadata directly in code, but they do not deploy the plugin by themselves.
+
+To deploy the plugin steps into Dataverse, use the deployment process described in [Deployment Plugins](./deployment-plugins.md).
+
+Before deployment, make sure that all required registration attributes are configured correctly, especially message, stage, mode, entity name, filtering attributes, and required images.
+
 ## Discovery
 
 Use `PluginRegistrationDiscovery` to read registration metadata:
@@ -240,3 +248,9 @@ The deployment manifest validator enforces basic safety rules:
 - entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes.
 - typed attribute selection reads logical names from `AttributeLogicalNameAttribute` on early-bound entity properties.
 - custom API and custom action messages can be registered with `OnMessage(...)`.
+
+## ➡️ Related documents
+
+- [Deployment Plugins](./deployment-plugins.md) - Deploy registered plugin steps into Dataverse.
+- [Plugin Model](./plugin-model.md) - Understand how plugin classes and runtime task registration fit together.
+- [Plugin Step Configuration](./step-configuration.md) - Configure unsecure and secure values for plugin steps.

@@ -232,8 +232,10 @@ When in doubt:
 Continue with:
 
 - [Getting Started](./getting-started.md)
+- [Plugin Registration API](./plugin-registration-api.md)
 - [Task Model](./task-model.md)
 - [Validation Model](./validation.md)
 - [Data Access](./data-access.md)
 - [Architecture](./architecture.md)
 - [Execution Pipeline](./execution-pipeline.md)
+- [Deployment Plugins](./deployment-plugins.md)
