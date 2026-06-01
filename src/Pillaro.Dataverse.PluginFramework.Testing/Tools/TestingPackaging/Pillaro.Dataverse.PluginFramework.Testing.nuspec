@@ -10,7 +10,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<license type="file">LICENSE</license>
 
-		<projectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</projectUrl>
+        <projectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</projectUrl>
 		<repository type="git" url="https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework" />
 
 		<readme>docs\README.md</readme>
