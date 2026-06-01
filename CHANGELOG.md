@@ -20,6 +20,17 @@
 - Aligned package dependencies and package metadata for configuration, environment variable, memory cache, and Dataverse testing support.
 - Fixed issue #25, where the NuGet package build had incorrect changelog content.
 
+### 1.0.2
+
+### Pillaro.Dataverse.PluginFramework
+- Promoted package version after successful verification and production deployment.
+- No functional changes were introduced in this release.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+- Promoted package version after successful verification and production deployment.
+- No functional changes were introduced in this release.
+
+
 ### 1.0.2-rc
 
 ### Pillaro.Dataverse.PluginFramework
