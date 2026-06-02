@@ -84,27 +84,74 @@ Use `debug` for local development, `release` for local release-build verificatio
 
 ## 3. Set the Connection String
 
-The deployment script reads the Dataverse connection string from an environment variable.
+The deployment script reads the Dataverse connection string from an environment variable. The generated wrappers do not store or create the connection string; they only read the variable named in `PillaroSettings.json`.
 
-PowerShell example for the current terminal session:
+The default variable name is:
 
-```powershell
-$env:DV_CONN = 'AuthType=ClientSecret;Url=https://your-org.crm4.dynamics.com;ClientId=your-client-id;ClientSecret=your-client-secret;TenantId=your-tenant-id'
+```text
+DV_CONN
 ```
 
-PowerShell example for the current Windows user:
+### Recommended local Windows setup
+
+For local development, create the connection string as a **user environment variable**.
+
+The fastest way to open the required Windows dialog is:
+
+```text
+Win + R
+SystemPropertiesAdvanced
+Enter
+```
+
+This opens **System Properties** on the **Advanced** tab.
+
+Then:
+
+1. Click **Environment Variables...**.
+2. Under **User variables**, click **New...**.
+3. Set **Variable name** to:
+
+```text
+DV_CONN
+```
+
+4. Set **Variable value** to the Dataverse connection string.
+5. Confirm the dialogs with **OK**.
+6. Restart Visual Studio, PowerShell, or the terminal before running deployment.
+
+This makes the connection string available for local deployment without setting it again in every terminal session.
+
+Example value:
+
+```text
+AuthType=ClientSecret;Url=https://your-org.crm4.dynamics.com;ClientId=your-client-id;ClientSecret=your-client-secret
+```
+
+### PowerShell example for the current terminal session
+
+This sets the variable only for the currently opened PowerShell session:
+
+```powershell
+$env:DV_CONN = 'AuthType=ClientSecret;Url=https://your-org.crm4.dynamics.com;ClientId=your-client-id;ClientSecret=your-client-secret'
+```
+
+After closing the terminal, the variable is lost.
+
+### PowerShell example for the current Windows user
+
+This creates the same kind of user environment variable as the Windows **Environment Variables** dialog:
 
 ```powershell
 [Environment]::SetEnvironmentVariable(
     'DV_CONN',
-    'AuthType=ClientSecret;Url=https://your-org.crm4.dynamics.com;ClientId=your-client-id;ClientSecret=your-client-secret;TenantId=your-tenant-id',
+    'AuthType=ClientSecret;Url=https://your-org.crm4.dynamics.com;ClientId=your-client-id;ClientSecret=your-client-secret',
     'User')
 ```
 
-Restart Visual Studio or the terminal after setting a user-level variable.
+After setting the variable this way, restart Visual Studio, PowerShell, or the terminal before running deployment.
 
 Do not commit connection strings into source control.
-
 ---
 
 ## 4. Deploy Locally
@@ -173,5 +220,6 @@ The `ci` profile should point to the plugin DLL produced by the pipeline build.
 ## ➡️ Related documents
 
 - [Plugin Registration API](./plugin-registration-api.md) - Configure plugin registration metadata in code.
+- [Early-Bound Entity Generation](./early-bound-generation.md) - Generate entity classes used by typed registration metadata.
 - [Getting Started](./getting-started.md) - Build the first deployable plugin assembly.
 - [CI/CD Pipelines](../ci-cd-pipelines.md) - Run build, package, and deployment automation from pipelines.

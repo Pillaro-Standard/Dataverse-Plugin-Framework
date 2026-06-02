@@ -21,6 +21,7 @@
 - [4. Create the `Plugins` project](#4-create-the-plugins-project)
 - [5. Enable signing](#5-enable-signing)
 - [6. Review the generated tooling](#6-review-the-generated-tooling)
+- [6.3 Generate early-bound classes](#63-generate-early-bound-classes)
 - [7. Create your solution `PluginBase`](#7-create-your-solution-pluginbase)
 - [8. Create your first task](#8-create-your-first-task)
 - [9. Create your first plugin](#9-create-your-first-plugin)
@@ -295,6 +296,27 @@ The prepared post-build action solves that by creating one final output even whe
 > For framework-based solutions, the `Logic` + `Plugins` setup is the recommended default.
 > It keeps your business logic referenceable and avoids the problems that appear when other projects start referencing merged outputs.
 
+### 6.3 Generate early-bound classes
+
+The package-generated early-bound tooling uses Power Platform CLI (`pac modelbuilder`) to generate strongly typed Dataverse entity classes.
+
+Configure:
+
+    Tools/EarlyBound/EarlyBoundSettings.json
+
+Then authenticate with Power Platform CLI and run from the plugin project root:
+
+    .\Tools\EarlyBound\GenerateEarlyBound.bat
+
+Generated C# files are written to:
+
+    EarlyBound/
+
+Use this when you want typed Dataverse entities, generated field constants, or typed attribute selection in plugin registration metadata.
+
+> [!NOTE]
+> See [Early-Bound Entity Generation](./early-bound-generation.md) for the full setup, settings, and troubleshooting guide.
+
 ---
 
 ## 7. Create your solution `PluginBase`
@@ -515,6 +537,7 @@ Continue with:
 - [Step Configuration](./step-configuration.md)
 - [Architecture](./architecture.md)
 - [Plugin Registration API](./plugin-registration-api.md)
+- [Early-Bound Entity Generation](./early-bound-generation.md)
 - [Deployment Plugins](./deployment-plugins.md)
 - [Testing Overview](../tests/testing.md)
 

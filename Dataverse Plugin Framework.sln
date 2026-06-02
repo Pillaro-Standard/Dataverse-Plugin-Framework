@@ -55,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{04AD
 		docs\plugins\data-access.md = docs\plugins\data-access.md
 		docs\plugins\data-service.md = docs\plugins\data-service.md
 		docs\plugins\deployment-plugins.md = docs\plugins\deployment-plugins.md
+		docs\plugins\early-bound-generation.md = docs\plugins\early-bound-generation.md
 		docs\plugins\error-handling.md = docs\plugins\error-handling.md
 		docs\plugins\execution-pipeline.md = docs\plugins\execution-pipeline.md
 		docs\plugins\getting-started.md = docs\plugins\getting-started.md

@@ -16,6 +16,7 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
+| 🧱 [Generated Tooling](#-generated-tooling)                | Use package-generated local tools for ILMerge, deployment, and early-bound generation |
 | 🚚 [Deployment Plugins](#-deployment-plugins)              | Deploy plugins precisely, repeatably, and without accidental duplicates      |
 | 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
@@ -72,6 +73,24 @@ Use this section when you are building Dataverse plugins with the framework.
 | [Autonumbering](./plugins/autonumbering.md) | Number sequence generation and related patterns | ✅ |
 | [Logging](./plugins/logging.md) | Runtime logging and diagnostics | ✅ |
 | [Error Handling](./plugins/error-handling.md) | Exceptions, validation failures, and runtime behavior | ✅ |
+
+---
+
+## 🧱 Generated Tooling
+
+The framework package creates local tooling in consuming plugin projects after rebuild. These tools help developers keep repeatable project operations close to the plugin source code.
+
+Generated tooling covers three areas:
+
+- `Tools/ILMerge/` - prepared merge tooling and post-build action templates for producing one deployable Dataverse plugin assembly
+- `Tools/Deployment/` - deployment wrappers for publishing the plugin assembly and synchronizing registration metadata
+- `Tools/EarlyBound/` - Power Platform CLI wrapper and settings for generating strongly typed Dataverse entity classes
+
+| Document | Description | Status |
+|---|---|---|
+| [ILMerge Post-Build Tooling](./plugins/getting-started.md#61-choose-the-correct-ilmerge-post-build-action) | Prepare the final single plugin assembly required by Dataverse deployment | ✅ |
+| [Early-Bound Entity Generation](./plugins/early-bound-generation.md) | Generate strongly typed Dataverse entity classes using Power Platform CLI | ✅ |
+| [Deployment Plugins](./plugins/deployment-plugins.md) | Deploy plugin assemblies and synchronize registration metadata | ✅ |
 
 ---
 
@@ -180,6 +199,7 @@ Repository-level policies and contribution guidance.
 6. [Execution Pipeline](./plugins/execution-pipeline.md)
 7. [Data Access](./plugins/data-access.md)
 8. [DataService](./plugins/data-service.md)
+9. [Early-Bound Entity Generation](./plugins/early-bound-generation.md)
 
 ### I want to deploy plugins
 
@@ -217,5 +237,6 @@ Repository-level policies and contribution guidance.
 
 - [Getting Started](./plugins/getting-started.md) - Start building Dataverse plugins with the framework.
 - [Plugin Registration API](./plugins/plugin-registration-api.md) - Configure plugin registration metadata in code.
+- [Early-Bound Entity Generation](./plugins/early-bound-generation.md) - Generate Dataverse entity classes with Power Platform CLI.
 - [Deployment Plugins](./plugins/deployment-plugins.md) - Deploy plugin assemblies and plugin steps into Dataverse.
 - [Testing Overview](./tests/testing.md) - Build integration tests against Dataverse.
