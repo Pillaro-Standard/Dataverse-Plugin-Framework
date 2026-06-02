@@ -150,13 +150,23 @@ Relative paths in `PillaroSettings.json` are resolved from the folder where `Pil
 
 ## Connection string
 
-The deployment tool reads the Dataverse connection string from an environment variable.
+The deployment tool reads the Dataverse connection string from an environment variable. The generated wrappers do not store or create the connection string; they only read the variable named in `PillaroSettings.json`.
 
 Default variable name:
 
 ```text
 DV_CONN
 ```
+
+Recommended local Windows setup:
+
+1. Open **System Properties**.
+2. Open **Environment Variables**.
+3. Under **User variables**, add a new variable named `DV_CONN`.
+4. Set its value to the Dataverse connection string.
+5. Restart Visual Studio, PowerShell, or the terminal before running deployment.
+
+This makes the connection string available for local deployment without setting it again in every terminal session.
 
 PowerShell, current terminal session:
 
@@ -173,7 +183,7 @@ PowerShell, current Windows user:
     'User')
 ```
 
-Restart Visual Studio, PowerShell or your terminal after setting a user-level environment variable.
+The PowerShell user-level example writes the same kind of user environment variable as the Windows **Environment Variables** dialog.
 
 Do not commit connection strings or secrets into source control.
 

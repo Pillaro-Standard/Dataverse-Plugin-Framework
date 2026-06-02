@@ -209,7 +209,15 @@ Example changelog structure:
     ### Pillaro.Dataverse.PluginFramework.Testing
     - Testing-specific changes
 
-NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file.
+NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file through the branch used to build the package.
+
+Examples:
+
+- stable releases built from `main` link to `main/CHANGELOG.md`
+- release candidates built from a release branch link to that release branch
+- preview builds built from a development branch link to that development branch
+
+The package metadata should not point to a specific commit for release notes. Keeping the link branch-based allows documentation and changelog clarifications to be updated in the release branch without rebuilding and republishing the package.
 
 ---
 

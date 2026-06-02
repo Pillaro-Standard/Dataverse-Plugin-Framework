@@ -455,7 +455,23 @@ jobs:
           script: |
             Add-Type -AssemblyName System.Xml
 
-            $releaseNotesUrl = "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/$(Build.SourceVersion)/CHANGELOG.md"
+            $sourceRef = "$(Build.SourceBranch)"
+
+            if ($sourceRef -match "^refs/heads/(.+)$") {
+              $releaseNotesRef = $Matches[1]
+            }
+            elseif ($sourceRef -match "^refs/tags/(.+)$") {
+              $releaseNotesRef = $Matches[1]
+              Write-Warning "Build.SourceBranch points to tag '$releaseNotesRef'. Release notes will point to the tag because no source branch is available in the build context."
+            }
+            else {
+              throw "Unsupported Build.SourceBranch '$sourceRef'. Expected refs/heads/<branch> or refs/tags/<tag>."
+            }
+
+            $releaseNotesUrl = "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/$releaseNotesRef/CHANGELOG.md"
+            Write-Host "##vso[task.setvariable variable=RELEASE_NOTES_REF]$releaseNotesRef"
+            Write-Host "##vso[task.setvariable variable=RELEASE_NOTES_URL]$releaseNotesUrl"
+
             $nuspecPaths = @(
               "$(Build.SourcesDirectory)/$(frameworkNuspecPath)",
               "$(Build.SourcesDirectory)/$(testingNuspecPath)"
@@ -515,7 +531,7 @@ jobs:
             Add-Type -AssemblyName System.IO.Compression.FileSystem
 
             $packageVersion = "$(PACKAGE_VERSION)"
-            $expectedReleaseNotes = "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/$(Build.SourceVersion)/CHANGELOG.md"
+            $expectedReleaseNotes = "$(RELEASE_NOTES_URL)"
             $packages = Get-ChildItem "$(Build.ArtifactStagingDirectory)" -Filter *.nupkg
 
             if (-not $packages) {
@@ -585,10 +601,10 @@ jobs:
                 $actualReleaseNotes = $releaseNotesNode.InnerText
                 Write-Host "  ReleaseNotes: $actualReleaseNotes"
 
-                foreach ($blockedSegment in @('/blob/main/', '/blob/develop/', '/blob/release/')) {
-                  if ($actualReleaseNotes -like "*$blockedSegment*") {
-                    throw "Package '$($package.Name)' has invalid releaseNotes '$actualReleaseNotes'. It must point to the source commit URL and not a branch URL containing '$blockedSegment'."
-                  }
+                $sourceCommitReleaseNotes = "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/$(Build.SourceVersion)/CHANGELOG.md"
+
+                if ($actualReleaseNotes -eq $sourceCommitReleaseNotes) {
+                  throw "Package '$($package.Name)' has invalid releaseNotes '$actualReleaseNotes'. It must point to the source branch or tag, not the exact source commit."
                 }
 
                 if ($actualReleaseNotes -ne $expectedReleaseNotes) {
