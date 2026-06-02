@@ -1,160 +1,52 @@
 ﻿# Pillaro.Dataverse.PluginFramework.Plugins
 
-This project contains Dataverse plugin implementations and related logic used by the Pillaro Framework.
+This project contains Dataverse plugins that are part of the Pillaro Dataverse Plugin Framework model-driven application solution.
 
-## Structure Overview
+It is not a template project for customer plugins and it is not the main onboarding project for the NuGet package.
 
-The project follows a simple and consistent structure to keep responsibilities clear and easy to navigate:
+## Purpose
 
-* **Plugins/**
+The project contains framework-owned plugin logic required by the model-driven application solution.
 
-  * Contains plugin entry points (e.g. `AutonumberingPlugin`)
-  * Each plugin represents a Dataverse execution entry
+At the moment, the only supported functionality in this project is:
 
-* **Tasks/**
+- autonumbering support
+- `GetAutoNumber` plugin/task used by the framework autonumbering feature
 
-  * Contains executable units (use-cases)
-  * Each task represents a single operation triggered by a plugin
+No customer-specific business plugins should be added to this project.
 
-* **Features/**
+## Current Functionality
 
-  * Groups feature-specific logic
-  * Contains supporting components used by tasks (renderers, providers, helpers, etc.)
-  * Example: `Autonumbering/`
+### Autonumbering
 
-## Execution Flow
+The project provides the plugin logic required for the framework autonumbering functionality.
 
-1. Dataverse triggers a plugin
-2. The plugin maps execution to a Task
-3. The Task performs validation and execution using Feature components
+The autonumbering feature is used by the model-driven application solution to generate configured numbers for Dataverse records.
 
-## Task Model
+Current implementation:
 
-Tasks are the core execution units of the framework.
+- plugin area: `Autonumbering`
+- task: `GetAutoNumber`
+- purpose: generate autonumbering values based on framework configuration stored in Dataverse
 
-Each task:
+## Relationship to the Framework Solution
 
-* Inherits from a generic base class
-* Has two distinct phases:
+This project belongs to the deployable framework solution.
 
-  * **Validation** – checks whether execution is allowed
-  * **Execution** – performs the actual logic
+It is part of the internal Pillaro Dataverse Plugin Framework application/runtime package and should be maintained together with the framework solution components.
 
-### Task Types
+It should stay focused only on plugin behavior required by the framework solution itself.
 
-Tasks can be implemented in two ways:
+## Deployment
 
-* **Typed (entity-specific)**
+The compiled plugin assembly is deployed as part of the framework solution deployment process.
 
-  * Designed for a specific Dataverse entity
-  * Most common approach
-
-* **Generic (multi-entity)**
-
-  * Works across multiple entities
-  * Useful for cross-cutting logic
-
-## Design Principles
-
-* Plugins are **thin entry points**
-* Tasks contain **application logic orchestration**
-* Features contain **feature-specific implementation details**
-* No unnecessary abstraction layers (e.g. generic services) are introduced to keep the code simple and explicit
-
-This structure ensures:
-
-* high readability
-* clear separation of concerns
-* easy onboarding for new contributors
-
-## Plugin Registration
-
-Plugin registration is defined directly on plugin classes using `CrmPluginRegistration` attributes.
-
-Each attribute represents a Dataverse plugin step.
-
-Step identification can be handled in two ways:
-
-* **Explicit ID (recommended)**
-  * Define a fixed GUID using the `Id` property
-  * Ensures stable and predictable deployments
-
-* **SPKL-managed ID**
-  * Omit the `Id` in code
-  * Use `spkl instrumentplugin` (Plugin.bat) to pull the ID from Dataverse and inject it into the code
-
-Key rules:
-
-* Each step must have a **stable unique ID across deployments**
-* This ensures **idempotent deployments** and prevents duplicate step creation
-* SPKL is used to deploy the plugin assembly and synchronize registration into Dataverse
-
-## Build & Deployment
-
-* Plugins must be built using a **strong name key (`.snk`)**
-* SPKL configuration is defined in `spkl.json`
-* Early bound types are generated via `EarlyBoundTypes.cs`
-
-## Adding a New Plugin
-
-1. Create a new plugin class in `Plugins/`
-2. Add one or more `CrmPluginRegistration` attributes with fixed GUIDs
-3. Register a Task in the plugin constructor using `RegisterTask<TTask>(...)`
-4. Implement the task in `Tasks/`
-5. Add supporting logic into `Features/<FeatureName>/`
-6. Deploy using SPKL
-
-## Example
-
-A working example is available in the project:
-
-* Plugin: `AutonumberingPlugin`
-* Task: `GetAutoNumber`
-* Feature: `Autonumbering`
-
-This example demonstrates:
-
-* plugin → task mapping
-* task validation and execution flow
-* feature-based implementation structure
-
-## Diagnostics & Logging
-
-The framework provides detailed diagnostic logging stored directly in Dataverse.
-
-Each execution records:
-
-* executed plugin and task
-* validation and execution phases
-* input data and context
-* execution time and correlation identifiers
-
-These logs are available in the Pillaro Framework application and allow full traceability of plugin execution.
+Plugin registration metadata should stay aligned with the actual framework solution components that depend on this plugin behavior.
 
 ## Versioning
 
-Each plugin execution log includes a **framework version**, defined in `PluginBase`.
+The plugin project uses the framework plugin versioning model.
 
-The version is returned from a method (e.g. `GetSolutionVersion()`) and must be maintained manually or via build automation.
+Plugin execution logs use the version returned from `PluginBase.GetVersion()`.
 
-Why this matters:
-
-* allows linking errors to a specific deployed version
-* helps determine whether a fix is already deployed or not
-* enables reliable troubleshooting in shared environments
-
-Current approach:
-
-* version is **manually updated in code**, or
-* injected via **CI/CD pipeline (recommended for production)**
-
-There is currently no automatic versioning mechanism built into the framework.
-
-## Scope
-
-This project focuses only on plugin execution and related logic.
-It does not aim to provide a full application framework or domain layer.
-
-## Notes
-
-* This project intentionally stays minimal
+Keep the version aligned with the framework release when publishing or deploying a new version of the framework solution.

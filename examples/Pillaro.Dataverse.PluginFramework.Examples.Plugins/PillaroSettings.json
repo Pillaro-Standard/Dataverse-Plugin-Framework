@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "solution": "PillaroPluginFrameworkExamples",
+  "dataverse": {
+    "connectionStringEnvironmentVariable": "DV_CONN"
+  },
+  "defaultProfile": "debug",
+  "profiles": {
+    "debug": {
+      "pluginAssemblyPath": "bin/Debug/Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
+    },
+    "release": {
+      "pluginAssemblyPath": "bin/Release/Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
+    },
+    "ci": {
+      "pluginAssemblyPath": "$(BUILD_BINARIESDIRECTORY)/Pillaro.Dataverse.PluginFramework.Examples.Plugins.dll"
+    }
+  }
+}

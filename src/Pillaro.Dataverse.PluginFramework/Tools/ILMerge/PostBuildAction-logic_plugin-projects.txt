@@ -25,7 +25,7 @@ rename "$(TargetDir)$(TargetFileName)" "ForMerge$(TargetFileName)"
  "$(TargetDir)ForMerge$(TargetFileName)" ^
  "$(TargetDir)Pillaro.Dataverse.PluginFramework.dll" ^
  "$(TargetDir)Newtonsoft.Json.dll" ^
- "$(TargetDir){LOGIC_ASSEMBLY}
+ "$(TargetDir){LOGIC_ASSEMBLY}"
  
 
 del "$(TargetDir)ForMerge$(TargetFileName)"

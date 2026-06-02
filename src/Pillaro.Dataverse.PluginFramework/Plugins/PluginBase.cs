@@ -3,22 +3,21 @@ using Pillaro.Dataverse.PluginFramework.Exceptions;
 using Pillaro.Dataverse.PluginFramework.Logging.Enums;
 using Pillaro.Dataverse.PluginFramework.Logging;
 using Pillaro.Dataverse.PluginFramework.Logging.Models;
+using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Tasks;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Pillaro.Dataverse.PluginFramework.Plugins;
 
-public abstract class PluginBase : IPlugin
+public abstract class PluginBase(string unsecureConfig, string secureConfig) : IPlugin
 {
     private readonly List<PluginRegistration> _registeredEvents = [];
-    private readonly string _secureConfig;
-    private readonly string _unsecureConfig;
+    private readonly string _secureConfig = secureConfig;
+    private readonly string _unsecureConfig = unsecureConfig;
 
-    public PluginBase(string unsecureConfig, string secureConfig)
+    public virtual void Register(IPluginRegistration registration)
     {
-        _secureConfig = secureConfig;
-        _unsecureConfig = unsecureConfig;
     }
 
     public void Execute(IServiceProvider serviceProvider)
@@ -31,17 +30,16 @@ public abstract class PluginBase : IPlugin
         {
             var stop = Stopwatch.StartNew();
 
-            var execContext = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
-            if (execContext == null)
-                throw new ArgumentNullException(nameof(execContext));
+            var execContext = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext)) 
+                ?? throw new InvalidOperationException($"Required service '{nameof(IPluginExecutionContext)}' was not provided by IServiceProvider.");
 
             var taskContext = new TaskContext(_unsecureConfig, _secureConfig, execContext);
             if (taskContext.PluginExecutionContext == null)
-                throw new ArgumentNullException(nameof(taskContext.PluginExecutionContext));
+                throw new InvalidOperationException(
+                    $"{nameof(TaskContext)}.{nameof(TaskContext.PluginExecutionContext)} was not initialized.");
 
-            var orgServiceFactory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
-            if (orgServiceFactory == null)
-                throw new ArgumentNullException(nameof(orgServiceFactory));
+            var orgServiceFactory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory))
+                ?? throw new InvalidOperationException($"Required service '{nameof(IOrganizationServiceFactory)}' was not provided by IServiceProvider.");
 
             var userOrgSvc = orgServiceFactory.CreateOrganizationService(execContext.UserId);
             var adminOrgSvc = orgServiceFactory.CreateOrganizationService(null);
@@ -149,7 +147,7 @@ public abstract class PluginBase : IPlugin
         }
     }
 
-    private void EnrichLogWithParametersAndImages(Log log, IPluginExecutionContext ctx)
+    private static void EnrichLogWithParametersAndImages(Log log, IPluginExecutionContext ctx)
     {
         if (log == null || ctx == null)
             return;

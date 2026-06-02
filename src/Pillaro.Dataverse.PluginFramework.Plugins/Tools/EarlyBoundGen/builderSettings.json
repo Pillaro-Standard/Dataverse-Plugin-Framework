@@ -1,0 +1,28 @@
+{
+  "suppressINotifyPattern": true,
+  "suppressGeneratedCodeAttribute": true,
+  "language": "CS",
+  "logLevel": "Off",
+
+  "namespace": "Pillaro.Dataverse.PluginFramework.Plugins",
+  "serviceContextName": "ServiceContext",
+
+  "generateSdkMessages": true,
+  "generateGlobalOptionSets": true,
+
+  "emitFieldsClasses": true,
+  "emitEntityETC": false,
+  "emitVirtualAttributes": false,
+
+  "entityTypesFolder": "Entities",
+  "messagesTypesFolder": "Messages",
+  "optionSetsTypesFolder": "OptionSets",
+
+  "entityNamesFilter": [
+    "pl_autonumbering"
+  ],
+
+  "messageNamesFilter": [
+    "pl_AutoNumbering_GetNewNumber"
+  ]
+}

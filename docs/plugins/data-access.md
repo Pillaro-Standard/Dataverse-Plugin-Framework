@@ -17,7 +17,7 @@
 - [💡 Why `DataService` matters](#-why-dataservice-matters)
 - [💻 Example](#-example)
 - [✅ Design recommendations](#-design-recommendations)
-- [➡️ Related documents](#-related-documents)
+- [➡️ Related documents](#️-related-documents)
 
 ---
 
@@ -266,9 +266,5 @@ Continue with:
 - [Task Model](./task-model.md)
 - [Validation Model](./validation.md)
 - [Getting Started](./getting-started.md)
-- [Architecture](../architecture.md)
-- [DataService](./data-service.md)
-
-Planned next topic:
-
+- [Architecture](./architecture.md)
 - [DataService](./data-service.md)

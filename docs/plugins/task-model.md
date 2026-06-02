@@ -18,7 +18,7 @@
 - [💻 Example](#-example)
 - [⚠️ User-facing business failures](#-user-facing-business-failures)
 - [✅ Design recommendations](#-design-recommendations)
-- [➡️ Related documents](#-related-documents)
+- [➡️ Related documents](#️-related-documents)
 
 ---
 
@@ -311,7 +311,6 @@ Continue with:
 - [Plugin Model](./plugin-model.md)
 - [Validation Model](./validation.md)
 - [Data Access](./data-access.md)
-- [Architecture](../architecture.md)
-- [Execution Pipeline](../execution-pipeline.md)
-- [Data Access](./data-access.md)
+- [Architecture](./architecture.md)
+- [Execution Pipeline](./execution-pipeline.md)
 - [DataService](./data-service.md)

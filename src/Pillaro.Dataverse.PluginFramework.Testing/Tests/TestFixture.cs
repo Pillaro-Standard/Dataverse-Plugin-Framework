@@ -21,7 +21,7 @@ public class TestFixture<TAutofacModule>
         Container = builder.Build();
     }
 
-    private IConfiguration GetConfiguration()
+    private static IConfiguration GetConfiguration()
     {
         return new ConfigurationBuilder()
          .SetBasePath(Directory.GetCurrentDirectory())

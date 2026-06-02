@@ -1,41 +1,66 @@
 using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
+using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
-    [CrmPluginRegistration("Create", 
-    "task", StageEnum.PreOperation, ExecutionModeEnum.Synchronous,
-    "subject","Pillaro Examples Pre Create Task", 1, 
-    IsolationModeEnum.Sandbox 
-    ,Id = "f94d984d-0f31-f111-88b4-000d3ab2695d" 
-    )]
-    [CrmPluginRegistration("Create",
-    "task", StageEnum.PostOperation, ExecutionModeEnum.Synchronous,
-    "","Pillaro Examples Post Create Task", 2,
-    IsolationModeEnum.Sandbox
-    ,Id = "a14d984d-0f31-f111-88b4-000d3ab2695d"
-    )]
-    [CrmPluginRegistration("Update",
-    "task", StageEnum.PostOperation, ExecutionModeEnum.Synchronous,
-    "regardingobjectid,scheduledend,statecode,statuscode","Pillaro Examples Post Update Task", 3,
-    IsolationModeEnum.Sandbox
-    ,Id = "b24d984d-0f31-f111-88b4-000d3ab2695d"
-    ,Image1Name = "image"
-    ,Image1Type = ImageTypeEnum.PreImage
-    ,Image1Attributes = "regardingobjectid,scheduledend,statecode,statuscode,actualend"
-    ,Image2Name = "image"
-    ,Image2Type = ImageTypeEnum.PostImage
-    ,Image2Attributes = "regardingobjectid,scheduledend,statecode,statuscode,actualend"
-    )]
     public class TaskPlugin : PluginBase
     {
+        private const string SolutionName = "PillaroPluginFrameworkExamples";
+
         public TaskPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
-            //Pre
             RegisterTask<Tasks.Task.AutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName, PluginMode.Synchronous);
-
-            //Post
             RegisterTask<SummarySync>(PluginStage.Postoperation, ["Create", "Update"], Task.EntityLogicalName, PluginMode.Synchronous);
+        }
+
+        public override void Register(IPluginRegistration registration)
+        {
+            registration
+                .OnCreate<Task>("f94d984d-0f31-f111-88b4-000d3ab2695d")
+                .PreOperation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .WithName("Pillaro Examples Pre Create Task")
+                .Rank(1)
+                .WithFilteringAttributes("subject");
+
+            registration
+                .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
+                .PostOperation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .WithName("Pillaro Examples Post Create Task")
+                .Rank(2);
+
+            registration
+                .OnUpdate<Task>("b24d984d-0f31-f111-88b4-000d3ab2695d")
+                .PostOperation()
+                .Synchronous()
+                .InSolution(SolutionName)
+                .WithName("Pillaro Examples Post Update Task")
+                .Rank(3)
+                .WhenChanged(
+                    "regardingobjectid",
+                    "scheduledend",
+                    "statecode",
+                    "statuscode")
+                .WithPreImage(
+                    "b34d984d-0f31-f111-88b4-000d3ab2695d",
+                    "image",
+                    "regardingobjectid",
+                    "scheduledend",
+                    "statecode",
+                    "statuscode",
+                    "actualend")
+                .WithPostImage(
+                    "b44d984d-0f31-f111-88b4-000d3ab2695d",
+                    "image",
+                    "regardingobjectid",
+                    "scheduledend",
+                    "statecode",
+                    "statuscode",
+                    "actualend");
         }
     }
 }
