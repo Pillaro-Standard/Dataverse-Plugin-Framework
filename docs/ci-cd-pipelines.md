@@ -143,9 +143,17 @@ Determines version suffix and target audience:
 
 #### Release Notes
 
-NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file.
+NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file through the source branch used by the package build.
 
-This keeps package metadata simple while the detailed release history stays in one maintained place.
+This keeps package metadata simple while the detailed release history stays in one maintained place. It also allows release-branch documentation and changelog corrections without rebuilding the NuGet package.
+
+The packaging pipeline stamps both framework package nuspec files with:
+
+```text
+https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/<source-branch>/CHANGELOG.md
+```
+
+Package verification rejects release notes that point to the exact source commit instead of the source branch.
 
 ### Environment Variables
 

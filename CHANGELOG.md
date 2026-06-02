@@ -4,9 +4,10 @@
 
 ### Pillaro.Dataverse.PluginFramework
 
-- Added code-first plugin registration metadata API through `Register(IPluginRegistration registration)`.
-- Added deployment CLI support for Dataverse plugin assembly deployment and plugin step/image synchronization.
+- Added code-first plugin registration metadata API through `Register(IPluginRegistration registration)`. See [Plugin Registration API](docs/plugins/plugin-registration-api.md).
+- Added deployment CLI support for Dataverse plugin assembly deployment and plugin step/image synchronization. See [Deployment Plugins](docs/plugins/deployment-plugins.md).
 - Added generated deployment tooling for consuming plugin projects, including `PillaroSettings.json`, deployment wrappers, and deployment documentation.
+- Added generated early-bound entity generation tooling for consuming plugin projects, including `Tools/EarlyBound/GenerateEarlyBound.bat`, user-owned `Tools/EarlyBound/EarlyBoundSettings.json`, package-managed tooling documentation, and Power Platform CLI (`pac modelbuilder`) support. See [Early-Bound Entity Generation](docs/plugins/early-bound-generation.md).
 - Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
 - Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing.
 - Added unsecure configuration details to logs and masked secure configuration values by logging only that secure configuration is registered.

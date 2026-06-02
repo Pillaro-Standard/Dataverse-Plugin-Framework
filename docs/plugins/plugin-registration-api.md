@@ -127,6 +127,8 @@ registration
 
 Typed selection is available for `OnUpdate<TEntity>(...)` steps. It keeps the entity type from `OnUpdate<Contact>(...)` through the fluent chain, so only properties from `Contact` are offered by IntelliSense.
 
+If you need to generate these types for your solution, see [Early-Bound Entity Generation](./early-bound-generation.md).
+
 ## Filtering Attributes
 
 Filtering attributes can be declared for Create and Update steps in this framework registration metadata.
@@ -251,6 +253,7 @@ The deployment manifest validator enforces basic safety rules:
 
 ## ➡️ Related documents
 
+- [Early-Bound Entity Generation](./early-bound-generation.md) - Generate strongly typed Dataverse entity classes.
 - [Deployment Plugins](./deployment-plugins.md) - Deploy registered plugin steps into Dataverse.
 - [Plugin Model](./plugin-model.md) - Understand how plugin classes and runtime task registration fit together.
 - [Plugin Step Configuration](./step-configuration.md) - Configure unsecure and secure values for plugin steps.

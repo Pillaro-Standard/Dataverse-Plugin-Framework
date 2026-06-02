@@ -64,6 +64,7 @@ This framework introduces a consistent structure:
 - behavior is deterministic and explicit
 - plugin registration metadata is defined in code
 - deployment can precisely create or update the intended Dataverse plugin components
+- generated early-bound entity classes can be created from Dataverse metadata using Power Platform CLI tooling
 - built-in testing support
 - built-in diagnostic logging
 
@@ -108,6 +109,22 @@ This solves one of the most common operational problems in Dataverse plugin deli
 Developers can deploy from the generated local tooling during implementation, while teams can run the same deployment process from Azure DevOps pipelines or any other DevOps automation capable of building the plugin assembly and executing the deployment script.
 
 See [Plugin Registration API](docs/plugins/plugin-registration-api.md) and [Deployment Plugins](docs/plugins/deployment-plugins.md) for the registration and deployment workflow.
+
+---
+
+### Early-Bound Entity Generation
+
+The framework package also prepares generated tooling for early-bound entity generation in consuming plugin projects.
+
+After rebuilding the plugin project, the package creates `Tools/EarlyBound/` with:
+
+- `EarlyBoundSettings.json` for selecting entities, messages, namespace, and generation options
+- `GenerateEarlyBound.bat` as the local wrapper around Power Platform CLI `pac modelbuilder`
+- a generated README that explains the local tool files
+
+This helps teams generate strongly typed Dataverse classes, field constants, and optional message classes directly from environment metadata. Those generated types can then be used in task code and in the registration API for typed filtering attributes and images.
+
+See [Early-Bound Entity Generation](docs/plugins/early-bound-generation.md) for the full workflow.
 
 ---
 
@@ -278,6 +295,7 @@ Start with the implementation guide:
 - [Getting Started](docs/plugins/getting-started.md)
 - [Plugin Registration API](docs/plugins/plugin-registration-api.md)
 - [Deployment Plugins](docs/plugins/deployment-plugins.md)
+- [Early-Bound Entity Generation](docs/plugins/early-bound-generation.md)
 
 ---
 

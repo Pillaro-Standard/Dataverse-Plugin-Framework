@@ -14,6 +14,7 @@ This README is included in the NuGet package so consumers can understand package
 - Validation-level logging — each validation rule produces a clear log message explaining why the task did or did not execute.
 - Structured logging and conventions suitable for diagnostics and automated testing.
 - Opinionated helpers for common scenarios (e.g. autonumbering, entity images, deterministic execution patterns).
+- Generated local tooling for early-bound entity generation through Power Platform CLI (`pac modelbuilder`).
 
 ---
 
@@ -156,9 +157,25 @@ Choose the variant that matches your project structure.
 
 7. Build the plugin project.
 
-After signing and post-build configuration, the project produces a single merged assembly ready for deployment. The package also generates deployment helpers in `Tools/Deployment/` and a `PillaroSettings.json` file in the plugin project root.
+After signing and post-build configuration, the project produces a single merged assembly ready for deployment. The package also generates deployment helpers in `Tools/Deployment/`, early-bound generation helpers in `Tools/EarlyBound/`, and a `PillaroSettings.json` file in the plugin project root.
 
-8. Deploy the plugin assembly.
+8. Optional: generate early-bound entity classes.
+
+The package generates early-bound helpers after rebuild:
+
+~~~text
+Tools/EarlyBound/
+~~~
+
+Configure `Tools/EarlyBound/EarlyBoundSettings.json`, authenticate with Power Platform CLI, and run:
+
+~~~bat
+Tools\EarlyBound\GenerateEarlyBound.bat
+~~~
+
+Generated C# files are written to `EarlyBound/` in the project root.
+
+9. Deploy the plugin assembly.
 
 Recommended tools:
 
