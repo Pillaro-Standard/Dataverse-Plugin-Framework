@@ -1,66 +1,74 @@
-<Project>
+﻿<Project>
 
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <OutputType>Library</OutputType>
-    <IsPackable>false</IsPackable>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<PropertyGroup>
+		<TargetFramework>net481</TargetFramework>
+		<OutputType>Library</OutputType>
+		<IsPackable>false</IsPackable>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <CreateVsixContainer>true</CreateVsixContainer>
-    <GeneratePkgDefFile>false</GeneratePkgDefFile>
-    <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
-    <IncludeAssemblyFromOutputFolderInVSIXContainer>false</IncludeAssemblyFromOutputFolderInVSIXContainer>
-    <IncludeCopyLocalReferencesInVSIXContainer>false</IncludeCopyLocalReferencesInVSIXContainer>
-    <VsixDeployOnDebug>false</VsixDeployOnDebug>
-    <DeployExtension>false</DeployExtension>
+		<CreateVsixContainer>true</CreateVsixContainer>
+		<VsixType>v3</VsixType>
 
-    <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\..\artifacts\templates</ArtifactsDirectory>
-    <TemplateOutputDirectory>$(MSBuildProjectDirectory)\obj\$(Configuration)\template</TemplateOutputDirectory>
-    <TemplateZipPath>$(TemplateOutputDirectory)\Pillaro.Dataverse.PluginTemplate.zip</TemplateZipPath>
-    <VsixPath>$(ArtifactsDirectory)\Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix</VsixPath>
-    <TargetVsixContainer>$(VsixPath)</TargetVsixContainer>
-  </PropertyGroup>
+		<GeneratePkgDefFile>false</GeneratePkgDefFile>
+		<IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
+		<IncludeAssemblyFromOutputFolderInVSIXContainer>false</IncludeAssemblyFromOutputFolderInVSIXContainer>
+		<IncludeCopyLocalReferencesInVSIXContainer>false</IncludeCopyLocalReferencesInVSIXContainer>
+		<VsixDeployOnDebug>false</VsixDeployOnDebug>
+		<DeployExtension>false</DeployExtension>
 
-  <ItemGroup>
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logic\Plugins\ExamplePlugin.cs" />
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logic\Plugins\PluginBase.cs" />
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logic\Tasks\Example\ExampleTask.cs" />
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Plugins\PluginAssemblyInfo.cs" />
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\TestAutofacModule.cs" />
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Tests\ExampleTests.cs" />
-    <Compile Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Tests\TestBase.cs" />
-  </ItemGroup>
+		<ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\..\artifacts\templates</ArtifactsDirectory>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2142" PrivateAssets="all" />
-  </ItemGroup>
+		<ManualTemplateZip>$(MSBuildProjectDirectory)\ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip</ManualTemplateZip>
+		<BuiltVsixPath>$(OutputPath)$(AssemblyName).vsix</BuiltVsixPath>
+		<ArtifactVsixPath>$(ArtifactsDirectory)\Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix</ArtifactVsixPath>
 
-  <ItemGroup>
-    <Content Include="Assets\Logo128.png">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>Assets</VSIXSubPath>
-    </Content>
-    <Content Include="$(TemplateZipPath)">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
-    </Content>
-  </ItemGroup>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj" />
-    <None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Plugins\Pillaro.Dataverse.PluginTemplate.Plugins.csproj" />
-    <None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Data\**" />
+	  <EmbeddedResource Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Tests\**" />
+	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Data\**" />
+	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Tests\**" />
+	</ItemGroup>
 
-  <Target Name="BuildVisualStudioProjectTemplate" BeforeTargets="GetVsixSourceItems">
-    <MakeDir Directories="$(ArtifactsDirectory);$(TemplateOutputDirectory)" />
-    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\visual-studio\build-template.ps1&quot; -OutputDirectory &quot;$(TemplateOutputDirectory)&quot;" />
-  </Target>
+	<ItemGroup>
+	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Plugins\key.snk" />
+	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\appsettings.Development.json" />
+	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\appsettings.json" />
+	</ItemGroup>
 
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
+	<ItemGroup>
+		<PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2142" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\Logo128.png">
+			<IncludeInVSIX>true</IncludeInVSIX>
+			<VSIXSubPath>Assets</VSIXSubPath>
+		</Content>
+
+		<Content Include="ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip">
+			<IncludeInVSIX>true</IncludeInVSIX>
+			<VSIXSubPath>ProjectTemplates</VSIXSubPath>
+		</Content>
+	</ItemGroup>
+
+	<Target Name="ValidateProjectTemplateZip" BeforeTargets="Build">
+		<Error Condition="!Exists('$(ManualTemplateZip)')" Text="Missing Visual Studio project template ZIP: $(ManualTemplateZip)" />
+	</Target>
+
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
+	<ItemGroup>
+	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\BannedSymbols.txt" />
+	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\vs-threading.LegacyThreadSwitchingMembers.txt" />
+	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\vs-threading.MainThreadAssertingMethods.txt" />
+	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\vs-threading.MainThreadSwitchingMethods.txt" />
+	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\vs-threading.MembersRequiringMainThread.txt" />
+	</ItemGroup>
 
 </Project>

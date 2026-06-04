@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
-  <Metadata>
-    <Identity Id="Pillaro.Dataverse.PluginTemplate.Template" Version="1.0.9" Language="en-US" Publisher="Pillaro Labs" />
-    <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
-    <Description xml:space="preserve">Creates a Dataverse plugin solution with Logic, Plugins and Tests projects.</Description>
-    <MoreInfo>https://github.com/</MoreInfo>
-    <Icon>Assets\Logo128.png</Icon>
-    <Tags>Dataverse,Power Platform,Dynamics 365,Plugin,Project Template</Tags>
-  </Metadata>
-  <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
-      <ProductArchitecture>amd64</ProductArchitecture>
-    </InstallationTarget>
-    <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,18.0)">
-      <ProductArchitecture>amd64</ProductArchitecture>
-    </InstallationTarget>
-    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
-      <ProductArchitecture>amd64</ProductArchitecture>
-    </InstallationTarget>
-  </Installation>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" />
-  </Assets>
-  <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
-  </Prerequisites>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="Pillaro.Dataverse.PluginTemplate.Template" Version="1.0.13" Language="en-US" Publisher="Pillaro Labs" />
+        <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
+        <Description xml:space="preserve">Creates a Dataverse plugin solution with Logic, Plugins and Tests projects.</Description>
+        <MoreInfo>https://github.com/</MoreInfo>
+        <Icon>Assets\Logo128.png</Icon>
+        <Tags>Dataverse,Power Platform,Dynamics 365,Plugin,Project Template</Tags>
+    </Metadata>
+    <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+    </Installation>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" d:Source="File" d:TargetPath="ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
 </PackageManifest>
