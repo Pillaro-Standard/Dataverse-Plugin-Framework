@@ -1,0 +1,64 @@
+﻿<VSTemplateManifest Version="1.0" xmlns="http://schemas.microsoft.com/developer/vstemplatemanifest/2015">
+  <VSTemplateContainer TemplateType="Project">
+    <RelativePathOnDisk>Pillaro.Dataverse.PluginTemplate\Logic</RelativePathOnDisk>
+    <TemplateFileName>Logic.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Pillaro Dataverse Logic Project</Name>
+        <Description>Logic project for Dataverse plugin orchestration and task implementation.</Description>
+        <ProjectType>CSharp</ProjectType>
+        <SortOrder>1001</SortOrder>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>DataverseProject.Logic</DefaultName>
+        <Hidden>true</Hidden>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Project">
+    <RelativePathOnDisk>Pillaro.Dataverse.PluginTemplate\Plugins</RelativePathOnDisk>
+    <TemplateFileName>Plugins.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Pillaro Dataverse Plugins Project</Name>
+        <Description>Deployable Dataverse plugin assembly project.</Description>
+        <ProjectType>CSharp</ProjectType>
+        <SortOrder>1002</SortOrder>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>DataverseProject.Plugins</DefaultName>
+        <Hidden>true</Hidden>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Project">
+    <RelativePathOnDisk>Pillaro.Dataverse.PluginTemplate\Tests</RelativePathOnDisk>
+    <TemplateFileName>Tests.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Pillaro Dataverse Tests Project</Name>
+        <Description>xUnit test project for Dataverse plugin logic.</Description>
+        <ProjectType>CSharp</ProjectType>
+        <SortOrder>1003</SortOrder>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>DataverseProject.Tests</DefaultName>
+        <Hidden>true</Hidden>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="ProjectGroup">
+    <RelativePathOnDisk>Pillaro.Dataverse.PluginTemplate</RelativePathOnDisk>
+    <TemplateFileName>Pillaro.Dataverse.PluginTemplate.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Pillaro Dataverse Plugin Template</Name>
+        <Description>Creates a Dataverse plugin solution with Logic, Plugins and Tests projects.</Description>
+        <ProjectType>CSharp</ProjectType>
+        <SortOrder>1000</SortOrder>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>Pillaro.Dataverse.PluginTemplate</DefaultName>
+        <ProvideDefaultName>true</ProvideDefaultName>
+        <LocationField>Enabled</LocationField>
+        <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+</VSTemplateManifest>

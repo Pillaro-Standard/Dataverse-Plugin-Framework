@@ -99,6 +99,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{20
 		power-platform-solutions\examples\README.md = power-platform-solutions\examples\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{D9E2BBDF-2EFE-4A06-924C-C1684226F641}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.Logic", "templates\Pillaro.Dataverse.PluginTemplate\Pillaro.Dataverse.PluginTemplate.Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj", "{22D4E159-AE72-FE28-B27A-AEAE6E2E7DB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.Plugins", "templates\Pillaro.Dataverse.PluginTemplate\Pillaro.Dataverse.PluginTemplate.Plugins\Pillaro.Dataverse.PluginTemplate.Plugins.csproj", "{8B0211C6-8277-4849-CE51-ED399EB020FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.Tests", "templates\Pillaro.Dataverse.PluginTemplate\Pillaro.Dataverse.PluginTemplate.Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj", "{6AF74CF0-CD09-3DEF-9A07-8BC34593ABD5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "visual-studio", "visual-studio", "{CF3492BF-A380-EC54-CC0B-49AEE19967FE}"
+	ProjectSection(SolutionItems) = preProject
+		templates\Pillaro.Dataverse.PluginTemplate\visual-studio\build-template.ps1 = templates\Pillaro.Dataverse.PluginTemplate\visual-studio\build-template.ps1
+		templates\Pillaro.Dataverse.PluginTemplate\visual-studio\Pillaro.Dataverse.PluginTemplate.vstemplate = templates\Pillaro.Dataverse.PluginTemplate\visual-studio\Pillaro.Dataverse.PluginTemplate.vstemplate
+		templates\Pillaro.Dataverse.PluginTemplate\visual-studio\README.md = templates\Pillaro.Dataverse.PluginTemplate\visual-studio\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "visual-studio-vsix", "visual-studio-vsix", "{6743192B-6968-4B7C-B653-C72650E70431}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix", "templates\Pillaro.Dataverse.PluginTemplate\visual-studio-vsix\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj", "{54F52063-A1CD-4358-9CF6-EB550999C61A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +156,22 @@ Global
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22D4E159-AE72-FE28-B27A-AEAE6E2E7DB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22D4E159-AE72-FE28-B27A-AEAE6E2E7DB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22D4E159-AE72-FE28-B27A-AEAE6E2E7DB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22D4E159-AE72-FE28-B27A-AEAE6E2E7DB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B0211C6-8277-4849-CE51-ED399EB020FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B0211C6-8277-4849-CE51-ED399EB020FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B0211C6-8277-4849-CE51-ED399EB020FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B0211C6-8277-4849-CE51-ED399EB020FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AF74CF0-CD09-3DEF-9A07-8BC34593ABD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AF74CF0-CD09-3DEF-9A07-8BC34593ABD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AF74CF0-CD09-3DEF-9A07-8BC34593ABD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AF74CF0-CD09-3DEF-9A07-8BC34593ABD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,11 +190,17 @@ Global
 		{3B0A10C4-61B6-4638-8AF6-3D571D1A36DE} = {B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74} = {0414BA72-E8A4-4E4D-8CD0-8ACCD277DA82}
 		{204B93AF-6340-4F3F-B0D5-7377DDB8169E} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
+		{22D4E159-AE72-FE28-B27A-AEAE6E2E7DB6} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{8B0211C6-8277-4849-CE51-ED399EB020FA} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{6AF74CF0-CD09-3DEF-9A07-8BC34593ABD5} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{CF3492BF-A380-EC54-CC0B-49AEE19967FE} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{6743192B-6968-4B7C-B653-C72650E70431} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{54F52063-A1CD-4358-9CF6-EB550999C61A} = {6743192B-6968-4B7C-B653-C72650E70431}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}
 	EndGlobalSection
 	GlobalSection(CRMSolutionProperties) = preSolution
-		        	SolutionIsBoundToCRM = True
+		SolutionIsBoundToCRM = True
 	EndGlobalSection
 EndGlobal

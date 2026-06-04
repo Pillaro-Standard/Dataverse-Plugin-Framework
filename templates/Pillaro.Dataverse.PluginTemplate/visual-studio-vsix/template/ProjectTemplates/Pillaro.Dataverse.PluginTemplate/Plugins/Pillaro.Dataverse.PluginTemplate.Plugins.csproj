@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>$safeprojectname$</RootNamespace>
+    <AssemblyName>$safeprojectname$</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PostBuildEvent>REM ============================================================
+REM Post-build merge script for Dataverse plugin projects
+REM ============================================================
+
+rename "$(TargetDir)$(AssemblyName).dll" "ForMerge$(AssemblyName).dll"
+if errorlevel 1 exit /b 1
+
+"$(NuGetPackageRoot)pillaro.dataverse.pluginframework\1.0.2\Content\tools\ILMerge\ILMerge.exe" ^
+ /keyfile:"$(ProjectDir)key.snk" ^
+ /target:library ^
+ /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" ^
+ /out:"$(TargetDir)$(AssemblyName).dll" ^
+ "$(TargetDir)ForMerge$(AssemblyName).dll" ^
+ "$(TargetDir)Pillaro.Dataverse.PluginFramework.dll" ^
+ "$(TargetDir)Newtonsoft.Json.dll" ^
+ "$(TargetDir)$ext_safeprojectname$.Logic.dll"
+if errorlevel 1 exit /b 1
+
+del "$(TargetDir)ForMerge$(AssemblyName).dll"
+del "$(TargetDir)$ext_safeprojectname$.Logic.dll"</PostBuildEvent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pillaro.Dataverse.PluginFramework" Version="1.0.2" />
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.60" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\$ext_safeprojectname$.Logic\$ext_safeprojectname$.Logic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="key.snk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
+

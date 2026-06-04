@@ -1,0 +1,24 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Pillaro Dataverse Logic Project</Name>
+    <Description>Logic project for Dataverse plugin orchestration and task implementation.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>1001</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>DataverseProject.Logic</DefaultName>
+    <Hidden>true</Hidden>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="Pillaro.Dataverse.PluginTemplate.Logic.csproj" TargetFileName="$safeprojectname$.csproj" ReplaceParameters="true">
+      <Folder Name="Plugins" TargetFolderName="Plugins">
+        <ProjectItem ReplaceParameters="true">PluginBase.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true">ExamplePlugin.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Tasks" TargetFolderName="Tasks">
+        <Folder Name="Example" TargetFolderName="Example">
+          <ProjectItem ReplaceParameters="true">ExampleTask.cs</ProjectItem>
+        </Folder>
+      </Folder>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

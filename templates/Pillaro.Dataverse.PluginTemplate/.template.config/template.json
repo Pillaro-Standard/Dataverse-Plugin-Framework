@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Pillaro Labs s.r.o.",
+  "classifications": [
+    "Dataverse",
+    "Dynamics 365",
+    "Power Platform",
+    "Plugin"
+  ],
+  "identity": "Pillaro.Dataverse.PluginTemplate.Template",
+  "name": "Pillaro Dataverse Plugin Template",
+  "shortName": "pillaro-dv-plugin",
+  "sourceName": "Pillaro.Dataverse.PluginTemplate",
+  "preferNameDirectory": true,
+  "primaryOutputs": [
+    {
+      "path": "Pillaro.Dataverse.PluginTemplate.sln"
+    }
+  ],
+  "guids": [
+    "11111111-1111-1111-1111-111111111111",
+    "22222222-2222-2222-2222-222222222222",
+    "33333333-3333-3333-3333-333333333333",
+    "44444444-4444-4444-4444-444444444444",
+    "55555555-5555-5555-5555-555555555555",
+    "66666666-6666-6666-6666-666666666666"
+  ],
+  "symbols": {
+    "dataverseSolutionName": {
+      "type": "parameter",
+      "datatype": "text",
+      "displayName": "Dataverse solution name",
+      "description": "Logical name of the Dataverse solution used by deployment tooling. It can be left empty and configured later.",
+      "defaultValue": "",
+      "replaces": "__DATAVERSE_SOLUTION_NAME__"
+    },
+    "testTargetFramework": {
+      "type": "parameter",
+      "datatype": "choice",
+      "displayName": "Test target framework",
+      "description": "Target framework for the test project.",
+      "choices": [
+        {
+          "choice": "net8.0",
+          "description": ".NET 8"
+        },
+        {
+          "choice": "net9.0",
+          "description": ".NET 9"
+        },
+        {
+          "choice": "net10.0",
+          "description": ".NET 10"
+        }
+      ],
+      "defaultValue": "net8.0",
+      "replaces": "net8.0"
+    },
+    "frameworkVersion": {
+      "type": "parameter",
+      "datatype": "text",
+      "displayName": "Pillaro framework package version",
+      "description": "NuGet package version used by Pillaro.Dataverse.PluginFramework and Pillaro.Dataverse.PluginFramework.Testing.",
+      "defaultValue": "1.0.2",
+      "replaces": "1.0.2"
+    }
+  },
+  "sources": [
+    {
+      "exclude": [
+        ".template.config/**",
+        "visual-studio/**",
+        "visual-studio-vsix/**"
+      ]
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Restore NuGet packages",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'."
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

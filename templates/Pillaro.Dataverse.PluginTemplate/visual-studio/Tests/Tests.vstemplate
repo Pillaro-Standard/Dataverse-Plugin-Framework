@@ -1,0 +1,22 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Pillaro Dataverse Tests Project</Name>
+    <Description>xUnit test project for Dataverse plugin logic.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>1003</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>DataverseProject.Tests</DefaultName>
+    <Hidden>true</Hidden>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="Pillaro.Dataverse.PluginTemplate.Tests.csproj" TargetFileName="$safeprojectname$.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="TestAutofacModule.cs">TestAutofacModule.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="appsettings.json">appsettings.json</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="appsettings.Development.json">appsettings.Development.json</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Data\CleanupHandlers\.gitkeep">Data\CleanupHandlers\.gitkeep</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Data\Repositories\.gitkeep">Data\Repositories\.gitkeep</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Tests\TestBase.cs">Tests\TestBase.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Tests\ExampleTests.cs">Tests\ExampleTests.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

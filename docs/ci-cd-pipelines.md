@@ -163,6 +163,42 @@ Stored in Azure DevOps variable group `dataverse-test-secrets`:
 
 ---
 
+## Visual Studio Template Artifact Pipeline
+
+**File**: `Templates - Build Visual Studio Artifacts.yml`
+
+### Template Purpose
+
+Builds the Visual Studio project template ZIP and the installable VSIX package. This pipeline only prepares Azure DevOps artifacts; Marketplace publishing is intentionally left for a separate manual or future release pipeline.
+
+### Trigger
+
+- **Manual only**: No automatic triggers
+- **On-demand**: Executed when a new Visual Studio template artifact is needed
+
+### Parameters
+
+| Parameter | Purpose |
+|-----------|---------|
+| `vsixVersion` | Version stamped into the VSIX manifest, in `Major.Minor.Patch` format |
+| `artifactName` | Name of the Azure DevOps pipeline artifact |
+
+### Template Execution Flow
+
+1. **Checkout**: Fetches the repository
+2. **Input validation**: Validates the VSIX version and artifact name
+3. **Build**: Builds `templates/Pillaro.Dataverse.PluginTemplate/visual-studio-vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
+4. **Template validation**: Confirms all files referenced from child `.vstemplate` files exist in the generated ZIP
+5. **VSIX validation**: Confirms the official VSIXv3 output contains the extension manifest, generated template manifest, expanded project template files, icon asset and expected version
+6. **Artifact publishing**: Uploads the generated ZIP and VSIX as a pipeline artifact
+
+### Artifacts Produced
+
+- `Pillaro.Dataverse.PluginTemplate.zip`
+- `Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix`
+
+---
+
 ## ➡️ Related documents
 
 - [Contributing Guidelines](CONTRIBUTING.md) — Contribution workflow and testing requirements
