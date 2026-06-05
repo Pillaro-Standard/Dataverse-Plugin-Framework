@@ -14,6 +14,7 @@ The goal is to keep plugin registration readable for developers while preserving
 - IntelliSense guides the developer through valid registration order
 - filtering attributes can be declared for Create and Update steps
 - attributes can be selected either by logical-name constants or by typed early-bound entity properties
+- entity registration supports both early-bound types and logical name strings
 
 ## Example
 
@@ -81,6 +82,87 @@ public sealed class ContactPlugin : PluginBase
 
 `RegisterTask(...)` calls in the constructor are runtime task registration. `Register(IPluginRegistration registration)` is deployment metadata only. Both are intentionally separate: the constructor tells the framework what task to execute at runtime, while `Register(...)` tells deployment tooling which Dataverse steps and images should exist. Developers must keep these two declarations aligned.
 
+## Entity Registration Modes
+
+Plugin steps can be registered using two different approaches for specifying the target entity.
+
+### Early-Bound Type Registration
+
+Use generic methods with early-bound entity types when you have generated entity classes. This approach provides compile-time type safety and IntelliSense support:
+
+~~~csharp
+registration
+    .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreValidation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution");
+
+registration
+    .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreValidation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution")
+    .WhenChanged(c => c.FirstName, c => c.LastName);
+
+registration
+    .OnDelete<Contact>("6056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution");
+
+registration
+    .OnMessage<Contact>("7056ef4c-0e08-f111-8407-000d3ab261ac", "MyCustomAction")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution");
+~~~
+
+The entity logical name is automatically extracted from the `EntityLogicalNameAttribute` on the early-bound type.
+
+### String-Based Logical Name Registration
+
+Use string-based overloads when:
+- early-bound classes don't exist for the entity
+- registering steps for custom entities without generated types
+- working with entities dynamically
+- you prefer explicit logical names over generic type parameters
+
+~~~csharp
+registration
+    .OnCreate("contact", "4e56ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreValidation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution");
+
+registration
+    .OnUpdate("contact", "5056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreValidation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution")
+    .WhenChanged("firstname", "lastname");
+
+registration
+    .OnDelete("contact", "6056ef4c-0e08-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution");
+
+registration
+    .OnMessage("contact", "7056ef4c-0e08-f111-8407-000d3ab261ac", "MyCustomAction")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution");
+~~~
+
+With string-based registration:
+- The first parameter is always the entity logical name (e.g., "contact", "account", "new_customentity")
+- The second parameter is always the step ID
+- For `OnMessage`, the third parameter is the message name
+- Filtering attributes must be specified as strings (typed expressions are not available)
+- The fluent API returns non-generic builder interfaces
+
+Both registration modes generate identical deployment metadata. Choose the mode that best fits your project structure and entity availability.
+
 ## Attribute Selection Modes
 
 There are two supported ways to select Dataverse attributes.
@@ -135,7 +217,8 @@ Filtering attributes can be declared for Create and Update steps in this framewo
 
 For Create steps, use `WithFilteringAttributes(...)`:
 
-```csharp
+~~~csharp
+// Early-bound with constants
 registration
     .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreValidation()
@@ -143,24 +226,51 @@ registration
     .Rank(1)
     .InSolution("MyDataverseSolution")
     .WithFilteringAttributes(Contact.Fields.FirstName, Contact.Fields.LastName);
-```
+
+// String-based
+registration
+    .OnCreate("contact", "00000000-0000-0000-0000-000000000000")
+    .PreValidation()
+    .Synchronous()
+    .Rank(1)
+    .InSolution("MyDataverseSolution")
+    .WithFilteringAttributes("firstname", "lastname");
+~~~
 
 For Update steps, use `WhenChanged(...)` or `WithFilteringAttributes(...)`. `WhenChanged(...)` is preferred for readability and keeps the entity-specific fluent flow:
 
-```csharp
+~~~csharp
+// Early-bound with constants
 registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
     .InSolution("MyDataverseSolution")
     .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
-```
+
+// Early-bound with typed expressions
+registration
+    .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution")
+    .WhenChanged(c => c.FirstName, c => c.LastName);
+
+// String-based
+registration
+    .OnUpdate("contact", "00000000-0000-0000-0000-000000000000")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution")
+    .WhenChanged("firstname", "lastname");
+~~~
 
 ## Multiple Images Per Step
 
 A step can have multiple images. Each image has its own Dataverse `SdkMessageProcessingStepImageId`.
 
-```csharp
+~~~csharp
+// Early-bound with typed expressions
 registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
@@ -177,7 +287,25 @@ registration
         "PostImage",
         c => c.FirstName,
         c => c.LastName);
-```
+
+// String-based
+registration
+    .OnUpdate("contact", "00000000-0000-0000-0000-000000000000")
+    .PreOperation()
+    .Synchronous()
+    .InSolution("MyDataverseSolution")
+    .WhenChanged("firstname", "lastname")
+    .WithPreImage(
+        "00000000-0000-0000-0000-000000000000",
+        "PreImage",
+        "firstname",
+        "lastname")
+    .WithPostImage(
+        "00000000-0000-0000-0000-000000000000",
+        "PostImage",
+        "firstname",
+        "lastname");
+~~~
 
 The fluent chain keeps every image attached to the exact step where it is declared. No additional linking attribute or registration ID is needed.
 
@@ -247,9 +375,12 @@ The deployment manifest validator enforces basic safety rules:
 ## Notes
 
 - a step can define multiple pre-images and/or post-images when the Dataverse step supports them.
-- entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes.
+- entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes for generic registration methods.
+- string-based registration methods accept entity logical names directly as parameters.
 - typed attribute selection reads logical names from `AttributeLogicalNameAttribute` on early-bound entity properties.
-- custom API and custom action messages can be registered with `OnMessage(...)`.
+- custom API and custom action messages can be registered with `OnMessage(...)` or `OnMessage<TEntity>(...)`.
+- both early-bound and string-based registration modes generate identical deployment metadata.
+- string-based registration validates that the entity logical name is not null, empty, or whitespace.
 
 ## ➡️ Related documents
 

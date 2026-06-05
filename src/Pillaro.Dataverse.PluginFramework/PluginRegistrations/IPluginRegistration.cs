@@ -8,16 +8,24 @@ public interface IPluginRegistration
     IPluginStepStageBuilder OnCreate<TEntity>(string stepId)
         where TEntity : Entity;
 
+    IPluginStepStageBuilder OnCreate(string entityLogicalName, string stepId);
+
     IPluginUpdateStepStageBuilder<TEntity> OnUpdate<TEntity>(string stepId)
         where TEntity : Entity;
 
+    IPluginUpdateStepStageBuilder OnUpdate(string entityLogicalName, string stepId);
+
     IPluginStepStageBuilder OnDelete<TEntity>(string stepId)
         where TEntity : Entity;
+
+    IPluginStepStageBuilder OnDelete(string entityLogicalName, string stepId);
 
     IPluginStepStageBuilder OnMessage(string stepId, string messageName);
 
     IPluginStepStageBuilder OnMessage<TEntity>(string stepId, string messageName)
         where TEntity : Entity;
+
+    IPluginStepStageBuilder OnMessage(string entityLogicalName, string stepId, string messageName);
 }
 
 public interface IPluginStepStageBuilder
@@ -43,6 +51,17 @@ public interface IPluginUpdateStepStageBuilder<TEntity>
     IPluginUpdateStepModeBuilder<TEntity> PostOperation();
 }
 
+public interface IPluginUpdateStepStageBuilder
+{
+    IPluginUpdateStepModeBuilder PreValidation();
+
+    IPluginUpdateStepModeBuilder PreOperation();
+
+    IPluginUpdateStepModeBuilder MainOperation();
+
+    IPluginUpdateStepModeBuilder PostOperation();
+}
+
 public interface IPluginStepModeBuilder
 {
     IPluginStepBuilder Synchronous();
@@ -56,6 +75,13 @@ public interface IPluginUpdateStepModeBuilder<TEntity>
     IPluginUpdateStepBuilder<TEntity> Synchronous();
 
     IPluginUpdateStepBuilder<TEntity> Asynchronous();
+}
+
+public interface IPluginUpdateStepModeBuilder
+{
+    IPluginUpdateStepBuilder Synchronous();
+
+    IPluginUpdateStepBuilder Asynchronous();
 }
 
 public interface IPluginStepBuilder
@@ -100,4 +126,23 @@ public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
 
     IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
 
+}
+
+public interface IPluginUpdateStepBuilder : IPluginStepBuilder
+{
+    new IPluginUpdateStepBuilder Rank(int rank);
+
+    new IPluginUpdateStepBuilder InSolution(string solutionName);
+
+    new IPluginUpdateStepBuilder WithName(string name);
+
+    new IPluginUpdateStepBuilder WithFilteringAttributes(params string[] attributes);
+
+    new IPluginUpdateStepBuilder WithUnsecureConfiguration(string unsecureConfiguration);
+
+    IPluginUpdateStepBuilder WhenChanged(params string[] attributes);
+
+    new IPluginUpdateStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
+
+    new IPluginUpdateStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
 }

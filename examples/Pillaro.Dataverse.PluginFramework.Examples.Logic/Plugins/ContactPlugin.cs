@@ -17,6 +17,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
         public override void Register(IPluginRegistration registration)
         {
             registration
+                //.OnCreate("contact", "4e56ef4c-0e08-f111-8407-000d3ab261ac")
                 .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
@@ -27,6 +28,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 ;
 
             registration
+                //.OnUpdate("contact", "5056ef4c-0e08-f111-8407-000d3ab261ac")
                 .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
