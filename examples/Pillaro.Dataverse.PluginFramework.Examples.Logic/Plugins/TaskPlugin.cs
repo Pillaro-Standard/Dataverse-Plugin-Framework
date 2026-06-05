@@ -6,8 +6,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
     public class TaskPlugin : PluginBase
     {
-        private const string SolutionName = "PillaroPluginFrameworkExamples";
-
         public TaskPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
             RegisterTask<Tasks.Task.AutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName, PluginMode.Synchronous);

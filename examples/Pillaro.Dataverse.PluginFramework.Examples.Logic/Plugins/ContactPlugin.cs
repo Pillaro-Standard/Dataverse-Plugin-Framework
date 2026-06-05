@@ -6,8 +6,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
     public class ContactPlugin : PluginBase
     {
-        private const string SolutionName = "PillaroPluginFrameworkExamples";
-
+        
         public ContactPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
             RegisterTask<ValidateNames>(PluginStage.Prevalidation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
