@@ -7,6 +7,7 @@
 		<IsPackable>false</IsPackable>
 		<NoWarn>$(NoWarn);NU1701</NoWarn>
 		<RestoreNoWarn>$(RestoreNoWarn);NU1701</RestoreNoWarn>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="coverlet.collector" Version="8.0.1">
