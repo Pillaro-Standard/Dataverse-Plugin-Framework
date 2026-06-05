@@ -88,8 +88,6 @@ public interface IPluginStepBuilder
 {
     IPluginStepBuilder Rank(int rank);
 
-    IPluginStepBuilder InSolution(string solutionName);
-
     IPluginStepBuilder WithName(string name);
 
     IPluginStepBuilder WithFilteringAttributes(params string[] attributes);
@@ -105,8 +103,6 @@ public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
     where TEntity : Entity
 {
     new IPluginUpdateStepBuilder<TEntity> Rank(int rank);
-
-    new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName);
 
     new IPluginUpdateStepBuilder<TEntity> WithName(string name);
 
@@ -131,8 +127,6 @@ public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
 public interface IPluginUpdateStepBuilder : IPluginStepBuilder
 {
     new IPluginUpdateStepBuilder Rank(int rank);
-
-    new IPluginUpdateStepBuilder InSolution(string solutionName);
 
     new IPluginUpdateStepBuilder WithName(string name);
 

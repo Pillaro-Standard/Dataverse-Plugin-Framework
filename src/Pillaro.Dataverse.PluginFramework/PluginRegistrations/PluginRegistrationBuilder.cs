@@ -103,7 +103,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         private PluginStage? _stage;
         private PluginMode? _mode;
         private int _rank = 1;
-        private string _solutionName;
         private string _name;
         private PluginDeploymentPolicyDescriptor _deploymentPolicy;
         private string _unsecureConfiguration;
@@ -137,12 +136,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public IPluginStepBuilder Rank(int rank)
         {
             SetRank(rank);
-            return this;
-        }
-
-        public IPluginStepBuilder InSolution(string solutionName)
-        {
-            SetSolution(solutionName);
             return this;
         }
 
@@ -188,11 +181,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 throw new InvalidOperationException($"Plugin step '{StepId}' must define an execution mode.");
             }
 
-            if (string.IsNullOrWhiteSpace(_solutionName))
-            {
-                throw new InvalidOperationException($"Plugin step '{StepId}' must define solution name using InSolution(...).");
-            }
-
             return new PluginStepRegistrationDescriptor(
                 StepId,
                 pluginType,
@@ -201,7 +189,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 _stage.Value,
                 _mode.Value,
                 _rank,
-                _solutionName!,
                 _name,
                 _filteringAttributes.Distinct(StringComparer.OrdinalIgnoreCase).ToArray(),
                 _images.ToArray(),
@@ -234,11 +221,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             }
 
             _rank = rank;
-        }
-
-        protected void SetSolution(string solutionName)
-        {
-            _solutionName = RequireValue(solutionName, nameof(solutionName));
         }
 
         protected void SetName(string name)
@@ -374,12 +356,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             return this;
         }
 
-        public new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName)
-        {
-            SetSolution(solutionName);
-            return this;
-        }
-
         public new IPluginUpdateStepBuilder<TEntity> WithName(string name)
         {
             SetName(name);
@@ -484,12 +460,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public new IPluginUpdateStepBuilder Rank(int rank)
         {
             SetRank(rank);
-            return this;
-        }
-
-        public new IPluginUpdateStepBuilder InSolution(string solutionName)
-        {
-            SetSolution(solutionName);
             return this;
         }
 
