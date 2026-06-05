@@ -436,6 +436,22 @@ This example shows the basic plugin pattern:
 > A plugin usually targets one entity or one functional area.
 > The task itself can still represent either entity-specific logic or reusable business logic used across multiple entities.
 
+**Alternative: String-Based Registration**
+
+If you don't have early-bound entity types or prefer explicit logical names, you can use string-based registration:
+
+    public override void Register(IPluginRegistration registration)
+    {
+        registration
+            .OnCreate("task", "8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
+            .PreOperation()
+            .Synchronous()
+            .Rank(1)
+            .InSolution("YourSolution");
+    }
+
+Both approaches generate identical deployment metadata. See [Plugin Registration API](./plugin-registration-api.md) for details on entity registration modes.
+
 ---
 
 ## 10. Build the final assembly
