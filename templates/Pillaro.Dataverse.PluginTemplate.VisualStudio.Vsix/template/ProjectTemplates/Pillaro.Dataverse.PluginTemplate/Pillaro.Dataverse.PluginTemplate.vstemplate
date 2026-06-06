@@ -10,7 +10,7 @@
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-	<Icon>Logo128.png</Icon>
+	<Icon>PillaroLogo128.png</Icon>
   </TemplateData>
   <TemplateContent>
     <ProjectCollection>

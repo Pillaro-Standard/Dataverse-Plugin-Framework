@@ -1,0 +1,105 @@
+<Project>
+
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+	<PropertyGroup>
+		<TargetFramework>net481</TargetFramework>
+		<OutputType>Library</OutputType>
+		<IsPackable>false</IsPackable>
+
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+		<CreateVsixContainer>true</CreateVsixContainer>
+		<VsixType>v3</VsixType>
+
+		<GeneratePkgDefFile>false</GeneratePkgDefFile>
+		<IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
+		<IncludeAssemblyFromOutputFolderInVSIXContainer>false</IncludeAssemblyFromOutputFolderInVSIXContainer>
+		<IncludeCopyLocalReferencesInVSIXContainer>false</IncludeCopyLocalReferencesInVSIXContainer>
+		<VsixDeployOnDebug>false</VsixDeployOnDebug>
+		<DeployExtension>false</DeployExtension>
+
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+		<ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\..\artifacts\templates</ArtifactsDirectory>
+
+		<PillaroTemplateSourceDir>$(MSBuildProjectDirectory)\..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate</PillaroTemplateSourceDir>
+		<PillaroVisualStudioOverlayDir>$(MSBuildProjectDirectory)\template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate</PillaroVisualStudioOverlayDir>
+		<PillaroPreparedTemplateDir>$(MSBuildProjectDirectory)\obj\PreparedTemplate\Pillaro.Dataverse.PluginTemplate</PillaroPreparedTemplateDir>
+		<PillaroProjectTemplateSourceDir>$(PillaroPreparedTemplateDir)</PillaroProjectTemplateSourceDir>
+		<PillaroProjectTemplateZip>$(MSBuildProjectDirectory)\ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip</PillaroProjectTemplateZip>
+
+		<ManualTemplateZip>$(PillaroProjectTemplateZip)</ManualTemplateZip>
+		<BuiltVsixPath>$(OutputPath)$(AssemblyName).vsix</BuiltVsixPath>
+		<ArtifactVsixPath>$(ArtifactsDirectory)\Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix</ArtifactVsixPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2142" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Pillaro.Dataverse.PluginTemplate.Source\Pillaro.Dataverse.PluginTemplate.Source.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="ProjectTemplates\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Pillaro.Dataverse.PluginTemplate.vstemplate" />
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logic\Logic.vstemplate" />
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj" />
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Plugins\Plugins.vstemplate" />
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Plugins\Pillaro.Dataverse.PluginTemplate.Plugins.csproj" />
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Tests.vstemplate" />
+		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt">
+			<Link>Assets\LICENSE.txt</Link>
+			<VSIXSubPath>Assets\</VSIXSubPath>
+			<IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
+		<Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\PillaroLogo128.png">
+			<Link>Assets\PillaroLogo128.png</Link>
+			<VSIXSubPath>Assets\</VSIXSubPath>
+			<IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
+	</ItemGroup>
+
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
+
+	<Target Name="PreparePillaroVisualStudioTemplate">
+		<Message Importance="high" Text="Preparing Pillaro Visual Studio project template..." />
+
+		<Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\PrepareVisualStudioTemplate.ps1&quot; -SharedSourceDir &quot;$(PillaroTemplateSourceDir)&quot; -VisualStudioOverlayDir &quot;$(PillaroVisualStudioOverlayDir)&quot; -PreparedTemplateDir &quot;$(PillaroPreparedTemplateDir)&quot;" />
+	</Target>
+
+	<Target Name="PackPillaroProjectTemplateZip" BeforeTargets="GetVsixSourceItems" DependsOnTargets="PreparePillaroVisualStudioTemplate">
+
+		<Message Importance="high" Text="Packing Pillaro project template ZIP..." />
+		<Message Importance="high" Text="Template source: $(PillaroProjectTemplateSourceDir)" />
+		<Message Importance="high" Text="Template ZIP: $(PillaroProjectTemplateZip)" />
+
+		<MakeDir Directories="$(MSBuildProjectDirectory)\ProjectTemplates" />
+
+		<Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\PackProjectTemplate.ps1&quot; -SourceDir &quot;$(PillaroProjectTemplateSourceDir)&quot; -ZipPath &quot;$(PillaroProjectTemplateZip)&quot;" />
+
+		<Error Condition="!Exists('$(PillaroProjectTemplateZip)')" Text="Project template ZIP was not generated: $(PillaroProjectTemplateZip)" />
+	</Target>
+
+	<Target Name="IncludePillaroProjectTemplateZipInVsix" AfterTargets="GetVsixSourceItems">
+
+		<ItemGroup>
+			<VSIXSourceItem Include="$(PillaroProjectTemplateZip)">
+				<VSIXSubPath>ProjectTemplates\</VSIXSubPath>
+			</VSIXSourceItem>
+		</ItemGroup>
+
+		<Message Importance="high" Text="Added template ZIP to VSIX: $(PillaroProjectTemplateZip)" />
+	</Target>
+</Project>

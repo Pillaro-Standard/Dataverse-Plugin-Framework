@@ -1,19 +1,21 @@
-# Pillaro Dataverse Plugin Template – Setup Guide
+# Pillaro Dataverse Plugin Template - Setup Guide
 
-This guide describes the required steps after creating a new solution from the **Pillaro Dataverse Plugin Template**.
+This is the main setup guide for projects created from the **Pillaro Dataverse Plugin Template**.
+
+It lives in the **Logic** project so users see it where they spend the most time.
 
 ## Quick setup checklist
 
 1. Create a new solution from the Visual Studio template.
 2. Run **Build > Rebuild Solution**.
-3. Include generated files and folders in Visual Studio:
+3. Include generated files and folders in Visual Studio if needed:
    - `Logic\Tools\EarlyBound`
    - `Plugins\Tools\Deployment`
    - `Plugins\PillaroSettings.json`
 4. Set `"Solution": "ExampleSolution"` in `PillaroSettings.json`.
 5. Configure the `DVCON` environment variable.
 6. Configure the local Dataverse connection in `<YourSolutionName>.Tests\appsettings.Development.json`.
-7. Add `appsettings.Development.json` to `.gitignore`.
+7. Do not commit `appsettings.Development.json`.
 8. Run the `Connect_Should_Return_Valid_UserId` test to verify the Dataverse connection.
 
 ---
@@ -47,14 +49,7 @@ Use this process for the items listed below.
 
 ## 3. Logic project
 
-After the first rebuild, the **Logic** project will contain:
-
-```text
-Tools
-├── EarlyBound
-├── Deployment
-└── ILMerge
-```
+After the first rebuild, the **Logic** project will contain generated helper folders.
 
 Include only:
 
@@ -75,7 +70,7 @@ pac
 More details are available in:
 
 ```text
-Logic\Tools\EarlyBound\README.md
+Tools\EarlyBound\README.md
 ```
 
 ---
@@ -95,7 +90,7 @@ This folder contains scripts and tools used to deploy the plugin assembly, plugi
 More details are available in:
 
 ```text
-Plugins\Tools\Deployment\README.md
+Tools\Deployment\README.md
 ```
 
 Also include the following file from the **Plugins** project root:
@@ -136,19 +131,19 @@ The deployment tools use the environment variable:
 DVCON
 ```
 
-This variable contains the Dataverse connection string used by the build/deployment tooling.
+This variable contains the Dataverse connection string used by the build and deployment tooling.
 
 The setup of `DVCON` is described in:
 
 ```text
-Plugins\Tools\Deployment\README.md
+Tools\Deployment\README.md
 ```
 
 ---
 
 ## 7. Configure Dataverse connection for tests
 
-To run the integration/example tests, configure the local Dataverse connection in:
+To run the integration and example tests, configure the local Dataverse connection in:
 
 ```text
 appsettings.Development.json
@@ -170,7 +165,7 @@ Connect_Should_Return_Valid_UserId
 
 ---
 
-## 8. Known Issues
+## 8. Known issues
 
 ### Test project does not run correctly after creating the solution from the template
 
@@ -216,7 +211,7 @@ Add it to `.gitignore`:
 
 ```gitignore
 # Local development settings
-appsettings.Development.json
+**/appsettings.Development.json
 ```
 
 If the file has already been committed, remove it from git tracking while keeping it locally:
@@ -252,9 +247,9 @@ It is copied into the `Plugins` project before `PostBuildEvent` runs, so the pos
 Detailed documentation is available in the generated tool folders:
 
 ```text
-Logic\Tools\EarlyBound\README.md
-Plugins\Tools\ILMerge\README.md
-Plugins\Tools\Deployment\README.md
+Tools\EarlyBound\README.md
+Tools\ILMerge\README.md
+Tools\Deployment\README.md
 ```
 
 These documents describe:

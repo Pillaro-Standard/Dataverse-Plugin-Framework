@@ -1,0 +1,9 @@
+# Local development settings
+**/appsettings.Development.json
+
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/

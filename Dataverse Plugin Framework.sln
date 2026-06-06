@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		build-local-nuget-packages.bat = build-local-nuget-packages.bat
 		CHANGELOG.md = CHANGELOG.md
 		LICENSE = LICENSE
 		Nightly – Tests Only.yml = Nightly – Tests Only.yml
@@ -101,9 +102,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{20
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{D9E2BBDF-2EFE-4A06-924C-C1684226F641}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "visual-studio-vsix", "visual-studio-vsix", "{6743192B-6968-4B7C-B653-C72650E70431}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix", "templates\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj", "{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix", "templates\Pillaro.Dataverse.PluginTemplate\visual-studio-vsix\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj", "{54F52063-A1CD-4358-9CF6-EB550999C61A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.Source", "templates\Pillaro.Dataverse.PluginTemplate.Source\Pillaro.Dataverse.PluginTemplate.Source.csproj", "{1332D3FC-022B-47DA-88A5-C3508B7A5003}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,10 +144,14 @@ Global
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54F52063-A1CD-4358-9CF6-EB550999C61A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -165,8 +170,8 @@ Global
 		{3B0A10C4-61B6-4638-8AF6-3D571D1A36DE} = {B58A9E8D-B06E-46E0-A4C7-6895B8B97DA3}
 		{CC7B0EA5-78C2-F415-6C57-896E852BFF74} = {0414BA72-E8A4-4E4D-8CD0-8ACCD277DA82}
 		{204B93AF-6340-4F3F-B0D5-7377DDB8169E} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
-		{6743192B-6968-4B7C-B653-C72650E70431} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
-		{54F52063-A1CD-4358-9CF6-EB550999C61A} = {6743192B-6968-4B7C-B653-C72650E70431}
+		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{1332D3FC-022B-47DA-88A5-C3508B7A5003} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}
