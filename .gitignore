@@ -371,3 +371,4 @@ FodyWeavers.xsd
 
 # Local nuget.exe used for packaging
 tools/nuget.exe
+/templates/Pillaro.Dataverse.PluginTemplate/visual-studio-vsix/ProjectTemplates/Pillaro.Dataverse.PluginTemplate.zip

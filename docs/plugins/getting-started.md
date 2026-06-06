@@ -415,8 +415,7 @@ Example:
                 .OnCreate<Task>("8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
                 .PreOperation()
                 .Synchronous()
-                .Rank(1)
-                .InSolution("YourSolution");
+                .Rank(1);
         }
     }
 
@@ -446,8 +445,7 @@ If you don't have early-bound entity types or prefer explicit logical names, you
             .OnCreate("task", "8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
             .PreOperation()
             .Synchronous()
-            .Rank(1)
-            .InSolution("YourSolution");
+            .Rank(1);
     }
 
 Both approaches generate identical deployment metadata. See [Plugin Registration API](./plugin-registration-api.md) for details on entity registration modes.

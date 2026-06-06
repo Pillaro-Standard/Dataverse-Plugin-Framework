@@ -39,15 +39,13 @@ public sealed class ContactPlugin : PluginBase
             .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
             .PreValidation()
             .Synchronous()
-            .Rank(1)
-            .InSolution("MyDataverseSolution");
+            .Rank(1);
 
         registration
             .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
             .PreValidation()
             .Synchronous()
             .Rank(1)
-            .InSolution("MyDataverseSolution")
             .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 
         registration
@@ -55,7 +53,6 @@ public sealed class ContactPlugin : PluginBase
             .PreOperation()
             .Synchronous()
             .Rank(1)
-            .InSolution("MyDataverseSolution")
             .WhenChanged(
                 Contact.Fields.FirstName,
                 Contact.Fields.LastName,
@@ -94,27 +91,23 @@ Use generic methods with early-bound entity types when you have generated entity
 registration
     .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
     .PreValidation()
-    .Synchronous()
-    .InSolution("MyDataverseSolution");
+    .Synchronous();
 
 registration
     .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
     .PreValidation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(c => c.FirstName, c => c.LastName);
 
 registration
     .OnDelete<Contact>("6056ef4c-0e08-f111-8407-000d3ab261ac")
     .PreOperation()
-    .Synchronous()
-    .InSolution("MyDataverseSolution");
+    .Synchronous();
 
 registration
     .OnMessage<Contact>("7056ef4c-0e08-f111-8407-000d3ab261ac", "MyCustomAction")
     .PreOperation()
-    .Synchronous()
-    .InSolution("MyDataverseSolution");
+    .Synchronous();
 ~~~
 
 The entity logical name is automatically extracted from the `EntityLogicalNameAttribute` on the early-bound type.
@@ -131,27 +124,23 @@ Use string-based overloads when:
 registration
     .OnCreate("contact", "4e56ef4c-0e08-f111-8407-000d3ab261ac")
     .PreValidation()
-    .Synchronous()
-    .InSolution("MyDataverseSolution");
+    .Synchronous();
 
 registration
     .OnUpdate("contact", "5056ef4c-0e08-f111-8407-000d3ab261ac")
     .PreValidation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged("firstname", "lastname");
 
 registration
     .OnDelete("contact", "6056ef4c-0e08-f111-8407-000d3ab261ac")
     .PreOperation()
-    .Synchronous()
-    .InSolution("MyDataverseSolution");
+    .Synchronous();
 
 registration
     .OnMessage("contact", "7056ef4c-0e08-f111-8407-000d3ab261ac", "MyCustomAction")
     .PreOperation()
-    .Synchronous()
-    .InSolution("MyDataverseSolution");
+    .Synchronous();
 ~~~
 
 With string-based registration:
@@ -176,7 +165,6 @@ registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(
         Contact.Fields.FirstName,
         Contact.Fields.LastName)
@@ -196,7 +184,6 @@ registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(
         c => c.FirstName,
         c => c.LastName)
@@ -224,7 +211,6 @@ registration
     .PreValidation()
     .Synchronous()
     .Rank(1)
-    .InSolution("MyDataverseSolution")
     .WithFilteringAttributes(Contact.Fields.FirstName, Contact.Fields.LastName);
 
 // String-based
@@ -233,7 +219,6 @@ registration
     .PreValidation()
     .Synchronous()
     .Rank(1)
-    .InSolution("MyDataverseSolution")
     .WithFilteringAttributes("firstname", "lastname");
 ~~~
 
@@ -245,7 +230,6 @@ registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 
 // Early-bound with typed expressions
@@ -253,7 +237,6 @@ registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(c => c.FirstName, c => c.LastName);
 
 // String-based
@@ -261,7 +244,6 @@ registration
     .OnUpdate("contact", "00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged("firstname", "lastname");
 ~~~
 
@@ -275,7 +257,6 @@ registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(c => c.FirstName, c => c.LastName)
     .WithPreImage(
         "00000000-0000-0000-0000-000000000000",
@@ -293,7 +274,6 @@ registration
     .OnUpdate("contact", "00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged("firstname", "lastname")
     .WithPreImage(
         "00000000-0000-0000-0000-000000000000",
@@ -326,7 +306,6 @@ public override void Register(IPluginRegistration registration)
         .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
         .PreOperation()
         .Synchronous()
-        .InSolution("MyDataverseSolution")
         .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 }
 ```
