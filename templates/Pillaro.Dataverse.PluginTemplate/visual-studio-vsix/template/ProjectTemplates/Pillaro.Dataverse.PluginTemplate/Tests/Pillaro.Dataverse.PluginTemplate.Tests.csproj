@@ -7,14 +7,14 @@
 		<IsPackable>false</IsPackable>
 		<NoWarn>$(NoWarn);NU1701;NU1702</NoWarn>
 		<RestoreNoWarn>$(RestoreNoWarn);NU1701;NU1702</RestoreNoWarn>
-
 		<EnableDefaultItems>false</EnableDefaultItems>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Compile Include="TestAutofacModule.cs" />
 		<Compile Include="Tests\TestBase.cs" />
-		<Compile Include="Tests\ExampleTests.cs" />
+		<Compile Include="Tests\ConnectionTests.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,13 +26,10 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</None>
-
-		<None Include="Data\CleanupHandlers\.gitkeep" />
-		<None Include="Data\Repositories\.gitkeep" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Pillaro.Dataverse.PluginFramework.Testing" Version="1.0.2" />
+		<PackageReference Include="Pillaro.Dataverse.PluginFramework.Testing" Version="1.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
 		<PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.24" />
@@ -55,6 +52,11 @@
 
 	<ItemGroup>
 		<Using Include="Xunit" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Data\CleanupHandlers\" />
+		<Folder Include="Data\Repositories\" />
 	</ItemGroup>
 
 </Project>

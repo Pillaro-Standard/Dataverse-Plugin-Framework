@@ -36,6 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Assets\LICENSE.txt" />
 	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Plugins\key.snk" />
 	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\appsettings.Development.json" />
 	  <None Remove="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\appsettings.json" />
@@ -46,14 +47,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Assets\LICENSE.txt">
+		  <IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
 		<Content Include="Assets\Logo128.png">
 			<IncludeInVSIX>true</IncludeInVSIX>
 			<VSIXSubPath>Assets</VSIXSubPath>
 		</Content>
-
-		<Content Include="ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip">
-			<IncludeInVSIX>true</IncludeInVSIX>
-			<VSIXSubPath>ProjectTemplates</VSIXSubPath>
+		<Content Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Logo128.png">
+		  <VSIXSubPath>Assets</VSIXSubPath>
+		  <IncludeInVSIX>true</IncludeInVSIX>
 		</Content>
 	</ItemGroup>
 
@@ -70,5 +73,39 @@
 	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\vs-threading.MainThreadSwitchingMethods.txt" />
 	  <AdditionalFiles Remove="C:\Users\janmu\.nuget\packages\microsoft.visualstudio.sdk.analyzers\17.7.79\build\AdditionalFiles\vs-threading.MembersRequiringMainThread.txt" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="ProjectTemplates\" />
+	</ItemGroup>
+
+	<Target Name="PackPillaroProjectTemplateZip" BeforeTargets="PrepareForBuild">
+		<Message Importance="high" Text="Packing Pillaro Dataverse project template ZIP..." />
+
+		<Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\PackProjectTemplate.ps1&quot; -SourceDir &quot;$(MSBuildProjectDirectory)\template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate&quot; -ZipPath &quot;$(MSBuildProjectDirectory)\ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip&quot;" />
+	</Target>
+
+	<PropertyGroup>
+		<PillaroProjectTemplateSourceDir>$(MSBuildProjectDirectory)\template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate</PillaroProjectTemplateSourceDir>
+		<PillaroProjectTemplateZip>$(MSBuildProjectDirectory)\ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip</PillaroProjectTemplateZip>
+	</PropertyGroup>
+
+	<Target Name="PackPillaroProjectTemplateZip" BeforeTargets="GetVsixSourceItems">
+		<Message Importance="high" Text="Packing Pillaro project template ZIP..." />
+
+		<MakeDir Directories="$(MSBuildProjectDirectory)\ProjectTemplates" />
+
+		<Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\PackProjectTemplate.ps1&quot; -SourceDir &quot;$(PillaroProjectTemplateSourceDir)&quot; -ZipPath &quot;$(PillaroProjectTemplateZip)&quot;" />
+
+		<Error Condition="!Exists('$(PillaroProjectTemplateZip)')" Text="Project template ZIP was not generated: $(PillaroProjectTemplateZip)" />
+	</Target>
+
+	<Target Name="IncludePillaroProjectTemplateZipInVsix" AfterTargets="GetVsixSourceItems">
+		<ItemGroup>
+			<VSIXSourceItem Include="$(PillaroProjectTemplateZip)">
+				<VSIXSubPath>ProjectTemplates\</VSIXSubPath>
+			</VSIXSourceItem>
+		</ItemGroup>
+
+		<Message Importance="high" Text="Added template ZIP to VSIX: $(PillaroProjectTemplateZip)" />
+	</Target>
 
 </Project>

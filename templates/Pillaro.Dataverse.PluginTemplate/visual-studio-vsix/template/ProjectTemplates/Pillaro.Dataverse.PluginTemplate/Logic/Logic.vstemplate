@@ -1,22 +1,33 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-	<TemplateData>
-		<Name>Pillaro Dataverse Logic Project</Name>
-		<Description>Logic project for Dataverse plugin orchestration and task implementation.</Description>
-		<ProjectType>CSharp</ProjectType>
-		<SortOrder>1001</SortOrder>
-		<CreateNewFolder>true</CreateNewFolder>
-		<DefaultName>DataverseProject.Logic</DefaultName>
-		<Hidden>true</Hidden>
-		<CreateInPlace>true</CreateInPlace>
-	</TemplateData>
+  <TemplateData>
+    <Name>Pillaro Dataverse Logic Project</Name>
+    <Description>Logic project for Dataverse plugin orchestration and task implementation.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>1001</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <CreateInPlace>true</CreateInPlace>
+    <DefaultName>DataverseProject.Logic</DefaultName>
+    <Hidden>true</Hidden>
+  </TemplateData>
 
-	<TemplateContent>
-		<Project File="Pillaro.Dataverse.PluginTemplate.Logic.csproj" TargetFileName="$safeprojectname$.csproj" ReplaceParameters="true">
+  <TemplateContent>
+    <Project File="Pillaro.Dataverse.PluginTemplate.Logic.csproj"
+             TargetFileName="$safeprojectname$.csproj"
+             ReplaceParameters="true">
 
-			<ProjectItem ReplaceParameters="true">Plugins\PluginBase.cs</ProjectItem>
-			<ProjectItem ReplaceParameters="true">Plugins\ExamplePlugin.cs</ProjectItem>
-			<ProjectItem ReplaceParameters="true">Tasks\Example\ExampleTask.cs</ProjectItem>
+      <Folder Name="Plugins" TargetFolderName="Plugins">
+        <ProjectItem ReplaceParameters="true">PluginBase.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true">ExamplePlugin.cs</ProjectItem>
+      </Folder>
 
-		</Project>
-	</TemplateContent>
+      <Folder Name="Tasks" TargetFolderName="Tasks">
+        <Folder Name="Example" TargetFolderName="Example">
+          <ProjectItem ReplaceParameters="true">ExampleTask.cs</ProjectItem>
+        </Folder>
+      </Folder>
+	  
+	  <ProjectItem ReplaceParameters="true">README.md</ProjectItem>	
+		
+	</Project>
+  </TemplateContent>
 </VSTemplate>

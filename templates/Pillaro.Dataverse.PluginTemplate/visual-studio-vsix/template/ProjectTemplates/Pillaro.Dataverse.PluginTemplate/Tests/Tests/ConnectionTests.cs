@@ -3,15 +3,15 @@ using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 
 namespace $safeprojectname$.Tests;
 
-public class ExampleTests : TestBase
+public class ConnectionTests : TestBase
 {
-    public ExampleTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output)
+    public ConnectionTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output)
         : base(testFixture, output)
     {
     }
 
     [Fact]
-    public void Template_Should_Be_Ready_For_Project_Tests()
+    public void Connect_Should_Return_Valid_UserId()
     {
         var res = (WhoAmIResponse)OrganizationService.Execute(new WhoAmIRequest());
 

@@ -5,10 +5,12 @@
     <ProjectType>CSharp</ProjectType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
+    <CreateInPlace>true</CreateInPlace>
     <DefaultName>Pillaro.Dataverse.PluginTemplate</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+	<Icon>Logo128.png</Icon>
   </TemplateData>
   <TemplateContent>
     <ProjectCollection>
