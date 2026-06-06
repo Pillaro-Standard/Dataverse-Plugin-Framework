@@ -24,7 +24,7 @@ See [Plugin Registration API](./plugin-registration-api.md) for details about ho
 
 ## 1. Install the Package
 
-Install `Pillaro.Dataverse.PluginFramework` into the Dataverse plugin project.
+Install `Pillaro.Dataverse.PluginFramework` into the Dataverse plugin project as a direct `PackageReference`.
 
 After the package is installed, rebuild the plugin project. The build creates:
 
@@ -35,9 +35,14 @@ Tools/
     DeployPlugins.bat
     DeployPlugins.ps1
     README.md
+  ILMerge/
+    ILMerge.exe
+    README.md
 ```
 
 Include the generated `Tools` folder and `PillaroSettings.json` in the project so they are visible in Visual Studio and can be committed with the solution.
+
+The direct package reference matters because the package target that copies `Tools\ILMerge` and the deployment scaffolding is only imported into projects that reference the NuGet package themselves. A project that only references a Logic project will not get the post-build merge support.
 
 ---
 

@@ -1,121 +1,77 @@
 # ILMerge Tooling
 
-This folder contains ILMerge tooling and prepared post-build action templates copied by the `Pillaro.Dataverse.PluginFramework` NuGet package into consuming plugin projects.
+This folder contains the ILMerge binaries and prepared post-build script templates that the `Pillaro.Dataverse.PluginFramework` NuGet package copies into consuming plugin projects.
 
-The purpose of this tooling is to help produce a single deployable Dataverse plugin assembly.
+The scripts run from the project-local `Tools\ILMerge` folder and derive paths explicitly from:
 
-## Why ILMerge Is Used
+- `$(MSBuildProjectDirectory)`
+- `$(Configuration)`
+- `$(AssemblyName)`
 
-Dataverse plugin deployment requires a single plugin assembly.
+They no longer depend on:
 
-When plugin logic is split across multiple projects or uses additional runtime dependencies, those assemblies must be merged into one final plugin DLL before deployment.
-
-Typical structure:
-
-- `Plugin.dll` - Dataverse plugin entry point
-- `Logic.dll` - business logic shared with tests
-- framework/runtime dependencies
-- final merged plugin assembly
-
-The final output should be one deployable DLL registered in Dataverse.
-
----
+- `$(TargetDir)`
+- `$(TargetFileName)`
+- `$(ProjectDir)`
 
 ## Files
 
-This folder contains:
-
 - `ILMerge.exe` - merge tool used during build
-- `PostBuildAction-logic_plugin-projects.txt` - post-build template for solutions with separate Plugin and Logic projects
-- `PostBuildAction-single-project.txt` - post-build template for solutions where plugin entry points and business logic are in one project
+- `PostBuildAction-logic_plugin-projects.txt` - post-build script for separate Plugin and Logic projects
+- `PostBuildAction-single-project.txt` - post-build script for a single plugin project
 - `README.md` - this documentation
 
----
+## Copy behavior
 
-## Post-Build Action Templates
-
-Choose the template that matches your project structure.
-
-### `PostBuildAction-logic_plugin-projects.txt`
-
-Use this template when:
-
-- the Dataverse plugin entry point is in a Plugin project
-- the business logic is in a separate Logic project
-- the final plugin assembly must include the Logic assembly
-
-Before using the template, replace:
+The package target copies the ILMerge payload from:
 
 ```text
-{LOGIC_ASSEMBLY}
+$(MSBuildThisFileDirectory)..\tools\ILMerge\
 ```
 
-with the actual Logic project output DLL name.
-
-Example:
+into the consuming project path:
 
 ```text
-MySolution.Logic.dll
+$(MSBuildProjectDirectory)\Tools\ILMerge\
 ```
 
-Important rules:
+The copy runs `BeforeTargets="PostBuildEvent"` so the merge tool is available before the post-build merge executes.
 
-- the Logic assembly must exist in `$(TargetDir)`
-- the Logic assembly must be the last item in the merge list
-- update the merge list when adding or removing dependencies
+The target is imported only into projects that directly reference the `Pillaro.Dataverse.PluginFramework` NuGet package.
 
-### `PostBuildAction-single-project.txt`
+## Logic + Plugins projects
 
-Use this template when:
+Use `PostBuildAction-logic_plugin-projects.txt` when plugin code and business logic are split across two projects.
 
-- plugin entry points and business logic are in one plugin project
-- there is no separate Logic assembly to merge
-- only the plugin assembly and required dependencies need to be merged
+Replace `{LOGIC_ASSEMBLY}` with the actual logic project output DLL name in reusable text files and documentation.
 
-Important rules:
+The generated Visual Studio template may use:
 
-- all assemblies in the merge list must exist in `$(TargetDir)`
-- update the merge list when adding or removing dependencies
-- this variant does not use `{LOGIC_ASSEMBLY}`
+```bat
+set "LOGIC_DLL=$ext_safeprojectname$.Logic.dll"
+```
 
----
+for the Logic project assembly name.
 
-## Cleanup Behavior
+## Single-project plugins
 
-After the merge completes, the post-build script removes temporary or duplicated files from the output directory.
+Use `PostBuildAction-single-project.txt` when plugin code and business logic live in one project.
 
-The exact cleanup depends on the selected template.
+This variant does not use `{LOGIC_ASSEMBLY}`.
 
-For the Logic + Plugin project template:
+## Runtime path
 
-- the temporary renamed assembly is removed
-- the separate Logic assembly is removed after it has been merged
+The post-build scripts always execute ILMerge from the project-local tool folder:
 
-For the single-project template:
+```text
+%PROJECT_DIR%\Tools\ILMerge\ILMerge.exe
+```
 
-- the temporary renamed assembly is removed
-
-This keeps the build output focused on the final merged plugin DLL.
-
----
+That path is the one the consuming project should rely on at build time.
 
 ## Notes
 
-- Adjust paths if your project structure differs.
 - Keep the dependency list explicit and under control.
 - Include only assemblies that must be part of the final Dataverse plugin DLL.
-- Make sure the final merged assembly is strong-name signed if required by your deployment process.
+- Keep the Logic assembly at the end of the merge list in the split-project variant.
 - Rebuild the plugin project after changing the post-build action.
-
----
-
-## Design Decision
-
-ILMerge is used because of Dataverse plugin runtime constraints:
-
-- plugin deployment expects a single assembly
-- plugin runtime does not load arbitrary local dependency DLLs
-- plugin assemblies target `.NET Framework 4.6.2`
-- deterministic deployment is easier when the final artifact is one DLL
-
-This approach keeps deployment predictable and reduces missing-dependency issues in Dataverse environments.

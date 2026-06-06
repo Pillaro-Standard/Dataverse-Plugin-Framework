@@ -124,30 +124,36 @@ REM Purpose:
 REM - merge plugin assembly with its dependencies into a single DLL
 REM - required for Dataverse plugin deployment
 REM
-REM How to use:
-REM - replace {LOGIC_ASSEMBLY} with your actual logic project output
-REM   example: Pillaro.Plugins.Examples.Logic.dll
-REM
 REM Notes:
-REM - all assemblies must exist in $(TargetDir)
+REM - all assemblies must exist in the output directory
+REM - ILMerge.exe must exist in the project Tools\ILMerge folder
 REM - keep Logic assembly at the END of the merge list
 REM - update dependencies when adding/removing references
 REM ============================================================
 
-rename "$(TargetDir)$(TargetFileName)" "ForMerge$(TargetFileName)"
+set "PROJECT_DIR=$(MSBuildProjectDirectory)"
+set "OUT_DIR=$(MSBuildProjectDirectory)\bin\$(Configuration)\"
+set "PLUGIN_DLL=$(AssemblyName).dll"
+set "FOR_MERGE_DLL=ForMerge$(AssemblyName).dll"
+set "LOGIC_DLL=Pillaro.Dataverse.PluginFramework.Examples.Logic.dll"
 
-"$(ProjectDir)Tools\ILMerge\ILMerge.exe" ^
- /keyfile:"$(ProjectDir)key.snk" ^
+pushd "%OUT_DIR%"
+
+rename "%PLUGIN_DLL%" "%FOR_MERGE_DLL%"
+
+"%PROJECT_DIR%\Tools\ILMerge\ILMerge.exe" ^
+ /keyfile:"%PROJECT_DIR%\key.snk" ^
  /target:library ^
  /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" ^
- /out:"$(TargetDir)$(TargetFileName)" ^
- "$(TargetDir)ForMerge$(TargetFileName)" ^
- "$(TargetDir)Pillaro.Dataverse.PluginFramework.dll" ^
- "$(TargetDir)Newtonsoft.Json.dll" ^
- "$(TargetDir)Pillaro.Dataverse.PluginFramework.Examples.Logic.dll"
+ /out:"%PLUGIN_DLL%" ^
+ "%FOR_MERGE_DLL%" ^
+ "Pillaro.Dataverse.PluginFramework.dll" ^
+ "Newtonsoft.Json.dll" ^
+ "%LOGIC_DLL%"
 
-del "$(TargetDir)ForMerge$(TargetFileName)"
-del "$(TargetDir)Pillaro.Dataverse.PluginFramework.Examples.Logic.dll"
-		</PostBuildEvent>
+del "%FOR_MERGE_DLL%"
+del "%LOGIC_DLL%"
+
+popd</PostBuildEvent>
   </PropertyGroup>
 </Project>
