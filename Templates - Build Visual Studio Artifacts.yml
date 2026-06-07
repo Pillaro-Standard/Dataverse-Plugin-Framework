@@ -5,8 +5,8 @@ trigger: none
 pr: none
 
 parameters:
-  - name: vsixVersion
-    displayName: 'VSIX version (Major.Minor.Patch)'
+  - name: vsixBaseVersion
+    displayName: 'VSIX base version (Major.Minor.Patch)'
     type: string
     default: '1.0.8'
 
@@ -40,19 +40,23 @@ jobs:
         inputs:
           targetType: inline
           script: |
-            $vsixVersion = '${{ parameters.vsixVersion }}'
+            $vsixBaseVersion = '${{ parameters.vsixBaseVersion }}'
             $artifactName = '${{ parameters.artifactName }}'
 
-            if ($vsixVersion -notmatch '^\d+\.\d+\.\d+$') {
-              throw "vsixVersion must be in format Major.Minor.Patch, e.g. 1.0.1. Current value: '$vsixVersion'."
+            if ($vsixBaseVersion -notmatch '^\d+\.\d+\.\d+$') {
+              throw "vsixBaseVersion must be in format Major.Minor.Patch, e.g. 1.0.1. Current value: '$vsixBaseVersion'."
             }
 
             if ([string]::IsNullOrWhiteSpace($artifactName)) {
               throw "artifactName cannot be empty."
             }
 
-            Write-Host "VSIX version: $vsixVersion"
+            $vsixVersion = "$vsixBaseVersion.$(Build.BuildId)"
+
+            Write-Host "VSIX base version: $vsixBaseVersion"
+            Write-Host "VSIX build version: $vsixVersion"
             Write-Host "Pipeline artifact name: $artifactName"
+            Write-Host "##vso[task.setvariable variable=vsixVersion]$vsixVersion"
 
       - task: DotNetCoreCLI@2
         displayName: Build template ZIP and VSIX
@@ -60,7 +64,7 @@ jobs:
           command: build
           projects: $(vsixProjectPath)
           arguments: >
-            /p:VsixVersion=${{ parameters.vsixVersion }}
+            /p:VsixVersion=$(vsixVersion)
             /p:ArtifactsDirectory="$(artifactOutputDirectory)"
 
       - task: PowerShell@2
@@ -70,7 +74,7 @@ jobs:
           filePath: scripts/Test-PluginTemplateArtifacts.ps1
           arguments: >
             -TemplateName "$(templateName)"
-            -VsixVersion "${{ parameters.vsixVersion }}"
+            -VsixVersion "$(vsixVersion)"
             -ArtifactsDirectory "$(artifactOutputDirectory)"
 
       - task: PublishPipelineArtifact@1

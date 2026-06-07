@@ -21,8 +21,7 @@
 		<DeployExtension>false</DeployExtension>
 
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<VsixVersion Condition="'$(VsixVersion)' == ''">1.0.52</VsixVersion>
-		<PillaroVsixVersion Condition="'$(PillaroVsixVersion)' == ''">$(VsixVersion)</PillaroVsixVersion>
+		<VsixVersion Condition="'$(VsixVersion)' == ''">1.0.8</VsixVersion>
 
 		<ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\templates</ArtifactsDirectory>
 		<ArtifactsDirectoryIsRooted>$([System.IO.Path]::IsPathRooted('$(ArtifactsDirectory)'))</ArtifactsDirectoryIsRooted>
@@ -86,7 +85,7 @@
 
 	<Target Name="GetVsixVersion" Outputs="$(_VsixVersion)">
 		<PropertyGroup>
-			<_VsixVersion>$(PillaroVsixVersion)</_VsixVersion>
+			<_VsixVersion>$(VsixVersion)</_VsixVersion>
 		</PropertyGroup>
 	</Target>
 

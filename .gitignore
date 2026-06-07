@@ -361,6 +361,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 *.txt
+!templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate/LICENSE.txt
 *.bak
 /examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/appsettings.Development.json
 /tests/Pillaro.Dataverse.PluginFramework.Tests/appsettings.Development.json

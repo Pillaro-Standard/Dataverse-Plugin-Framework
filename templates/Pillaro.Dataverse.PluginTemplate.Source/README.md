@@ -93,7 +93,6 @@ After changing files in this project, validate the generated Visual Studio templ
 
 ```powershell
 dotnet build "templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj" `
-  /p:VsixVersion=1.0.8 `
   /p:ArtifactsDirectory="artifacts/templates"
 
 powershell -NoProfile -ExecutionPolicy Bypass `
@@ -102,6 +101,8 @@ powershell -NoProfile -ExecutionPolicy Bypass `
   -VsixVersion "1.0.8" `
   -ArtifactsDirectory "artifacts/templates"
 ```
+
+The VSIX project has a default version in its `.csproj`. Pass `VsixVersion` only when you want to build a different local package version.
 
 ## Short summary
 

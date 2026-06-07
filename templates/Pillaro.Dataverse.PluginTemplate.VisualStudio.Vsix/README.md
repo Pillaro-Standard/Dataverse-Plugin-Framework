@@ -151,9 +151,10 @@ From the repository root:
 
 ```powershell
 dotnet build "templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj" `
-  /p:VsixVersion=1.0.8 `
   /p:ArtifactsDirectory="artifacts/templates"
 ```
+
+The VSIX project has a default version in its `.csproj`. Override `VsixVersion` only when you want to build a different local package version.
 
 ## Validation command
 
