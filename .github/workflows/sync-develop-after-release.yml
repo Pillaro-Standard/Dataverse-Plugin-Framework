@@ -6,12 +6,18 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: sync-develop-after-release
+  cancel-in-progress: false
 
 jobs:
   sync-develop:
-    name: Sync develop branch to main after release PR
+    name: Fast-forward develop to main after release PR
     runs-on: ubuntu-latest
     if: >
       github.event.pull_request.merged == true &&
@@ -20,17 +26,13 @@ jobs:
 
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Verify develop did not move after release PR
+      - name: Verify develop can be fast-forwarded to main
         run: |
           git fetch origin main develop
 
@@ -41,11 +43,30 @@ jobs:
           echo "Current origin/develop SHA: $CURRENT_DEVELOP_SHA"
 
           if [ "$CURRENT_DEVELOP_SHA" != "$EXPECTED_DEVELOP_SHA" ]; then
-            echo "::error::develop moved after the release PR was merged. Refusing to sync automatically to avoid overwriting new work."
-            echo "Resolve manually: merge or release the new develop changes, then sync again."
+            echo "::error::develop moved after the release PR was merged. Refusing to sync automatically."
             exit 1
           fi
 
-      - name: Sync develop to main
+          if git merge-base --is-ancestor origin/develop origin/main; then
+            echo "develop can be fast-forwarded to main."
+          else
+            echo "::error::develop cannot be fast-forwarded to main."
+            exit 1
+          fi
+
+      - name: Configure deploy key
+        env:
+          SYNC_DEPLOY_KEY: ${{ secrets.SYNC_DEVELOP_DEPLOY_KEY }}
         run: |
-          git push --force-with-lease=refs/heads/develop:${{ github.event.pull_request.head.sha }} origin HEAD:refs/heads/develop
+          mkdir -p ~/.ssh
+          printf "%s\n" "$SYNC_DEPLOY_KEY" > ~/.ssh/sync_develop_after_release
+          chmod 600 ~/.ssh/sync_develop_after_release
+
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+          git config core.sshCommand "ssh -i ~/.ssh/sync_develop_after_release -o IdentitiesOnly=yes"
+          git remote set-url origin git@github.com:Pillaro-Standard/Dataverse-Plugin-Framework.git
+
+      - name: Fast-forward develop to main
+        run: |
+          git push origin HEAD:refs/heads/develop
