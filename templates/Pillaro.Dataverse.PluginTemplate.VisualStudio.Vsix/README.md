@@ -154,7 +154,9 @@ dotnet build "templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pilla
   /p:ArtifactsDirectory="artifacts/templates"
 ```
 
-The VSIX project has a default version in its `.csproj`. Override `VsixVersion` only when you want to build a different local package version.
+The VSIX project stores its version directly in `source.extension.vsixmanifest`. For local Visual Studio rebuilds, edit the `Version` value in that manifest and rebuild the project.
+
+The Azure DevOps pipeline overwrites that manifest version at queue time with its own computed version before building.
 
 ## Validation command
 

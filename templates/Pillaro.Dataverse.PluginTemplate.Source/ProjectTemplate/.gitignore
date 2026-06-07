@@ -1,5 +1,6 @@
 # Local development settings
 **/appsettings.Development.json
+!Tests/appsettings.Development.json
 
 # Build output
 bin/

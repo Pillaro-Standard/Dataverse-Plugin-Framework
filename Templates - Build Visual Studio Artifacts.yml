@@ -58,13 +58,34 @@ jobs:
             Write-Host "Pipeline artifact name: $artifactName"
             Write-Host "##vso[task.setvariable variable=vsixVersion]$vsixVersion"
 
+      - task: PowerShell@2
+        displayName: Stamp VSIX manifest version
+        inputs:
+          targetType: inline
+          script: |
+            $manifestPath = "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix\source.extension.vsixmanifest"
+            $vsixVersion = "$(vsixVersion)"
+
+            [xml]$manifest = Get-Content -LiteralPath $manifestPath -Raw
+            $ns = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+            $ns.AddNamespace('vsx', 'http://schemas.microsoft.com/developer/vsx-schema/2011')
+
+            $identity = $manifest.SelectSingleNode('//vsx:Identity', $ns)
+            if (-not $identity) {
+              throw "VSIX Identity node was not found in '$manifestPath'."
+            }
+
+            $identity.Version = $vsixVersion
+            $manifest.Save($manifestPath)
+
+            Write-Host "Stamped VSIX manifest version: $vsixVersion"
+
       - task: DotNetCoreCLI@2
         displayName: Build template ZIP and VSIX
         inputs:
           command: build
           projects: $(vsixProjectPath)
           arguments: >
-            /p:VsixVersion=$(vsixVersion)
             /p:ArtifactsDirectory="$(artifactOutputDirectory)"
 
       - task: PowerShell@2

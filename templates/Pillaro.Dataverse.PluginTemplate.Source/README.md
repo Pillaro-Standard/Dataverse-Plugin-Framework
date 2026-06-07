@@ -102,7 +102,7 @@ powershell -NoProfile -ExecutionPolicy Bypass `
   -ArtifactsDirectory "artifacts/templates"
 ```
 
-The VSIX project has a default version in its `.csproj`. Pass `VsixVersion` only when you want to build a different local package version.
+The VSIX project stores its version directly in `source.extension.vsixmanifest`. For local Visual Studio rebuilds, edit the `Version` value in that manifest and rebuild the project. The pipeline overwrites that manifest version before building.
 
 ## Short summary
 

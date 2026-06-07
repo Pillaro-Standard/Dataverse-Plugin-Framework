@@ -187,10 +187,11 @@ Builds the Visual Studio project template ZIP and the installable VSIX package. 
 
 1. **Checkout**: Fetches the repository
 2. **Input validation**: Validates the base version, appends `Build.BuildId`, and checks the artifact name
-3. **Build**: Builds `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
-4. **Template validation**: Confirms all files referenced from child `.vstemplate` files exist in the generated ZIP
-5. **VSIX validation**: Confirms the official VSIXv3 output contains the extension manifest, generated template manifest, expanded project template files, icon asset and the computed version
-6. **Artifact publishing**: Uploads the generated ZIP and VSIX from `$(Build.ArtifactStagingDirectory)/templates` as a pipeline artifact
+3. **Manifest stamping**: Writes the computed version into `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/source.extension.vsixmanifest`
+4. **Build**: Builds `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
+5. **Template validation**: Confirms all files referenced from child `.vstemplate` files exist in the generated ZIP
+6. **VSIX validation**: Confirms the official VSIXv3 output contains the extension manifest, generated template manifest, expanded project template files, icon asset and the computed version
+7. **Artifact publishing**: Uploads the generated ZIP and VSIX from `$(Build.ArtifactStagingDirectory)/templates` as a pipeline artifact
 
 ### Artifacts Produced
 

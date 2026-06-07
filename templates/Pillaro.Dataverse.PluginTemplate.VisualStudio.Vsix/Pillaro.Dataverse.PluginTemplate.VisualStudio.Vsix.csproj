@@ -21,8 +21,6 @@
 		<DeployExtension>false</DeployExtension>
 
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<VsixVersion Condition="'$(VsixVersion)' == ''">1.0.8</VsixVersion>
-
 		<ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\templates</ArtifactsDirectory>
 		<ArtifactsDirectoryIsRooted>$([System.IO.Path]::IsPathRooted('$(ArtifactsDirectory)'))</ArtifactsDirectoryIsRooted>
 		<ArtifactsDirectory Condition="'$(ArtifactsDirectoryIsRooted)' != 'True'">$(MSBuildProjectDirectory)\..\..\$(ArtifactsDirectory)</ArtifactsDirectory>
@@ -81,12 +79,6 @@
 		<Message Importance="high" Text="Preparing Pillaro Visual Studio project template..." />
 
 		<Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\PrepareVisualStudioTemplate.ps1&quot; -SharedSourceDir &quot;$(PillaroTemplateSourceDir)&quot; -VisualStudioOverlayDir &quot;$(PillaroVisualStudioOverlayDir)&quot; -PreparedTemplateDir &quot;$(PillaroPreparedTemplateDir)&quot;" />
-	</Target>
-
-	<Target Name="GetVsixVersion" Outputs="$(_VsixVersion)">
-		<PropertyGroup>
-			<_VsixVersion>$(VsixVersion)</_VsixVersion>
-		</PropertyGroup>
 	</Target>
 
 	<Target Name="PackPillaroProjectTemplateZip" BeforeTargets="GetVsixSourceItems" DependsOnTargets="PreparePillaroVisualStudioTemplate">
