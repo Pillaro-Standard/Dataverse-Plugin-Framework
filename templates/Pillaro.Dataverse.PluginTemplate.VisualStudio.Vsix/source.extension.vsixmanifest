@@ -8,7 +8,7 @@
         <License>Assets\LICENSE.txt</License>
         <Icon>Assets\PillaroLogo128.png</Icon>
         <PreviewImage>Assets\PillaroLogo128.png</PreviewImage>
-        <Tags>Dataverse,Power Platform,Dynamics 365,Plugin,Project Template</Tags>
+        <Tags>Dataverse Power Platform Dynamics 365 Plugin</Tags>
     </Metadata>
     <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
