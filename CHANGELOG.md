@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.0
+
+### Pillaro.Dataverse.PluginFramework
+
+- Added code-first plugin registration metadata API through `Register(IPluginRegistration registration)`.
+- Added deployment CLI support for Dataverse plugin assembly deployment and plugin step/image synchronization.
+- Added generated deployment tooling for consuming plugin projects.
+- Added generated early-bound entity generation tooling.
+- Added Visual Studio VSIX project template support for generating a standard Logic / Plugins / Tests solution structure.
+- Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
+- Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing.
+- Improved logging for plugin registration, configuration, and empty registration metadata.
+- Updated documentation for plugin registration, deployment, early-bound generation, CI/CD, generated tooling, and Visual Studio template packaging.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Aligned package dependencies and metadata for configuration, environment variables, memory cache, and Dataverse testing support.
+- Added support required by generated template test projects.
+
 ## 1.1.0-rc
 
 ### Pillaro.Dataverse.PluginFramework
