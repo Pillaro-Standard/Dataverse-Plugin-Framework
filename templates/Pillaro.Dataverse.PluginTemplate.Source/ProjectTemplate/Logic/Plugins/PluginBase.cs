@@ -1,9 +1,9 @@
-﻿namespace $safeprojectname$.Plugins;
+namespace $safeprojectname$.Plugins;
 
-public abstract class PluginBase(string unsecureConfig, string secureConfig) : PluginFramework.Plugins.PluginBase(unsecureConfig, secureConfig)
+public abstract class PluginBase(string unsecureConfig, string secureConfig) : Pillaro.Dataverse.PluginFramework.Plugins.PluginBase(unsecureConfig, secureConfig)
 {
-     public override string GetVersion()
-     {
-         return "1.0";
-     }
+    public override string GetVersion()
+    {
+        return "1.0";
+    }
 }

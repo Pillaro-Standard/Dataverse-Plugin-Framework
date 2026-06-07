@@ -21,18 +21,23 @@
 		<DeployExtension>false</DeployExtension>
 
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<VsixVersion Condition="'$(VsixVersion)' == ''">1.0.52</VsixVersion>
+		<PillaroVsixVersion Condition="'$(PillaroVsixVersion)' == ''">$(VsixVersion)</PillaroVsixVersion>
 
-		<ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\..\artifacts\templates</ArtifactsDirectory>
+		<ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\templates</ArtifactsDirectory>
+		<ArtifactsDirectoryIsRooted>$([System.IO.Path]::IsPathRooted('$(ArtifactsDirectory)'))</ArtifactsDirectoryIsRooted>
+		<ArtifactsDirectory Condition="'$(ArtifactsDirectoryIsRooted)' != 'True'">$(MSBuildProjectDirectory)\..\..\$(ArtifactsDirectory)</ArtifactsDirectory>
+		<ArtifactsDirectory>$([System.IO.Path]::GetFullPath('$(ArtifactsDirectory)'))</ArtifactsDirectory>
 
 		<PillaroTemplateSourceDir>$(MSBuildProjectDirectory)\..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate</PillaroTemplateSourceDir>
 		<PillaroVisualStudioOverlayDir>$(MSBuildProjectDirectory)\template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate</PillaroVisualStudioOverlayDir>
 		<PillaroPreparedTemplateDir>$(MSBuildProjectDirectory)\obj\PreparedTemplate\Pillaro.Dataverse.PluginTemplate</PillaroPreparedTemplateDir>
 		<PillaroProjectTemplateSourceDir>$(PillaroPreparedTemplateDir)</PillaroProjectTemplateSourceDir>
 		<PillaroProjectTemplateZip>$(MSBuildProjectDirectory)\ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip</PillaroProjectTemplateZip>
+		<ArtifactTemplateZipPath>$([System.IO.Path]::GetFullPath('$(ArtifactsDirectory)\Pillaro.Dataverse.PluginTemplate.zip'))</ArtifactTemplateZipPath>
 
 		<ManualTemplateZip>$(PillaroProjectTemplateZip)</ManualTemplateZip>
-		<BuiltVsixPath>$(OutputPath)$(AssemblyName).vsix</BuiltVsixPath>
-		<ArtifactVsixPath>$(ArtifactsDirectory)\Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix</ArtifactVsixPath>
+		<ArtifactVsixPath>$([System.IO.Path]::GetFullPath('$(ArtifactsDirectory)\Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix'))</ArtifactVsixPath>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -79,6 +84,12 @@
 		<Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\PrepareVisualStudioTemplate.ps1&quot; -SharedSourceDir &quot;$(PillaroTemplateSourceDir)&quot; -VisualStudioOverlayDir &quot;$(PillaroVisualStudioOverlayDir)&quot; -PreparedTemplateDir &quot;$(PillaroPreparedTemplateDir)&quot;" />
 	</Target>
 
+	<Target Name="GetVsixVersion" Outputs="$(_VsixVersion)">
+		<PropertyGroup>
+			<_VsixVersion>$(PillaroVsixVersion)</_VsixVersion>
+		</PropertyGroup>
+	</Target>
+
 	<Target Name="PackPillaroProjectTemplateZip" BeforeTargets="GetVsixSourceItems" DependsOnTargets="PreparePillaroVisualStudioTemplate">
 
 		<Message Importance="high" Text="Packing Pillaro project template ZIP..." />
@@ -92,6 +103,10 @@
 		<Error Condition="!Exists('$(PillaroProjectTemplateZip)')" Text="Project template ZIP was not generated: $(PillaroProjectTemplateZip)" />
 	</Target>
 
+	<Target Name="ForcePillaroVsixContainerRebuild" BeforeTargets="CreateVsixContainer">
+		<Delete Files="$(TargetVsixContainer)" Condition="Exists('$(TargetVsixContainer)')" />
+	</Target>
+
 	<Target Name="IncludePillaroProjectTemplateZipInVsix" AfterTargets="GetVsixSourceItems">
 
 		<ItemGroup>
@@ -101,5 +116,15 @@
 		</ItemGroup>
 
 		<Message Importance="high" Text="Added template ZIP to VSIX: $(PillaroProjectTemplateZip)" />
+	</Target>
+
+	<Target Name="PublishPillaroVisualStudioArtifacts" AfterTargets="Build" DependsOnTargets="PackPillaroProjectTemplateZip">
+		<MakeDir Directories="$(ArtifactsDirectory)" />
+		<Message Importance="high" Text="Copying Visual Studio template artifacts to $(ArtifactsDirectory)..." />
+
+		<Copy SourceFiles="$(PillaroProjectTemplateZip)" DestinationFiles="$(ArtifactTemplateZipPath)" />
+		<Error Condition="!Exists('$(TargetVsixContainer)')" Text="VSIX container was not generated: $(TargetVsixContainer)" />
+		<Message Importance="high" Text="VSIX container: $(TargetVsixContainer)" />
+		<Copy SourceFiles="$(TargetVsixContainer)" DestinationFiles="$(ArtifactVsixPath)" />
 	</Target>
 </Project>

@@ -20,7 +20,7 @@ variables:
     value: Pillaro.Dataverse.PluginTemplate
 
   - name: vsixProjectPath
-    value: templates/Pillaro.Dataverse.PluginTemplate/visual-studio-vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj
+    value: templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj
 
   - name: artifactOutputDirectory
     value: $(Build.ArtifactStagingDirectory)/templates

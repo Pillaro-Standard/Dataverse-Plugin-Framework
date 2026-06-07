@@ -141,11 +141,8 @@ function Test-VisualStudioTemplateZip {
             'Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj',
             'Tests\TestAutofacModule.cs',
             'Tests\appsettings.json',
-            'Tests\appsettings.Development.json',
-            'Tests\Data\CleanupHandlers\.gitkeep',
-            'Tests\Data\Repositories\.gitkeep',
             'Tests\Tests\TestBase.cs',
-            'Tests\Tests\ExampleTests.cs'
+            'Tests\Tests\ConnectionTests.cs'
         )
 
         $missing = New-Object System.Collections.Generic.List[string]
@@ -234,7 +231,7 @@ function Test-VisualStudioVsix {
             '[Content_Types].xml',
             'manifest.json',
             'catalog.json',
-            'Assets\Logo128.png',
+            'Assets\PillaroLogo128.png',
             'ProjectTemplates\templateManifest0.noloc.vstman',
             "ProjectTemplates\$TemplateName\$TemplateName.vstemplate",
             "ProjectTemplates\$TemplateName\Logic\Logic.vstemplate",
@@ -275,8 +272,8 @@ function Test-VisualStudioVsix {
             throw "VSIX manifest version is '$($identity.Version)', expected '$VsixVersion'."
         }
 
-        if (-not $icon -or $icon.InnerText -ne 'Assets\Logo128.png') {
-            throw 'VSIX manifest icon must point to Assets\Logo128.png.'
+        if (-not $icon -or $icon.InnerText -ne 'Assets\PillaroLogo128.png') {
+            throw 'VSIX manifest icon must point to Assets\PillaroLogo128.png.'
         }
 
         $contentTypesEntry = $entries['[Content_Types].xml']
@@ -488,9 +485,9 @@ function Invoke-VisualStudioTemplateSmoke {
         (Join-Path $generatedRoot "$SmokeProjectName.Logic\Plugins\ExamplePlugin.cs"),
         (Join-Path $generatedRoot "$SmokeProjectName.Logic\Tasks\Example\ExampleTask.cs"),
         (Join-Path $generatedRoot "$SmokeProjectName.Plugins\key.snk"),
-        (Join-Path $generatedRoot "$SmokeProjectName.Tests\Tests\ExampleTests.cs"),
-        (Join-Path $generatedRoot "$SmokeProjectName.Tests\Data\CleanupHandlers\.gitkeep"),
-        (Join-Path $generatedRoot "$SmokeProjectName.Tests\Data\Repositories\.gitkeep")
+        (Join-Path $generatedRoot "$SmokeProjectName.Tests\Tests\ConnectionTests.cs"),
+        (Join-Path $generatedRoot "$SmokeProjectName.Tests\Data\CleanupHandlers"),
+        (Join-Path $generatedRoot "$SmokeProjectName.Tests\Data\Repositories")
     )) {
         Assert-PathExists -Path $requiredPath -Description 'Generated template file'
     }
@@ -522,41 +519,9 @@ function Invoke-VisualStudioTemplateSmoke {
 }
 
 function Invoke-DotnetTemplateSmoke {
-    $templateSource = Join-Path $repoRoot "templates\$TemplateName"
-    Assert-PathExists -Path $templateSource -Description 'dotnet template source'
-
-    $smokeRoot = Join-Path $workspaceArtifactsRoot 'template-smoke-dotnet'
-    $hiveRoot = Join-Path $smokeRoot 'hive'
-    $generatedRoot = Join-Path $smokeRoot 'generated'
-    $projectName = 'Pill.DotnetSmoke'
-    $projectRoot = Join-Path $generatedRoot $projectName
-
-    Remove-SafeDirectory -Path $smokeRoot
-    New-Item -ItemType Directory -Path $hiveRoot -Force | Out-Null
-    New-Item -ItemType Directory -Path $generatedRoot -Force | Out-Null
-
-    Invoke-CheckedCommand -FilePath 'dotnet' -Arguments @('new', 'install', $templateSource, '--debug:custom-hive', $hiveRoot) -WorkingDirectory $repoRoot
-    Invoke-CheckedCommand -FilePath 'dotnet' -Arguments @('new', 'pillaro-dv-plugin', '-n', $projectName, '-o', $projectRoot, '--debug:custom-hive', $hiveRoot) -WorkingDirectory $generatedRoot
-
-    $solution = Get-ChildItem -LiteralPath $projectRoot -Filter '*.sln' -File | Select-Object -First 1
-    if (-not $solution) {
-        $solution = Get-ChildItem -LiteralPath $projectRoot -Filter '*.slnx' -File | Select-Object -First 1
-    }
-
-    if (-not $solution) {
-        throw "dotnet template did not create a solution under $projectRoot."
-    }
-
-    $msbuild = Get-MSBuildPath
-    Invoke-CheckedCommand -FilePath $msbuild -Arguments @(
-        $solution.FullName,
-        '/t:Restore,Build',
-        "/p:Configuration=$Configuration",
-        '/p:UseSharedCompilation=false',
-        '/m:1'
-    ) -WorkingDirectory $projectRoot
-
-    Write-Host "dotnet template smoke build passed: $($solution.FullName)"
+    # This repository currently ships only the Visual Studio VSIX template.
+    # The dotnet new smoke is intentionally disabled until an installable dotnet template package is added.
+    Write-Host 'Dotnet template smoke intentionally skipped: no installable dotnet template package is published in this repo.'
 }
 
 Test-VisualStudioTemplateZip -Path $zipPath

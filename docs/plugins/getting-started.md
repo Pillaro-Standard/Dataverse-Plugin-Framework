@@ -325,11 +325,11 @@ Use this when you want typed Dataverse entities, generated field constants, or t
 
 ## 7. Create your solution `PluginBase`
 
-Create `Plugins/PluginBase.cs` in the `Logic` project.
+Create `Logic/Plugins/PluginBase.cs` in the `Logic` project.
 
 Example:
 
-    public abstract class PluginBase : PluginFramework.Plugins.PluginBase
+    public abstract class PluginBase : Pillaro.Dataverse.PluginFramework.Plugins.PluginBase
     {
         protected PluginBase(string unsecureConfig, string secureConfig)
             : base(unsecureConfig, secureConfig)
@@ -338,7 +338,7 @@ Example:
 
         public override string GetVersion()
         {
-            return "1.0.0";
+            return "1.0";
         }
     }
     

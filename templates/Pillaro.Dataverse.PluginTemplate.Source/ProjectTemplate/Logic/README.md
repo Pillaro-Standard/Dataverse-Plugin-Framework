@@ -13,7 +13,7 @@ It lives in the **Logic** project so users see it where they spend the most time
    - `Plugins\Tools\Deployment`
    - `Plugins\PillaroSettings.json`
 4. Set `"Solution": "ExampleSolution"` in `PillaroSettings.json`.
-5. Configure the `DVCON` environment variable.
+5. Configure the `DV_CONN` environment variable.
 6. Configure the local Dataverse connection in `<YourSolutionName>.Tests\appsettings.Development.json`.
 7. Do not commit `appsettings.Development.json`.
 8. Run the `Connect_Should_Return_Valid_UserId` test to verify the Dataverse connection.
@@ -128,12 +128,12 @@ Example:
 The deployment tools use the environment variable:
 
 ```text
-DVCON
+DV_CONN
 ```
 
 This variable contains the Dataverse connection string used by the build and deployment tooling.
 
-The setup of `DVCON` is described in:
+The setup of `DV_CONN` is described in:
 
 ```text
 Tools\Deployment\README.md
@@ -258,7 +258,7 @@ These documents describe:
 - ILMerge setup and post-build merge behavior,
 - Microsoft Power Platform CLI setup,
 - deployment scripts,
-- `DVCON` configuration,
+- `DV_CONN` configuration,
 - plugin and plugin step registration.
 
 ---
