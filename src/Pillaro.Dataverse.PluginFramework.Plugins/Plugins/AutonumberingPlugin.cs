@@ -17,7 +17,6 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Plugins
                 .PostOperation()
                 .Synchronous()
                 .WithName("Post Operation pl_AutoNumbering_GetNewNumber")
-                .InSolution("PillaroPluginFramework")
                 .Rank(1);
         }
     }

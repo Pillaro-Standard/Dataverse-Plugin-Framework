@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net481</TargetFramework>
+		<OutputType>Library</OutputType>
+		<IsPackable>false</IsPackable>
+		<LangVersion>latest</LangVersion>
+		<!-- Do not compile template C# files as part of this project -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+		<EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="TemplateSourceMarker.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="ProjectTemplate\**\*.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="ProjectTemplate\LICENSE.txt">
+	    <IncludeInVSIX>true</IncludeInVSIX>
+	  </Content>
+	  <Content Include="ProjectTemplate\PillaroLogo128.png">
+	    <VSIXSubPath>Assets</VSIXSubPath>
+	    <IncludeInVSIX>true</IncludeInVSIX>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="README.md" />
+	</ItemGroup>
+
+</Project>

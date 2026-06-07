@@ -664,6 +664,16 @@ jobs:
                     Assert-PackageEntry -Zip $zip -PackageName $package.Name -EntryPath $entryPath
                   }
 
+                  $environmentVariablesDependency = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']/*[local-name()='dependencies']/*[local-name()='group'][@targetFramework='net8.0']/*[local-name()='dependency'][@id='Microsoft.Extensions.Configuration.EnvironmentVariables']")
+
+                  if (-not $environmentVariablesDependency) {
+                    throw "Package '$($package.Name)' does not declare dependency 'Microsoft.Extensions.Configuration.EnvironmentVariables' for net8.0."
+                  }
+
+                  if ($environmentVariablesDependency.version -ne "8.0.0") {
+                    throw "Package '$($package.Name)' declares Microsoft.Extensions.Configuration.EnvironmentVariables version '$($environmentVariablesDependency.version)', expected '8.0.0'."
+                  }
+
                   Write-Host "  Testing package content checks passed."
                 }
                 else {

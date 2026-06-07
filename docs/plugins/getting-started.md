@@ -176,6 +176,8 @@ Example:
 
 Add the plugin package to the `Plugins` project.
 
+This must be a direct `PackageReference` in the `Plugins` project so the package target can copy `Tools\ILMerge` and import the post-build merge support into the project that actually builds the deployable plugin DLL.
+
 > [!IMPORTANT]
 > `YourSolution.Plugins` is the deployment project.
 > It should not become the place where your business logic grows.
@@ -257,20 +259,18 @@ into one final deployable DLL.
 > Do not use the prepared post-build action as-is without checking its placeholders.
 
 > [!NOTE]
-> In the logic + plugin project variant, the script contains a placeholder for the referenced Logic assembly name.
+> In reusable text files and documentation, use `{LOGIC_ASSEMBLY}` as the placeholder for the referenced Logic assembly name.
 > Replace it with the actual DLL name of your Logic project.
 
 Placeholder:
 
     {LOGIC_ASSEMBLY}
 
-Example of the placeholder usage inside the prepared action:
+In the generated Visual Studio template, the same value can be emitted directly as:
 
-    del "$(TargetDir){LOGIC_ASSEMBLY}"
+    set "LOGIC_DLL=$ext_safeprojectname$.Logic.dll"
 
-This means you must replace `{LOGIC_ASSEMBLY}` with the actual output DLL name, for example:
-
-    del "$(TargetDir)YourSolution.Logic.dll"
+That generated template value is only appropriate for a new solution created from the VSIX template.
 
 #### Option B — You use a single project only
 
@@ -283,11 +283,15 @@ Use:
 
     Tools/ILMerge/PostBuildAction-single-project.txt
 
+This variant uses the same project-local path pattern, but it does not use `{LOGIC_ASSEMBLY}`.
+
 ### 6.2 What the merge step is for
 
 Dataverse requires a single deployable plugin assembly.
 
 The prepared post-build action solves that by creating one final output even when development is split into multiple projects.
+
+The scripts no longer depend on `$(TargetDir)`, `$(TargetFileName)`, or `$(ProjectDir)`.
 
 > [!IMPORTANT]
 > The final deployment artifact is one DLL, even though development may be split into separate projects.
@@ -321,11 +325,11 @@ Use this when you want typed Dataverse entities, generated field constants, or t
 
 ## 7. Create your solution `PluginBase`
 
-Create `Plugins/PluginBase.cs` in the `Logic` project.
+Create `Logic/Plugins/PluginBase.cs` in the `Logic` project.
 
 Example:
 
-    public abstract class PluginBase : PluginFramework.Plugins.PluginBase
+    public abstract class PluginBase : Pillaro.Dataverse.PluginFramework.Plugins.PluginBase
     {
         protected PluginBase(string unsecureConfig, string secureConfig)
             : base(unsecureConfig, secureConfig)
@@ -334,7 +338,7 @@ Example:
 
         public override string GetVersion()
         {
-            return "1.0.0";
+            return "1.0";
         }
     }
     
@@ -415,8 +419,7 @@ Example:
                 .OnCreate<Task>("8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
                 .PreOperation()
                 .Synchronous()
-                .Rank(1)
-                .InSolution("YourSolution");
+                .Rank(1);
         }
     }
 
@@ -435,6 +438,21 @@ This example shows the basic plugin pattern:
 > [!NOTE]
 > A plugin usually targets one entity or one functional area.
 > The task itself can still represent either entity-specific logic or reusable business logic used across multiple entities.
+
+**Alternative: String-Based Registration**
+
+If you don't have early-bound entity types or prefer explicit logical names, you can use string-based registration:
+
+    public override void Register(IPluginRegistration registration)
+    {
+        registration
+            .OnCreate("task", "8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
+            .PreOperation()
+            .Synchronous()
+            .Rank(1);
+    }
+
+Both approaches generate identical deployment metadata. See [Plugin Registration API](./plugin-registration-api.md) for details on entity registration modes.
 
 ---
 

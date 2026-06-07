@@ -6,8 +6,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
 {
     public class TaskPlugin : PluginBase
     {
-        private const string SolutionName = "PillaroPluginFrameworkExamples";
-
         public TaskPlugin(string unsecureConfig, string secureConfig) : base(unsecureConfig, secureConfig)
         {
             RegisterTask<Tasks.Task.AutoNumbering>(PluginStage.Preoperation, ["Create"], Task.EntityLogicalName, PluginMode.Synchronous);
@@ -20,7 +18,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Task>("f94d984d-0f31-f111-88b4-000d3ab2695d")
                 .PreOperation()
                 .Synchronous()
-                .InSolution(SolutionName)
                 .WithName("Pillaro Examples Pre Create Task")
                 .Rank(1)
                 .WithFilteringAttributes("subject");
@@ -29,7 +26,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
                 .PostOperation()
                 .Synchronous()
-                .InSolution(SolutionName)
                 .WithName("Pillaro Examples Post Create Task")
                 .Rank(2);
 
@@ -37,7 +33,6 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnUpdate<Task>("b24d984d-0f31-f111-88b4-000d3ab2695d")
                 .PostOperation()
                 .Synchronous()
-                .InSolution(SolutionName)
                 .WithName("Pillaro Examples Post Update Task")
                 .Rank(3)
                 .WhenChanged(

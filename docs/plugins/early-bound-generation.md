@@ -155,7 +155,6 @@ registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
     .PreOperation()
     .Synchronous()
-    .InSolution("MyDataverseSolution")
     .WhenChanged(c => c.FirstName, c => c.LastName)
     .WithPreImage(
         "00000000-0000-0000-0000-000000000000",

@@ -163,6 +163,49 @@ Stored in Azure DevOps variable group `dataverse-test-secrets`:
 
 ---
 
+## Visual Studio Template Artifact Pipeline
+
+**File**: `Templates - Build Visual Studio Artifacts.yml`
+
+### Template Purpose
+
+Builds the Visual Studio project template ZIP and the installable VSIX package. This pipeline only prepares Azure DevOps artifacts; Marketplace publishing is intentionally left for a separate manual or future release pipeline.
+
+### Trigger
+
+- **Manual only**: No automatic triggers
+- **On-demand**: Executed when a new Visual Studio template artifact is needed
+
+### Parameters
+
+| Parameter | Purpose |
+|-----------|---------|
+| `vsixBaseVersion` | Base version entered at queue time, in `Major.Minor.Patch` format |
+| `artifactName` | Name of the Azure DevOps pipeline artifact |
+
+### Template Execution Flow
+
+1. **Checkout**: Fetches the repository
+2. **Input validation**: Validates the base version, appends `Build.BuildId`, and checks the artifact name
+3. **Manifest stamping**: Writes the computed version into `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/source.extension.vsixmanifest`
+4. **Build**: Builds `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
+5. **Template validation**: Confirms all files referenced from child `.vstemplate` files exist in the generated ZIP
+6. **VSIX validation**: Confirms the official VSIXv3 output contains the extension manifest, generated template manifest, expanded project template files, icon asset and the computed version
+7. **Artifact publishing**: Uploads the generated ZIP and VSIX from `$(Build.ArtifactStagingDirectory)/templates` as a pipeline artifact
+
+### Artifacts Produced
+
+- `Pillaro.Dataverse.PluginTemplate.zip`
+- `Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix`
+
+### Version Strategy
+
+The pipeline asks for a base semantic version such as `1.0.8`, then appends the Azure DevOps build ID to produce the final VSIX version, for example `1.0.8.12345`.
+
+This keeps local builds simple while still giving pipeline builds a unique, traceable package version.
+
+---
+
 ## ➡️ Related documents
 
 - [Contributing Guidelines](CONTRIBUTING.md) — Contribution workflow and testing requirements
