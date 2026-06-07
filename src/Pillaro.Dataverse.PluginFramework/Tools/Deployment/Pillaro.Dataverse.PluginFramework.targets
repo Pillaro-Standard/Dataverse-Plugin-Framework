@@ -36,26 +36,49 @@
     <Compile Include="EarlyBound\**\*.cs" Condition="Exists('EarlyBound')" />
   </ItemGroup>
 
-  <!-- ============================================================
-       Copy ILMerge tooling (always)
-       ============================================================ -->
-  <Target Name="PillaroCopyILMerge"
-          AfterTargets="Build"
-          Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+	<!-- ============================================================
+     Copy ILMerge tooling before post-build merge
+     ============================================================ -->
+	<Target Name="PillaroCopyILMerge"
+			BeforeTargets="PostBuildEvent"
+			Condition="'$(DesignTimeBuild)' != 'true'">
 
-    <MakeDir Directories="$(PillaroIlMergeDir)" Condition="!Exists('$(PillaroIlMergeDir)')" />
+		<PropertyGroup>
+			<!-- Source path inside NuGet package -->
+			<PillaroIlMergeSourceDir>$(MSBuildThisFileDirectory)..\tools\ILMerge\</PillaroIlMergeSourceDir>
 
-    <ItemGroup>
-      <_ILMergeFiles Include="$(PillaroToolsRoot)ILMerge\**\*.*" />
-    </ItemGroup>
+			<!-- Target path inside consuming project -->
+			<PillaroIlMergeTargetDir>$(MSBuildProjectDirectory)\Tools\ILMerge\</PillaroIlMergeTargetDir>
+		</PropertyGroup>
 
-    <Copy SourceFiles="@(_ILMergeFiles)"
-          DestinationFolder="$(PillaroIlMergeDir)%(RecursiveDir)"
-          SkipUnchangedFiles="true"
-          OverwriteReadOnlyFiles="true"
-          Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroIlMergeDir)%(RecursiveDir)%(Filename)%(Extension)'))" />
+		<Message Importance="high"
+				 Text="Preparing Pillaro ILMerge tooling." />
 
-  </Target>
+		<Message Importance="high"
+				 Text="ILMerge source: $(PillaroIlMergeSourceDir)" />
+
+		<Message Importance="high"
+				 Text="ILMerge target: $(PillaroIlMergeTargetDir)" />
+
+		<MakeDir Directories="$(PillaroIlMergeTargetDir)" />
+
+		<ItemGroup>
+			<_PillaroILMergeFiles Include="$(PillaroIlMergeSourceDir)**\*.*" />
+		</ItemGroup>
+
+		<Error Condition="'@(_PillaroILMergeFiles)' == ''"
+			   Text="No ILMerge files were found in package path: $(PillaroIlMergeSourceDir)" />
+
+		<Copy
+		  SourceFiles="@(_PillaroILMergeFiles)"
+		  DestinationFiles="@(_PillaroILMergeFiles->'$(PillaroIlMergeTargetDir)%(RecursiveDir)%(Filename)%(Extension)')"
+		  SkipUnchangedFiles="true"
+		  OverwriteReadOnlyFiles="true" />
+
+		<Error Condition="!Exists('$(PillaroIlMergeTargetDir)ILMerge.exe')"
+			   Text="ILMerge.exe was not copied to project tools folder: $(PillaroIlMergeTargetDir)ILMerge.exe" />
+
+	</Target>
 
   <!-- ============================================================
        Scaffold deployment tools

@@ -143,7 +143,7 @@ Post-build actions are generated after rebuild and are available in:
 Tools/ILMerge/
 ~~~
 
-There are two variants:
+Use the variant that matches your project structure:
 
 - **PostBuildAction-logic_plugin-projects.txt**  
   Use this when your solution contains separate Logic and Plugin projects.  
@@ -153,11 +153,19 @@ There are two variants:
   Use this when all logic is implemented in a single plugin project.  
   This variant merges only the plugin assembly and its dependencies.
 
-Choose the variant that matches your project structure.
+These scripts run `Tools\ILMerge\ILMerge.exe` from the project-local tools folder and derive paths from `$(MSBuildProjectDirectory)`, `$(Configuration)`, and `$(AssemblyName)`.
+
+They do not use `$(TargetDir)`, `$(TargetFileName)`, or `$(ProjectDir)`.
+
+If you are using the generated Visual Studio template, the Logic + Plugins variant can use:
+
+~~~bat
+set "LOGIC_DLL=$ext_safeprojectname$.Logic.dll"
+~~~
 
 7. Build the plugin project.
 
-After signing and post-build configuration, the project produces a single merged assembly ready for deployment. The package also generates deployment helpers in `Tools/Deployment/`, early-bound generation helpers in `Tools/EarlyBound/`, and a `PillaroSettings.json` file in the plugin project root.
+After signing and post-build configuration, the project produces a single merged assembly ready for deployment. The package also generates ILMerge tooling in `Tools/ILMerge/`, deployment helpers in `Tools/Deployment/`, early-bound generation helpers in `Tools/EarlyBound/`, and a `PillaroSettings.json` file in the plugin project root.
 
 8. Optional: generate early-bound entity classes.
 

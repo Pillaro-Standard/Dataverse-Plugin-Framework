@@ -1,0 +1,17 @@
+PILLARO LABS SOFTWARE LICENSE
+
+Copyright (c) 2026 Pillaro Labs s.r.o.
+
+This software, template, documentation, and related files are provided by Pillaro Labs s.r.o.
+
+Permission is granted to use, copy, modify, and integrate this software for personal, internal, and commercial purposes.
+
+You may use this software as part of commercial projects, customer projects, internal tools, and delivered solutions.
+
+This software is provided "as is", without warranty of any kind, whether express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, correctness, availability, security, or non-infringement.
+
+Pillaro Labs s.r.o. is not liable for any claim, damage, loss, defect, business interruption, data loss, security issue, system failure, deployment issue, configuration issue, or any other consequence arising from the use, modification, distribution, or inability to use this software.
+
+You are responsible for reviewing, testing, validating, configuring, and operating this software in your own environment before using it in production or delivering it to customers.
+
+Use of this software means you accept these terms.

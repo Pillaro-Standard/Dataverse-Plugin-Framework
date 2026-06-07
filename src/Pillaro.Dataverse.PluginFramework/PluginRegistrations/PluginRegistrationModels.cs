@@ -37,7 +37,6 @@ public sealed record PluginStepRegistrationDescriptor(
     PluginStage Stage,
     PluginMode Mode,
     int Rank,
-    string SolutionName,
     string Name,
     IReadOnlyCollection<string> FilteringAttributes,
     IReadOnlyCollection<PluginImageRegistrationDescriptor> Images,

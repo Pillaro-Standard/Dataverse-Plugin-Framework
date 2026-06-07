@@ -14,6 +14,12 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
     public IPluginStepStageBuilder OnCreate<TEntity>(string stepId)
         where TEntity : Entity => CreateStep(stepId, DataverseMessages.Create, GetEntityLogicalName<TEntity>(), isUpdate: false);
 
+    public IPluginStepStageBuilder OnCreate(string entityLogicalName, string stepId)
+    {
+        ValidateEntityLogicalName(entityLogicalName);
+        return CreateStep(stepId, DataverseMessages.Create, entityLogicalName, isUpdate: false);
+    }
+
     public IPluginUpdateStepStageBuilder<TEntity> OnUpdate<TEntity>(string stepId)
         where TEntity : Entity
     {
@@ -22,13 +28,33 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         return builder;
     }
 
+    public IPluginUpdateStepStageBuilder OnUpdate(string entityLogicalName, string stepId)
+    {
+        ValidateEntityLogicalName(entityLogicalName);
+        var builder = new UpdateStepBuilderNonGeneric(stepId, DataverseMessages.Update, entityLogicalName);
+        _steps.Add(builder);
+        return builder;
+    }
+
     public IPluginStepStageBuilder OnDelete<TEntity>(string stepId)
         where TEntity : Entity => CreateStep(stepId, DataverseMessages.Delete, GetEntityLogicalName<TEntity>(), isUpdate: false);
+
+    public IPluginStepStageBuilder OnDelete(string entityLogicalName, string stepId)
+    {
+        ValidateEntityLogicalName(entityLogicalName);
+        return CreateStep(stepId, DataverseMessages.Delete, entityLogicalName, isUpdate: false);
+    }
 
     public IPluginStepStageBuilder OnMessage(string stepId, string messageName) => CreateStep(stepId, messageName, entityName: null, isUpdate: false);
 
     public IPluginStepStageBuilder OnMessage<TEntity>(string stepId, string messageName)
         where TEntity : Entity => CreateStep(stepId, messageName, GetEntityLogicalName<TEntity>(), isUpdate: false);
+
+    public IPluginStepStageBuilder OnMessage(string entityLogicalName, string stepId, string messageName)
+    {
+        ValidateEntityLogicalName(entityLogicalName);
+        return CreateStep(stepId, messageName, entityLogicalName, isUpdate: false);
+    }
 
     public PluginRegistrationDescriptor Build()
     {
@@ -42,6 +68,14 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         var builder = new StepBuilder(stepId, messageName, entityName, isUpdate);
         _steps.Add(builder);
         return builder;
+    }
+
+    private static void ValidateEntityLogicalName(string entityLogicalName)
+    {
+        if (string.IsNullOrWhiteSpace(entityLogicalName))
+        {
+            throw new ArgumentException("Entity logical name is required.", nameof(entityLogicalName));
+        }
     }
 
     private static string GetEntityLogicalName<TEntity>()
@@ -69,7 +103,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         private PluginStage? _stage;
         private PluginMode? _mode;
         private int _rank = 1;
-        private string _solutionName;
         private string _name;
         private PluginDeploymentPolicyDescriptor _deploymentPolicy;
         private string _unsecureConfiguration;
@@ -103,12 +136,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public IPluginStepBuilder Rank(int rank)
         {
             SetRank(rank);
-            return this;
-        }
-
-        public IPluginStepBuilder InSolution(string solutionName)
-        {
-            SetSolution(solutionName);
             return this;
         }
 
@@ -154,11 +181,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 throw new InvalidOperationException($"Plugin step '{StepId}' must define an execution mode.");
             }
 
-            if (string.IsNullOrWhiteSpace(_solutionName))
-            {
-                throw new InvalidOperationException($"Plugin step '{StepId}' must define solution name using InSolution(...).");
-            }
-
             return new PluginStepRegistrationDescriptor(
                 StepId,
                 pluginType,
@@ -167,7 +189,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
                 _stage.Value,
                 _mode.Value,
                 _rank,
-                _solutionName!,
                 _name,
                 _filteringAttributes.Distinct(StringComparer.OrdinalIgnoreCase).ToArray(),
                 _images.ToArray(),
@@ -200,11 +221,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             }
 
             _rank = rank;
-        }
-
-        protected void SetSolution(string solutionName)
-        {
-            _solutionName = RequireValue(solutionName, nameof(solutionName));
         }
 
         protected void SetName(string name)
@@ -340,12 +356,6 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
             return this;
         }
 
-        public new IPluginUpdateStepBuilder<TEntity> InSolution(string solutionName)
-        {
-            SetSolution(solutionName);
-            return this;
-        }
-
         public new IPluginUpdateStepBuilder<TEntity> WithName(string name)
         {
             SetName(name);
@@ -397,6 +407,95 @@ public sealed class PluginRegistrationBuilder<TPlugin> : IPluginRegistration
         public IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes)
         {
             AddImage(imageId, PluginImageType.PostImage, name, TypedAttributeSelector.GetLogicalNames(attributes));
+            return this;
+        }
+    }
+
+    private sealed class UpdateStepBuilderNonGeneric : StepBuilder,
+        IPluginUpdateStepStageBuilder,
+        IPluginUpdateStepModeBuilder,
+        IPluginUpdateStepBuilder
+    {
+        public UpdateStepBuilderNonGeneric(string stepId, string messageName, string entityName)
+            : base(stepId, messageName, entityName, isUpdate: true)
+        {
+        }
+
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.PreValidation()
+        {
+            SetStage(PluginStage.Prevalidation);
+            return this;
+        }
+
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.PreOperation()
+        {
+            SetStage(PluginStage.Preoperation);
+            return this;
+        }
+
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.MainOperation()
+        {
+            SetStage(PluginStage.Mainoperation);
+            return this;
+        }
+
+        IPluginUpdateStepModeBuilder IPluginUpdateStepStageBuilder.PostOperation()
+        {
+            SetStage(PluginStage.Postoperation);
+            return this;
+        }
+
+        IPluginUpdateStepBuilder IPluginUpdateStepModeBuilder.Synchronous()
+        {
+            SetMode(PluginMode.Synchronous);
+            return this;
+        }
+
+        IPluginUpdateStepBuilder IPluginUpdateStepModeBuilder.Asynchronous()
+        {
+            SetMode(PluginMode.Asynchronous);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder Rank(int rank)
+        {
+            SetRank(rank);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder WithName(string name)
+        {
+            SetName(name);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder WithFilteringAttributes(params string[] attributes)
+        {
+            AddFilteringAttributes(NormalizeAttributes(attributes, nameof(attributes)));
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder WithUnsecureConfiguration(string unsecureConfiguration)
+        {
+            SetUnsecureConfiguration(unsecureConfiguration);
+            return this;
+        }
+
+        public IPluginUpdateStepBuilder WhenChanged(params string[] attributes)
+        {
+            AddFilteringAttributes(NormalizeAttributes(attributes, nameof(attributes)));
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder WithPreImage(string imageId, string name, params string[] attributes)
+        {
+            AddImage(imageId, PluginImageType.PreImage, name, attributes);
+            return this;
+        }
+
+        public new IPluginUpdateStepBuilder WithPostImage(string imageId, string name, params string[] attributes)
+        {
+            AddImage(imageId, PluginImageType.PostImage, name, attributes);
             return this;
         }
     }
