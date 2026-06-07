@@ -23,9 +23,9 @@ public class TaskContext
 
     public string Message { get; }
 
-    public Dictionary<string, object> UnsecureConfig { get; }
+    public string UnsecureConfig { get; }
 
-    public Dictionary<string, object> SecureConfig { get; }
+    public string SecureConfig { get; }
 
     public string Version { get; set; } = "Unknown";
 
@@ -47,56 +47,8 @@ public class TaskContext
         Stage = (PluginStage)PluginExecutionContext.Stage;
         Message = PluginExecutionContext.MessageName;
         Mode = (PluginMode)PluginExecutionContext.Mode;
-
-        if (!string.IsNullOrEmpty(unsecuredConfig))
-            UnsecureConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(unsecuredConfig);
-
-        if (!string.IsNullOrEmpty(securedConfig))
-            SecureConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(securedConfig);
-    }
-
-    public TValue? GetSecuredValue<TValue>(string key) where TValue : struct
-    {
-        if (SecureConfig == null)
-            return null;
-
-        if (!SecureConfig.ContainsKey(key))
-            return null;
-
-        return (TValue)Convert.ChangeType(SecureConfig[key], typeof(TValue));
-    }
-
-    public string GetSecuredValue(string key)
-    {
-        if (SecureConfig == null)
-            return null;
-
-        if (!SecureConfig.ContainsKey(key))
-            return null;
-
-        return SecureConfig[key]?.ToString();
-    }
-
-    public TValue? GetUnsecuredValue<TValue>(string key) where TValue : struct
-    {
-        if (UnsecureConfig == null)
-            return null;
-
-        if (!UnsecureConfig.ContainsKey(key))
-            return null;
-
-        return (TValue)Convert.ChangeType(UnsecureConfig[key], typeof(TValue));
-    }
-
-    public string GetUnsecuredValue(string key)
-    {
-        if (UnsecureConfig == null)
-            return null;
-
-        if (!UnsecureConfig.ContainsKey(key))
-            return null;
-
-        return UnsecureConfig[key]?.ToString();
+        UnsecureConfig = unsecuredConfig;
+        SecureConfig = securedConfig;
     }
 
     public void AddItem(string key, object value)

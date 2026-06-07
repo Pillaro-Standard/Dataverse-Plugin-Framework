@@ -20,7 +20,7 @@ All pipelines are defined in YAML files at the repository root.
 
 **File**: `Nightly – Tests Only.yml`
 
-### Purpose
+### Nightly Purpose
 
 Validates all test projects against a real Dataverse environment to detect integration issues and regressions early.
 
@@ -31,10 +31,10 @@ Validates all test projects against a real Dataverse environment to detect integ
 - **Branches**: `main` and `develop`
 - **Trigger**: Scheduled (runs even if no changes were made)
 
-### Execution Flow
+### Nightly Execution Flow
 
 1. **Checkout**: Fetches latest code (shallow clone, depth 1)
-2. **SDK Installation**: Installs .NET SDK 10.x
+2. **SDK Installation**: Installs .NET SDK 8.x
 3. **Restore**: Restores all NuGet packages for test projects
 4. **Build**: Builds all test projects in Release configuration
 5. **Test Execution**: Runs all tests with code coverage collection
@@ -91,7 +91,7 @@ Running tests on a schedule (rather than on every commit) provides:
 
 **File**: `Packages – Build & Package.yml`
 
-### Purpose
+### Package Purpose
 
 Builds and packages NuGet packages for distribution.
 
@@ -119,15 +119,14 @@ Determines version suffix and target audience:
 | `rc` | `1.0.0-rc.{buildId}` | Release candidate builds |
 | `release` | `1.0.0` | Stable production release |
 
-### Execution Flow
+### Package Execution Flow
 
 1. **Checkout**: Fetches full repository history (`fetchDepth: 0`)
-2. **SDK Installation**: Installs .NET SDK 10.x
+2. **SDK Installation**: Installs .NET SDK 8.x
 3. **Version Calculation**: Determines package and assembly versions
-4. **CHANGELOG Injection**: Reads latest release notes from `CHANGELOG.md`
-5. **Build**: Builds framework and testing projects
-6. **Pack**: Creates NuGet packages (`.nupkg` files)
-7. **Publish**: Uploads packages as pipeline artifacts
+4. **Build**: Builds framework and testing projects
+5. **Pack**: Creates NuGet packages (`.nupkg` files)
+6. **Publish**: Uploads packages as pipeline artifacts
 
 ### Packages Produced
 
@@ -144,15 +143,17 @@ Determines version suffix and target audience:
 
 #### Release Notes
 
-Release notes are automatically extracted from `CHANGELOG.md` and injected into each package's `.nuspec` file.
+NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file through the source branch used by the package build.
 
-The pipeline:
+This keeps package metadata simple while the detailed release history stays in one maintained place. It also allows release-branch documentation and changelog corrections without rebuilding the NuGet package.
 
-1. Reads latest release section from `CHANGELOG.md`
-2. Extracts section for each package
-3. Injects content into corresponding `.nuspec` file
+The packaging pipeline stamps both framework package nuspec files with:
 
-This ensures package metadata is always synchronized with the changelog.
+```text
+https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/<source-branch>/CHANGELOG.md
+```
+
+Package verification rejects release notes that point to the exact source commit instead of the source branch.
 
 ### Environment Variables
 
@@ -162,9 +163,53 @@ Stored in Azure DevOps variable group `dataverse-test-secrets`:
 
 ---
 
-## Related Documentation
+## Visual Studio Template Artifact Pipeline
+
+**File**: `Templates - Build Visual Studio Artifacts.yml`
+
+### Template Purpose
+
+Builds the Visual Studio project template ZIP and the installable VSIX package. This pipeline only prepares Azure DevOps artifacts; Marketplace publishing is intentionally left for a separate manual or future release pipeline.
+
+### Trigger
+
+- **Manual only**: No automatic triggers
+- **On-demand**: Executed when a new Visual Studio template artifact is needed
+
+### Parameters
+
+| Parameter | Purpose |
+|-----------|---------|
+| `vsixBaseVersion` | Base version entered at queue time, in `Major.Minor.Patch` format |
+| `artifactName` | Name of the Azure DevOps pipeline artifact |
+
+### Template Execution Flow
+
+1. **Checkout**: Fetches the repository
+2. **Input validation**: Validates the base version, appends `Build.BuildId`, and checks the artifact name
+3. **Manifest stamping**: Writes the computed version into `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/source.extension.vsixmanifest`
+4. **Build**: Builds `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
+5. **Template validation**: Confirms all files referenced from child `.vstemplate` files exist in the generated ZIP
+6. **VSIX validation**: Confirms the official VSIXv3 output contains the extension manifest, generated template manifest, expanded project template files, icon asset and the computed version
+7. **Artifact publishing**: Uploads the generated ZIP and VSIX from `$(Build.ArtifactStagingDirectory)/templates` as a pipeline artifact
+
+### Artifacts Produced
+
+- `Pillaro.Dataverse.PluginTemplate.zip`
+- `Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix`
+
+### Version Strategy
+
+The pipeline asks for a base semantic version such as `1.0.8`, then appends the Azure DevOps build ID to produce the final VSIX version, for example `1.0.8.12345`.
+
+This keeps local builds simple while still giving pipeline builds a unique, traceable package version.
+
+---
+
+## ➡️ Related documents
 
 - [Contributing Guidelines](CONTRIBUTING.md) — Contribution workflow and testing requirements
 - [Testing Overview](tests/testing.md) — Framework testing infrastructure
-- [Versioning Strategy](VERSIONING.md) — Release and version management
+- [Deployment Plugins](plugins/deployment-plugins.md) — Deploy plugin assemblies and registration metadata
+- [Versioning Strategy](versioning.md) — Release and version management
 

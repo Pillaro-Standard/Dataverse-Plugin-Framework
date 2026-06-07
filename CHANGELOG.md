@@ -1,5 +1,56 @@
 # Changelog
 
+## 1.1.0
+
+### Pillaro.Dataverse.PluginFramework
+
+- Added code-first plugin registration metadata API through `Register(IPluginRegistration registration)`.
+- Added deployment CLI support for Dataverse plugin assembly deployment and plugin step/image synchronization.
+- Added generated deployment tooling for consuming plugin projects.
+- Added generated early-bound entity generation tooling.
+- Added Visual Studio VSIX project template support for generating a standard Logic / Plugins / Tests solution structure.
+- Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
+- Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing.
+- Improved logging for plugin registration, configuration, and empty registration metadata.
+- Updated documentation for plugin registration, deployment, early-bound generation, CI/CD, generated tooling, and Visual Studio template packaging.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Aligned package dependencies and metadata for configuration, environment variables, memory cache, and Dataverse testing support.
+- Added support required by generated template test projects.
+
+## 1.1.0-rc
+
+### Pillaro.Dataverse.PluginFramework
+
+- Added code-first plugin registration metadata API through `Register(IPluginRegistration registration)`. See [Plugin Registration API](docs/plugins/plugin-registration-api.md).
+- Added deployment CLI support for Dataverse plugin assembly deployment and plugin step/image synchronization. See [Deployment Plugins](docs/plugins/deployment-plugins.md).
+- Added generated deployment tooling for consuming plugin projects, including `PillaroSettings.json`, deployment wrappers, and deployment documentation.
+- Added generated early-bound entity generation tooling for consuming plugin projects, including `Tools/EarlyBound/GenerateEarlyBound.bat`, user-owned `Tools/EarlyBound/EarlyBoundSettings.json`, package-managed tooling documentation, and Power Platform CLI (`pac modelbuilder`) support. See [Early-Bound Entity Generation](docs/plugins/early-bound-generation.md).
+- Fixed deployment registration upsert so image create/update changes are applied even when the parent step is unchanged.
+- Changed `SecureConfig` and `UnsecureConfig` handling to expose raw string values intentionally instead of automatic JSON parsing.
+- Added unsecure configuration details to logs and masked secure configuration values by logging only that secure configuration is registered.
+- Added logging when `Register` method is empty or not overridden, indicating no steps were registered via registration API.
+- Clarified documentation for Create and Update filtering attributes, generated deployment tooling, SDK-style early-bound source inclusion, and `MinimalSeverityLevel`.
+- Aligned package dependency metadata and deployment documentation with the current build and packaging behavior.
+- Fixed issue #25, where the NuGet package build had incorrect changelog content.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Aligned package dependencies and package metadata for configuration, environment variable, memory cache, and Dataverse testing support.
+- Fixed issue #25, where the NuGet package build had incorrect changelog content.
+
+### 1.0.2
+
+### Pillaro.Dataverse.PluginFramework
+- Promoted package version after successful verification and production deployment.
+- No functional changes were introduced in this release.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+- Promoted package version after successful verification and production deployment.
+- No functional changes were introduced in this release.
+
+
 ### 1.0.2-rc
 
 ### Pillaro.Dataverse.PluginFramework

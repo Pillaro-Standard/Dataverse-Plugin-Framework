@@ -91,3 +91,10 @@ Security updates will be released as patch versions and announced via:
 - Release notes
 
 We recommend enabling GitHub notifications for this repository to stay informed about security updates.
+
+## ➡️ Related documents
+
+- [Contributing](./CONTRIBUTING.md) - Contribution workflow and review expectations.
+- [Code of Conduct](./CODE_OF_CONDUCT.md) - Community behavior expectations.
+- [Limitations](./limitations.md) - Framework constraints and compatibility notes.
+- [Error Handling](./plugins/error-handling.md) - Exception handling and validation failure behavior.

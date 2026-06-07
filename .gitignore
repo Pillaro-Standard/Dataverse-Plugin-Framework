@@ -361,9 +361,17 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 *.txt
+!templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate/LICENSE.txt
 *.bak
 /examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/appsettings.Development.json
 /tests/Pillaro.Dataverse.PluginFramework.Tests/appsettings.Development.json
 /examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/appsettings.Development.json
 /tests/Pillaro.Dataverse.PluginFramework.Tests/appsettings.Development.json
 /.vscode
+/.github
+
+# Local nuget.exe used for packaging
+tools/nuget.exe
+/templates.zip
+/artifacts/templates/
+/templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/ProjectTemplates/Pillaro.Dataverse.PluginTemplate.zip
