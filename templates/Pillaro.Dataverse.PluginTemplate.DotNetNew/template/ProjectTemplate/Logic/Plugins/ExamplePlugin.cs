@@ -1,8 +1,8 @@
-using $safeprojectname$.Logic.Tasks.Example;
+using $logicnamespace$.Tasks.Example;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
-namespace $safeprojectname$.Logic.Plugins;
+namespace $logicnamespace$.Plugins;
 
 public class ExamplePlugin : PluginBase
 {

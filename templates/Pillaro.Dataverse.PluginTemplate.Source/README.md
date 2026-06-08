@@ -9,7 +9,7 @@ This project contains the shared source files for the Pillaro Dataverse plugin p
 It contains files that are independent of a specific template delivery format. These files are expected to be reused by multiple template types, for example:
 
 - Visual Studio VSIX project template
-- future `dotnet new` template
+- `dotnet new` template package
 - future internal or CI-generated template packages
 
 The goal is to keep the actual plugin solution skeleton in one shared place and avoid duplicating common files across multiple template packaging projects.
@@ -69,13 +69,15 @@ Those files belong to the packaging-specific project, for example `Pillaro.Datav
 
 The Visual Studio VSIX project reads this shared source and combines it with Visual Studio-specific overlay files.
 
+The `dotnet new` template package reads the same shared source and combines it with CLI-oriented overlay files for Visual Studio Code and terminal-based workflows.
+
 The shared source is copied into a prepared temporary template folder. Then Visual Studio-specific files from the VSIX project are overlaid on top of it.
 
 This means:
 
 1. common files live here,
 2. Visual Studio-specific files live in the VSIX project,
-3. the VSIX project is responsible for producing the final installable template package.
+3. the VSIX project is responsible for producing the final installable Visual Studio template package.
 
 ## Maintenance rules
 

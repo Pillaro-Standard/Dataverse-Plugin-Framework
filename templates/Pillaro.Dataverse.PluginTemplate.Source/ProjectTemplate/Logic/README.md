@@ -6,8 +6,8 @@ It lives in the **Logic** project so users see it where they spend the most time
 
 ## Quick setup checklist
 
-1. Create a new solution from the Visual Studio template.
-2. Run **Build > Rebuild Solution**.
+1. Create a new solution from the template.
+2. Run **Build > Rebuild Solution** in Visual Studio, or run `dotnet build` from the terminal in Visual Studio Code.
 3. Include generated files and folders in Visual Studio if needed:
    - `Logic\Tools\EarlyBound`
    - `Plugins\Tools\Deployment`
@@ -26,6 +26,12 @@ After creating the project from the template, first rebuild the whole solution:
 
 ```text
 Build > Rebuild Solution
+```
+
+If you are using Visual Studio Code, run:
+
+```powershell
+dotnet build
 ```
 
 During the rebuild, helper folders and files are generated into the projects.

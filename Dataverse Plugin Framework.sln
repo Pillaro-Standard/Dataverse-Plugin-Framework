@@ -106,6 +106,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.Source", "templates\Pillaro.Dataverse.PluginTemplate.Source\Pillaro.Dataverse.PluginTemplate.Source.csproj", "{1332D3FC-022B-47DA-88A5-C3508B7A5003}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.DotNetNew", "templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\Pillaro.Dataverse.PluginTemplate.DotNetNew.csproj", "{6E757C3A-BA38-F869-0A37-B405C0A129BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +154,10 @@ Global
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,6 +178,7 @@ Global
 		{204B93AF-6340-4F3F-B0D5-7377DDB8169E} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
 		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}

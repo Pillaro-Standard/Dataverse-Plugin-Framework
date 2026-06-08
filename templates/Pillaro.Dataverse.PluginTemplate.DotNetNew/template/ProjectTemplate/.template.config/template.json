@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Pillaro Labs s.r.o.",
+  "classifications": [
+    "Dataverse",
+    "Dynamics 365",
+    "Plugin",
+    "Solution"
+  ],
+  "description": "Creates a Dataverse plugin solution with Logic, Plugins and Tests projects.",
+  "identity": "Pillaro.Dataverse.PluginTemplate.DotNetNew",
+  "name": "Pillaro Dataverse Plugin Template",
+  "shortName": "pillaro-dataverse-plugin",
+  "sourceName": "Pillaro.Dataverse.PluginTemplate",
+  "groupIdentity": "Pillaro.Dataverse.PluginTemplate",
+  "preferNameDirectory": true,
+  "defaultName": "Pillaro.Dataverse.PluginTemplate",
+  "forms": {
+    "appendLogicSuffix": {
+      "identifier": "replace",
+      "pattern": "^(.*)$",
+      "replacement": "$1.Logic"
+    },
+    "appendTestsSuffix": {
+      "identifier": "replace",
+      "pattern": "^(.*)$",
+      "replacement": "$1.Tests"
+    }
+  },
+  "symbols": {
+    "logicnamespace": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "appendLogicSuffix",
+      "replaces": "$logicnamespace$"
+    },
+    "testprojectname": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "appendTestsSuffix",
+      "replaces": "$testprojectname$"
+    }
+  },
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}
