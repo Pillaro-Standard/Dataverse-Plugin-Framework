@@ -55,6 +55,9 @@ variables:
   - name: visualStudioArtifactOutputDirectory
     value: $(artifactOutputRoot)/visual-studio
 
+  - name: dotnetNewArtifactOutputDirectory
+    value: $(artifactOutputRoot)/dotnet-new
+
 jobs:
   - job: BuildTemplateArtifacts
     displayName: Build Visual Studio and .NET template artifacts
@@ -188,8 +191,24 @@ jobs:
           command: restore
           projects: $(dotnetTemplateProjectPath)
 
+      - task: PowerShell@2
+        displayName: Prepare .NET template artifact directory
+        inputs:
+          targetType: inline
+          script: |
+            $artifactDirectory = "$(dotnetNewArtifactOutputDirectory)"
+
+            if (Test-Path -LiteralPath $artifactDirectory) {
+              Get-ChildItem -LiteralPath $artifactDirectory -Force | Remove-Item -Recurse -Force
+            }
+            else {
+              New-Item -ItemType Directory -Path $artifactDirectory -Force | Out-Null
+            }
+
+            Write-Host "Prepared .NET template artifact directory: $artifactDirectory"
+
       - task: DotNetCoreCLI@2
-        displayName: Build .NET template project
+        displayName: Build .NET template project and create NuGet package
         inputs:
           command: build
           projects: $(dotnetTemplateProjectPath)
@@ -208,37 +227,38 @@ jobs:
             /p:PublishRepositoryUrl=true
             /p:EmbedUntrackedSources=true
             /p:IncludeSourceRevisionInInformationalVersion=false
-            /p:GeneratePackageOnBuild=false
+            /p:GeneratePackageOnBuild=true
+            /p:PackageOutputPath="$(dotnetNewArtifactOutputDirectory)"
 
       - task: PowerShell@2
-        displayName: Resolve .NET template package path
+        displayName: Resolve .NET template NuGet package
         inputs:
           targetType: inline
           script: |
-            $searchRoots = @(
-              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)",
-              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew"
-            ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+            $artifactDirectory = "$(dotnetNewArtifactOutputDirectory)"
 
-            $package = $null
-            foreach ($root in $searchRoots) {
-              if (-not (Test-Path -LiteralPath $root)) {
-                continue
-              }
-
-              $package = Get-ChildItem -LiteralPath $root -Filter "$(templatePackageId).*nupkg" -File -Recurse -ErrorAction SilentlyContinue |
-                Sort-Object LastWriteTime -Descending |
-                Select-Object -First 1
-
-              if ($package) {
-                break
-              }
+            if (-not (Test-Path -LiteralPath $artifactDirectory)) {
+              throw ".NET template artifact directory was not found: $artifactDirectory"
             }
 
-            if (-not $package) {
-              $inspected = $searchRoots -join '; '
-              throw "Could not find the .NET template package. Searched: $inspected"
+            $zipFiles = Get-ChildItem -LiteralPath $artifactDirectory -Filter "*.zip" -File -ErrorAction SilentlyContinue
+            if ($zipFiles) {
+              $names = ($zipFiles | ForEach-Object { $_.FullName }) -join '; '
+              throw ".NET template artifact directory must not contain ZIP files. Found: $names"
             }
+
+            $packages = Get-ChildItem -LiteralPath $artifactDirectory -Filter "$(templatePackageId).*.nupkg" -File -ErrorAction SilentlyContinue
+
+            if (-not $packages) {
+              throw "Could not find generated .NET template .nupkg in artifact directory: $artifactDirectory"
+            }
+
+            if ($packages.Count -ne 1) {
+              $names = ($packages | ForEach-Object { $_.FullName }) -join '; '
+              throw "Expected exactly one .NET template .nupkg, but found $($packages.Count): $names"
+            }
+
+            $package = $packages | Select-Object -First 1
 
             Write-Host "Resolved .NET template package path: $($package.FullName)"
             Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$($package.FullName)"
@@ -260,7 +280,7 @@ jobs:
           artifact: ${{ parameters.visualStudioArtifactName }}
 
       - task: PublishPipelineArtifact@1
-        displayName: Upload .NET template artifacts
+        displayName: Upload .NET template NuGet package
         inputs:
-          targetPath: $(dotnetTemplatePackagePath)
+          targetPath: $(dotnetNewArtifactOutputDirectory)
           artifact: ${{ parameters.dotnetNewArtifactName }}
