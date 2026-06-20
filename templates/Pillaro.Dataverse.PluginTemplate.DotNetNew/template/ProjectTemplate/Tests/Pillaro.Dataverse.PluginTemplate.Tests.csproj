@@ -46,18 +46,18 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj" ExcludeAssets="runtime" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj" ExcludeAssets="runtime" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Data\" />
+		<Folder Include="Data\CleanupHandlers\" />
+		<Folder Include="Data\Repositories\" />
+	</ItemGroup>
 
-  <!--<ItemGroup>
-    <Folder Include="Data\CleanupHandlers\" />
-    <Folder Include="Data\Repositories\" />
-    <Folder Include="Data\" />
-  </ItemGroup>-->
+	<ItemGroup>
+		<Using Include="Xunit" />
+	</ItemGroup>
 
 </Project>

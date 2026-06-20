@@ -13,7 +13,7 @@ dotnet pack "templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/Pillaro.Datave
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass `
   -File scripts/Test-DotNetTemplateArtifacts.ps1 `
-  -TemplatePackagePath "templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/bin/Release/Pillaro.Dataverse.PluginTemplate.DotNetNew.1.0.12.nupkg" `
+  -TemplatePackagePath "templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/bin/Release/Pillaro.Dataverse.PluginTemplate.DotNetNew.<version>.nupkg" `
   -SkipBuildSmoke
 ```
 

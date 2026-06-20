@@ -60,9 +60,4 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Data\CleanupHandlers\" />
-		<Folder Include="Data\Repositories\" />
-	</ItemGroup>
-
 </Project>
