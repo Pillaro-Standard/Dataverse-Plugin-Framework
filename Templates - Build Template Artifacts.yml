@@ -28,7 +28,7 @@ parameters:
   - name: dotnetNewArtifactName
     displayName: '.NET new artifact name'
     type: string
-    default: 'dotnet-new-template'
+    default: 'Pillaro.Dataverse.PluginTemplate.DotNetNew'
 
 variables:
   - name: configuration
@@ -54,9 +54,6 @@ variables:
 
   - name: visualStudioArtifactOutputDirectory
     value: $(artifactOutputRoot)/visual-studio
-
-  - name: dotnetNewArtifactOutputDirectory
-    value: $(artifactOutputRoot)/dotnet-new
 
 jobs:
   - job: BuildTemplateArtifacts
@@ -192,16 +189,13 @@ jobs:
           projects: $(dotnetTemplateProjectPath)
 
       - task: DotNetCoreCLI@2
-        displayName: Pack .NET template project
+        displayName: Build .NET template project
         inputs:
-          command: pack
-          packagesToPack: $(dotnetTemplateProjectPath)
-          nobuild: true
-          includesymbols: false
+          command: build
+          projects: $(dotnetTemplateProjectPath)
           arguments: >
             --configuration $(configuration)
             --no-restore
-            --output "$(dotnetNewArtifactOutputDirectory)"
             /p:Version=$(dotnetPackageVersion)
             /p:PackageVersion=$(dotnetPackageVersion)
             /p:AssemblyVersion=$(dotnetAssemblyVersion)
@@ -221,10 +215,7 @@ jobs:
         inputs:
           targetType: inline
           script: |
-            $targetDirectory = "$(dotnetNewArtifactOutputDirectory)"
             $searchRoots = @(
-              $targetDirectory,
-              "$(Build.ArtifactStagingDirectory)",
               "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)",
               "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew"
             ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
@@ -249,16 +240,8 @@ jobs:
               throw "Could not find the .NET template package. Searched: $inspected"
             }
 
-            New-Item -ItemType Directory -Path $targetDirectory -Force | Out-Null
-            $targetPath = Join-Path $targetDirectory $package.Name
-
-            if ($package.FullName -ne $targetPath) {
-              Copy-Item -LiteralPath $package.FullName -Destination $targetPath -Force
-              Write-Host "Copied .NET template package to artifact directory: $targetPath"
-            }
-
-            Write-Host "Resolved .NET template package path: $targetPath"
-            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$targetPath"
+            Write-Host "Resolved .NET template package path: $($package.FullName)"
+            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$($package.FullName)"
 
       - task: PowerShell@2
         displayName: Validate .NET template artifacts and smoke build
