@@ -6,9 +6,9 @@ pr: none
 
 parameters:
   - name: baseVersion
-    displayName: 'Base version (e.g. 1.0.20)'
+    displayName: 'Base version (e.g. 1.0.0)'
     type: string
-    default: '1.0.20'
+    default: '1.0.0'
 
   - name: packageType
     displayName: 'Template package type'
@@ -57,9 +57,6 @@ variables:
 
   - name: visualStudioPublishOutputDirectory
     value: $(artifactOutputRoot)/visual-studio-publish
-
-  - name: dotnetNewArtifactOutputDirectory
-    value: $(artifactOutputRoot)/dotnet-new
 
 jobs:
   - job: BuildTemplateArtifacts
@@ -249,57 +246,30 @@ jobs:
             /p:IncludeSourceRevisionInInformationalVersion=false
 
       - task: PowerShell@2
-        displayName: Prepare .NET new publish artifact
+        displayName: Resolve .NET template NuGet package
         inputs:
           targetType: inline
           script: |
-            $target = "$(dotnetNewArtifactOutputDirectory)"
-            New-Item -ItemType Directory -Path $target -Force | Out-Null
+            $packagePath = "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)\$(templatePackageId).$(dotnetPackageVersion).nupkg"
 
-            Get-ChildItem -LiteralPath $target -File -Recurse -ErrorAction SilentlyContinue |
-              Remove-Item -Force
+            if (-not (Test-Path -LiteralPath $packagePath)) {
+              Write-Host "Expected package was not found:"
+              Write-Host $packagePath
+              Write-Host ""
+              Write-Host "Existing packages in bin\$(configuration):"
 
-            $searchRoots = @(
-              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)",
-              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)\net8.0"
-            )
+              Get-ChildItem -LiteralPath "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)" `
+                -Filter "*.nupkg" `
+                -File `
+                -ErrorAction SilentlyContinue |
+                ForEach-Object { Write-Host $_.FullName }
 
-            $packages = @()
-            foreach ($root in $searchRoots) {
-              if (-not (Test-Path -LiteralPath $root)) {
-                continue
-              }
-
-              $packages += Get-ChildItem -LiteralPath $root -Filter "$(templatePackageId).*nupkg" -File -Recurse -ErrorAction SilentlyContinue
+              throw "Expected .NET template NuGet package was not produced by build."
             }
 
-            $expectedPackageName = "$(templatePackageId).$(dotnetPackageVersion).nupkg"
-            $package = $packages |
-              Where-Object { $_.Name -eq $expectedPackageName } |
-              Sort-Object LastWriteTime -Descending |
-              Select-Object -First 1
-
-            if (-not $package) {
-              $package = $packages |
-                Sort-Object LastWriteTime -Descending |
-                Select-Object -First 1
-            }
-
-            if (-not $package) {
-              $inspected = $searchRoots -join '; '
-              throw "Could not find .NET new nupkg package. Searched: $inspected"
-            }
-
-            Copy-Item -LiteralPath $package.FullName -Destination $target -Force
-
-            $publishedPackagePath = Join-Path $target $package.Name
-            Write-Host "Prepared .NET new nupkg artifact: $publishedPackagePath"
-            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$publishedPackagePath"
-
-            $zipFiles = Get-ChildItem -LiteralPath $target -Filter "*.zip" -File -Recurse -ErrorAction SilentlyContinue
-            if ($zipFiles) {
-              throw ".NET new publish artifact must not contain ZIP files."
-            }
+            Write-Host "Resolved .NET template package:"
+            Write-Host $packagePath
+            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$packagePath"
 
       - task: PowerShell@2
         displayName: Validate .NET template artifacts and smoke build
@@ -318,7 +288,7 @@ jobs:
           artifact: ${{ parameters.visualStudioArtifactName }}
 
       - task: PublishPipelineArtifact@1
-        displayName: Upload .NET new template artifacts
+        displayName: Upload .NET new template package
         inputs:
-          targetPath: $(dotnetNewArtifactOutputDirectory)
+          targetPath: $(dotnetTemplatePackagePath)
           artifact: ${{ parameters.dotnetNewArtifactName }}
