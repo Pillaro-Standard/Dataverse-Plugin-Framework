@@ -217,12 +217,54 @@ jobs:
             /p:GeneratePackageOnBuild=false
 
       - task: PowerShell@2
+        displayName: Resolve .NET template package path
+        inputs:
+          targetType: inline
+          script: |
+            $targetDirectory = "$(dotnetNewArtifactOutputDirectory)"
+            $searchRoots = @(
+              $targetDirectory,
+              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)"
+            ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+
+            $package = $null
+            foreach ($root in $searchRoots) {
+              if (-not (Test-Path -LiteralPath $root)) {
+                continue
+              }
+
+              $package = Get-ChildItem -LiteralPath $root -Filter "$(templatePackageId).*nupkg" -File -Recurse -ErrorAction SilentlyContinue |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -First 1
+
+              if ($package) {
+                break
+              }
+            }
+
+            if (-not $package) {
+              $inspected = $searchRoots -join '; '
+              throw "Could not find the .NET template package. Searched: $inspected"
+            }
+
+            New-Item -ItemType Directory -Path $targetDirectory -Force | Out-Null
+            $targetPath = Join-Path $targetDirectory $package.Name
+
+            if ($package.FullName -ne $targetPath) {
+              Copy-Item -LiteralPath $package.FullName -Destination $targetPath -Force
+              Write-Host "Copied .NET template package to artifact directory: $targetPath"
+            }
+
+            Write-Host "Resolved .NET template package path: $targetPath"
+            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$targetPath"
+
+      - task: PowerShell@2
         displayName: Validate .NET template artifacts and smoke build
         inputs:
           targetType: filePath
           filePath: scripts/Test-DotNetTemplateArtifacts.ps1
           arguments: >
-            -TemplatePackagePath "$(dotnetNewArtifactOutputDirectory)\$(templatePackageId).$(dotnetPackageVersion).nupkg"
+            -TemplatePackagePath "$(dotnetTemplatePackagePath)"
             -TemplateShortName "$(templateShortName)"
             -Configuration "$(configuration)"
 
