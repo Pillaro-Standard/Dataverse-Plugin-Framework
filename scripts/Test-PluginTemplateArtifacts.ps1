@@ -135,7 +135,6 @@ function Test-VisualStudioTemplateZip {
             'Logic\Tasks\Example\ExampleTask.cs',
             'Plugins\Plugins.vstemplate',
             'Plugins\Pillaro.Dataverse.PluginTemplate.Plugins.csproj',
-            'Plugins\PluginAssemblyInfo.cs',
             'Plugins\key.snk',
             'Tests\Tests.vstemplate',
             'Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj',
