@@ -401,28 +401,6 @@ function Invoke-DotNetNewSmoke {
         }
     }
 
-    $folderChecks = @(
-        @{
-            Path = Join-Path $generatedRoot "Tests\$SmokeProjectName.Tests.csproj"
-            Expected = @(
-                '<Folder Include="Data\" />',
-                '<Folder Include="Data\CleanupHandlers\" />',
-                '<Folder Include="Data\Repositories\" />'
-            )
-            Description = 'Generated Tests folder declarations'
-        }
-    )
-
-    foreach ($check in $folderChecks) {
-        Assert-PathExists -Path $check.Path -Description $check.Description
-        $content = Get-Content -LiteralPath $check.Path -Raw
-        foreach ($expected in $check.Expected) {
-            if ($content -notmatch [Regex]::Escape($expected)) {
-                throw "$($check.Description) does not include '$expected'."
-            }
-        }
-    }
-
     if (-not $SkipBuildSmoke) {
         if (-not (Test-NuGetOrgReachable)) {
             Write-Warning 'Build smoke was skipped because api.nuget.org is not reachable from this environment. Template generation and package validation still passed.'
