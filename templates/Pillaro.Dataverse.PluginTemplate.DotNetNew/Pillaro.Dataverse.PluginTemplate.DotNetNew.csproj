@@ -35,6 +35,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="PUBLISHING.md" />
     <None Include="README.md" Pack="true" PackagePath="" />
     <None Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt" Pack="true" PackagePath="" Link="LICENSE.txt" />
     <Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt">

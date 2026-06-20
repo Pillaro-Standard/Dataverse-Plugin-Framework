@@ -279,5 +279,5 @@ jobs:
       - task: PublishPipelineArtifact@1
         displayName: Upload .NET template artifacts
         inputs:
-          targetPath: $(dotnetNewArtifactOutputDirectory)
+          targetPath: $(dotnetTemplatePackagePath)
           artifact: ${{ parameters.dotnetNewArtifactName }}
