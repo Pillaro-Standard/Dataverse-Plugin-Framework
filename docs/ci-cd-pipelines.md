@@ -206,6 +206,51 @@ This keeps local builds simple while still giving pipeline builds a unique, trac
 
 ---
 
+## DotNetNew Template Artifact Pipeline
+
+**File**: `Templates - Build DotNetNew Artifacts.yml`
+
+### Template Purpose
+
+Builds the CLI-oriented `dotnet new` template package for the shared Dataverse plugin solution. This pipeline prepares the NuGet template artifact for distribution and validation; it does not publish anything to an external gallery.
+
+### Trigger
+
+- **Manual only**: No automatic triggers
+- **On-demand**: Executed when a new dotnet-new template artifact is needed
+
+### Parameters
+
+| Parameter | Purpose |
+|-----------|---------|
+| `baseVersion` | Base version entered at queue time, in `Major.Minor.Patch` format |
+| `packageType` | Determines whether the package version becomes `ci`, `preview`, `rc`, or `release` |
+| `artifactName` | Name of the Azure DevOps pipeline artifact |
+
+### Template Execution Flow
+
+1. **Checkout**: Fetches the repository with full history
+2. **SDK Installation**: Installs .NET SDK 8.x
+3. **Version Calculation**: Determines package, assembly, file, and informational versions
+4. **Restore**: Restores the dotnet-new template project
+5. **Pack**: Creates the `Pillaro.Dataverse.PluginTemplate.DotNetNew` NuGet template package
+6. **Validation**: Confirms the package contains the expected template metadata, icon, projects, and smoke-generated namespaces
+7. **Artifact publishing**: Uploads the generated `.nupkg` from `$(Build.ArtifactStagingDirectory)/templates` as a pipeline artifact
+
+### Artifacts Produced
+
+- `Pillaro.Dataverse.PluginTemplate.DotNetNew.<version>.nupkg`
+
+### Version Strategy
+
+The pipeline uses the same versioning model as the NuGet package pipeline.
+
+It accepts a base semantic version such as `1.0.20` and appends the Azure DevOps build ID for non-release builds, for example `1.0.20-ci.12345`.
+
+For tag builds, the tag version is used directly, while `AssemblyVersion` and `FileVersion` remain aligned to the `Major.Minor.Patch.0` scheme.
+
+---
+
 ## ➡️ Related documents
 
 - [Contributing Guidelines](CONTRIBUTING.md) — Contribution workflow and testing requirements

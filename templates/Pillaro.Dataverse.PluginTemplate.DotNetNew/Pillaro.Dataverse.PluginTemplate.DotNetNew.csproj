@@ -1,0 +1,147 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+    <PackageId>Pillaro.Dataverse.PluginTemplate.DotNetNew</PackageId>
+    <Version>1.0.0-rc.1</Version>
+    <Authors>Pillaro Labs s.r.o.</Authors>
+    <Company>Pillaro Labs s.r.o.</Company>
+    <Description>Dotnet new template package for the Pillaro Dataverse plugin solution, suitable for Visual Studio Code and CLI-based workflows.</Description>
+    <PackageTags>dotnet-new;template;templates;dataverse;plugin;vscode</PackageTags>
+    <PackageType>Template</PackageType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+
+    <RepositoryUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>PillaroLogo128.png</PackageIcon>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+
+    <DotNetNewSourceRoot>..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate</DotNetNewSourceRoot>
+    <DotNetNewStageRoot>$(BaseIntermediateOutputPath)dotnetnew-template\ProjectTemplate</DotNetNewStageRoot>
+    <DotNetNewPrepareScript>$(MSBuildProjectDirectory)\build\Prepare-DotNetNewTemplate.ps1</DotNetNewPrepareScript>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt" Pack="true" PackagePath="" Link="LICENSE.txt" />
+    <Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
+    </Content>
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\PillaroLogo128.png">
+      <Pack>true</Pack>
+      <PackagePath></PackagePath>
+    </Content>
+    <Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\PillaroLogo128.png">
+      <Link>template\ProjectTemplate\.template.config\PillaroLogo128.png</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.template.config\</PackagePath>
+    </Content>
+
+    <Content Include="template\ProjectTemplate\.template.config\template.json">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.template.config\</PackagePath>
+    </Content>
+    <Content Include="template\ProjectTemplate\Pillaro.Dataverse.PluginTemplate.slnx">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
+    </Content>
+    <Content Include="template\ProjectTemplate\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Logic\</PackagePath>
+    </Content>
+    <Content Include="template\ProjectTemplate\Plugins\Pillaro.Dataverse.PluginTemplate.Plugins.csproj">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Plugins\</PackagePath>
+    </Content>
+
+
+
+
+    <Content Include="template\ProjectTemplate\Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Tests\</PackagePath>
+    </Content>
+    <Content Include="template\ProjectTemplate\.vscode\extensions.json">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.vscode\</PackagePath>
+    </Content>
+    <Content Include="template\ProjectTemplate\.vscode\settings.json">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.vscode\</PackagePath>
+    </Content>
+
+    <Content Include="$(DotNetNewStageRoot)\Logic\README.md">
+      <Link>template\ProjectTemplate\Logic\README.md</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Logic\README.md</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Logic\Plugins\PluginBase.cs">
+      <Link>template\ProjectTemplate\Logic\Plugins\PluginBase.cs</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Logic\Plugins\PluginBase.cs</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Logic\Plugins\ExamplePlugin.cs">
+      <Link>template\ProjectTemplate\Logic\Plugins\ExamplePlugin.cs</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Logic\Plugins\ExamplePlugin.cs</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Logic\Tasks\Example\ExampleTask.cs">
+      <Link>template\ProjectTemplate\Logic\Tasks\Example\ExampleTask.cs</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Logic\Tasks\Example\ExampleTask.cs</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Plugins\key.snk">
+      <Link>template\ProjectTemplate\Plugins\key.snk</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Plugins\key.snk</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Tests\TestAutofacModule.cs">
+      <Link>template\ProjectTemplate\Tests\TestAutofacModule.cs</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Tests\TestAutofacModule.cs</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Tests\appsettings.json">
+      <Link>template\ProjectTemplate\Tests\appsettings.json</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Tests\appsettings.json</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Tests\appsettings.Development.json">
+      <Link>template\ProjectTemplate\Tests\appsettings.Development.json</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Tests\appsettings.Development.json</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Tests\Tests\TestBase.cs">
+      <Link>template\ProjectTemplate\Tests\Tests\TestBase.cs</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Tests\Tests\TestBase.cs</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewStageRoot)\Tests\Tests\ConnectionTests.cs">
+      <Link>template\ProjectTemplate\Tests\Tests\ConnectionTests.cs</Link>
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Tests\Tests\ConnectionTests.cs</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="PrepareDotNetNewTemplateContent" BeforeTargets="GenerateNuspec;Pack">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(DotNetNewPrepareScript)&quot; -SourceRoot &quot;$(DotNetNewSourceRoot)&quot; -DestinationRoot &quot;$(DotNetNewStageRoot)&quot;" />
+  </Target>
+
+</Project>
