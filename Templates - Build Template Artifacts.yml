@@ -55,6 +55,9 @@ variables:
   - name: visualStudioArtifactOutputDirectory
     value: $(artifactOutputRoot)/visual-studio
 
+  - name: visualStudioPublishOutputDirectory
+    value: $(artifactOutputRoot)/visual-studio-publish
+
   - name: dotnetNewArtifactOutputDirectory
     value: $(artifactOutputRoot)/dotnet-new
 
@@ -185,30 +188,47 @@ jobs:
             -VsixVersion "$(vsixVersion)"
             -ArtifactsDirectory "$(visualStudioArtifactOutputDirectory)"
 
+      - task: PowerShell@2
+        displayName: Prepare Visual Studio publish artifact
+        inputs:
+          targetType: inline
+          script: |
+            $source = "$(visualStudioArtifactOutputDirectory)"
+            $target = "$(visualStudioPublishOutputDirectory)"
+
+            New-Item -ItemType Directory -Path $target -Force | Out-Null
+
+            Get-ChildItem -LiteralPath $target -File -Recurse -ErrorAction SilentlyContinue |
+              Remove-Item -Force
+
+            $vsixFiles = Get-ChildItem -LiteralPath $source -Filter "*.vsix" -File -Recurse -ErrorAction SilentlyContinue
+
+            if (-not $vsixFiles -or $vsixFiles.Count -eq 0) {
+              throw "No VSIX file was found in '$source'."
+            }
+
+            if ($vsixFiles.Count -ne 1) {
+              $found = ($vsixFiles | ForEach-Object { $_.FullName }) -join '; '
+              throw "Expected exactly one VSIX file, found $($vsixFiles.Count): $found"
+            }
+
+            Copy-Item -LiteralPath $vsixFiles[0].FullName -Destination $target -Force
+
+            $zipFiles = Get-ChildItem -LiteralPath $target -Filter "*.zip" -File -Recurse -ErrorAction SilentlyContinue
+            if ($zipFiles) {
+              throw "Visual Studio publish artifact must not contain ZIP files."
+            }
+
+            Write-Host "Prepared Visual Studio publish artifact: $($vsixFiles[0].Name)"
+
       - task: DotNetCoreCLI@2
         displayName: Restore .NET template project
         inputs:
           command: restore
           projects: $(dotnetTemplateProjectPath)
 
-      - task: PowerShell@2
-        displayName: Prepare .NET template artifact directory
-        inputs:
-          targetType: inline
-          script: |
-            $artifactDirectory = "$(dotnetNewArtifactOutputDirectory)"
-
-            if (Test-Path -LiteralPath $artifactDirectory) {
-              Get-ChildItem -LiteralPath $artifactDirectory -Force | Remove-Item -Recurse -Force
-            }
-            else {
-              New-Item -ItemType Directory -Path $artifactDirectory -Force | Out-Null
-            }
-
-            Write-Host "Prepared .NET template artifact directory: $artifactDirectory"
-
       - task: DotNetCoreCLI@2
-        displayName: Build .NET template project and create NuGet package
+        displayName: Build .NET template project
         inputs:
           command: build
           projects: $(dotnetTemplateProjectPath)
@@ -227,41 +247,59 @@ jobs:
             /p:PublishRepositoryUrl=true
             /p:EmbedUntrackedSources=true
             /p:IncludeSourceRevisionInInformationalVersion=false
-            /p:GeneratePackageOnBuild=true
-            /p:PackageOutputPath="$(dotnetNewArtifactOutputDirectory)"
 
       - task: PowerShell@2
-        displayName: Resolve .NET template NuGet package
+        displayName: Prepare .NET new publish artifact
         inputs:
           targetType: inline
           script: |
-            $artifactDirectory = "$(dotnetNewArtifactOutputDirectory)"
+            $target = "$(dotnetNewArtifactOutputDirectory)"
+            New-Item -ItemType Directory -Path $target -Force | Out-Null
 
-            if (-not (Test-Path -LiteralPath $artifactDirectory)) {
-              throw ".NET template artifact directory was not found: $artifactDirectory"
+            Get-ChildItem -LiteralPath $target -File -Recurse -ErrorAction SilentlyContinue |
+              Remove-Item -Force
+
+            $searchRoots = @(
+              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)",
+              "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)\net8.0"
+            )
+
+            $packages = @()
+            foreach ($root in $searchRoots) {
+              if (-not (Test-Path -LiteralPath $root)) {
+                continue
+              }
+
+              $packages += Get-ChildItem -LiteralPath $root -Filter "$(templatePackageId).*nupkg" -File -Recurse -ErrorAction SilentlyContinue
             }
 
-            $zipFiles = Get-ChildItem -LiteralPath $artifactDirectory -Filter "*.zip" -File -ErrorAction SilentlyContinue
+            $expectedPackageName = "$(templatePackageId).$(dotnetPackageVersion).nupkg"
+            $package = $packages |
+              Where-Object { $_.Name -eq $expectedPackageName } |
+              Sort-Object LastWriteTime -Descending |
+              Select-Object -First 1
+
+            if (-not $package) {
+              $package = $packages |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -First 1
+            }
+
+            if (-not $package) {
+              $inspected = $searchRoots -join '; '
+              throw "Could not find .NET new nupkg package. Searched: $inspected"
+            }
+
+            Copy-Item -LiteralPath $package.FullName -Destination $target -Force
+
+            $publishedPackagePath = Join-Path $target $package.Name
+            Write-Host "Prepared .NET new nupkg artifact: $publishedPackagePath"
+            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$publishedPackagePath"
+
+            $zipFiles = Get-ChildItem -LiteralPath $target -Filter "*.zip" -File -Recurse -ErrorAction SilentlyContinue
             if ($zipFiles) {
-              $names = ($zipFiles | ForEach-Object { $_.FullName }) -join '; '
-              throw ".NET template artifact directory must not contain ZIP files. Found: $names"
+              throw ".NET new publish artifact must not contain ZIP files."
             }
-
-            $packages = Get-ChildItem -LiteralPath $artifactDirectory -Filter "$(templatePackageId).*.nupkg" -File -ErrorAction SilentlyContinue
-
-            if (-not $packages) {
-              throw "Could not find generated .NET template .nupkg in artifact directory: $artifactDirectory"
-            }
-
-            if ($packages.Count -ne 1) {
-              $names = ($packages | ForEach-Object { $_.FullName }) -join '; '
-              throw "Expected exactly one .NET template .nupkg, but found $($packages.Count): $names"
-            }
-
-            $package = $packages | Select-Object -First 1
-
-            Write-Host "Resolved .NET template package path: $($package.FullName)"
-            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$($package.FullName)"
 
       - task: PowerShell@2
         displayName: Validate .NET template artifacts and smoke build
@@ -276,11 +314,11 @@ jobs:
       - task: PublishPipelineArtifact@1
         displayName: Upload Visual Studio template artifacts
         inputs:
-          targetPath: $(visualStudioArtifactOutputDirectory)
+          targetPath: $(visualStudioPublishOutputDirectory)
           artifact: ${{ parameters.visualStudioArtifactName }}
 
       - task: PublishPipelineArtifact@1
-        displayName: Upload .NET template NuGet package
+        displayName: Upload .NET new template artifacts
         inputs:
           targetPath: $(dotnetNewArtifactOutputDirectory)
           artifact: ${{ parameters.dotnetNewArtifactName }}
