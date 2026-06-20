@@ -28,6 +28,12 @@ After creating the project from the template, first rebuild the whole solution:
 Build > Rebuild Solution
 ```
 
+If you are using Visual Studio Code, run:
+
+```powershell
+dotnet build
+```
+
 During the rebuild, helper folders and files are generated into the projects.
 
 Some generated files may be physically present on disk but not yet included in the Visual Studio project.

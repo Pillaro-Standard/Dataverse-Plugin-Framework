@@ -13,6 +13,7 @@
 
 ## 📑 Navigation
 
+- [0. Choose a template](#0-choose-a-template)
 - [⚙️ Prerequisites](#️-prerequisites)
 - [⚙️ Language version](#️-language-version)
 - [1. Import the framework solution](#1-import-the-framework-solution)
@@ -30,6 +31,25 @@
 - [12. Verify the result](#12-verify-the-result)
 - [✅ Recommendations](#-recommendations)
 - [➡️ Related documents](#️-related-documents)
+
+---
+
+## 0. Choose a template
+
+If you are starting a new solution, begin with the CLI-oriented [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) template:
+
+- recommended default for new projects
+- best fit for VS Code and other CLI-first workflows
+- backed by the same shared template source as the [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
+
+Template links:
+
+- [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+- [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
+
+> [!TIP]
+> Use the [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) when you specifically need an installable Visual Studio extension or Marketplace presence.
+> For everyday project creation, the [`dotnet new` template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) is the recommended starting point.
 
 ---
 
@@ -270,7 +290,7 @@ In the generated Visual Studio template, the same value can be emitted directly 
 
     set "LOGIC_DLL=$ext_safeprojectname$.Logic.dll"
 
-That generated template value is only appropriate for a new solution created from the VSIX template.
+That generated template value is only appropriate for a new solution created from the [VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate).
 
 #### Option B — You use a single project only
 

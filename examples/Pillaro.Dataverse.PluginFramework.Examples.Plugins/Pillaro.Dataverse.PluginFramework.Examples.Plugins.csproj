@@ -63,7 +63,6 @@
     <None Include="PillaroSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="spkl.json" />
     <None Include="Tools\Deployment\DeployPlugins.bat" />
     <None Include="Tools\Deployment\DeployPlugins.ps1" />
     <None Include="Tools\Deployment\README.md" />

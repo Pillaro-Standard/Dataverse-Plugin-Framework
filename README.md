@@ -3,6 +3,9 @@
 [![NuGet - Framework](https://img.shields.io/badge/NuGet-Pillaro.Dataverse.PluginFramework-blue?logo=nuget)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework)
 [![NuGet - Testing](https://img.shields.io/badge/NuGet-Pillaro.Dataverse.PluginFramework.Testing-blue?logo=nuget)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing)
 
+[![Template - Visual Studio VSIX](https://img.shields.io/badge/Template-Visual%20Studio%20VSIX-blue?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
+[![Template - dotnet new](https://img.shields.io/badge/Template-dotnet%20new-blue?logo=visualstudiocode)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+
 Source-open, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
 
 
@@ -24,6 +27,39 @@ This enables:
 - long-term maintainability at scale
 
 The framework is designed for real-world production environments and long-term solution sustainability.
+
+## Start a New Solution
+
+Choose one of the official template packages, [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) or [Visual Studio VSIX](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate), when you want to start a new Dataverse plugin solution quickly:
+
+| Template | Best for | Recommendation |
+| --- | --- | --- |
+| [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) | CLI workflows, VS Code, and Visual Studio | Recommended default |
+| [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) | Visual Studio installable template and Marketplace visibility | Use when you want the Visual Studio extension experience |
+
+The shared template source lives in `templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate`, so both delivery formats generate the same starter solution structure.
+
+If you are choosing one for a new project, start with the [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew). Keep the [VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) for Visual Studio distribution and store presence.
+
+### Install the [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+
+The CLI template will be published on NuGet.org here:
+
+- [Pillaro.Dataverse.PluginTemplate.DotNetNew](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+
+Install it with:
+
+```powershell
+dotnet new install Pillaro.Dataverse.PluginTemplate.DotNetNew
+```
+
+After installation, create a new solution with:
+
+```powershell
+dotnet new pillaro-dataverse-plugin-dotnet -n MySolution
+```
+
+The generated solution works well in both Visual Studio Code and Visual Studio, so you can use the same template regardless of whether you prefer CLI-first or IDE-first workflows.
 
 
 ## Proven in Production

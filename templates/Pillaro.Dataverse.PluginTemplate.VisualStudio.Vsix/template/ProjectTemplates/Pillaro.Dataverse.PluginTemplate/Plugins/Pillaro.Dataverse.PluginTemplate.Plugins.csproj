@@ -57,9 +57,6 @@ del "%LOGIC_DLL%"
 popd
 		</PostBuildEvent>
 	</PropertyGroup>
-	<ItemGroup>
-		<Compile Include="PluginAssemblyInfo.cs" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Pillaro.Dataverse.PluginFramework" Version="1.1.0" GeneratePathProperty="true" />

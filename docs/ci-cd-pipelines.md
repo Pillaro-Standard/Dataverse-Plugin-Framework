@@ -163,46 +163,58 @@ Stored in Azure DevOps variable group `dataverse-test-secrets`:
 
 ---
 
-## Visual Studio Template Artifact Pipeline
+## Template Artifact Pipeline
 
-**File**: `Templates - Build Visual Studio Artifacts.yml`
+**File**: `Templates - Build Template Artifacts.yml`
 
 ### Template Purpose
 
-Builds the Visual Studio project template ZIP and the installable VSIX package. This pipeline only prepares Azure DevOps artifacts; Marketplace publishing is intentionally left for a separate manual or future release pipeline.
+Builds both official template deliveries in one Azure DevOps run:
+
+- the Visual Studio template ZIP and VSIX package
+- the CLI-oriented `dotnet new` NuGet template package
+
+This pipeline prepares two separate Azure DevOps artifacts so both template formats can be published or downloaded together.
 
 ### Trigger
 
 - **Manual only**: No automatic triggers
-- **On-demand**: Executed when a new Visual Studio template artifact is needed
+- **On-demand**: Executed when either template artifact set is needed
+
+When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and `packageType` in the same style as the framework package pipeline.
 
 ### Parameters
 
 | Parameter | Purpose |
 |-----------|---------|
-| `vsixBaseVersion` | Base version entered at queue time, in `Major.Minor.Patch` format |
-| `artifactName` | Name of the Azure DevOps pipeline artifact |
+| `baseVersion` | Base version entered at queue time for both template packages, in `Major.Minor.Patch` format |
+| `packageType` | Determines whether the NuGet template version becomes `ci`, `preview`, `rc`, or `release` |
+| `visualStudioArtifactName` | Name of the Azure DevOps artifact containing the Visual Studio template outputs |
+| `dotnetNewArtifactName` | Name of the Azure DevOps artifact containing the `dotnet new` package |
 
 ### Template Execution Flow
 
-1. **Checkout**: Fetches the repository
-2. **Input validation**: Validates the base version, appends `Build.BuildId`, and checks the artifact name
-3. **Manifest stamping**: Writes the computed version into `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/source.extension.vsixmanifest`
-4. **Build**: Builds `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
-5. **Template validation**: Confirms all files referenced from child `.vstemplate` files exist in the generated ZIP
-6. **VSIX validation**: Confirms the official VSIXv3 output contains the extension manifest, generated template manifest, expanded project template files, icon asset and the computed version
-7. **Artifact publishing**: Uploads the generated ZIP and VSIX from `$(Build.ArtifactStagingDirectory)/templates` as a pipeline artifact
+1. **Checkout**: Fetches the repository with full history
+2. **SDK Installation**: Installs .NET SDK 8.x
+3. **Version Calculation**: Determines the shared base version, then derives the VSIX and NuGet package versions
+4. **Manifest stamping**: Writes the computed version into `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/source.extension.vsixmanifest`
+5. **VSIX build**: Builds `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj`
+6. **VSIX validation**: Confirms the ZIP and VSIX outputs are complete and smoke-buildable
+7. **NuGet restore**: Restores the `dotnet new` template project
+8. **NuGet pack**: Creates the `Pillaro.Dataverse.PluginTemplate.DotNetNew` template package
+9. **NuGet validation**: Confirms the package contains the expected template metadata and smoke-generates the template successfully
+10. **Artifact publishing**: Uploads the Visual Studio outputs and the `.nupkg` as two separate pipeline artifacts
 
 ### Artifacts Produced
 
-- `Pillaro.Dataverse.PluginTemplate.zip`
-- `Pillaro.Dataverse.PluginTemplate.VisualStudio.vsix`
+- Visual Studio template ZIP and VSIX
+- `Pillaro.Dataverse.PluginTemplate.DotNetNew.<version>.nupkg`
 
 ### Version Strategy
 
-The pipeline asks for a base semantic version such as `1.0.8`, then appends the Azure DevOps build ID to produce the final VSIX version, for example `1.0.8.12345`.
+The VSIX package uses the supplied base semantic version and appends the Azure DevOps build ID, for example `1.0.20.12345`.
 
-This keeps local builds simple while still giving pipeline builds a unique, traceable package version.
+The NuGet template package uses the same versioning model as the framework package pipeline, including support for `ci`, `preview`, `rc`, and `release` package types. For tag builds, the tag version is used directly, while `AssemblyVersion` and `FileVersion` remain aligned to the `Major.Minor.Patch.0` scheme.
 
 ---
 

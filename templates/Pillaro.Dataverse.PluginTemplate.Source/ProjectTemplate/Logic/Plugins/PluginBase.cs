@@ -1,4 +1,4 @@
-namespace $safeprojectname$.Plugins;
+namespace $safeprojectname$.Logic.Plugins;
 
 public abstract class PluginBase(string unsecureConfig, string secureConfig) : Pillaro.Dataverse.PluginFramework.Plugins.PluginBase(unsecureConfig, secureConfig)
 {

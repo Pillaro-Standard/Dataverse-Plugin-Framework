@@ -15,7 +15,6 @@
              TargetFileName="$safeprojectname$.csproj"
              ReplaceParameters="true">
 
-      <ProjectItem ReplaceParameters="true">PluginAssemblyInfo.cs</ProjectItem>
       <ProjectItem ReplaceParameters="false">key.snk</ProjectItem>
 
     </Project>
