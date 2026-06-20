@@ -17,6 +17,7 @@
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
 | 🧱 [Generated Tooling](#-generated-tooling)                | Use package-generated local tools for ILMerge, deployment, and early-bound generation |
+| 🧩 [Project Templates](#-project-templates)                | Start new solutions with the recommended [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) or [Visual Studio VSIX](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) template |
 | 🚚 [Deployment Plugins](#-deployment-plugins)              | Deploy plugins precisely, repeatably, and without accidental duplicates      |
 | 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
@@ -91,6 +92,19 @@ Generated tooling covers three areas:
 | [ILMerge Post-Build Tooling](./plugins/getting-started.md#61-choose-the-correct-ilmerge-post-build-action) | Prepare the final single plugin assembly required by Dataverse deployment | ✅ |
 | [Early-Bound Entity Generation](./plugins/early-bound-generation.md) | Generate strongly typed Dataverse entity classes using Power Platform CLI | ✅ |
 | [Deployment Plugins](./plugins/deployment-plugins.md) | Deploy plugin assemblies and synchronize registration metadata | ✅ |
+
+---
+
+## 🧩 Project Templates
+
+Use one of the official template packages, [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) or [Visual Studio VSIX](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate), when you want to start a new solution quickly.
+
+| Document | Description | Recommendation |
+|---|---|---|
+| [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) | CLI-oriented template package for VS Code, Visual Studio, and command-line workflows | ✅ Recommended default |
+| [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) | Installable Visual Studio template package with Marketplace-oriented delivery | Use when you need the VSIX experience |
+
+The shared generated-project source lives in `templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate`, so both delivery formats stay aligned.
 
 ---
 

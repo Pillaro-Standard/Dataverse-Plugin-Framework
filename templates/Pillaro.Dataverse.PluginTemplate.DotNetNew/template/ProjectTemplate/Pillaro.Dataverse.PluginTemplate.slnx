@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Logic/Pillaro.Dataverse.PluginTemplate.Logic.csproj" />
+  <Project Path="Plugins/Pillaro.Dataverse.PluginTemplate.Plugins.csproj" />
+  <Project Path="Tests/Pillaro.Dataverse.PluginTemplate.Tests.csproj" />
+</Solution>

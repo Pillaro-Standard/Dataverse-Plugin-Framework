@@ -4,7 +4,7 @@ using Pillaro.Dataverse.PluginFramework.Tasks;
 using Pillaro.Dataverse.PluginFramework.Tasks.Validation.FluentInterfaces;
 using System;
 
-namespace $safeprojectname$.Tasks.Example;
+namespace $safeprojectname$.Logic.Tasks.Example;
 
 public class ExampleTask(IServiceProvider serviceProvider, TaskContext taskContext) : TaskBase<Entity>(serviceProvider, taskContext)
 {

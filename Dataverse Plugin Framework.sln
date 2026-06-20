@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		build-local-nuget-packages.bat = build-local-nuget-packages.bat
 		CHANGELOG.md = CHANGELOG.md
 		LICENSE = LICENSE
 		Nightly – Tests Only.yml = Nightly – Tests Only.yml
@@ -17,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		Packages – Build & Package.yml = Packages – Build & Package.yml
 		PR – Validate.yml = PR – Validate.yml
 		README.md = README.md
+		.github\workflows\sync-develop-after-release.yml = .github\workflows\sync-develop-after-release.yml
+		Templates - Build Template Artifacts.yml = Templates - Build Template Artifacts.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{25FE1426-88F6-47E1-B942-DCAAC521C232}"
@@ -106,6 +107,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.Source", "templates\Pillaro.Dataverse.PluginTemplate.Source\Pillaro.Dataverse.PluginTemplate.Source.csproj", "{1332D3FC-022B-47DA-88A5-C3508B7A5003}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pillaro.Dataverse.PluginTemplate.DotNetNew", "templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\Pillaro.Dataverse.PluginTemplate.DotNetNew.csproj", "{6E757C3A-BA38-F869-0A37-B405C0A129BA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{F653BDCC-04FD-457F-AEE9-235949FB25D8}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\build-local-nuget-packages.bat = scripts\build-local-nuget-packages.bat
+		scripts\Test-DotNetTemplateArtifacts.ps1 = scripts\Test-DotNetTemplateArtifacts.ps1
+		scripts\Test-PluginTemplateArtifacts.ps1 = scripts\Test-PluginTemplateArtifacts.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +162,10 @@ Global
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,6 +186,7 @@ Global
 		{204B93AF-6340-4F3F-B0D5-7377DDB8169E} = {D4B7D6F7-867D-4992-9067-228DA7A898B2}
 		{9172461A-9D9B-2969-D2D5-C61BDDA1B8B4} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
 		{1332D3FC-022B-47DA-88A5-C3508B7A5003} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
+		{6E757C3A-BA38-F869-0A37-B405C0A129BA} = {D9E2BBDF-2EFE-4A06-924C-C1684226F641}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19C17113-6CBE-4E38-802F-827219193530}

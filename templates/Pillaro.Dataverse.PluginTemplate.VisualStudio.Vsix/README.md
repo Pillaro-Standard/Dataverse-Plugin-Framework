@@ -1,12 +1,16 @@
 # Pillaro Dataverse Visual Studio VSIX Template
 
-This project builds the Visual Studio project template package for Pillaro Dataverse Plugin Framework.
+This project builds the [Visual Studio project template package](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) for Pillaro Dataverse Plugin Framework.
+
+This template exists mainly so the solution can be installed through Visual Studio and remain visible in the extension store flow.
+For new projects, the CLI-oriented [`dotnet new`](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) template is the recommended default.
 
 ## Purpose
 
 `Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix` is responsible for producing an installable Visual Studio VSIX package.
 
-The VSIX package installs a Visual Studio project template that creates a standard Pillaro Dataverse plugin solution structure.
+The [VSIX package](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) installs a Visual Studio project template that creates a standard Pillaro Dataverse plugin solution structure.
+Use it when you specifically want the Visual Studio extension experience rather than the CLI package flow.
 
 The generated solution currently contains:
 
@@ -197,4 +201,4 @@ This project owns the Visual Studio packaging process.
 
 It should answer the question:
 
-> How do we turn the shared Pillaro Dataverse plugin template source into an installable Visual Studio VSIX template?
+> How do we turn the shared Pillaro Dataverse plugin template source into an installable [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)?

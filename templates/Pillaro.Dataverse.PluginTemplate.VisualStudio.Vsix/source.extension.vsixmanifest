@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Pillaro.Dataverse.PluginTemplate.Template" Version="1.0.60" Language="en-US" Publisher="Pillaro" />
+        <Identity Id="Pillaro.Dataverse.PluginTemplate.Template" Version="1.0.64" Language="en-US" Publisher="Pillaro" />
         <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
         <Description xml:space="preserve">Creates a Dataverse plugin solution with Logic, Plugins and Tests projects.</Description>
         <MoreInfo>https://pillaro.cz/</MoreInfo>

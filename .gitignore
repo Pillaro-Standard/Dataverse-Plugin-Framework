@@ -375,3 +375,4 @@ tools/nuget.exe
 /templates.zip
 /artifacts/templates/
 /templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/ProjectTemplates/Pillaro.Dataverse.PluginTemplate.zip
+/docs/.obsidian
