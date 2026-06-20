@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution Items", "solution 
 		PR – Validate.yml = PR – Validate.yml
 		README.md = README.md
 		.github\workflows\sync-develop-after-release.yml = .github\workflows\sync-develop-after-release.yml
-		Templates - Build DotNetNew Artifacts.yml = Templates - Build DotNetNew Artifacts.yml
+		Templates - Build Template Artifacts.yml = Templates - Build Template Artifacts.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{25FE1426-88F6-47E1-B942-DCAAC521C232}"

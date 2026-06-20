@@ -1,0 +1,250 @@
+name: Templates - Build Template Artifacts
+
+trigger: none
+
+pr: none
+
+parameters:
+  - name: vsixBaseVersion
+    displayName: 'VSIX base version (Major.Minor.Patch)'
+    type: string
+    default: '1.0.8'
+
+  - name: dotnetBaseVersion
+    displayName: '.NET template base version (Major.Minor.Patch)'
+    type: string
+    default: '1.0.20'
+
+  - name: dotnetPackageType
+    displayName: '.NET template package type'
+    type: string
+    default: 'ci'
+    values:
+      - ci
+      - preview
+      - rc
+      - release
+
+  - name: visualStudioArtifactName
+    displayName: 'Visual Studio artifact name'
+    type: string
+    default: 'visual-studio-template'
+
+  - name: dotnetNewArtifactName
+    displayName: '.NET new artifact name'
+    type: string
+    default: 'dotnet-new-template'
+
+variables:
+  - name: configuration
+    value: Release
+
+  - name: templateName
+    value: Pillaro.Dataverse.PluginTemplate
+
+  - name: templatePackageId
+    value: Pillaro.Dataverse.PluginTemplate.DotNetNew
+
+  - name: templateShortName
+    value: pillaro-dataverse-plugin-dotnet
+
+  - name: vsixProjectPath
+    value: templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj
+
+  - name: dotnetTemplateProjectPath
+    value: templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/Pillaro.Dataverse.PluginTemplate.DotNetNew.csproj
+
+  - name: artifactOutputRoot
+    value: $(Build.ArtifactStagingDirectory)/templates
+
+  - name: visualStudioArtifactOutputDirectory
+    value: $(artifactOutputRoot)/visual-studio
+
+  - name: dotnetNewArtifactOutputDirectory
+    value: $(artifactOutputRoot)/dotnet-new
+
+jobs:
+  - job: BuildTemplateArtifacts
+    displayName: Build Visual Studio and .NET template artifacts
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 0
+
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: '8.x'
+
+      - task: PowerShell@2
+        displayName: Validate pipeline inputs and calculate versions
+        inputs:
+          targetType: inline
+          script: |
+            $vsixBaseVersion = '${{ parameters.vsixBaseVersion }}'
+            $dotnetBaseVersion = '${{ parameters.dotnetBaseVersion }}'
+            $dotnetPackageType = '${{ parameters.dotnetPackageType }}'
+            $visualStudioArtifactName = '${{ parameters.visualStudioArtifactName }}'
+            $dotnetNewArtifactName = '${{ parameters.dotnetNewArtifactName }}'
+            $buildId = [int]"$(Build.BuildId)"
+
+            foreach ($versionName in @(
+              @{ Name = 'vsixBaseVersion'; Value = $vsixBaseVersion },
+              @{ Name = 'dotnetBaseVersion'; Value = $dotnetBaseVersion }
+            )) {
+              if ($versionName.Value -notmatch '^\d+\.\d+\.\d+$') {
+                throw "$($versionName.Name) must be in format Major.Minor.Patch, e.g. 1.0.8. Current value: '$($versionName.Value)'."
+              }
+            }
+
+            if ([string]::IsNullOrWhiteSpace($visualStudioArtifactName)) {
+              throw 'visualStudioArtifactName cannot be empty.'
+            }
+
+            if ([string]::IsNullOrWhiteSpace($dotnetNewArtifactName)) {
+              throw 'dotnetNewArtifactName cannot be empty.'
+            }
+
+            $vsixVersion = "$vsixBaseVersion.$buildId"
+
+            $ref = "$(Build.SourceBranch)"
+            $parts = $dotnetBaseVersion.Split('.')
+            $major = [int]$parts[0]
+            $minor = [int]$parts[1]
+            $patch = [int]$parts[2]
+
+            if ($ref -match "^refs/tags/v(.+)$") {
+              $dotnetPackageVersion = $Matches[1]
+
+              if ($dotnetPackageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
+                throw "Tag version '$dotnetPackageVersion' is not valid."
+              }
+
+              $dotnetAssemblyVersion = "$major.$minor.$patch.0"
+              $dotnetFileVersion = "$major.$minor.$patch.0"
+              $dotnetInformationalVersion = $dotnetPackageVersion
+            }
+            else {
+              switch ($dotnetPackageType) {
+                "ci"      { $dotnetPackageVersion = "$dotnetBaseVersion-ci.$buildId" }
+                "preview" { $dotnetPackageVersion = "$dotnetBaseVersion-preview.$buildId" }
+                "rc"      { $dotnetPackageVersion = "$dotnetBaseVersion-rc.$buildId" }
+                "release" { $dotnetPackageVersion = $dotnetBaseVersion }
+                default   { throw "Unsupported dotnetPackageType '$dotnetPackageType'." }
+              }
+
+              $dotnetAssemblyVersion = "$major.$minor.$patch.0"
+              $dotnetFileVersion = "$major.$minor.$patch.$buildId"
+              $dotnetInformationalVersion = $dotnetPackageVersion
+            }
+
+            Write-Host "VSIX base version: $vsixBaseVersion"
+            Write-Host "VSIX build version: $vsixVersion"
+            Write-Host ".NET template version: $dotnetPackageVersion"
+            Write-Host ".NET assembly version: $dotnetAssemblyVersion"
+            Write-Host ".NET file version: $dotnetFileVersion"
+            Write-Host ".NET informational version: $dotnetInformationalVersion"
+            Write-Host "Visual Studio artifact name: $visualStudioArtifactName"
+            Write-Host ".NET new artifact name: $dotnetNewArtifactName"
+
+            Write-Host "##vso[task.setvariable variable=vsixVersion]$vsixVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetPackageVersion]$dotnetPackageVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetAssemblyVersion]$dotnetAssemblyVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetFileVersion]$dotnetFileVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetInformationalVersion]$dotnetInformationalVersion"
+
+      - task: PowerShell@2
+        displayName: Stamp VSIX manifest version
+        inputs:
+          targetType: inline
+          script: |
+            $manifestPath = "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix\source.extension.vsixmanifest"
+            $vsixVersion = "$(vsixVersion)"
+
+            [xml]$manifest = Get-Content -LiteralPath $manifestPath -Raw
+            $ns = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+            $ns.AddNamespace('vsx', 'http://schemas.microsoft.com/developer/vsx-schema/2011')
+
+            $identity = $manifest.SelectSingleNode('//vsx:Identity', $ns)
+            if (-not $identity) {
+              throw "VSIX Identity node was not found in '$manifestPath'."
+            }
+
+            $identity.Version = $vsixVersion
+            $manifest.Save($manifestPath)
+
+            Write-Host "Stamped VSIX manifest version: $vsixVersion"
+
+      - task: DotNetCoreCLI@2
+        displayName: Build Visual Studio template artifacts
+        inputs:
+          command: build
+          projects: $(vsixProjectPath)
+          arguments: >
+            /p:ArtifactsDirectory="$(visualStudioArtifactOutputDirectory)"
+
+      - task: PowerShell@2
+        displayName: Validate Visual Studio template artifacts and smoke build
+        inputs:
+          targetType: filePath
+          filePath: scripts/Test-PluginTemplateArtifacts.ps1
+          arguments: >
+            -TemplateName "$(templateName)"
+            -VsixVersion "$(vsixVersion)"
+            -ArtifactsDirectory "$(visualStudioArtifactOutputDirectory)"
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore .NET template project
+        inputs:
+          command: restore
+          projects: $(dotnetTemplateProjectPath)
+
+      - task: DotNetCoreCLI@2
+        displayName: Pack .NET template project
+        inputs:
+          command: pack
+          packagesToPack: $(dotnetTemplateProjectPath)
+          nobuild: true
+          includesymbols: false
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+            --output "$(dotnetNewArtifactOutputDirectory)"
+            /p:Version=$(dotnetPackageVersion)
+            /p:PackageVersion=$(dotnetPackageVersion)
+            /p:AssemblyVersion=$(dotnetAssemblyVersion)
+            /p:FileVersion=$(dotnetFileVersion)
+            /p:InformationalVersion=$(dotnetInformationalVersion)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
+            /p:IncludeSourceRevisionInInformationalVersion=false
+            /p:GeneratePackageOnBuild=false
+
+      - task: PowerShell@2
+        displayName: Validate .NET template artifacts and smoke build
+        inputs:
+          targetType: filePath
+          filePath: scripts/Test-DotNetTemplateArtifacts.ps1
+          arguments: >
+            -TemplatePackagePath "$(dotnetNewArtifactOutputDirectory)\$(templatePackageId).$(dotnetPackageVersion).nupkg"
+            -TemplateShortName "$(templateShortName)"
+            -Configuration "$(configuration)"
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload Visual Studio template artifacts
+        inputs:
+          targetPath: $(visualStudioArtifactOutputDirectory)
+          artifact: ${{ parameters.visualStudioArtifactName }}
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload .NET template artifacts
+        inputs:
+          targetPath: $(dotnetNewArtifactOutputDirectory)
+          artifact: ${{ parameters.dotnetNewArtifactName }}

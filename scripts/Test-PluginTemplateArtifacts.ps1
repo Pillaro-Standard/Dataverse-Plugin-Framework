@@ -519,9 +519,9 @@ function Invoke-VisualStudioTemplateSmoke {
 }
 
 function Invoke-DotnetTemplateSmoke {
-    # This repository currently ships only the Visual Studio VSIX template.
-    # The dotnet new smoke is intentionally disabled until an installable dotnet template package is added.
-    Write-Host 'Dotnet template smoke intentionally skipped: no installable dotnet template package is published in this repo.'
+    # The dotnet new template package is validated by Test-DotNetTemplateArtifacts.ps1.
+    # This script focuses on the Visual Studio VSIX outputs.
+    Write-Host 'Dotnet template smoke intentionally skipped in the VSIX validator; use Test-DotNetTemplateArtifacts.ps1 for NuGet template validation.'
 }
 
 Test-VisualStudioTemplateZip -Path $zipPath
