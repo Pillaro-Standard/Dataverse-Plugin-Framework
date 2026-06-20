@@ -6,19 +6,13 @@ pr: none
 
 parameters:
   - name: baseVersion
-    displayName: 'Base version (e.g. 1.0.20)'
+    displayName: 'Base version'
     type: string
     default: '1.0.20'
 
-  - name: packageType
-    displayName: 'Template package type'
-    type: string
-    default: 'ci'
-    values:
-      - ci
-      - preview
-      - rc
-      - release
-
   - name: visualStudioArtifactName
     displayName: 'Visual Studio artifact name'
+    type: string
+    default: 'visual-studio-template'
+
+  -
