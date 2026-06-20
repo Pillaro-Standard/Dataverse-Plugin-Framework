@@ -5,18 +5,13 @@ trigger: none
 pr: none
 
 parameters:
-  - name: vsixBaseVersion
-    displayName: 'VSIX base version (Major.Minor.Patch)'
-    type: string
-    default: '1.0.8'
-
-  - name: dotnetBaseVersion
-    displayName: '.NET template base version (Major.Minor.Patch)'
+  - name: baseVersion
+    displayName: 'Base version (e.g. 1.0.20)'
     type: string
     default: '1.0.20'
 
-  - name: dotnetPackageType
-    displayName: '.NET template package type'
+  - name: packageType
+    displayName: 'Template package type'
     type: string
     default: 'ci'
     values:
@@ -84,20 +79,14 @@ jobs:
         inputs:
           targetType: inline
           script: |
-            $vsixBaseVersion = '${{ parameters.vsixBaseVersion }}'
-            $dotnetBaseVersion = '${{ parameters.dotnetBaseVersion }}'
-            $dotnetPackageType = '${{ parameters.dotnetPackageType }}'
+            $baseVersion = '${{ parameters.baseVersion }}'
+            $packageType = '${{ parameters.packageType }}'
             $visualStudioArtifactName = '${{ parameters.visualStudioArtifactName }}'
             $dotnetNewArtifactName = '${{ parameters.dotnetNewArtifactName }}'
             $buildId = [int]"$(Build.BuildId)"
 
-            foreach ($versionName in @(
-              @{ Name = 'vsixBaseVersion'; Value = $vsixBaseVersion },
-              @{ Name = 'dotnetBaseVersion'; Value = $dotnetBaseVersion }
-            )) {
-              if ($versionName.Value -notmatch '^\d+\.\d+\.\d+$') {
-                throw "$($versionName.Name) must be in format Major.Minor.Patch, e.g. 1.0.8. Current value: '$($versionName.Value)'."
-              }
+            if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+              throw "baseVersion must be in format Major.Minor.Patch, e.g. 1.0.20. Current value: '$baseVersion'."
             }
 
             if ([string]::IsNullOrWhiteSpace($visualStudioArtifactName)) {
@@ -108,10 +97,10 @@ jobs:
               throw 'dotnetNewArtifactName cannot be empty.'
             }
 
-            $vsixVersion = "$vsixBaseVersion.$buildId"
+            $vsixVersion = "$baseVersion.$buildId"
 
             $ref = "$(Build.SourceBranch)"
-            $parts = $dotnetBaseVersion.Split('.')
+            $parts = $baseVersion.Split('.')
             $major = [int]$parts[0]
             $minor = [int]$parts[1]
             $patch = [int]$parts[2]
@@ -128,12 +117,12 @@ jobs:
               $dotnetInformationalVersion = $dotnetPackageVersion
             }
             else {
-              switch ($dotnetPackageType) {
-                "ci"      { $dotnetPackageVersion = "$dotnetBaseVersion-ci.$buildId" }
-                "preview" { $dotnetPackageVersion = "$dotnetBaseVersion-preview.$buildId" }
-                "rc"      { $dotnetPackageVersion = "$dotnetBaseVersion-rc.$buildId" }
-                "release" { $dotnetPackageVersion = $dotnetBaseVersion }
-                default   { throw "Unsupported dotnetPackageType '$dotnetPackageType'." }
+              switch ($packageType) {
+                "ci"      { $dotnetPackageVersion = "$baseVersion-ci.$buildId" }
+                "preview" { $dotnetPackageVersion = "$baseVersion-preview.$buildId" }
+                "rc"      { $dotnetPackageVersion = "$baseVersion-rc.$buildId" }
+                "release" { $dotnetPackageVersion = $baseVersion }
+                default   { throw "Unsupported packageType '$packageType'." }
               }
 
               $dotnetAssemblyVersion = "$major.$minor.$patch.0"
@@ -141,7 +130,7 @@ jobs:
               $dotnetInformationalVersion = $dotnetPackageVersion
             }
 
-            Write-Host "VSIX base version: $vsixBaseVersion"
+            Write-Host "Base version: $baseVersion"
             Write-Host "VSIX build version: $vsixVersion"
             Write-Host ".NET template version: $dotnetPackageVersion"
             Write-Host ".NET assembly version: $dotnetAssemblyVersion"
