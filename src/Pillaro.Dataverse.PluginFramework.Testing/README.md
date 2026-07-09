@@ -147,9 +147,9 @@ public class TestTaskTest(TestFixture<TestAutofacModule> testFixture, ITestOutpu
             LastName = "Mucha"
         };
 
-        contact.Id = DataService.CreateTestEntity(contact);
+        contact.Id = TestDataService.CreateTestEntity(contact);
 
-        var loaded = DataService
+        var loaded = TestDataService
             .Query<Contact>()
             .Where(x => x.Id == contact.Id)
             .Select(x => new Contact { FirstName = x.FirstName, LastName = x.LastName })

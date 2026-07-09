@@ -1,4 +1,4 @@
-﻿# Versioning Strategy
+# Versioning Strategy
 
 > Versioning model for Pillaro Dataverse Plugin Framework packages and releases.
 
@@ -209,10 +209,15 @@ Example changelog structure:
     ### Pillaro.Dataverse.PluginFramework.Testing
     - Testing-specific changes
 
-During the build process:
+NuGet package metadata links to the central [CHANGELOG.md](../CHANGELOG.md) file through the branch used to build the package.
 
-* each package receives only its relevant section
-* NuGet metadata is populated automatically from the changelog
+Examples:
+
+- stable releases built from `main` link to `main/CHANGELOG.md`
+- release candidates built from a release branch link to that release branch
+- preview builds built from a development branch link to that development branch
+
+The package metadata should not point to a specific commit for release notes. Keeping the link branch-based allows documentation and changelog clarifications to be updated in the release branch without rebuilding and republishing the package.
 
 ---
 
@@ -340,3 +345,9 @@ For MAJOR version upgrades, migration guides are provided in:
 
 > [!IMPORTANT]
 > We aim to minimize breaking changes and provide clear migration paths when they are necessary.
+
+## ➡️ Related documents
+
+- [Changelog](../CHANGELOG.md) - Release notes and change history.
+- [CI/CD Pipelines](./ci-cd-pipelines.md) - Build and package automation.
+- [Contributing](./CONTRIBUTING.md) - Contribution workflow and release expectations.

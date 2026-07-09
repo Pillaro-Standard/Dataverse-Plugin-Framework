@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Pillaro.Dataverse.PluginTemplate.Logic</RootNamespace>
+    <AssemblyName>Pillaro.Dataverse.PluginTemplate.Logic</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Plugins\PluginBase.cs" />
+    <Compile Include="Plugins\ExamplePlugin.cs" />
+    <Compile Include="Tasks\Example\ExampleTask.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pillaro.Dataverse.PluginFramework" Version="1.1.0" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.60" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
+</Project>

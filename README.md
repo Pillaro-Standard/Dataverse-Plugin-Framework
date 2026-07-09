@@ -3,6 +3,9 @@
 [![NuGet - Framework](https://img.shields.io/badge/NuGet-Pillaro.Dataverse.PluginFramework-blue?logo=nuget)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework)
 [![NuGet - Testing](https://img.shields.io/badge/NuGet-Pillaro.Dataverse.PluginFramework.Testing-blue?logo=nuget)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing)
 
+[![Template - Visual Studio VSIX](https://img.shields.io/badge/Template-Visual%20Studio%20VSIX-blue?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
+[![Template - dotnet new](https://img.shields.io/badge/Template-dotnet%20new-blue?logo=visualstudiocode)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+
 Source-open, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
 
 
@@ -10,14 +13,53 @@ Source-open, AI-ready standard for building scalable Dynamics 365 and Power Plat
 
 Pillaro Framework provides a structured and production-proven approach to developing Dataverse plugins using C#.
 
-It introduces a task-based execution model with explicit validation and execution phases, enabling:
+For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://www.pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
+
+It introduces a task-based execution model with explicit validation and execution phases, together with a precise deployment model for plugin assemblies, plugin steps, images, filtering attributes, and related registration metadata.
+
+This enables:
 
 - predictable and deterministic behavior
+- exact and repeatable plugin deployment
+- plugin step synchronization without accidental duplicates
 - strict separation of concerns
 - fully testable plugin logic
 - long-term maintainability at scale
 
 The framework is designed for real-world production environments and long-term solution sustainability.
+
+## Start a New Solution
+
+Choose one of the official template packages, [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) or [Visual Studio VSIX](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate), when you want to start a new Dataverse plugin solution quickly:
+
+| Template | Best for | Recommendation |
+| --- | --- | --- |
+| [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) | CLI workflows, VS Code, and Visual Studio | Recommended default |
+| [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) | Visual Studio installable template and Marketplace visibility | Use when you want the Visual Studio extension experience |
+
+The shared template source lives in `templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate`, so both delivery formats generate the same starter solution structure.
+
+If you are choosing one for a new project, start with the [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew). Keep the [VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) for Visual Studio distribution and store presence.
+
+### Install the [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+
+The CLI template will be published on NuGet.org here:
+
+- [Pillaro.Dataverse.PluginTemplate.DotNetNew](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
+
+Install it with:
+
+```powershell
+dotnet new install Pillaro.Dataverse.PluginTemplate.DotNetNew
+```
+
+After installation, create a new solution with:
+
+```powershell
+dotnet new pillaro-dataverse-plugin-dotnet -n MySolution
+```
+
+The generated solution works well in both Visual Studio Code and Visual Studio, so you can use the same template regardless of whether you prefer CLI-first or IDE-first workflows.
 
 
 ## Proven in Production
@@ -47,12 +89,18 @@ Standard plugin development often leads to:
 - multiple responsibilities in a single class
 - lack of testability
 - duplicated patterns across projects
+- manual or inconsistent plugin registration
+- duplicate plugin steps after repeated deployments
+- deployment that is hard to reproduce across environments
 
 This framework introduces a consistent structure:
 
 - each functionality = single task
 - validation is separated from execution
 - behavior is deterministic and explicit
+- plugin registration metadata is defined in code
+- deployment can precisely create or update the intended Dataverse plugin components
+- generated early-bound entity classes can be created from Dataverse metadata using Power Platform CLI tooling
 - built-in testing support
 - built-in diagnostic logging
 
@@ -77,6 +125,42 @@ Each plugin is composed of independent tasks:
 - fail-fast validation that prevents execution of invalid tasks while allowing the pipeline to continue
 - consistent handling of validation and execution errors with clear and traceable outcomes
 - automatic logging of validation failures with detailed reasons
+
+---
+
+### Exact Plugin Deployment
+
+The framework treats plugin deployment as a repeatable engineering process, not a manual registration exercise.
+
+Plugin registration metadata is defined in code and used by the deployment tooling to synchronize Dataverse plugin assemblies, steps, filtering attributes, images, rank, configuration, and solution membership with high precision.
+
+This solves one of the most common operational problems in Dataverse plugin delivery:
+
+- deployments are deterministic and repeatable
+- plugin steps are created or updated intentionally
+- duplicate plugin steps are avoided
+- registration metadata stays close to the plugin implementation
+- local developer deployment and automated DevOps deployment use the same source of truth
+
+Developers can deploy from the generated local tooling during implementation, while teams can run the same deployment process from Azure DevOps pipelines or any other DevOps automation capable of building the plugin assembly and executing the deployment script.
+
+See [Plugin Registration API](docs/plugins/plugin-registration-api.md) and [Deployment Plugins](docs/plugins/deployment-plugins.md) for the registration and deployment workflow.
+
+---
+
+### Early-Bound Entity Generation
+
+The framework package also prepares generated tooling for early-bound entity generation in consuming plugin projects.
+
+After rebuilding the plugin project, the package creates `Tools/EarlyBound/` with:
+
+- `EarlyBoundSettings.json` for selecting entities, messages, namespace, and generation options
+- `GenerateEarlyBound.bat` as the local wrapper around Power Platform CLI `pac modelbuilder`
+- a generated README that explains the local tool files
+
+This helps teams generate strongly typed Dataverse classes, field constants, and optional message classes directly from environment metadata. Those generated types can then be used in task code and in the registration API for typed filtering attributes and images.
+
+See [Early-Bound Entity Generation](docs/plugins/early-bound-generation.md) for the full workflow.
 
 ---
 
@@ -242,8 +326,12 @@ Configuration is loaded dynamically from Dataverse.
 
 ## Getting Started
 
-> 🚧 TODO  
-> Detailed setup and usage guide will be added soon.
+Start with the implementation guide:
+
+- [Getting Started](docs/plugins/getting-started.md)
+- [Plugin Registration API](docs/plugins/plugin-registration-api.md)
+- [Deployment Plugins](docs/plugins/deployment-plugins.md)
+- [Early-Bound Entity Generation](docs/plugins/early-bound-generation.md)
 
 ---
 
@@ -324,6 +412,14 @@ We offer:
 - extended technical support
 - business partnership opportunities
 - custom development and integration services
+
+## Need help?
+
+If you need help with implementation, deployment, configuration, plugin registration, or getting the framework running in your environment, feel free to contact us.
+
+We provide practical support for teams adopting the Pillaro Dataverse Plugin Framework in real Dataverse / Dynamics 365 / Power Platform projects.
+
+[Contact Pillaro](https://www.pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support)
 
 
 ## License

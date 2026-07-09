@@ -1,0 +1,100 @@
+name: PR Validate
+
+trigger:
+  branches:
+    include:
+      - develop
+      - main
+
+pr:
+  branches:
+    include:
+      - develop
+      - main
+
+variables:
+  - group: dataverse-test-secrets
+
+  - name: configuration
+    value: Release
+
+jobs:
+  - job: Validate
+    displayName: Validate build and tests
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 1
+
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: '8.x'
+
+      - task: NuGetToolInstaller@1
+        displayName: Setup NuGet
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore test projects
+        inputs:
+          command: restore
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+
+      - task: VSBuild@1
+        displayName: Build framework test project
+        inputs:
+          solution: tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          configuration: $(configuration)
+          msbuildArgs: /restore
+          clean: false
+          maximumCpuCount: true
+
+      - task: VSBuild@1
+        displayName: Build example test project
+        inputs:
+          solution: examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          configuration: $(configuration)
+          msbuildArgs: /restore
+          clean: false
+          maximumCpuCount: true
+
+      - task: DotNetCoreCLI@2
+        displayName: Run all tests
+        inputs:
+          command: test
+          projects: |
+            tests/**/*.Tests.csproj
+            examples/**/*.Tests.csproj
+          arguments: >
+            --configuration $(configuration)
+            --no-build
+            --no-restore
+            --logger trx
+            --results-directory "$(Agent.TempDirectory)\TestResults"
+            --collect "XPlat Code Coverage"
+          publishTestResults: false
+        env:
+          ConnectionStrings__Dataverse: $(DataverseConnectionString)
+
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        condition: always()
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/*.trx'
+          searchFolder: '$(Agent.TempDirectory)\TestResults'
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+          testRunTitle: 'PR Validate Tests'
+
+      - task: PublishCodeCoverageResults@2
+        displayName: Publish code coverage
+        condition: succeededOrFailed()
+        inputs:
+          summaryFileLocation: '$(Agent.TempDirectory)\TestResults\**\coverage.cobertura.xml'
+          failIfCoverageEmpty: false

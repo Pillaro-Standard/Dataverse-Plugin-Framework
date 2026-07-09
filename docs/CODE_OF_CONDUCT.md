@@ -39,3 +39,8 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be repor
 ## Attribution
 
 This Code of Conduct is adapted from Contributor Covenant, version 2.1.
+
+## ➡️ Related documents
+
+- [Contributing](./CONTRIBUTING.md) - Contribution workflow and review expectations.
+- [Security](./SECURITY.md) - Vulnerability reporting and security handling.

@@ -6,17 +6,11 @@ using Microsoft.Xrm.Sdk;
 namespace Pillaro.Dataverse.PluginFramework.Testing.Infrastructure.Dataverse;
 
 
-internal class DataverseConnectionServiceFactory : IDataverseConnectionService
+internal class DataverseConnectionServiceFactory(IConfiguration configuration, IMemoryCache memoryCache) : IDataverseConnectionService
 {
     private const int CacheExpirationMinutes = 5;
-    private readonly IConfiguration _configuration;
-    private readonly IMemoryCache _memoryCache;
-
-    public DataverseConnectionServiceFactory(IConfiguration configuration, IMemoryCache memoryCache)
-    {
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-    }
+    private readonly IConfiguration _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+    private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
 
     public IOrganizationServiceAsync2 GetOrganizationService(string connectionStringName = "Dataverse", bool ignoreCache = false)
     {
@@ -30,7 +24,7 @@ internal class DataverseConnectionServiceFactory : IDataverseConnectionService
             return new ServiceClient(connectionString);
 
         var cacheKey = GetBaseCacheKey(connectionString);
-        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
+        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient? cachedClient) && cachedClient is { IsReady: true })
             return cachedClient;
 
         var client = new ServiceClient(connectionString);
@@ -50,7 +44,7 @@ internal class DataverseConnectionServiceFactory : IDataverseConnectionService
             return CreateCallerClient(connectionString, callerId);
 
         var cacheKey = GetCallerCacheKey(connectionString, callerId);
-        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient cachedClient) && cachedClient.IsReady)
+        if (_memoryCache.TryGetValue(cacheKey, out ServiceClient? cachedClient) && cachedClient != null && cachedClient.IsReady)
             return cachedClient;
 
         var client = CreateCallerClient(connectionString, callerId);
@@ -64,7 +58,7 @@ internal class DataverseConnectionServiceFactory : IDataverseConnectionService
             ?? throw new InvalidOperationException($"Connection string with name '{connectionStringName}' is missing.");
     }
 
-    private ServiceClient CreateCallerClient(string connectionString, Guid callerId)
+    private static ServiceClient CreateCallerClient(string connectionString, Guid callerId)
     {
         var client = new ServiceClient(connectionString)
         {

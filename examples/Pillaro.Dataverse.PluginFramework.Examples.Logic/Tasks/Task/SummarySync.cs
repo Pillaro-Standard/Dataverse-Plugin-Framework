@@ -95,13 +95,13 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
 
             foreach (var task in relatedTasks)
             {
-                if (task.StateCode == TaskState.Open && task.ScheduledEnd.HasValue)
+                if (task.StateCode == task_statecode.Open && task.ScheduledEnd.HasValue)
                 {
                     if (!latestPlannedDate.HasValue || task.ScheduledEnd.Value > latestPlannedDate.Value)
                         latestPlannedDate = task.ScheduledEnd.Value;
                 }
 
-                if (task.StateCode == TaskState.Completed && task.ActualEnd.HasValue)
+                if (task.StateCode == task_statecode.Completed && task.ActualEnd.HasValue)
                 {
                     if (!latestCompletedDate.HasValue || task.ActualEnd.Value > latestCompletedDate.Value)
                         latestCompletedDate = task.ActualEnd.Value;

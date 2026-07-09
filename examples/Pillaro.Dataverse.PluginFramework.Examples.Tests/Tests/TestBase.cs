@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Pillaro.Dataverse.PluginFramework.Settings;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
+using System.Net;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests;
 

@@ -389,8 +389,10 @@ Continue with:
 
 - [Getting Started](./getting-started.md)
 - [Plugin Model](./plugin-model.md)
+- [Plugin Registration API](./plugin-registration-api.md)
+- [Deployment Plugins](./deployment-plugins.md)
 - [Task Model](./task-model.md)
 - [Validation Model](./validation.md)
-- [Execution Pipeline](../execution-pipeline.md)
+- [Execution Pipeline](./execution-pipeline.md)
 - [Data Access](./data-access.md)
 - [DataService](./data-service.md)

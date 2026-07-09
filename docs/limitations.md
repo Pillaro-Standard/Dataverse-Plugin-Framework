@@ -8,7 +8,6 @@
 ## 📑 Navigation
 
 - [🧪 Merged assembly reference limitation](#-merged-assembly-reference-limitation)
-- [🧰 SPKL early-bound generation limitation](#-spkl-early-bound-generation-limitation)
 - [➡️ Related documents](#️-related-documents)
 
 ---
@@ -27,16 +26,6 @@ Because of that:
 
 > [!IMPORTANT]
 > The `Logic` and `Plugins` split is required not only for structure, but also to avoid reference conflicts caused by the merged deployment assembly.
-
----
-
-## 🧰 SPKL early-bound generation limitation
-
-If SPKL is used for early-bound generation, `Microsoft.CrmSdk.CoreTools` must not be upgraded beyond:
-
-    9.1.0.92
-
-This limitation applies only to SPKL early-bound generation usage.
 
 ---
 

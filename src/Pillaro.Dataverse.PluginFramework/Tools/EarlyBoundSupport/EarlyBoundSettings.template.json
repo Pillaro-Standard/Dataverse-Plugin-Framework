@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/PowerApps-Language-Tooling/master/src/PAModelTests/testdata/schema.json",
+
+  "suppressINotifyPattern": true,
+  "suppressGeneratedCodeAttribute": true,
+  "language": "CS",
+  "logLevel": "Off",
+
+  "namespace": "YourSolution.Logic.EarlyBound",
+  "serviceContextName": "ServiceContext",
+
+  "generateSdkMessages": false,
+  "generateGlobalOptionSets": true,
+
+  "emitFieldsClasses": true,
+  "emitEntityETC": false,
+  "emitVirtualAttributes": false,
+
+  "entityTypesFolder": "Entities",
+  "messagesTypesFolder": "Messages",
+  "optionSetsTypesFolder": "OptionSets",
+
+  "entityNamesFilter": [
+    "contact",
+    "task",
+    "account"
+  ],
+
+  "messageNamesFilter": []
+}

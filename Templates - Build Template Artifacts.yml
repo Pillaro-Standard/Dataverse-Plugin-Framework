@@ -1,0 +1,294 @@
+name: Templates - Build Template Artifacts
+
+trigger: none
+
+pr: none
+
+parameters:
+  - name: baseVersion
+    displayName: 'Base version (e.g. 1.0.0)'
+    type: string
+    default: '1.0.0'
+
+  - name: packageType
+    displayName: 'Template package type'
+    type: string
+    default: 'ci'
+    values:
+      - ci
+      - preview
+      - rc
+      - release
+
+  - name: visualStudioArtifactName
+    displayName: 'Visual Studio artifact name'
+    type: string
+    default: 'visual-studio-template'
+
+  - name: dotnetNewArtifactName
+    displayName: '.NET new artifact name'
+    type: string
+    default: 'Pillaro.Dataverse.PluginTemplate.DotNetNew'
+
+variables:
+  - name: configuration
+    value: Release
+
+  - name: templateName
+    value: Pillaro.Dataverse.PluginTemplate
+
+  - name: templatePackageId
+    value: Pillaro.Dataverse.PluginTemplate.DotNetNew
+
+  - name: templateShortName
+    value: pillaro-dataverse-plugin-dotnet
+
+  - name: vsixProjectPath
+    value: templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj
+
+  - name: dotnetTemplateProjectPath
+    value: templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/Pillaro.Dataverse.PluginTemplate.DotNetNew.csproj
+
+  - name: artifactOutputRoot
+    value: $(Build.ArtifactStagingDirectory)/templates
+
+  - name: visualStudioArtifactOutputDirectory
+    value: $(artifactOutputRoot)/visual-studio
+
+  - name: visualStudioPublishOutputDirectory
+    value: $(artifactOutputRoot)/visual-studio-publish
+
+jobs:
+  - job: BuildTemplateArtifacts
+    displayName: Build Visual Studio and .NET template artifacts
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 0
+
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: '8.x'
+
+      - task: PowerShell@2
+        displayName: Validate pipeline inputs and calculate versions
+        inputs:
+          targetType: inline
+          script: |
+            $baseVersion = '${{ parameters.baseVersion }}'
+            $packageType = '${{ parameters.packageType }}'
+            $visualStudioArtifactName = '${{ parameters.visualStudioArtifactName }}'
+            $dotnetNewArtifactName = '${{ parameters.dotnetNewArtifactName }}'
+            $buildId = [int]"$(Build.BuildId)"
+
+            if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+              throw "baseVersion must be in format Major.Minor.Patch, e.g. 1.0.20. Current value: '$baseVersion'."
+            }
+
+            if ([string]::IsNullOrWhiteSpace($visualStudioArtifactName)) {
+              throw 'visualStudioArtifactName cannot be empty.'
+            }
+
+            if ([string]::IsNullOrWhiteSpace($dotnetNewArtifactName)) {
+              throw 'dotnetNewArtifactName cannot be empty.'
+            }
+
+            $vsixVersion = "$baseVersion.$buildId"
+
+            $ref = "$(Build.SourceBranch)"
+            $parts = $baseVersion.Split('.')
+            $major = [int]$parts[0]
+            $minor = [int]$parts[1]
+            $patch = [int]$parts[2]
+
+            if ($ref -match "^refs/tags/v(.+)$") {
+              $dotnetPackageVersion = $Matches[1]
+
+              if ($dotnetPackageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
+                throw "Tag version '$dotnetPackageVersion' is not valid."
+              }
+
+              $dotnetAssemblyVersion = "$major.$minor.$patch.0"
+              $dotnetFileVersion = "$major.$minor.$patch.0"
+              $dotnetInformationalVersion = $dotnetPackageVersion
+            }
+            else {
+              switch ($packageType) {
+                "ci"      { $dotnetPackageVersion = "$baseVersion-ci.$buildId" }
+                "preview" { $dotnetPackageVersion = "$baseVersion-preview.$buildId" }
+                "rc"      { $dotnetPackageVersion = "$baseVersion-rc.$buildId" }
+                "release" { $dotnetPackageVersion = $baseVersion }
+                default   { throw "Unsupported packageType '$packageType'." }
+              }
+
+              $dotnetAssemblyVersion = "$major.$minor.$patch.0"
+              $dotnetFileVersion = "$major.$minor.$patch.$buildId"
+              $dotnetInformationalVersion = $dotnetPackageVersion
+            }
+
+            Write-Host "Base version: $baseVersion"
+            Write-Host "VSIX build version: $vsixVersion"
+            Write-Host ".NET template version: $dotnetPackageVersion"
+            Write-Host ".NET assembly version: $dotnetAssemblyVersion"
+            Write-Host ".NET file version: $dotnetFileVersion"
+            Write-Host ".NET informational version: $dotnetInformationalVersion"
+            Write-Host "Visual Studio artifact name: $visualStudioArtifactName"
+            Write-Host ".NET new artifact name: $dotnetNewArtifactName"
+
+            Write-Host "##vso[task.setvariable variable=vsixVersion]$vsixVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetPackageVersion]$dotnetPackageVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetAssemblyVersion]$dotnetAssemblyVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetFileVersion]$dotnetFileVersion"
+            Write-Host "##vso[task.setvariable variable=dotnetInformationalVersion]$dotnetInformationalVersion"
+
+      - task: PowerShell@2
+        displayName: Stamp VSIX manifest version
+        inputs:
+          targetType: inline
+          script: |
+            $manifestPath = "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix\source.extension.vsixmanifest"
+            $vsixVersion = "$(vsixVersion)"
+
+            [xml]$manifest = Get-Content -LiteralPath $manifestPath -Raw
+            $ns = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+            $ns.AddNamespace('vsx', 'http://schemas.microsoft.com/developer/vsx-schema/2011')
+
+            $identity = $manifest.SelectSingleNode('//vsx:Identity', $ns)
+            if (-not $identity) {
+              throw "VSIX Identity node was not found in '$manifestPath'."
+            }
+
+            $identity.Version = $vsixVersion
+            $manifest.Save($manifestPath)
+
+            Write-Host "Stamped VSIX manifest version: $vsixVersion"
+
+      - task: DotNetCoreCLI@2
+        displayName: Build Visual Studio template artifacts
+        inputs:
+          command: build
+          projects: $(vsixProjectPath)
+          arguments: >
+            /p:ArtifactsDirectory="$(visualStudioArtifactOutputDirectory)"
+
+      - task: PowerShell@2
+        displayName: Validate Visual Studio template artifacts and smoke build
+        inputs:
+          targetType: filePath
+          filePath: scripts/Test-PluginTemplateArtifacts.ps1
+          arguments: >
+            -TemplateName "$(templateName)"
+            -VsixVersion "$(vsixVersion)"
+            -ArtifactsDirectory "$(visualStudioArtifactOutputDirectory)"
+
+      - task: PowerShell@2
+        displayName: Prepare Visual Studio publish artifact
+        inputs:
+          targetType: inline
+          script: |
+            $source = "$(visualStudioArtifactOutputDirectory)"
+            $target = "$(visualStudioPublishOutputDirectory)"
+
+            New-Item -ItemType Directory -Path $target -Force | Out-Null
+
+            Get-ChildItem -LiteralPath $target -File -Recurse -ErrorAction SilentlyContinue |
+              Remove-Item -Force
+
+            $vsixFiles = Get-ChildItem -LiteralPath $source -Filter "*.vsix" -File -Recurse -ErrorAction SilentlyContinue
+
+            if (-not $vsixFiles -or $vsixFiles.Count -eq 0) {
+              throw "No VSIX file was found in '$source'."
+            }
+
+            if ($vsixFiles.Count -ne 1) {
+              $found = ($vsixFiles | ForEach-Object { $_.FullName }) -join '; '
+              throw "Expected exactly one VSIX file, found $($vsixFiles.Count): $found"
+            }
+
+            Copy-Item -LiteralPath $vsixFiles[0].FullName -Destination $target -Force
+
+            $zipFiles = Get-ChildItem -LiteralPath $target -Filter "*.zip" -File -Recurse -ErrorAction SilentlyContinue
+            if ($zipFiles) {
+              throw "Visual Studio publish artifact must not contain ZIP files."
+            }
+
+            Write-Host "Prepared Visual Studio publish artifact: $($vsixFiles[0].Name)"
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore .NET template project
+        inputs:
+          command: restore
+          projects: $(dotnetTemplateProjectPath)
+
+      - task: DotNetCoreCLI@2
+        displayName: Build .NET template project
+        inputs:
+          command: build
+          projects: $(dotnetTemplateProjectPath)
+          arguments: >
+            --configuration $(configuration)
+            --no-restore
+            /p:Version=$(dotnetPackageVersion)
+            /p:PackageVersion=$(dotnetPackageVersion)
+            /p:AssemblyVersion=$(dotnetAssemblyVersion)
+            /p:FileVersion=$(dotnetFileVersion)
+            /p:InformationalVersion=$(dotnetInformationalVersion)
+            /p:ContinuousIntegrationBuild=true
+            /p:Deterministic=true
+            /p:DebugType=portable
+            /p:DebugSymbols=true
+            /p:PublishRepositoryUrl=true
+            /p:EmbedUntrackedSources=true
+            /p:IncludeSourceRevisionInInformationalVersion=false
+
+      - task: PowerShell@2
+        displayName: Resolve .NET template NuGet package
+        inputs:
+          targetType: inline
+          script: |
+            $packagePath = "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)\$(templatePackageId).$(dotnetPackageVersion).nupkg"
+
+            if (-not (Test-Path -LiteralPath $packagePath)) {
+              Write-Host "Expected package was not found:"
+              Write-Host $packagePath
+              Write-Host ""
+              Write-Host "Existing packages in bin\$(configuration):"
+
+              Get-ChildItem -LiteralPath "$(Build.SourcesDirectory)\templates\Pillaro.Dataverse.PluginTemplate.DotNetNew\bin\$(configuration)" `
+                -Filter "*.nupkg" `
+                -File `
+                -ErrorAction SilentlyContinue |
+                ForEach-Object { Write-Host $_.FullName }
+
+              throw "Expected .NET template NuGet package was not produced by build."
+            }
+
+            Write-Host "Resolved .NET template package:"
+            Write-Host $packagePath
+            Write-Host "##vso[task.setvariable variable=dotnetTemplatePackagePath]$packagePath"
+
+      - task: PowerShell@2
+        displayName: Validate .NET template artifacts and smoke build
+        inputs:
+          targetType: filePath
+          filePath: scripts/Test-DotNetTemplateArtifacts.ps1
+          arguments: >
+            -TemplatePackagePath "$(dotnetTemplatePackagePath)"
+            -TemplateShortName "$(templateShortName)"
+            -Configuration "$(configuration)"
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload Visual Studio template artifacts
+        inputs:
+          targetPath: $(visualStudioPublishOutputDirectory)
+          artifact: ${{ parameters.visualStudioArtifactName }}
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload .NET new template package
+        inputs:
+          targetPath: $(dotnetTemplatePackagePath)
+          artifact: ${{ parameters.dotnetNewArtifactName }}

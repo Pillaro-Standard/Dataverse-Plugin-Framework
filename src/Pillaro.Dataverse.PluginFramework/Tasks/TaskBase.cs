@@ -281,11 +281,23 @@ public abstract class TaskBase<TEntity> : ITask
 
     private Log CreateDefaultLog(IPluginExecutionContext executionContext)
     {
-        return new Log(LogSeverity.Debug, new LogExecutionContext(executionContext), "Task")
+        var log = new Log(LogSeverity.Debug, new LogExecutionContext(executionContext), "Task")
         {
             TaskName = GetTaskName(),
             StartUtc = DateTime.UtcNow,
         };
+
+        if (!string.IsNullOrWhiteSpace(TaskContext.UnsecureConfig))
+        {
+            log.AddDetail("UnsecureConfig", TaskContext.UnsecureConfig);
+        }
+
+        if (!string.IsNullOrWhiteSpace(TaskContext.SecureConfig))
+        {
+            log.AddDetail("SecureConfig", "Secure configuration is registered, but its value will not be displayed for security reasons.");
+        }
+
+        return log;
     }
 
     private static TService GetRequiredService<TService>(IServiceProvider serviceProvider)

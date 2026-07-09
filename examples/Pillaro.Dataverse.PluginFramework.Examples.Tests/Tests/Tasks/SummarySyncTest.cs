@@ -167,7 +167,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
         OrganizationService.Execute(new SetStateRequest
         {
             EntityMoniker = new EntityReference(Task.EntityLogicalName, taskId),
-            State = new OptionSetValue((int)TaskState.Completed),
+            State = new OptionSetValue((int)task_statecode.Completed),
             Status = new OptionSetValue(-1)
         });
         

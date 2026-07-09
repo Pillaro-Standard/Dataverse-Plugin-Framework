@@ -395,10 +395,10 @@ When reviewing the pipeline behavior of a plugin, you should be able to answer:
 
 Continue with:
 
-- [Plugin Model](./plugins/plugin-model.md)
-- [Task Model](./plugins/task-model.md)
-- [Validation Model](./plugins/validation.md)
-- [Data Access](./plugins/data-access.md)
-- [DataService](./plugins/data-service.md)
-- [Getting Started](./plugins/getting-started.md)
+- [Plugin Model](./plugin-model.md)
+- [Task Model](./task-model.md)
+- [Validation Model](./validation.md)
+- [Data Access](./data-access.md)
+- [DataService](./data-service.md)
+- [Getting Started](./getting-started.md)
 - [Architecture](./architecture.md)

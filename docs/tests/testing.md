@@ -24,7 +24,7 @@
 - [7. Create your first integration test](#7-create-your-first-integration-test)
 - [8. Run and verify](#8-run-and-verify)
 - [✅ Recommendations](#-recommendations)
-- [➡️ Next steps](#️-next-steps)
+- [➡️ Related documents](#️-related-documents)
 
 ---
 
@@ -289,7 +289,7 @@ Create a base class for all test classes:
 
 ~~~csharp
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace YourSolution.Tests.Tests;
 
@@ -321,7 +321,6 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 using Xunit;
-using Xunit.Abstractions;
 using YourSolution.Tests.Data.Repositories;
 
 namespace YourSolution.Tests.Tests.Contact;
@@ -424,7 +423,7 @@ After execution:
 
 ---
 
-## ➡️ Next steps
+## ➡️ Related documents
 
 - [Test Architecture](./test-architecture.md)
 - [Test Execution Flow](./test-execution-flow.md)
@@ -434,3 +433,5 @@ After execution:
 For plugin development, see:
 
 - [Getting Started](../plugins/getting-started.md)
+- [Plugin Registration API](../plugins/plugin-registration-api.md)
+- [Deployment Plugins](../plugins/deployment-plugins.md)

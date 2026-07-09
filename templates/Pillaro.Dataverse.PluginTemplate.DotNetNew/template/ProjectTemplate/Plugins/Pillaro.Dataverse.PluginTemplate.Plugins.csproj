@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Pillaro.Dataverse.PluginTemplate.Plugins</RootNamespace>
+    <AssemblyName>Pillaro.Dataverse.PluginTemplate.Plugins</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PostBuildEvent>
+      REM ============================================================
+      REM Post-build merge script for Dataverse plugin projects
+      REM ============================================================
+      REM Purpose:
+      REM - merge plugin assembly with its dependencies into a single DLL
+      REM - required for Dataverse plugin deployment
+      REM
+      REM Notes:
+      REM - all assemblies must exist in the output directory
+      REM - ILMerge.exe must exist in the project Tools\ILMerge folder
+      REM - keep Logic assembly at the END of the merge list
+      REM - update dependencies when adding/removing references
+      REM ============================================================
+
+      set "PROJECT_DIR=$(MSBuildProjectDirectory)"
+      set "OUT_DIR=$(MSBuildProjectDirectory)\bin\$(Configuration)\"
+      set "PLUGIN_DLL=$(AssemblyName).dll"
+      set "FOR_MERGE_DLL=ForMerge$(AssemblyName).dll"
+      set "LOGIC_DLL=Pillaro.Dataverse.PluginTemplate.Logic.dll"
+
+      pushd "%OUT_DIR%"
+
+      rename "%PLUGIN_DLL%" "%FOR_MERGE_DLL%"
+
+      "%PROJECT_DIR%\Tools\ILMerge\ILMerge.exe" ^
+       /keyfile:"%PROJECT_DIR%\key.snk" ^
+       /target:library ^
+       /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" ^
+       /out:"%PLUGIN_DLL%" ^
+       "%FOR_MERGE_DLL%" ^
+       "Pillaro.Dataverse.PluginFramework.dll" ^
+       "Newtonsoft.Json.dll" ^
+       "%LOGIC_DLL%"
+
+      del "%FOR_MERGE_DLL%"
+      del "%LOGIC_DLL%"
+
+      popd
+    </PostBuildEvent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pillaro.Dataverse.PluginFramework" Version="1.1.0" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.60" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="key.snk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿# Pillaro Dataverse Plugin Framework — Documentation
+# Pillaro Dataverse Plugin Framework — Documentation
 
 > [!IMPORTANT]
 > The root [README](../README.md) helps you decide whether the framework is relevant for your solution.
@@ -16,6 +16,9 @@
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 💬 [Questions & Discussions](#-questions--discussions)     | Ask questions, share ideas, and report issues in the repository discussions |
 | 🚀 [Plugin Development](#-plugin-development)              | Build and structure Dataverse plugins with the framework                    |
+| 🧱 [Generated Tooling](#-generated-tooling)                | Use package-generated local tools for ILMerge, deployment, and early-bound generation |
+| 🧩 [Project Templates](#-project-templates)                | Start new solutions with the recommended [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) or [Visual Studio VSIX](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) template |
+| 🚚 [Deployment Plugins](#-deployment-plugins)              | Deploy plugins precisely, repeatably, and without accidental duplicates      |
 | 📱 [Model-Driven Application](#-model-driven-application)  | Pillaro Plugin Framework for runtime management and diagnostics             |
 | 🧪 [Test Development](#-test-development)                  | Build and run programmatic tests against Dataverse                          |
 | 📦 [Release and Versioning](#-release-and-versioning)      | Release and versioning information                                          |
@@ -39,23 +42,24 @@
 
 Use this section when you are building Dataverse plugins with the framework.
 
-### Start
+### Plugin Start
 
 | Document | Description | Status |
 |---|---|---|
 | [Getting Started](./plugins/getting-started.md) | First setup, first plugin, and first deployable assembly | ✅ |
 
-### Core Concepts
+### Plugin Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
 | [Architecture](./plugins/architecture.md) | High-level plugin architecture and project structure | ✅ |
 | [Plugin Model](./plugins/plugin-model.md) | Plugin responsibilities and registration approach | ✅ |
+| [Plugin Registration API](./plugins/plugin-registration-api.md) | Fluent static registration metadata API | ✅ |
 | [Task Model](./plugins/task-model.md) | Task lifecycle, structure, and responsibilities | ✅ |
 | [Validation Model](./plugins/validation.md) | Validation flow and validation chain design | ✅ |
 | [Execution Pipeline](./plugins/execution-pipeline.md) | Plugin execution flow and task orchestration | ✅ |
 
-### Data Access
+### Plugin Data Access
 
 | Document | Description | Status |
 |---|---|---|
@@ -73,6 +77,55 @@ Use this section when you are building Dataverse plugins with the framework.
 
 ---
 
+## 🧱 Generated Tooling
+
+The framework package creates local tooling in consuming plugin projects after rebuild. These tools help developers keep repeatable project operations close to the plugin source code.
+
+Generated tooling covers three areas:
+
+- `Tools/ILMerge/` - prepared merge tooling and post-build action templates for producing one deployable Dataverse plugin assembly
+- `Tools/Deployment/` - deployment wrappers for publishing the plugin assembly and synchronizing registration metadata
+- `Tools/EarlyBound/` - Power Platform CLI wrapper and settings for generating strongly typed Dataverse entity classes
+
+| Document | Description | Status |
+|---|---|---|
+| [ILMerge Post-Build Tooling](./plugins/getting-started.md#61-choose-the-correct-ilmerge-post-build-action) | Prepare the final single plugin assembly required by Dataverse deployment | ✅ |
+| [Early-Bound Entity Generation](./plugins/early-bound-generation.md) | Generate strongly typed Dataverse entity classes using Power Platform CLI | ✅ |
+| [Deployment Plugins](./plugins/deployment-plugins.md) | Deploy plugin assemblies and synchronize registration metadata | ✅ |
+
+---
+
+## 🧩 Project Templates
+
+Use one of the official template packages, [dotnet new](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) or [Visual Studio VSIX](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate), when you want to start a new solution quickly.
+
+| Document | Description | Recommendation |
+|---|---|---|
+| [dotnet new template](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) | CLI-oriented template package for VS Code, Visual Studio, and command-line workflows | ✅ Recommended default |
+| [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) | Installable Visual Studio template package with Marketplace-oriented delivery | Use when you need the VSIX experience |
+
+The shared generated-project source lives in `templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate`, so both delivery formats stay aligned.
+
+---
+
+## 🚚 Deployment Plugins
+
+Use this section when you need to deploy Dataverse plugin assemblies and plugin registration metadata in an exact, repeatable way.
+
+The framework deployment process uses registration metadata defined in code as the source of truth. It is designed to create or update the intended plugin assemblies, plugin steps, filtering attributes, images, and related registration metadata without accidental duplicates.
+
+Developers can run the generated deployment tooling locally, and teams can use the same process from Azure DevOps pipelines or other DevOps automation.
+
+| Document | Description | Status |
+|---|---|---|
+| [Deployment Plugins](./plugins/deployment-plugins.md) | Main deployment guide for exact local and automated plugin deployment | ✅ |
+
+> [!NOTE]
+> The plugin deployment flow is intentionally separated from plugin development.
+> Development documentation explains how to build plugin code; this chapter explains how the built assembly and registration metadata get deployed precisely and repeatably.
+
+---
+
 ## 📱 Model-Driven Application
 
 Use this section to learn about the Pillaro Plugin Framework included with the framework.
@@ -87,13 +140,13 @@ Use this section to learn about the Pillaro Plugin Framework included with the f
 
 Use this section when you are building programmatic tests for Dataverse solutions.
 
-### Start
+### Test Start
 
 | Document | Description | Status |
 |---|---|---|
 | [Testing Overview](./tests/testing.md) | Entry point for test setup and test usage | ✅ |
 
-### Core Concepts
+### Test Core Concepts
 
 | Document | Description | Status |
 |---|---|---|
@@ -101,7 +154,7 @@ Use this section when you are building programmatic tests for Dataverse solution
 | [Test Execution Flow](./tests/test-execution-flow.md) | How test setup, execution, assertion, and cleanup work | ✅ |
 | [Test Data Lifecycle](./tests/test-data-lifecycle.md) | Creating, using, and removing test data safely | ✅ |
 
-### Data Access
+### Test Data Access
 
 | Document | Description | Status |
 |---|---|---|
@@ -141,9 +194,9 @@ Repository-level policies and contribution guidance.
 
 | Document | Description | Status |
 |---|---|---|
-| [Contributing](../CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
-| [Security](../SECURITY.md) | Vulnerability reporting and security handling | ✅ |
-| [Code of Conduct](../CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
+| [Contributing](./CONTRIBUTING.md) | Basic contribution process and expectations | ✅ |
+| [Security](./SECURITY.md) | Vulnerability reporting and security handling | ✅ |
+| [Code of Conduct](./CODE_OF_CONDUCT.md) | Community behavior expectations | ✅ |
 | [License](../LICENSE) | Repository license | ✅ |
 
 ---
@@ -160,6 +213,13 @@ Repository-level policies and contribution guidance.
 6. [Execution Pipeline](./plugins/execution-pipeline.md)
 7. [Data Access](./plugins/data-access.md)
 8. [DataService](./plugins/data-service.md)
+9. [Early-Bound Entity Generation](./plugins/early-bound-generation.md)
+
+### I want to deploy plugins
+
+1. [Deployment Plugins](./plugins/deployment-plugins.md)
+2. [Plugin Registration API](./plugins/plugin-registration-api.md)
+3. [CI/CD Pipelines](./ci-cd-pipelines.md)
 
 ### I want to build tests
 
@@ -177,12 +237,20 @@ Repository-level policies and contribution guidance.
 
 ### I want to contribute
 
-1. [Contributing](../CONTRIBUTING.md)
+1. [Contributing](./CONTRIBUTING.md)
 2. [CI/CD Pipelines](./ci-cd-pipelines.md)
-3. [Code of Conduct](../CODE_OF_CONDUCT.md)
-4. [Security](../SECURITY.md)
+3. [Code of Conduct](./CODE_OF_CONDUCT.md)
+4. [Security](./SECURITY.md)
 5. [License](../LICENSE)
 
 ---
 
 **Questions?** Open a [Discussion](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/discussions) or check [Issues](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues)
+
+## ➡️ Related documents
+
+- [Getting Started](./plugins/getting-started.md) - Start building Dataverse plugins with the framework.
+- [Plugin Registration API](./plugins/plugin-registration-api.md) - Configure plugin registration metadata in code.
+- [Early-Bound Entity Generation](./plugins/early-bound-generation.md) - Generate Dataverse entity classes with Power Platform CLI.
+- [Deployment Plugins](./plugins/deployment-plugins.md) - Deploy plugin assemblies and plugin steps into Dataverse.
+- [Testing Overview](./tests/testing.md) - Build integration tests against Dataverse.
