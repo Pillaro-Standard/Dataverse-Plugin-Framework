@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.1
+
+### Pillaro.Dataverse.PluginFramework
+
+- Fixed generated Windows deployment wrappers when NuGet package or project paths contain diacritics or other non-ASCII characters.
+- Improved the local NuGet package build helper so it resolves repository paths correctly when run from the `scripts` directory and keeps the downloaded NuGet CLI outside the repository.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Added Windows deployment scaffolding coverage for Unicode paths, profile forwarding, settings resolution, working directory handling, and exit code propagation.
+
 ## 1.1.1-rc
 
 ### Pillaro.Dataverse.PluginFramework
