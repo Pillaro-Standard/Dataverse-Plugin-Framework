@@ -96,10 +96,9 @@
           OverwriteReadOnlyFiles="true"
           Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroDeploymentDir)README.md'))" />
 
-    <!-- Template DeployPlugins.bat -->
+    <!-- DeployPlugins.bat stays ASCII-only and delegates Unicode paths to the UTF-8 PowerShell wrapper. -->
     <PropertyGroup>
-      <_BatTemplate>$([System.IO.File]::ReadAllText('$(PillaroToolsRoot)Deployment\DeployPlugins.bat.template'))</_BatTemplate>
-      <_BatContent>$(_BatTemplate.Replace('__PILLARO_CLI_DLL__', '$(PillaroCliDll)'))</_BatContent>
+      <_BatContent>$([System.IO.File]::ReadAllText('$(PillaroToolsRoot)Deployment\DeployPlugins.bat.template'))</_BatContent>
     </PropertyGroup>
     <WriteLinesToFile File="$(PillaroDeploymentDir)DeployPlugins.bat"
                       Lines="$(_BatContent)"

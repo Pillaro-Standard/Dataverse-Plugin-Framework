@@ -40,4 +40,19 @@
 	  </None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Include="..\..\src\Pillaro.Dataverse.PluginFramework\Tools\Deployment\DeployPlugins.bat.template"
+	        Link="DeploymentScaffolding\tools\Deployment\DeployPlugins.bat.template"
+	        CopyToOutputDirectory="PreserveNewest" />
+	  <None Include="..\..\src\Pillaro.Dataverse.PluginFramework\Tools\Deployment\DeployPlugins.ps1.template"
+	        Link="DeploymentScaffolding\tools\Deployment\DeployPlugins.ps1.template"
+	        CopyToOutputDirectory="PreserveNewest" />
+	  <None Include="..\..\src\Pillaro.Dataverse.PluginFramework\Tools\Deployment\Pillaro.Dataverse.PluginFramework.targets"
+	        Link="DeploymentScaffolding\build\Pillaro.Dataverse.PluginFramework.targets"
+	        CopyToOutputDirectory="PreserveNewest" />
+	  <None Include="..\..\src\Pillaro.Dataverse.PluginFramework\Tools\Deployment\README.md"
+	        Link="DeploymentScaffolding\tools\Deployment\README.md"
+	        CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>
