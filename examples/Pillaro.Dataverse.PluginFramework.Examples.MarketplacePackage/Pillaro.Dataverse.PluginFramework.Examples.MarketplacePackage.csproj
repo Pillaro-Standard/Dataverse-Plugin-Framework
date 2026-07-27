@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyTitle>Pillaro Dataverse Plugin Framework Marketplace Package</AssemblyTitle>
+    <Product>Pillaro Dataverse Plugin Framework</Product>
+    <Company>Pillaro Labs s.r.o.</Company>
+    <Copyright>Copyright © 2026 Pillaro Labs s.r.o.</Copyright>
+    <Version>1.0.0</Version>
+    <PackageId>Pillaro.Dataverse.PluginFramework.MarketplacePackage</PackageId>
+    <PdPackageFilenameIncludeVersion>false</PdPackageFilenameIncludeVersion>
+    <PdPackageTargetFileName>package.zip</PdPackageTargetFileName>
+    <MarketplacePackageFileName>Pillaro_Dataverse_Plugin_Framework.zip</MarketplacePackageFileName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.PowerApps.MSBuild.PDPackage" Version="1.52.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CrmSdk.XrmTooling.CoreAssembly" Version="9.1.0.79" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CrmSdk.XrmTooling.PackageDeployment" Version="9.1.0.74" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PdSolution Include="..\..\power-platform-solutions\framework\PillaroFramework_1_0_0_1_managed.zip" ImportOrder="1" />
+    <PdSolution Include="..\..\power-platform-solutions\examples\PillaroPluginFrameworkExamples_1_0_0_0_managed.zip" ImportOrder="2" />
+  </ItemGroup>
+
+  <Target Name="GenerateMarketplacePackage"
+          AfterTargets="GeneratePdPackage"
+          DependsOnTargets="ComputePdPackageOutput">
+    <PropertyGroup>
+      <MarketplacePackageOutputPath>$(PackageOutputAbsolutePath)$(MarketplacePackageFileName)</MarketplacePackageOutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <_MarketplacePackagePart Include="$(PdPackageOutputAbsolutePath)" PackagePath="package.zip" />
+      <_MarketplacePackagePart Include="MarketplaceAssets\Input.xml" PackagePath="Input.xml" />
+      <_MarketplacePackagePart Include="MarketplaceAssets\logo32x32.png" PackagePath="logo32x32.png" />
+      <_MarketplacePackagePart Include="MarketplaceAssets\TermsOfUse.html" PackagePath="TermsOfUse.html" />
+    </ItemGroup>
+    <CreateOpcPackage OutputFile="$(MarketplacePackageOutputPath)"
+                      PackageParts="@(_MarketplacePackagePart)" />
+    <Message Importance="High" Text="$(MSBuildProjectName) Marketplace package -> $(MarketplacePackageOutputPath)" />
+  </Target>
+
+  <Target Name="CleanMarketplacePackage" AfterTargets="Clean">
+    <Delete Files="$(PackageOutputAbsolutePath)$(MarketplacePackageFileName)"
+            Condition="'$(PackageOutputAbsolutePath)' != ''" />
+  </Target>
+</Project>
