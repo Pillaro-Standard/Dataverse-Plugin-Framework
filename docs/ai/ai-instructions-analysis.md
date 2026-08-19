@@ -55,6 +55,17 @@
    Instrukční sada proto musí být součástí `dotnet new` šablony a generovaného tooling
    v NuGet balíčku (`Tools/`), jinak ji dostane jen tým frameworku.
 
+### 1.1 Potvrzená rozhodnutí zadavatele
+
+| # | Otázka | Rozhodnutí |
+|---|---|---|
+| Q1 | Cílovka instrukcí | **Vývojáři zákaznických řešení** (výstup šablony). Instrukce musí být distribuovány v `dotnet new` šabloně a v generovaném tooling NuGet balíčku. |
+| Q2 | Podporované AI nástroje | **Všechny přes `AGENTS.md`** jako kanonický vstup; ostatní soubory jsou tenké redirecty. |
+| Q3 | GUIDy stepů a images | **Generuje tooling.** AI GUIDy nikdy nepíše ani neopisuje. Vyžaduje dodělat CLI příkaz — je to prerekvizita, ne volitelné vylepšení. |
+| Q4 | Ověřovací prostředí | **Dedikované Dataverse dev prostředí je k dispozici**, agent smí pouštět integrační testy. Plná smyčka *log → oprava → test* je tedy reálná. |
+
+Tato rozhodnutí jsou už zapracovaná do §3, §6.1, §7 a §12 níže.
+
 ---
 
 ## 2. Výchozí stav — co audit zjistil
@@ -113,10 +124,20 @@ Pracuje v `YourSolution.Logic` / `.Plugins` / `.Tests`. Potřebuje: kam patří 
 jak napsat task + validaci + registraci + test, jaké GUIDy použít, jak nasadit.
 **Tady je 90 % objemu práce a tedy i hodnoty AI.**
 
-**Doporučení:** psát obě sady, ale **B) je priorita** a musí se distribuovat
-v šabloně a v NuGet balíčku. Sdílená jádrová pravidla (architektura, task, validace,
-logování, error handling, data access) držet v jednom zdroji a do obou míst je publikovat,
-ne kopírovat ručně.
+**Rozhodnuto (Q1): cílovka je B).**
+Instrukční sada se píše pro vývojáře zákaznických řešení a **musí se distribuovat
+v `dotnet new` šabloně a v generovaném tooling NuGet balíčku** — jinak ji dostane jen
+tým frameworku. To má tři praktické důsledky pro celý návrh:
+
+1. **Zdroj pravdy je v tomto repozitáři, cíl je jinde.** Pravidla se udržují zde
+   (`docs/ai/rules/`) a *publikují* do šablony a do balíčku stejným mechanismem jako
+   dnešní `Tools/Deployment` a `Tools/EarlyBound`. Ruční kopírování povede k driftu.
+2. **Pravidla nesmí předpokládat kontext frameworkového repozitáře.** Žádné odkazy na
+   `src/`, `tools/`, `CHANGELOG.md` ani PR proti `develop` — v zákaznickém řešení nic
+   z toho neexistuje. Odkazy do dokumentace musí být absolutní URL na GitHub, ne
+   relativní cesty.
+3. **Contributor pravidla (A) se tím neruší, jen klesají v prioritě.** Vzniknou později
+   jako samostatná, tenčí sada nad stejným jádrem (§12, fáze P3).
 
 ---
 
@@ -307,18 +328,24 @@ je důvod, proč pravidlo v katalogu je — a zároveň důkaz, že si nic nevym
 Sekce, která v praxi rozhoduje o tom, jestli je AI použitelná, nebo jestli tiše rozbíjí
 produkční prostředí. Instrukce ji musí obsahovat explicitně a nahoře.
 
-### 6.1 GUIDy plugin stepů a images
-Validátor odmítá `Guid.Empty` i placeholder vzory. Model si GUID vymyslí vždy, když mu
-to nezakážeme. Existují tři možné politiky — **je potřeba jednu vybrat** (otázka Q3):
+### 6.1 GUIDy plugin stepů a images — **rozhodnuto: generuje tooling (Q3)**
 
-- **(a) AI generuje nový GUID** — legitimní, pokud deployment step s tímto ID zakládá;
-  instrukce pak musí říct „vygeneruj v4 GUID, nikdy neopisuj z dokumentace/příkladů“.
-- **(b) GUIDy dodává člověk** — AI píše `TODO-STEP-ID` a build/validace to odmítne.
-- **(c) GUIDy generuje tooling** — nejlepší varianta: `pillaro new-step` doplní ID sám.
+Validátor odmítá `Guid.Empty` i placeholder vzory a model si GUID vymyslí vždy, když mu
+to nezakážeme. Zvolená politika je proto **generování toolingem**: AI GUID nikdy nepíše.
 
-Riziko, které musí instrukce pokrýt v každé variantě: **AI nesmí kopírovat GUIDy
-z dokumentace ani z `/examples`** (`4e56ef4c-0e08-f111-8407-000d3ab261ac` apod.) — kolize
-ID napříč řešeními je nejhorší možný výsledek.
+Co z toho plyne:
+
+- **Prerekvizita:** musí vzniknout příkaz, který step/image zaregistruje a ID doplní sám
+  (např. `pillaro new-step --plugin ContactPlugin --message Update --stage PreOperation`).
+  Bez něj politika neexistuje a AI se vrátí k vymýšlení. Proto je v §12 zařazen do P1,
+  ne mezi „nice to have“.
+- **Pravidlo pro AI:** při přidání stepu AI *volá tooling* a do kódu doplní ID, které
+  tooling vrátil. Nikdy negeneruje vlastní GUID, nikdy needituje existující ID.
+- **Tvrdý zákaz:** AI NIKDY nekopíruje GUIDy z dokumentace ani z `/examples`
+  (`4e56ef4c-0e08-f111-8407-000d3ab261ac` apod.). Kolize ID napříč zákaznickými řešeními
+  je nejhorší možný výsledek — deployment by přepisoval cizí registrační metadata.
+- **Pojistka:** offline validace manifestu (§7.2/1) musí kromě placeholderů odmítnout
+  i známé GUIDy z dokumentace a příkladů. To udělá z pravidla vynutitelný gate.
 
 ### 6.2 Early-bound klasy
 Generuje `pac modelbuilder` proti živému prostředí. AI je NIKDY nepíše ani needituje.
@@ -354,8 +381,22 @@ Model bez rychlého ověření se nemá jak opravit.
 |---|---|---|
 | Co | build + analyzátory + validace manifestu + offline unit testy | integrační testy proti Dataverse |
 | Délka | sekundy až desítky sekund | minuty, potřebuje prostředí |
-| Kdo spouští | agent | vývojář nebo pipeline |
+| Kdo spouští | agent | **agent (dedikované dev prostředí, Q4)**, vývojář nebo pipeline |
 | Dnešní stav | **částečně chybí** | existuje (`PR – Validate.yml`, nightly) |
+
+**Rozhodnuto (Q4):** agent má k dispozici dedikované Dataverse dev prostředí, takže smí
+pouštět i slow loop. Tím se ale mění charakter rizika — agent teď může zapisovat do
+živého prostředí. Instrukce proto musí obsahovat tvrdá pravidla pro práci s prostředím:
+
+| ID | Pravidlo |
+|---|---|
+| PF-ENV-001 | Agent pracuje POUZE proti dedikovanému dev prostředí. NIKDY proti test/UAT/produkci. |
+| PF-ENV-002 | Connection string se čte z user-secrets nebo env proměnné. NIKDY se nepíše do souboru v repu ani do logu/výstupu. |
+| PF-ENV-003 | Zápis dat POUZE přes `TestDataService.CreateTestEntity(...)`, aby cleanup zafungoval (PF-TEST-002). |
+| PF-ENV-004 | Agent NIKDY nemaže ani neupravuje záznamy, které nevytvořil v aktuálním běhu. |
+| PF-ENV-005 | Agent nespouští deployment ani neregistruje assembly (PF-PROC-005) — testuje proti tomu, co je nasazené. |
+| PF-ENV-006 | Před spuštěním integračních testů agent ověří, že cílové prostředí je to dev (kontrola URL proti očekávané hodnotě), a při neshodě zastaví. |
+| PF-ENV-007 | Selhání integračního testu se NIKDY „neopraví“ úpravou testu tak, aby prošel — opravuje se task, nebo se nález eskaluje člověku. |
 
 ### 7.2 Co je potřeba dodělat (konkrétní návrhy)
 
@@ -376,6 +417,11 @@ Model bez rychlého ověření se nemá jak opravit.
    log dostane k agentovi**: export view / FetchXML dotaz do souboru, nebo MCP server
    nad Dataverse. Tím se z marketingového „AI Feedback Loop“ stane reálná smyčka:
    *log selhání → prompt → oprava tasku → test*.
+   Protože dev prostředí je podle Q4 dostupné, **není to už blokované na infrastruktuře**
+   — jde jen o dodělání čtecí cesty. Minimální varianta je jednoduchý dotaz na
+   `Diagnostic Log` filtrovaný podle `correlation id` posledního testovacího běhu,
+   uložený do souboru, který agent přečte. To je nejrychlejší způsob, jak smyčku uzavřít;
+   MCP server nad Dataverse je pohodlnější, ale výrazně dražší.
 5. **Ověření na šablonovém výstupu.** `scripts/Test-DotNetTemplateArtifacts.ps1` už dělá
    smoke build vygenerovaného projektu — je to přirozené místo, kde ověřit, že se
    instrukční pack do zákaznického řešení skutečně dostal.
@@ -531,21 +577,25 @@ Pouštět po každé změně katalogu pravidel — to je jediná ochrana proti t
 - Oprava nálezů z §9.3, jazykové značky u bloků kódu.
 - `docs/ai/verify.md` s doslovnými příkazy.
 
-### P1 — Vynucení a workflow
-- Offline `validate` příkaz v CLI (§7.2/1).
+### P1 — Vynucení a tooling (obsahuje prerekvizitu z Q3)
+- **`pillaro new-step` — generátor step/image ID.** Prerekvizita zvolené GUID politiky (§6.1).
+- Offline `validate` příkaz v CLI (§7.2/1), včetně odmítnutí GUIDů z dokumentace a příkladů.
 - `-warnaserror` profil pro AI/CI běh.
+- Pravidla `PF-ENV-*` pro práci s dev prostředím (§7.1) — nutná dřív, než agent dostane credentials.
 - Skills / slash commands: `new-task`, `new-step`, `new-test`, `review-pf`.
 - Doplnění chybějících konvencí z §9.4.
 
-### P2 — Distribuce k zákazníkům
+### P2 — Distribuce k zákazníkům (hlavní cíl podle Q1) + uzavření smyčky
 - Instrukční pack do `dotnet new` šablony a VSIX šablony.
 - Generovaný `Tools/AI/` v NuGet balíčku (stejný mechanismus jako `Tools/Deployment`).
+- Publikační krok místo ručního kopírování pravidel (§3, důsledek 1).
 - Smoke test v `scripts/Test-DotNetTemplateArtifacts.ps1`, že se pack propíše.
+- Cesta Diagnostic Log → agent (§7.2/4) — dev prostředí už je k dispozici.
 
-### P3 — Skutečná AI smyčka
+### P3 — Analýza jako vstup a měření
 - Formát specifikace tasku (§8) + generátor.
-- Cesta Diagnostic Log → agent (export nebo MCP server nad Dataverse).
 - Eval sada a metriky (§11).
+- Samostatná contributor sada pravidel nad stejným jádrem (§3, důsledek 3).
 
 ---
 
@@ -554,26 +604,24 @@ Pouštět po každé změně katalogu pravidel — to je jediná ochrana proti t
 Body, které mění návrh natolik, že je nemá smysl domýšlet. Označené **(Q)** jsou
 položeny přímo zadavateli.
 
-1. **(Q1) Cílovka.** Contributoři frameworku, vývojáři zákaznických řešení ze šablony,
-   nebo obojí? Určuje, kam instrukce fyzicky patří a jak se distribuují.
-2. **(Q2) Které AI nástroje oficiálně podporujeme?** GitHub Copilot, Claude Code, Cursor,
-   Codex, nebo „všechny přes `AGENTS.md`“. Určuje L0 vrstvu.
-3. **(Q3) Politika GUIDů** pro step/image ID (§6.1) — generuje AI, člověk, nebo tooling?
-4. **(Q4) Ověřovací prostředí.** Má agent (lokálně nebo v CI) k dispozici Dataverse dev
-   prostředí a credentials, nebo zůstává u čistě offline gate? Bez odpovědi nelze
-   dokončit design feedback loopu (§7).
-5. **Formát vstupu z analýzy.** Existuje dnes ustálený formát analytických výstupů
+**Q1–Q4 jsou zodpovězené** (viz §1.1) a zapracované. Zbývá:
+
+1. **Formát vstupu z analýzy.** Existuje dnes ustálený formát analytických výstupů
    (Word, Azure DevOps work items, něco jiného)? Bez toho je §8 návrh naslepo.
-6. **Konvence pojmenování stepů** — existuje interní dohoda, kterou jen zapsat, nebo ji
+2. **Konvence pojmenování stepů** — existuje interní dohoda, kterou jen zapsat, nebo ji
    máme navrhnout?
-7. **Jazyk instrukcí.** Doporučujeme EN (kód i dokumentace jsou EN, balíčky jsou public).
+3. **Jazyk instrukcí.** Doporučujeme EN (kód i dokumentace jsou EN, balíčky jsou public).
    Pokud je požadavek na CZ, řešit jako druhou vrstvu, ne jako překlad pravidel.
-8. **Public vs. interní.** Je instrukční sada součástí open-source repozitáře (marketingová
+4. **Public vs. interní.** Je instrukční sada součástí open-source repozitáře (marketingová
    hodnota „AI-ready“), nebo je to interní Pillaro standard?
-9. **IP a compliance.** Existují u zákazníků omezení na použití AI nástrojů / posílání
+5. **IP a compliance.** Existují u zákazníků omezení na použití AI nástrojů / posílání
    kódu do cloudových modelů, která musí instrukce zmiňovat?
-10. **Vlastník a údržba.** Kdo katalog pravidel udržuje a při jaké události se aktualizuje
-    (release? každá změna veřejného API?). Bez vlastníka drift nastane vždy.
+6. **Vlastník a údržba.** Kdo katalog pravidel udržuje a při jaké události se aktualizuje
+   (release? každá změna veřejného API?). Bez vlastníka drift nastane vždy.
+7. **Identita dev prostředí** (navazuje na Q4) — jaká je URL dev prostředí, aby šlo
+   implementovat pojistku `PF-ENV-006`, a kdo agentovi credentials poskytuje?
+8. **Rozsah `pillaro new-step`** (navazuje na Q3) — má příkaz jen vrátit GUID, nebo přímo
+   zapsat celý fluent blok do plugin classy a zarovnat `RegisterTask(...)`?
 
 ---
 
