@@ -51,9 +51,9 @@ F4–F6 lze dělat paralelně s instrukcemi.
 | ID | Oblast | Třída | Náročnost | Blokuje instrukce? |
 |---|---|---|---|---|
 | F1-01 | `validation.md` — nekompilovatelný příklad (`PluginContext`) | A | S | ✅ |
-| F1-02 | Rozpor ve 4 místech: co dělá `DataverseValidationException` | A | S | ✅ |
+| F1-02 | `DataverseValidationException` loguje `Info`, má logovat `Warning` — **změna kódu** | A | M | ✅ |
 | F1-03 | `plugin-registration-api.md` — nepřesné pravidlo unikátnosti názvů images | A | S | ✅ |
-| F1-04 | Rozpor: kam patří vygenerované early-bound klasy | A | M | ✅ |
+| F1-04 | Dokumentace generuje early-bound do `Plugins`, patří do `Logic` | A | M | ✅ |
 | F1-05 | `CONTRIBUTING.md` — neexistující název solution souboru | A | S | ✅ |
 | F1-06 | `docs/README.md` — rozbitý odkaz `VERSIONING.md` | A/D | S | — |
 | F1-07 | `examples/TaskPlugin.cs` — nezarovnaná validace a filtering attributes | A/B | S | ✅ |
@@ -116,30 +116,58 @@ s `examples/…/Tasks/Task/SummarySync.cs:19`.
 
 ---
 
-### F1-02 · Chování `DataverseValidationException` je popsáno třemi různými způsoby · **S**
+### F1-02 · `DataverseValidationException` loguje `Info`, má logovat `Warning` · **M** · změna kódu
 
 Nejzávažnější nález plánu, protože jde o **nejdůležitější behaviorální kontrakt frameworku** —
-jak signalizovat business zamítnutí uživateli.
+jak signalizovat business zamítnutí uživateli. Nález byl původně čtyřcestný rozpor:
 
 | Zdroj | Tvrzení |
 |---|---|
 | `src/…/Tasks/TaskBase.cs:82–88` | `Log.Status = TaskStatus.Success`, `Log.LogSeverity = LogSeverity.Info` |
-| `docs/plugins/execution-pipeline.md` | `Success` + `Info` — **správně** |
-| `docs/plugins/task-model.md:271–274` | `TaskStatus.NotValid` + `LogSeverity.Info` — **špatně ve stavu** |
-| `src/…/FluentInterfaces/IBreakValidation.cs` (XML doc `ThrowWithWarning`) | „will be logged as **Warning**“ — **špatně**, catch v `TaskBase` nastaví `Info` |
-| `examples/…/Tasks/Contact/ValidateNames.cs:33` | komentář „will be logged as **warning**“ — **špatně** |
+| `docs/plugins/execution-pipeline.md` | `Success` + `Info` |
+| `docs/plugins/task-model.md:271–274` | `TaskStatus.NotValid` + `LogSeverity.Info` |
+| `src/…/FluentInterfaces/IBreakValidation.cs` (XML doc `ThrowWithWarning`, obě přetížení) | „will be logged as **Warning**“ |
+| `examples/…/Tasks/Contact/ValidateNames.cs:33` | komentář „will be logged as **warning**“ |
 
-**Proč to AI rozbíjí:** dva různé důsledky, oba drahé. (a) Model bude vývojáři tvrdit
-nepravdu o tom, jak se výsledek objeví v monitoringu — a přesně kvůli monitoringu ta výjimka
-existuje. (b) XML dokumentace jde do IntelliSense i do NuGet balíčku, takže se chyba šíří
-k zákazníkům.
+> [!IMPORTANT]
+> **Rozhodnuto (D3): správná je `Warning`.** Chování se musí shodovat funkčně i logicky —
+> metoda `ThrowWithWarning(...)` nemůže logovat `Info`. Zdrojem pravdy tedy **není kód**;
+> opravuje se kód, ne dokumentace.
 
-**Oprava:** zdrojem pravdy je kód. Sjednotit na `TaskStatus.Success` + `LogSeverity.Info`
-ve `task-model.md`, v XML dokumentaci `ThrowWithWarning` (obě přetížení) i v komentáři příkladu.
-Zvážit, jestli není správnější naopak upravit kód (`Warning` by pro „warning“ metodu byl
-intuitivnější) — to je **produktové rozhodnutí, ne oprava dokumentace**, viz §12/D3.
+**Proč to AI rozbíjí:** dva různé důsledky, oba drahé. (a) Model tvrdí nepravdu o tom, jak
+se výsledek objeví v monitoringu — a přesně kvůli monitoringu ta výjimka existuje.
+(b) XML dokumentace jde do IntelliSense i do NuGet balíčku, takže se nepravda šíří k zákazníkům.
 
-**Hotovo když:** všechna čtyři místa tvrdí totéž a existuje test, který to chování zafixuje.
+**Oprava:**
+
+1. `TaskBase.cs:82–88` — v `catch (DataverseValidationException)` nastavit
+   `LogSeverity.Warning` místo `Info`.
+2. `docs/plugins/task-model.md:271–274` a `docs/plugins/execution-pipeline.md` — sjednotit
+   na `Warning`.
+3. `docs/plugins/logging.md` — ověřit dopad na tabulku `MinimalSeverityLevel`: při doporučené
+   produkční hodnotě `3` (`Warning`, `Error`) se business zamítnutí **začne v produkci logovat**,
+   zatímco dnes se jako `Info` zahazovalo. To je žádoucí (business zamítnutí je informace pro
+   support), ale je to **změna objemu produkčních logů** a patří ji zmínit v poznámkách k vydání.
+4. Komentář v `examples/…/ValidateNames.cs:33` — už je správný, ponechat.
+5. Test, který severitu zafixuje pro oba vstupy: přímý `throw` v `DoExecute()` i
+   `ThrowWithWarning(...)` ve validačním řetězu.
+
+> [!WARNING]
+> Jde o **změnu chování**, ne o opravu dokumentace: `CHANGELOG.md` + posouzení podle
+> `docs/versioning.md`. Kdokoli dnes filtruje logy na `Info`, přestane tyto záznamy vidět tam
+> a začne je vidět v `Warning`.
+
+**Otevřená návazná otázka — `TaskStatus` (D3b, §12).** Rozhodnutí D3 řeší severitu, ne stav.
+Ten je dnes `Success` pro oba případy, což u `ThrowWithWarning(...)` neodpovídá logice:
+výjimka je vyhozena už během `Validate(...)`, tělo tasku se nikdy nespustí, a přesto je
+výsledek `Success`. Podle stejného principu („musí odpovídat funkčně i logicky“) by tento
+případ měl být `NotValid`, zatímco `throw` z `DoExecute()` `Success` zůstat může.
+Implementačně je to oddělení `try` bloku kolem `Validate(...)` od bloku kolem
+`ExecuteInternal(...)`. Nedělám to bez rozhodnutí, protože stav se propisuje do statistik
+model-driven aplikace a do vyhodnocování „task se často spouští naprázdno“.
+
+**Hotovo když:** kód, obě dokumentace i XML doc tvrdí `Warning`, test to fixuje a změna je
+v `CHANGELOG.md`.
 
 ---
 
@@ -166,33 +194,61 @@ přitom je to častý zdroj chyb.
 
 ---
 
-### F1-04 · Není jednoznačné, kam patří vygenerované early-bound klasy · **M**
+### F1-04 · Dokumentace generuje early-bound do `Plugins`, patří do `Logic` · **M**
 
 **Nález:** dokumentace si protiřečí ve věci s reálnými technickými důsledky.
 
 | Zdroj | Implikace |
 |---|---|
-| `docs/plugins/early-bound-generation.md:20, 115` | tooling se instaluje a spouští v **plugin (Plugins) projektu**, výstup do `EarlyBound/` |
-| `docs/plugins/early-bound-generation.md:84` | doporučený namespace `YourSolution.Logic.EarlyBound` → tedy **Logic** |
-| `docs/plugins/getting-started.md` §6.3 | totéž: generovat z rootu plugin projektu |
-| `docs/plugins/architecture.md` | `Plugins` je **jen shell**, nesmí obsahovat implementaci; testy referencují `Logic` |
-| `examples/…Examples.Logic/EarlyBound/` | early-bound klasy jsou v **Logic** |
-| `src/…PluginFramework.Plugins/EarlyBound/` | ve vlastním repu jsou v **Plugins** |
+| `docs/plugins/early-bound-generation.md:20` | „Install … into the Dataverse **plugin project**“ |
+| `docs/plugins/early-bound-generation.md:115` | „Run the generated wrapper from the **plugin project root**“ |
+| `docs/plugins/early-bound-generation.md:84` | doporučený namespace `YourSolution.**Logic**.EarlyBound` |
+| `docs/plugins/getting-started.md` §6, §6.3 | `Tools/` se generují v `Plugins`, odtud se spouští generování |
+| `docs/plugins/architecture.md` | `Plugins` je jen shell; testy referencují `Logic` |
+| `examples/…Examples.Logic/EarlyBound/` | early-bound klasy jsou v `Logic` |
 
-**Proč to AI rozbíjí:** pokud AI podle `getting-started.md` vygeneruje early-bound do
-`Plugins`, tasky v `Logic` na ně nedosáhnou a testy taky ne — tedy přesně to, čemu má
-architektonické rozdělení zabránit. Model přitom nemá jak vybrat správně, protože
-autoritativní odpověď v dokumentaci není.
+> [!IMPORTANT]
+> **Rozhodnuto (D1): early-bound klasy patří do `Logic`.** V šabloně a v příkladech nejsou
+> commitnuté proto, že jsou závislé na konkrétním prostředí — generují se popsaným toolingem.
 
-**Oprava:** rozhodnout jedno místo (doporučuji **`Logic`** — plyne to z PF-ARCH-002,
-z testovatelnosti i z `/examples`) a srovnat: `early-bound-generation.md`,
-`getting-started.md` §6.3, popis generovaného toolingu a `EarlyBoundSettings.template.json`.
-Pokud tooling technicky umí generovat jen do projektu, kde je nainstalovaný balíček,
-patří to popsat explicitně jako známé omezení včetně doporučeného obejití.
-→ rozhodnutí **D1** v §12.
+**Technické potvrzení, že `Logic` je i zamýšlený cíl toolingu.** Ověřeno v
+`src/…/Tools/Deployment/Pillaro.Dataverse.PluginFramework.targets`:
 
-**Hotovo když:** existuje jediná odpověď na „kde leží `Logic.Contact`“ a všechny dotčené
-dokumenty i šablona ji říkají shodně.
+- target `PillaroScaffoldEarlyBound` (ř. 157–159) je podmíněný jen vlastností
+  `PillaroGenerateEarlyBoundTools` (default `true`), **není vázaný na typ projektu** — takže
+  `Tools/EarlyBound/` se vygeneruje v každém projektu, který balíček referencuje. Podle
+  `getting-started.md` §3.2 se framework balíček instaluje **i do `Logic`**, takže tooling
+  tam už dnes je.
+- generovaný `EarlyBoundSettings.json` má default `"namespace": "$(RootNamespace).EarlyBound"`
+  (ř. 192). Správný namespace `YourSolution.Logic.EarlyBound` tedy vznikne **jen při spuštění
+  z `Logic`**. Z `Plugins` by vyšel `YourSolution.Plugins.EarlyBound`.
+- `<Compile Include="EarlyBound\**\*.cs" />` (ř. 35–36) kompiluje výstup do toho projektu,
+  kde složka leží.
+
+Dokumentace tedy neopisuje jiný záměr — jen říká špatný projekt.
+
+**Proč to AI rozbíjí:** model podle `getting-started.md` vygeneruje early-bound do `Plugins`,
+tasky v `Logic` na ně nedosáhnou, testy taky ne, a namespace nesedí s tím, co dokumentace
+doporučuje. Tedy přesně to, čemu má architektonické rozdělení zabránit.
+
+**Oprava:**
+
+1. `early-bound-generation.md` — ř. 20 („plugin project“ → `Logic` projekt), ř. 115
+   („plugin project root“ → root `Logic` projektu). Doplnit, že výstup `EarlyBound/`
+   i `Tools/EarlyBound/` leží v `Logic`.
+2. `getting-started.md` §6.3 — přesunout krok generování early-bound z kontextu `Plugins`
+   do `Logic`; v §6 rozlišit, které `Tools/` patří kam (`ILMerge` + `Deployment` → `Plugins`,
+   `EarlyBound` → `Logic`). Dnes to čte, jako by všechno patřilo do `Plugins`.
+3. **Zpevnění (doporučeno):** v šabloně nastavit v `Plugins` projektu
+   `<PillaroGenerateEarlyBoundTools>false</PillaroGenerateEarlyBoundTools>`. Tooling pak
+   existuje na jediném místě a nelze ho omylem spustit z `Plugins`. Zabrání to chybě
+   spolehlivěji než jakékoli pravidlo v instrukcích.
+4. Do pravidel doplnit, že **`src/` není vzor**: framework vlastní `EarlyBound/` drží
+   v `Pillaro.Dataverse.PluginFramework.Plugins`, protože v tomhle repu žádný `Logic`
+   projekt neexistuje. Bez téhle poznámky si model vezme za vzor `src/`.
+
+**Hotovo když:** dokumentace i šablona říkají shodně `Logic`, a projekt vytvořený ze šablony
+nemá `Tools/EarlyBound/` v `Plugins`.
 
 ---
 
@@ -475,7 +531,7 @@ Aby plán nepřerostl. Tyto věci **nejsou** předpokladem funkčních AI instru
 
 | Krok | Obsah | Odhad | Výstup |
 |---|---|---|---|
-| 1 | F1 (všech 9 položek) | 0,5–1 den | Dokumentace nelže o API ani o chování |
+| 1 | F1 (všech 9 položek; F1-02 a F1-04 včetně změny kódu a šablony) | 1–1,5 dne | Dokumentace i kód tvrdí totéž |
 | 2 | F2-01 … F2-06 + srovnání `/examples` | 1–1,5 dne | Jediná kanonická forma pro každý úkon |
 | 3 | F3-01, F3-02, F3-04 | 0,5 dne | AI si umí sama ověřit build i registrační metadata |
 | 4 | **Napsat instrukce** (P0 z analýzy: `AGENTS.md` + katalog pravidel) | 1–2 dny | Použitelná instrukční sada |
@@ -498,8 +554,8 @@ jinak vzniknou konflikty v `/examples` a v `validation.md`.
 | Riziko | Dopad | Mitigace |
 |---|---|---|
 | F2 mění vzorový kód, který se buildí v PR pipeline | Rozbitý build examples | Po každé změně `/examples` build + nightly testy; změny po jednom tasku |
-| F1-02 může být chyba v kódu, ne v dokumentaci | Oprava dokumentace zakonzervuje nechtěné chování | Rozhodnout D3 před opravou; zafixovat testem |
-| F1-04 může narazit na omezení generovaného toolingu | Oprava se z M změní na produktovou změnu | Nejdřív ověřit, co `pac modelbuilder` wrapper umí; pak rozhodnout |
+| F1-02 mění chování logování (D3) | Kdo filtruje na `Info`, přestane záznamy vidět; v produkci naopak přibudou | `CHANGELOG.md`, posouzení verze, test fixující severitu, poznámka o objemu produkčních logů |
+| F1-02 zůstane nedotažené bez D3b | Severita bude `Warning`, ale stav dál `Success` i tam, kde tělo tasku neproběhlo | Rozhodnout D3b spolu s D3 a opravit jednou změnou |
 | F3-01 může narazit na nedokončenou funkcionalitu | Ze S se stane M–L | Ověřit `CreateFromAssembly` na reálné assembly před zapojením |
 | Instrukce se v čase rozejdou s frameworkem | Návrat do dnešního stavu | F6-02 + vlastník katalogu (otevřená otázka analýzy) |
 | Agent má přístup do dev prostředí (Q4) | Nechtěný zápis do jiného prostředí | F3-05 před předáním credentials, nikdy ne obráceně |
@@ -511,11 +567,19 @@ jinak vzniknou konflikty v `/examples` a v `validation.md`.
 Bez nich nelze některé položky dokončit. U každého je uvedené doporučení, takže lze
 odsouhlasit „jdi s doporučením“.
 
+### Rozhodnuto
+
+| # | Rozhodnutí | Výsledek | Dopad |
+|---|---|---|---|
+| **D1** | Kde leží early-bound klasy | **`Logic`.** V šabloně a příkladech nejsou commitnuté, protože závisí na prostředí — generují se toolingem. | F1-04 přepsáno; přidán návrh vypnout scaffolding v `Plugins` |
+| **D3** | Severita u `DataverseValidationException` | **`Warning`.** Chování musí odpovídat funkčně i logicky, takže se opravuje kód, ne dokumentace. | F1-02 z opravy textu na změnu kódu (S → M), + `CHANGELOG.md` a dopad na produkční objem logů |
+
+### Zbývá rozhodnout
+
 | # | Rozhodnutí | Doporučení | Blokuje |
 |---|---|---|---|
-| **D1** | Kde fyzicky leží early-bound klasy — `Logic`, nebo `Plugins`? | **`Logic`** (plyne z architektury a testovatelnosti) | F1-04 |
 | **D2** | Kanonická forma názvu atributu | **`Contact.Fields.X`**, `nameof(...)` zakázat, string jen jako fallback | F2-01, F2-06 |
-| **D3** | Má `ThrowWithWarning` logovat `Info` (dnešní kód), nebo `Warning` (dnešní XML doc)? | Nejdřív rozhodnout produktově; pokud `Warning`, jde o změnu kódu + verzování | F1-02 |
+| **D3b** | `TaskStatus` u `DataverseValidationException` — dnes `Success` pro oba případy | **`NotValid`** pro `ThrowWithWarning(...)` (vyhozeno ve `Validate`, tělo tasku neproběhlo), **`Success`** pro `throw` z `DoExecute()`. Plyne ze stejného principu jako D3, ale mění statistiky v model-driven aplikaci. | F1-02 |
 | **D4** | Konvence pojmenování stepů — máme navrhnout, nebo existuje dohoda? | Navrhneme `{Prefix} {Stage} {Message} {Entity}` podle `/examples` | F5-01 |
 | **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen AI/CI profil**, aby to nebrzdilo lokální rozpracovaný kód | F3-02 |
 | **D6** | Smí se měnit vzorový kód v `/examples`? | Ano — pro AI je to autoritativnější zdroj než próza | celé F2 |

@@ -73,6 +73,11 @@
 
 Tato rozhodnutí jsou už zapracovaná do §3, §6.1, §7 a §12 níže.
 
+Další rozhodnutí (**D1** — umístění early-bound klas, **D3** — severita
+`DataverseValidationException`) jsou vedená v
+[plánu oprav](./ai-readiness-fix-plan.md#rozhodnuto), aby existoval jediný seznam.
+Do katalogu pravidel v §5 jsou už promítnutá.
+
 ---
 
 ## 2. Výchozí stav — co audit zjistil
@@ -270,6 +275,8 @@ je důvod, proč pravidlo v katalogu je — a zároveň důkaz, že si nic nevym
 | PF-DATA-003 | Zvolený kontext musí být v kódu vizuálně zřejmý; nezakrývat ho helperem. | data-access.md |
 | PF-DATA-004 | Early-bound typy s prefixem `Logic.` (`Logic.Contact`). | CONTRIBUTING.md |
 | PF-DATA-005 | AI NIKDY nepíše ani needituje soubory v `EarlyBound/` — generuje je `pac modelbuilder`. | early-bound-generation.md (File Ownership) |
+| PF-DATA-006 | Early-bound klasy leží v projektu `Logic`; generování se spouští z rootu `Logic`. `src/` frameworku není vzor (nemá `Logic` projekt). | rozhodnutí D1, architecture.md |
+| PF-DATA-007 | Chybějící early-bound typ nebo atribut = AI zastaví a řekne, co vygenerovat. NIKDY nedopisovat partial class ani obcházet late-bound. | early-bound-generation.md |
 
 ### 5.6 Logování a chyby
 
@@ -278,9 +285,16 @@ je důvod, proč pravidlo v katalogu je — a zároveň důkaz, že si nic nevym
 | PF-LOG-001 | Task-level diagnostiku psát přes `AddLogMessageLine(...)` / `AddLogDetail(...)`, ne přes `LogService`. | task-model.md, logging.md |
 | PF-LOG-002 | Nelogovat vstupní parametry a images — framework je loguje automaticky. | task-model.md |
 | PF-LOG-003 | Do logu NIKDY tajemství, tokeny ani osobní údaje nad rámec business potřeby. | SECURITY.md, step-configuration.md |
-| PF-ERR-001 | Očekávané business zastavení = `DataverseValidationException` (log `Info`, uživatel vidí zprávu). | error-handling.md, task-model.md |
+| PF-ERR-001 | Očekávané business zastavení = `DataverseValidationException` (log **`Warning`**, uživatel vidí zprávu). | error-handling.md, task-model.md, rozhodnutí D3 |
 | PF-ERR-002 | `InvalidPluginExecutionException` v task kódu jen výjimečně — framework převod řeší sám. | error-handling.md |
 | PF-ERR-003 | Nebudovat vlastní try/catch pipeline v tasku. | error-handling.md |
+
+> [!NOTE]
+> `PF-ERR-001` uvádí cílový stav po rozhodnutí **D3**. Dnešní kód
+> (`TaskBase.cs:82–88`) nastavuje `LogSeverity.Info`; oprava je položka
+> [F1-02 plánu oprav](./ai-readiness-fix-plan.md#f1-02--dataversevalidationexception-loguje-info-má-logovat-warning--m--změna-kódu).
+> Pravidlo nesmí do instrukcí odejít dřív, než změna kódu vyjde — jinak by instrukce
+> popisovaly chování, které framework ještě nemá.
 
 ### 5.7 Registrační metadata (nejrizikovější oblast pro AI)
 
