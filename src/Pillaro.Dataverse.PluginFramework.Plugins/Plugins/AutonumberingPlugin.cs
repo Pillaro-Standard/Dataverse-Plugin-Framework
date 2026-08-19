@@ -16,7 +16,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Plugins
                 .OnMessage("5a6a2b33-e410-f111-8407-000d3ab26bbc", "pl_AutoNumbering_GetNewNumber")
                 .PostOperation()
                 .Synchronous()
-                .WithName("Post Operation pl_AutoNumbering_GetNewNumber")
+                .WithName($"{StepPrefix} pl_AutoNumbering_GetNewNumber PostOperation Synchronous")
                 .Rank(1);
         }
     }

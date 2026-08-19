@@ -21,7 +21,7 @@ public class ExamplePlugin : PluginBase
             .OnCreate("contact", "a4621296-6f72-42b6-b2c6-766732cec9fc")
             .PreValidation()
             .Synchronous()
-            .WithName("Pillaro Example Plugin PreVal Create Contact")
+            .WithName($"{StepPrefix} contact Create PreValidation Synchronous")
             .Rank(1)
             .WithFilteringAttributes("firstname", "lastname");
 
@@ -29,7 +29,7 @@ public class ExamplePlugin : PluginBase
             .OnUpdate("contact", "19d6cfed-9967-4465-9647-201ddb6a8082")
             .PreValidation()
             .Synchronous()
-            .WithName("Pillaro Example Plugin PreVal Update Contact")
+            .WithName($"{StepPrefix} contact Update PreValidation Synchronous")
             .Rank(1)
             .WhenChanged("firstname", "lastname");
     }

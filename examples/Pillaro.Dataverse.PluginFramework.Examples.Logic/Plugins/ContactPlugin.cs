@@ -19,7 +19,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
-                .WithName("Pillaro Examples PreVal Create Contact")
+                .WithName($"{StepPrefix} contact Create PreValidation Synchronous")
                 .Rank(1)
                 .WithFilteringAttributes(Contact.Fields.FirstName, Contact.Fields.LastName)
                 ;
@@ -28,7 +28,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
-                .WithName("Pillaro Examples PreVal Update Contact")
+                .WithName($"{StepPrefix} contact Update PreValidation Synchronous")
                 .Rank(1)
                 .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 
@@ -36,7 +36,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Contact>("4e72086e-1508-f111-8407-000d3ab261ac")
                 .PreOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Pre Create Contact")
+                .WithName($"{StepPrefix} contact Create PreOperation Synchronous")
                 .Rank(1)
                 .WithFilteringAttributes(
                     Contact.Fields.FirstName,
@@ -53,7 +53,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
                 .PreOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Pre Update Contact")
+                .WithName($"{StepPrefix} contact Update PreOperation Synchronous")
                 .Rank(1)
                 .WhenChanged(
                     Contact.Fields.FirstName,

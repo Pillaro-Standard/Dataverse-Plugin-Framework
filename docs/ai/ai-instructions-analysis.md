@@ -105,7 +105,7 @@ Do katalogu pravidel v §5 jsou už promítnutá.
 | Jediný kanonický příklad na koncept | V repu jsou **tři různé** styly práce s názvy atributů (viz §9.2) → AI kopíruje ten první, který uvidí |
 | Offline ověření | AI nemá jak zjistit, že vygenerovala nesmysl, dokud to nepustí člověk na Windows proti živému prostředí |
 | Politika pro GUIDy stepů/images | Validátor placeholdery odmítá, AI je přesto bude vymýšlet |
-| Konvence pojmenování stepů (`WithName(...)`) | Nedokumentováno → AI si vymyslí vlastní názvy, deployment vytvoří nekonzistentní metadata |
+| ~~Konvence pojmenování stepů~~ — **doplněno** (D4) | Bylo: nedokumentováno, šest různých stylů v repu → AI si vymýšlela názvy |
 | Strojově čitelný formát vstupu (analýza → task) | „Tasky lze identifikovat už v analýze“ (`README.md`) není nijak formalizováno |
 | Instrukce v šabloně/NuGet balíčku | Zákaznické projekty by je nedostaly |
 
@@ -309,7 +309,8 @@ je důvod, proč pravidlo v katalogu je — a zároveň důkaz, že si nic nevym
 | PF-REG-005 | Create step nesmí mít pre-image; Delete step nesmí mít post-image; images jen v Pre/PostOperation. | plugin-registration-api.md |
 | PF-REG-006 | Názvy images unikátní v rámci stepu, image ID unikátní v rámci manifestu. | plugin-registration-api.md |
 | PF-REG-007 | Preferovat typovaný výběr atributů (`c => c.FirstName`) nebo konstanty (`Contact.Fields.FirstName`); string literály jen když early-bound typ neexistuje. | plugin-registration-api.md |
-| PF-REG-008 | `WithName(...)` podle dohodnuté konvence pojmenování stepů. | **konvence dnes neexistuje — nutno doplnit (Q)** |
+| PF-REG-008 | `WithName(...)` nastavit VŽDY, ve tvaru `{StepPrefix} {entity} {Message} {Stage} {Mode}` (bez entity u custom API/action). Nenastavený název deployment nespravuje. | rozhodnutí D4, plugin-registration-api.md (Step Naming) |
+| PF-REG-009 | Název stepu popisuje koordináty stepu, ne jeho účel. Účel nesou názvy plugin classy a tasku. | rozhodnutí D4 |
 
 ### 5.8 Testy
 

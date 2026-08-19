@@ -190,7 +190,7 @@ Minimal example:
                 .OnCreate<Task>("8c46d6e6-3c25-4b9d-9264-6c0d02b4d2f1")
                 .PreOperation()
                 .Synchronous()
-                .WithName("My Custom Step Name")
+                .WithName($"{StepPrefix} task Create PreOperation Synchronous")
                 .Rank(1);
         }
     }

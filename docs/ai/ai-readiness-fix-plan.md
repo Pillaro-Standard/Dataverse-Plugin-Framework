@@ -72,7 +72,7 @@ F4–F6 lze dělat paralelně s instrukcemi.
 | F3-05 | Pojistka identity dev prostředí (`PF-ENV-006`) | C | M | — |
 | F4-01 | Normalizace bloků kódu (88 bloků bez jazyka) | D | L | — |
 | F4-02 | Jeden typ fence (`~~~` → ```` ``` ````) | D | M | — |
-| F5-01 | Konvence pojmenování stepů | E | S | ✅ |
+| F5-01 | Konvence pojmenování stepů — hotovo | E | S | ✅ |
 | F5-02 | Konvence pojmenování tasků a testů | E | S | ✅ |
 | F5-03 | Hranice `Features/` vs. privátní metoda | E | S | — |
 | F5-04 | Chybějící „co AI nesmí“ na úrovni souborů (ownership) | E | S | ✅ |
@@ -545,7 +545,7 @@ konzistentně jinak, než chce tým.
 
 | ID | Co chybí | Co je vidět v repu | Náročnost |
 |---|---|---|---|
-| F5-01 | Pojmenování stepů (`WithName`) | `"Pillaro Examples PreVal Create Contact"` → vzor `{Prefix} {Stage} {Message} {Entity}` | S |
+| F5-01 | ~~Pojmenování stepů (`WithName`)~~ — **hotovo**, viz níže | zavedeno `{StepPrefix} {entity} {Message} {Stage} {Mode}` | S |
 | F5-02 | Pojmenování tasků a testů | tasky imperativně (`ValidateNames`, `UpdateAddressLabel`, `SummarySync`); testy `Method_Condition_Expectation` | S |
 | F5-03 | Kdy `Features/` a kdy privátní metoda | `CustomerForbiddenNameService` je jediný vzor | S |
 | F5-04 | Ownership souborů — čeho se AI nesmí dotknout | `EarlyBound/**`, `Tools/**` (přegenerovává balíček), `key.snk`, `appsettings*.json`, `PillaroSettings.json`, `power-platform-solutions/**` (binární zipy) | S |
@@ -555,6 +555,72 @@ F5-04 je z nich nejdůležitější: `docs/plugins/early-bound-generation.md` m�
 generované soubory přepsané modelem se ztratí při dalším buildu a diagnostika toho je drahá.
 
 ---
+
+### F5-01 · Konvence pojmenování stepů · **S** · hotovo, součást této větve
+
+Před opravou existovalo **šest** různých stylů ve třinácti výskytech:
+
+| Styl | Kde | Příklad |
+|---|---|---|
+| `Pillaro Examples {StageAbbr} {Message} {Entity}` | `/examples`, 7× | `Pillaro Examples PreVal Create Contact` |
+| `Pillaro Example Plugin {StageAbbr} {Message} {Entity}` | šablona, 2× | `Pillaro Example Plugin PreVal Update Contact` |
+| `{Stage} {Message}` | **produkční plugin frameworku** | `Post Operation pl_AutoNumbering_GetNewNumber` |
+| volný business název | `step-configuration.md`, 3× | `Lead Integration`, `Account Validation` |
+| placeholder | `plugin-model.md` | `My Custom Step Name` |
+| `{Message} {Entity} {Stage} {Mode}` | fallback v kódu | `Update contact PreOperation Synchronous` |
+
+#### Co `WithName` technicky dělá (ověřeno)
+
+- **Je nepovinný a spravuje se opt-in.** `PluginRegistrationDiffCalculator.cs:191–199`:
+  *„If WithName() was not explicitly set, do not manage the name - leave it as-is in Dataverse.“*
+  Nenastavený název deployment vůbec neporovnává.
+- **Fallback se použije jen při vytvoření stepu** (`DataverseRegistrationUpserter.cs:190–196`):
+  `{Message} {Entity} {Stage} {Mode}`. Step vytvořený před změnou konvence si starý název ponese navždy.
+- **Párování je podle `StepId`**, ne podle názvu → přejmenování je bezpečné, duplikát nevznikne.
+- **Porovnání je case-insensitive a normalizované** → změna jen velikosti písmen nezpůsobí update.
+- **Název stepu není v diagnostickém logu.** `Log` nese `TaskName`, `Entity`, `Message`, `Stage`,
+  `Mode`, `Depth`, `CorrelationId`. Publikum názvu jsou lidé v Plugin Registration Tool a
+  v seznamech komponent solution, ne diagnostika.
+
+#### Rozhodnutí: koordináty, ne účel (D4)
+
+Vlastní otázka nebyl slovosled, ale filozofie. V repozitáři se míchaly dvě neslučitelné:
+
+- **koordináty** (`Pillaro Examples PreVal Create Contact`) — odvoditelné z fluent chainu, takže
+  deterministické pro AI a **ověřitelné**: název musí odpovídat chainu, jinak je jedno z toho špatně;
+- **účel** (`Lead Integration`) — informativnější, ale neodvoditelný a neverifikovatelný; model si
+  ho vymyslí a dva vývojáři pojmenují totéž různě.
+
+Zvoleny koordináty. Účel už nesou názvy plugin classy a tasku, které Plugin Registration Tool
+zobrazuje nad stepem — duplikovat ho do názvu stepu znamená druhé místo, které se rozejde.
+
+Formát: `{StepPrefix} {entity} {Message} {Stage} {Mode}`, u stepů bez primární entity
+(custom API, custom action) bez entity: `{StepPrefix} {Message} {Stage} {Mode}`.
+`{Stage}` a `{Mode}` plnými slovy shodně s fluent metodami, `{entity}` logický název.
+Entita před message záměrně — v plochém abecedním seznamu se hledá častěji „všechno na kontaktu“
+než „všechny Create“.
+
+#### Co bylo změněno
+
+| Soubor | Změna |
+|---|---|
+| `Plugins/PluginBase.cs` (examples, framework, šablona) | přidána `protected const string StepPrefix` — `"Pillaro Examples"`, `"Pillaro Framework"`, `"$safeprojectname$"` |
+| `ContactPlugin.cs` | 4 názvy |
+| `TaskPlugin.cs` | 3 názvy |
+| `ExamplePlugin.cs` (šablona) | 2 názvy; prefix nově z názvu generovaného projektu, ne „Pillaro“ |
+| `AutonumberingPlugin.cs` | 1 název — produkční step frameworku, varianta bez entity |
+| `plugin-model.md`, `step-configuration.md` | 5 názvů (placeholdery a business názvy → koordináty) |
+| `plugin-registration-api.md` | nová sekce **Step Naming** s konvencí, důsledky nenastaveného názvu a pravidlem pro kolize |
+
+Šablona dostala prefix `$safeprojectname$` místo hardcoded `"Pillaro Example Plugin"` — nový projekt
+má nést vlastní prefix, ne prefix dodavatele frameworku.
+
+**Kolize:** dva stepy se stejnou čtveřicí vzniknou, jen když dvě plugin classy registrují totéž;
+pravidlo pak říká připojit název plugin classy. Unikátnost názvů nic nevynucuje, párování je podle ID.
+
+**Zbývá ověřit:** build ve Visual Studiu (v kontejneru není .NET SDK) a jednorázový deploy examples,
+který dorovná názvy — v diffu se objeví jako `Name:` důvody u 9 stepů.
+
 
 ## 8. F6 — Zlepšení nad rámec oprav
 
@@ -630,6 +696,7 @@ odsouhlasit „jdi s doporučením“.
 | # | Rozhodnutí | Výsledek | Dopad |
 |---|---|---|---|
 | **D2** | Kanonická forma názvu atributu | **`Entity.Fields.X`**, jednotně ve všech kontextech. `nameof(...)` jako název atributu zakázán. String literály jsou správné, dokud early-bound typy neexistují — což je stav každého nového projektu. | F2-01 hotová; F2-06 tím vyřešena zároveň |
+| **D4** | Konvence pojmenování stepů | **Koordináty, ne účel:** `{StepPrefix} {entity} {Message} {Stage} {Mode}`, bez entity u custom API/action. `WithName` vždy nastavit. Frameworkový autonumbering step přejmenován. | F5-01 hotová |
 | **D1** | Kde leží early-bound klasy | **`Logic`.** V šabloně a příkladech nejsou commitnuté, protože závisí na prostředí — generují se toolingem. | F1-04 přepsáno; přidán návrh vypnout scaffolding v `Plugins` |
 | **D3** | Chování `DataverseValidationException` | **Kód je správně: `Success` + `Info`.** „Warning“ v `ThrowWithWarning(...)` je povaha hlášky pro uživatele, ne úroveň logu; task splnil svou práci. | F1-02 zůstává opravou dokumentace (S), bez změny chování. Kontrakt je nově vysvětlený v kódu. |
 
@@ -637,7 +704,6 @@ odsouhlasit „jdi s doporučením“.
 
 | # | Rozhodnutí | Doporučení | Blokuje |
 |---|---|---|---|
-| **D4** | Konvence pojmenování stepů — máme navrhnout, nebo existuje dohoda? | Navrhneme `{Prefix} {Stage} {Message} {Entity}` podle `/examples` | F5-01 |
 | **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen AI/CI profil**, aby to nebrzdilo lokální rozpracovaný kód | F3-02 |
 | **D6** | Smí se měnit vzorový kód v `/examples`? | Ano — pro AI je to autoritativnější zdroj než próza | celé F2 |
 
