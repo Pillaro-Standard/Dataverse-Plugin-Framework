@@ -21,7 +21,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName("Pillaro Examples PreVal Create Contact")
                 .Rank(1)
-                .WithFilteringAttributes("firstname", "lastname")
+                .WithFilteringAttributes(Contact.Fields.FirstName, Contact.Fields.LastName)
                 ;
 
             registration                
@@ -30,7 +30,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName("Pillaro Examples PreVal Update Contact")
                 .Rank(1)
-                .WhenChanged("firstname", "lastname");
+                .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName);
 
             registration
                 .OnCreate<Contact>("4e72086e-1508-f111-8407-000d3ab261ac")
@@ -39,15 +39,15 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .WithName("Pillaro Examples Pre Create Contact")
                 .Rank(1)
                 .WithFilteringAttributes(
-                    "firstname",
-                    "lastname",
-                    "address1_line1",
-                    "address1_line2",
-                    "address1_line3",
-                    "address1_city",
-                    "address1_postalcode",
-                    "address1_stateorprovince",
-                    "address1_country");
+                    Contact.Fields.FirstName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.Address1_Line1,
+                    Contact.Fields.Address1_Line2,
+                    Contact.Fields.Address1_Line3,
+                    Contact.Fields.Address1_City,
+                    Contact.Fields.Address1_PostalCode,
+                    Contact.Fields.Address1_StateOrProvince,
+                    Contact.Fields.Address1_Country);
 
             registration
                 .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
@@ -56,25 +56,25 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .WithName("Pillaro Examples Pre Update Contact")
                 .Rank(1)
                 .WhenChanged(
-                    "firstname",
-                    "lastname",
-                    "address1_line1",
-                    "address1_line2",
-                    "address1_line3",
-                    "address1_city",
-                    "address1_postalcode",
-                    "address1_stateorprovince",
-                    "address1_country")
+                    Contact.Fields.FirstName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.Address1_Line1,
+                    Contact.Fields.Address1_Line2,
+                    Contact.Fields.Address1_Line3,
+                    Contact.Fields.Address1_City,
+                    Contact.Fields.Address1_PostalCode,
+                    Contact.Fields.Address1_StateOrProvince,
+                    Contact.Fields.Address1_Country)
                 .WithPreImage(
                     "d79f2630-9be7-4b0c-9fe3-bf5fc4d7d4f1",
                     "image",
-                    "address1_line1",
-                    "address1_line2",
-                    "address1_line3",
-                    "address1_city",
-                    "address1_postalcode",
-                    "address1_stateorprovince",
-                    "address1_country");
+                    Contact.Fields.Address1_Line1,
+                    Contact.Fields.Address1_Line2,
+                    Contact.Fields.Address1_Line3,
+                    Contact.Fields.Address1_City,
+                    Contact.Fields.Address1_PostalCode,
+                    Contact.Fields.Address1_StateOrProvince,
+                    Contact.Fields.Address1_Country);
         }
     }
 }

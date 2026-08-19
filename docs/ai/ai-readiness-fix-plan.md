@@ -59,12 +59,12 @@ F4–F6 lze dělat paralelně s instrukcemi.
 | F1-07 | `examples/TaskPlugin.cs` — nezarovnaná validace a filtering attributes | A/B | S | ✅ |
 | F1-08 | `plugin-registration-api.md` — chybná reference „examples above“ | D | S | — |
 | F1-09 | `getting-started.md` — dvakrát sekce `### 4.3` | D | S | — |
-| F2-01 | **Jedna kanonická forma názvu atributu** | B | M | ✅ |
+| F2-01 | **Jedna kanonická forma názvu atributu** — hotovo | B | M | ✅ |
 | F2-02 | Jedna forma konstruktoru tasku | B | S | ✅ |
 | F2-03 | Kolekce: `["Create"]` vs `new[] { "Create" }` | B | S | ✅ |
 | F2-04 | Porovnání message v predikátech | B | S | ✅ |
 | F2-05 | Přístup k pre-image: `PreImage` vs `GetPreImage()` | B | S | ✅ |
-| F2-06 | Výběr atributů v registraci: typovaně vs. stringy | B | M | ✅ |
+| F2-06 | Výběr atributů v registraci: typovaně vs. stringy — vyřešeno v F2-01 | B | M | ✅ |
 | F3-01 | **Zprovoznit `validate` a `manifest` v CLI routeru** | C | S | ✅ |
 | F3-02 | `-warnaserror` profil pro AI/CI běh | C | S | — |
 | F3-03 | Odmítnutí GUIDů z dokumentace a příkladů ve validátoru | C | M | — |
@@ -324,29 +324,95 @@ než próza v `/docs`**.
 Pravidlo pro celé F2: *jeden úkon = jedna forma, kanonizovaná v `/examples`, popsaná
 v pravidlech, a nikde v repu neexistuje protipříklad.*
 
-### F2-01 · Název atributu — tři formy · **M** · nejdůležitější položka F2
+### F2-01 · Název atributu — tři formy · **M** · hotovo, součást této větve
 
-| Forma | Kde | Verdikt |
+Nejdůležitější položka F2. Změřený stav před opravou (`/examples` a `/templates`, bez `EarlyBound`):
+
+| Forma | Výskytů | Kde |
 |---|---|---|
-| `Contact.Fields.FirstName` | `plugin-registration-api.md` | ✅ **kanonická** |
-| `"firstname"` | `examples/…/Plugins/ContactPlugin.cs`, `TaskPlugin.cs` | fallback bez early-bound typu |
-| `nameof(ContextEntity.FirstName)`, `nameof(…).ToLower()` | `examples/…/ValidateNames.cs`, `UpdateAddressLabel.cs` | ❌ zakázat |
+| `nameof(ContextEntity.FirstName)` | ~24 jako název atributu | `ValidateNames`, `UpdateAddressLabel`, `SummarySync` |
+| `"firstname"` (string literál) | 48 | `ContactPlugin`, `TaskPlugin`, `ExamplePlugin` |
+| `Contact.Fields.FirstName` | **0** | nikde |
 
-**Proč `Fields` konstanty:** jsou generované z metadat, takže jsou správné konstrukcí.
-Ověřeno, že existují a jsou zapnuté defaultně
-(`examples/…/EarlyBound/Entities/contact.cs:438,593`, `emitFieldsClasses: true`
-v `EarlyBoundSettings.template.json:15`).
+Forma, kterou dokumentace doporučuje, nebyla v repozitáři použitá ani jednou. Model se učí
+ze spustitelného kódu víc než z prózy, takže produkoval ty dvě formy, které viděl.
 
-**Proč zakázat `nameof(...)`:** dnes to funguje jen náhodou. `EntityAttributesValidator`
-(`src/…/Validators/EntityAttributesValidator.cs:8,17`) obě strany převádí na lowercase, a
-`UpdateAddressLabel` si volá `.ToLowerInvariant()` ručně. Vazba property → logical name ale
-není zaručená (`ActivityId`, enum properties, aliasy) a `.ToLower()` navíc jde proti vlastní
-analyzer politice z `CONTRIBUTING.md`. Tichá chyba, která se projeví až za běhu tím, že
-se task nespustí.
+#### Kde se název atributu vyskytuje a jak selže chyba
 
-**Oprava:** kanonizovat `Fields` konstanty, přepsat oba vzorové tasky, doplnit pravidlo
-včetně závislosti *`emitFieldsClasses` musí zůstat `true`* a fallbacku pro entity bez
-early-bound typu.
+| Kontext | API | Typovaná varianta | Jak selže špatný název |
+|---|---|---|---|
+| Validace v tasku | `EntityWithAtLeastOneAttribute`, `EntityWithAllAttributes` | ❌ jen `string[]` | **Tiše za běhu** |
+| Registrace Update stepu | `WhenChanged`, `WithPreImage`, `WithPostImage` | ✅ `Expression<Func<TEntity, object>>` | typed: výjimka při buildu manifestu; string: až Dataverse při deploy |
+| Registrace Create / obecná | `WithFilteringAttributes(params string[])` | ❌ jen `string[]` | Dataverse při deploy (hlasitě) |
+| Čtení a zápis hodnot | typovaná property `ContextEntity.FirstName` | ✅ | nepřeloží se |
+
+Ověřeno v `IPluginRegistration.cs:93,109,115,119,123` a `TypedAttributeSelector.cs`.
+První řádek je klíčový: **validace je jediný kontext bez typované varianty a s tichým
+selháním** — a přitom ji má každý task.
+
+#### Proč `nameof(...)` zakázat
+
+Argument není frekvence. Změřeno na třech vzorových entitách: ze 459 property
+s `AttributeLogicalNameAttribute` se `property.ToLower()` rozchází s logickým názvem jen
+u tří — u `Id` (`contactid`, `activityid`, `accountid`). Plus 8 relationship navigation
+property v `contact.cs`, které nejsou atributy vůbec. Enum property (`StateCode`,
+`AccountRoleCode`) `AttributeLogicalName` nesou, takže jsou v pořádku.
+
+Problém je **režim selhání**. `nameof(...)` se přeloží pro jakýkoli člen, takže tohle je
+platný kód:
+
+```csharp
+.EntityWithAtLeastOneAttribute(ContextEntity, nameof(ContextEntity.Id))
+```
+
+Vyhodnotí se na `"id"`, což v `Attributes` nikdy není. Task skončí jako `NotValid` při každém
+spuštění a v logu to vypadá stejně jako legitimně odfiltrovaný task. `nameof(...)` tedy
+převádí compile-time garanci na tiché runtime nic.
+
+#### Pravidlo je dvoustupňové (nový poznatek)
+
+Šablona **žádné early-bound typy neobsahuje** — jsou závislé na prostředí a generují se
+toolingem (rozhodnutí D1). `ExampleTask` proto používá `TaskBase<Entity>` a `ExamplePlugin`
+string-based registraci; `Contact.Fields.FirstName` tam neexistuje. **Fallback na string
+literály tedy není okrajový případ, ale výchozí stav každého nového projektu.** Pravidlo
+proto musí znít:
+
+> Dokud pro entitu nejsou vygenerované early-bound typy, používej logické názvy jako string
+> literály. Jakmile typ existuje, používej `Entity.Fields.X`. `nameof(...)` jako název
+> atributu nikdy.
+
+#### Co bylo změněno
+
+| Soubor | Změna |
+|---|---|
+| `ValidateNames.cs` | 4 výskyty `nameof` → `Logic.Contact.Fields.*`; odstraněny 2× `.ToLower()` |
+| `UpdateAddressLabel.cs` | 14 výskytů `nameof` → `Logic.Contact.Fields.*`; odstraněn `.ToLowerInvariant()` v `GetValue` |
+| `SummarySync.cs` | 5 výskytů `nameof` → `Logic.Task.Fields.*` |
+| `ContactPlugin.cs` | 29 literálů → `Contact.Fields.*` |
+| `TaskPlugin.cs` | 15 literálů → `Task.Fields.*` |
+| `docs/plugins/validation.md` | literály → `Contact.Fields.*` (+ oprava F1-01) |
+| `ExampleTask.cs`, `ExamplePlugin.cs` (šablona) | kód nezměněn, doplněn komentář vysvětlující dvoustupňové pravidlo |
+
+`.ToLower()` a `.ToLowerInvariant()` v příkladech existovaly **jen proto**, aby dorovnaly
+PascalCase, který `nameof` vyrábí. S konstantami konverze zmizela.
+
+**Co zůstává povolené:** `nameof(...)` mimo roli názvu atributu — popisek v logu
+(`AddLogMessageLine($"Updating {nameof(ContextEntity.Address1_Name)} …")`) a kategorie testu
+(`[Trait("Category", nameof(SummarySync))]`). Pravidlo zakazuje `nameof` **jako název
+atributu**, ne `nameof` obecně.
+
+**Závislost:** `emitFieldsClasses: true` musí v `EarlyBoundSettings.json` zůstat, jinak se
+kanonická forma nepřeloží. Ověřeno, že je to default v šabloně
+(`EarlyBoundSettings.template.json:15`).
+
+**Vedlejší přínos:** s konstantami stojí validace i filtering attributes ve stejném tvaru,
+takže nesoulad z [F1-07](#f1-07--vzorový-plugin-má-nezarovnanou-validaci-a-filtering-attributes--s)
+(`SummarySync` validuje `ScheduledStart`, `TaskPlugin` na něj nefiltruje) je teď vidět na
+první pohled.
+
+**Zbývá ověřit:** build ve Visual Studiu. V kontejneru není .NET SDK, takže změny nebyly
+zkompilovány — jsou ale výhradně compile-time (konstanty místo `nameof` a literálů), takže
+případná chyba se projeví okamžitě při buildu, ne za běhu.
 
 ### F2-02 · Konstruktor tasku · **S**
 Primary constructor (`ValidateNames`, `SummarySync`, `AutoNumbering`, oba doc příklady)
@@ -525,7 +591,7 @@ Aby plán nepřerostl. Tyto věci **nejsou** předpokladem funkčních AI instru
 | Krok | Obsah | Odhad | Výstup |
 |---|---|---|---|
 | 1 | F1 (všech 9 položek; F1-02 hotová, F1-04 včetně úpravy šablony) | 0,5–1 den | Dokumentace i kód tvrdí totéž |
-| 2 | F2-01 … F2-06 + srovnání `/examples` | 1–1,5 dne | Jediná kanonická forma pro každý úkon |
+| 2 | F2-02 … F2-05 + srovnání `/examples` (F2-01 a F2-06 hotové) | 0,5–1 den | Jediná kanonická forma pro každý úkon |
 | 3 | F3-01, F3-02, F3-04 | 0,5 dne | AI si umí sama ověřit build i registrační metadata |
 | 4 | **Napsat instrukce** (P0 z analýzy: `AGENTS.md` + katalog pravidel) | 1–2 dny | Použitelná instrukční sada |
 | 5 | F5-01 … F5-04, F3-03, F3-05 | 0,5–1 den | Doplněné konvence a bezpečnostní pojistky |
@@ -563,6 +629,7 @@ odsouhlasit „jdi s doporučením“.
 
 | # | Rozhodnutí | Výsledek | Dopad |
 |---|---|---|---|
+| **D2** | Kanonická forma názvu atributu | **`Entity.Fields.X`**, jednotně ve všech kontextech. `nameof(...)` jako název atributu zakázán. String literály jsou správné, dokud early-bound typy neexistují — což je stav každého nového projektu. | F2-01 hotová; F2-06 tím vyřešena zároveň |
 | **D1** | Kde leží early-bound klasy | **`Logic`.** V šabloně a příkladech nejsou commitnuté, protože závisí na prostředí — generují se toolingem. | F1-04 přepsáno; přidán návrh vypnout scaffolding v `Plugins` |
 | **D3** | Chování `DataverseValidationException` | **Kód je správně: `Success` + `Info`.** „Warning“ v `ThrowWithWarning(...)` je povaha hlášky pro uživatele, ne úroveň logu; task splnil svou práci. | F1-02 zůstává opravou dokumentace (S), bez změny chování. Kontrakt je nově vysvětlený v kódu. |
 
@@ -570,7 +637,6 @@ odsouhlasit „jdi s doporučením“.
 
 | # | Rozhodnutí | Doporučení | Blokuje |
 |---|---|---|---|
-| **D2** | Kanonická forma názvu atributu | **`Contact.Fields.X`**, `nameof(...)` zakázat, string jen jako fallback | F2-01, F2-06 |
 | **D4** | Konvence pojmenování stepů — máme navrhnout, nebo existuje dohoda? | Navrhneme `{Prefix} {Stage} {Message} {Entity}` podle `/examples` | F5-01 |
 | **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen AI/CI profil**, aby to nebrzdilo lokální rozpracovaný kód | F3-02 |
 | **D6** | Smí se měnit vzorový kód v `/examples`? | Ano — pro AI je to autoritativnější zdroj než próza | celé F2 |

@@ -20,7 +20,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName("Pillaro Examples Pre Create Task")
                 .Rank(1)
-                .WithFilteringAttributes("subject");
+                .WithFilteringAttributes(Task.Fields.Subject);
 
             registration
                 .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
@@ -36,26 +36,26 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .WithName("Pillaro Examples Post Update Task")
                 .Rank(3)
                 .WhenChanged(
-                    "regardingobjectid",
-                    "scheduledend",
-                    "statecode",
-                    "statuscode")
+                    Task.Fields.RegardingObjectId,
+                    Task.Fields.ScheduledEnd,
+                    Task.Fields.StateCode,
+                    Task.Fields.StatusCode)
                 .WithPreImage(
                     "b34d984d-0f31-f111-88b4-000d3ab2695d",
                     "image",
-                    "regardingobjectid",
-                    "scheduledend",
-                    "statecode",
-                    "statuscode",
-                    "actualend")
+                    Task.Fields.RegardingObjectId,
+                    Task.Fields.ScheduledEnd,
+                    Task.Fields.StateCode,
+                    Task.Fields.StatusCode,
+                    Task.Fields.ActualEnd)
                 .WithPostImage(
                     "b44d984d-0f31-f111-88b4-000d3ab2695d",
                     "image",
-                    "regardingobjectid",
-                    "scheduledend",
-                    "statecode",
-                    "statuscode",
-                    "actualend");
+                    Task.Fields.RegardingObjectId,
+                    Task.Fields.ScheduledEnd,
+                    Task.Fields.StateCode,
+                    Task.Fields.StatusCode,
+                    Task.Fields.ActualEnd);
         }
     }
 }

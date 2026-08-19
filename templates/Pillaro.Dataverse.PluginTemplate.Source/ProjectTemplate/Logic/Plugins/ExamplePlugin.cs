@@ -11,6 +11,10 @@ public class ExamplePlugin : PluginBase
         RegisterTask<ExampleTask>(PluginStage.Prevalidation, ["Create", "Update"], "contact", PluginMode.Synchronous);
     }
 
+    // Entity and attribute names are written as string literals because this template ships
+    // without early-bound entity classes. After generating them with Tools/EarlyBound in the
+    // Logic project, switch to the typed overloads - OnCreate<Contact>(...) with
+    // Contact.Fields.FirstName - which keep the registration metadata bound to the entity type.
     public override void Register(IPluginRegistration registration)
     {
         registration

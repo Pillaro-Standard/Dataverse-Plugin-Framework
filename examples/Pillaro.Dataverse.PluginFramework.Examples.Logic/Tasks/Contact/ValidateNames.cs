@@ -16,7 +16,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
                 .WithStage(PluginStage.Prevalidation)
                 .WithMessages(["Create", "Update"])
                 .ForEntity(ContextEntity.LogicalName)
-                .EntityWithAtLeastOneAttribute(ContextEntity, nameof(ContextEntity.FirstName), nameof(ContextEntity.LastName));
+                .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName);
         }
 
         protected override void DoExecute()
@@ -25,7 +25,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
             
             AddLogMessageLine($"Forbidden words: {string.Join(",",forbiddenWords)}");
             
-            if (ContextEntity.Contains(nameof(ContextEntity.FirstName).ToLower()) &&
+            if (ContextEntity.Contains(Logic.Contact.Fields.FirstName) &&
                forbiddenWords.FindIndex(x => x.Equals(ContextEntity.FirstName, StringComparison.InvariantCultureIgnoreCase)) != -1)
             {
                 var msg = "First name is forbidden word, please write correct your first name";
@@ -34,7 +34,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
                 throw new DataverseValidationException(msg);
             }
 
-            if (ContextEntity.Contains(nameof(ContextEntity.LastName).ToLower()) &&
+            if (ContextEntity.Contains(Logic.Contact.Fields.LastName) &&
                 forbiddenWords.FindIndex(x => x.Equals(ContextEntity.LastName, StringComparison.InvariantCultureIgnoreCase)) != -1)
             {
                 var msg = "Last name is forbidden word, please write correct your last name";

@@ -274,6 +274,8 @@ je důvod, proč pravidlo v katalogu je — a zároveň důkaz, že si nic nevym
 | PF-DATA-002 | Nejnižší dostačující kontext. `Admin` NIKDY jako default — vyžaduje komentář s odůvodněním. | data-access.md |
 | PF-DATA-003 | Zvolený kontext musí být v kódu vizuálně zřejmý; nezakrývat ho helperem. | data-access.md |
 | PF-DATA-004 | Early-bound typy s prefixem `Logic.` (`Logic.Contact`). | CONTRIBUTING.md |
+| PF-DATA-008 | Název atributu vždy `Entity.Fields.X`. `nameof(...)` jako název atributu NIKDY — vrací název property, ne logický název, a chyba selže tiše. | rozhodnutí D2 |
+| PF-DATA-009 | Dokud pro entitu nejsou vygenerované early-bound typy (stav nového projektu), logické názvy jako string literály. Jakmile typ existuje, přejít na `Fields`. | rozhodnutí D2 |
 | PF-DATA-005 | AI NIKDY nepíše ani needituje soubory v `EarlyBound/` — generuje je `pac modelbuilder`. | early-bound-generation.md (File Ownership) |
 | PF-DATA-006 | Early-bound klasy leží v projektu `Logic`; generování se spouští z rootu `Logic`. `src/` frameworku není vzor (nemá `Logic` projekt). | rozhodnutí D1, architecture.md |
 | PF-DATA-007 | Chybějící early-bound typ nebo atribut = AI zastaví a řekne, co vygenerovat. NIKDY nedopisovat partial class ani obcházet late-bound. | early-bound-generation.md |

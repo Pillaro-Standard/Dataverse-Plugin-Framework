@@ -21,11 +21,11 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
                 .EntityWithAtLeastOneAttributeWhen(
                     ctx => ctx.Message == "Update",
                     ContextEntity,
-                    nameof(ContextEntity.RegardingObjectId), 
-                    nameof(ContextEntity.ScheduledEnd), 
-                    nameof(ContextEntity.ScheduledStart), 
-                    nameof(ContextEntity.StateCode),
-                    nameof(ContextEntity.StatusCode));
+                    Logic.Task.Fields.RegardingObjectId, 
+                    Logic.Task.Fields.ScheduledEnd, 
+                    Logic.Task.Fields.ScheduledStart, 
+                    Logic.Task.Fields.StateCode,
+                    Logic.Task.Fields.StatusCode);
         }
 
         protected override void DoExecute()

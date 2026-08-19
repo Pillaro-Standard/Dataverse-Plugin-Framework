@@ -9,13 +9,13 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
     {
         private static readonly string[] AddressAttributes =
         {
-            nameof(Logic.Contact.Address1_Line1),
-            nameof(Logic.Contact.Address1_Line2),
-            nameof(Logic.Contact.Address1_Line3),
-            nameof(Logic.Contact.Address1_City),
-            nameof(Logic.Contact.Address1_PostalCode),
-            nameof(Logic.Contact.Address1_StateOrProvince),
-            nameof(Logic.Contact.Address1_Country)
+            Logic.Contact.Fields.Address1_Line1,
+            Logic.Contact.Fields.Address1_Line2,
+            Logic.Contact.Fields.Address1_Line3,
+            Logic.Contact.Fields.Address1_City,
+            Logic.Contact.Fields.Address1_PostalCode,
+            Logic.Contact.Fields.Address1_StateOrProvince,
+            Logic.Contact.Fields.Address1_Country
         };
 
         public UpdateAddressLabel(IServiceProvider serviceProvider, TaskContext taskContext)
@@ -36,13 +36,13 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 
         protected override void DoExecute()
         {
-            var line1 = Normalize(GetValue(nameof(Logic.Contact.Address1_Line1), x => x.Address1_Line1));
-            var line2 = Normalize(GetValue(nameof(Logic.Contact.Address1_Line2), x => x.Address1_Line2));
-            var line3 = Normalize(GetValue(nameof(Logic.Contact.Address1_Line3), x => x.Address1_Line3));
-            var city = Normalize(GetValue(nameof(Logic.Contact.Address1_City), x => x.Address1_City));
-            var postalCode = Normalize(GetValue(nameof(Logic.Contact.Address1_PostalCode), x => x.Address1_PostalCode));
-            var state = Normalize(GetValue(nameof(Logic.Contact.Address1_StateOrProvince), x => x.Address1_StateOrProvince));
-            var country = Normalize(GetValue(nameof(Logic.Contact.Address1_Country), x => x.Address1_Country));
+            var line1 = Normalize(GetValue(Logic.Contact.Fields.Address1_Line1, x => x.Address1_Line1));
+            var line2 = Normalize(GetValue(Logic.Contact.Fields.Address1_Line2, x => x.Address1_Line2));
+            var line3 = Normalize(GetValue(Logic.Contact.Fields.Address1_Line3, x => x.Address1_Line3));
+            var city = Normalize(GetValue(Logic.Contact.Fields.Address1_City, x => x.Address1_City));
+            var postalCode = Normalize(GetValue(Logic.Contact.Fields.Address1_PostalCode, x => x.Address1_PostalCode));
+            var state = Normalize(GetValue(Logic.Contact.Fields.Address1_StateOrProvince, x => x.Address1_StateOrProvince));
+            var country = Normalize(GetValue(Logic.Contact.Fields.Address1_Country, x => x.Address1_Country));
 
             var addressLabel = BuildAddressLabel(line1, line2, line3, city, postalCode, state, country);
 
@@ -56,7 +56,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 
         private string GetValue(string attributeName, Func<Logic.Contact, string> selector)
         {
-            if (ContextEntity.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
+            if (ContextEntity.Attributes.ContainsKey(attributeName))
                 return selector(ContextEntity);
 
             var preImage = ContextEntity;
