@@ -30,7 +30,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
             {
                 var msg = "First name is forbidden word, please write correct your first name";
                 AddLogMessageLine(msg);
-                //this exception  will be logged as warning, but user will see the error message
+                //expected business outcome: the user sees the message, the task is logged as Success/Info
                 throw new DataverseValidationException(msg);
             }
 
@@ -40,7 +40,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
                 var msg = "Last name is forbidden word, please write correct your last name";
                 AddLogMessageLine(msg);
 
-                //this exception  will be logged
+                //expected business outcome: the user sees the message, the task is logged as Success/Info
                 throw new DataverseValidationException(msg);
             }
         }

@@ -51,7 +51,7 @@ F4–F6 lze dělat paralelně s instrukcemi.
 | ID | Oblast | Třída | Náročnost | Blokuje instrukce? |
 |---|---|---|---|---|
 | F1-01 | `validation.md` — nekompilovatelný příklad (`PluginContext`) | A | S | ✅ |
-| F1-02 | `DataverseValidationException` loguje `Info`, má logovat `Warning` — **změna kódu** | A | M | ✅ |
+| F1-02 | Dokumentace i XML doc popisují `DataverseValidationException` jinak než kód | A | S | ✅ |
 | F1-03 | `plugin-registration-api.md` — nepřesné pravidlo unikátnosti názvů images | A | S | ✅ |
 | F1-04 | Dokumentace generuje early-bound do `Plugins`, patří do `Logic` | A | M | ✅ |
 | F1-05 | `CONTRIBUTING.md` — neexistující název solution souboru | A | S | ✅ |
@@ -116,60 +116,53 @@ s `examples/…/Tasks/Task/SummarySync.cs:19`.
 
 ---
 
-### F1-02 · `DataverseValidationException` loguje `Info`, má logovat `Warning` · **M** · změna kódu
+### F1-02 · Dokumentace i XML doc popisují `DataverseValidationException` jinak než kód · **S**
 
 Nejzávažnější nález plánu, protože jde o **nejdůležitější behaviorální kontrakt frameworku** —
-jak signalizovat business zamítnutí uživateli. Nález byl původně čtyřcestný rozpor:
+jak signalizovat business zamítnutí uživateli.
 
 | Zdroj | Tvrzení |
 |---|---|
-| `src/…/Tasks/TaskBase.cs:82–88` | `Log.Status = TaskStatus.Success`, `Log.LogSeverity = LogSeverity.Info` |
-| `docs/plugins/execution-pipeline.md` | `Success` + `Info` |
-| `docs/plugins/task-model.md:271–274` | `TaskStatus.NotValid` + `LogSeverity.Info` |
-| `src/…/FluentInterfaces/IBreakValidation.cs` (XML doc `ThrowWithWarning`, obě přetížení) | „will be logged as **Warning**“ |
-| `examples/…/Tasks/Contact/ValidateNames.cs:33` | komentář „will be logged as **warning**“ |
+| `src/…/Tasks/TaskBase.cs:82–88` | `TaskStatus.Success` + `LogSeverity.Info` — **správně** |
+| `docs/plugins/execution-pipeline.md` | `Success` + `Info` — **správně** |
+| `docs/plugins/task-model.md:271–274` | `TaskStatus.NotValid` + `LogSeverity.Info` — **špatně ve stavu** |
+| `src/…/FluentInterfaces/IBreakValidation.cs` (XML doc `ThrowWithWarning`, obě přetížení) | „This error will be logged as **Warning**“ — **špatně** |
+| `examples/…/Tasks/Contact/ValidateNames.cs:33` | komentář „will be logged as **warning**“ — **špatně** |
 
 > [!IMPORTANT]
-> **Rozhodnuto (D3): správná je `Warning`.** Chování se musí shodovat funkčně i logicky —
-> metoda `ThrowWithWarning(...)` nemůže logovat `Info`. Zdrojem pravdy tedy **není kód**;
-> opravuje se kód, ne dokumentace.
+> **Rozhodnuto (D3): kód je správně, opravuje se dokumentace.**
+> `ThrowWithWarning(...)` je informace pro uživatele, která se zároveň zapíše do logu.
+> Task **splnil to, co měl** — vyhodnotil business pravidlo a výsledek oznámil uživateli —
+> takže stav je `Success`. Záznam v logu je čistě informativní, takže severita je `Info`.
+> **Slovo „warning“ v názvu metody popisuje povahu hlášky pro uživatele, ne úroveň logování.**
 
-**Proč to AI rozbíjí:** dva různé důsledky, oba drahé. (a) Model tvrdí nepravdu o tom, jak
-se výsledek objeví v monitoringu — a přesně kvůli monitoringu ta výjimka existuje.
-(b) XML dokumentace jde do IntelliSense i do NuGet balíčku, takže se nepravda šíří k zákazníkům.
+**Proč to AI rozbíjí:** model bude vývojáři tvrdit nepravdu o tom, jak se výsledek objeví
+v monitoringu — a přesně kvůli monitoringu ta výjimka existuje. XML dokumentace navíc jde
+do IntelliSense i do NuGet balíčku, takže se nepravda šíří k zákazníkům.
 
-**Oprava:**
+**Oprava — hotovo, součást této větve:**
 
-1. `TaskBase.cs:82–88` — v `catch (DataverseValidationException)` nastavit
-   `LogSeverity.Warning` místo `Info`.
-2. `docs/plugins/task-model.md:271–274` a `docs/plugins/execution-pipeline.md` — sjednotit
-   na `Warning`.
-3. `docs/plugins/logging.md` — ověřit dopad na tabulku `MinimalSeverityLevel`: při doporučené
-   produkční hodnotě `3` (`Warning`, `Error`) se business zamítnutí **začne v produkci logovat**,
-   zatímco dnes se jako `Info` zahazovalo. To je žádoucí (business zamítnutí je informace pro
-   support), ale je to **změna objemu produkčních logů** a patří ji zmínit v poznámkách k vydání.
-4. Komentář v `examples/…/ValidateNames.cs:33` — už je správný, ponechat.
-5. Test, který severitu zafixuje pro oba vstupy: přímý `throw` v `DoExecute()` i
-   `ThrowWithWarning(...)` ve validačním řetězu.
+1. `TaskBase.cs` — nad `catch (DataverseValidationException)` doplněn komentář, který kontrakt
+   vysvětluje na místě, kde se o něm rozhoduje: proč `Success`, proč `Info`, a že „warning“
+   se váže k hlášce pro uživatele, ne k logu.
+2. `IBreakValidation.cs` — XML doc obou přetížení `ThrowWithWarning(...)` přepsán: už netvrdí
+   „logged as Warning“, ale vysvětluje význam slova „warning“ a odkazuje na `ThrowWithError(...)`
+   pro skutečná selhání (ověřeno v `ThrowExceptionValidator.cs:35–38`: `ThrowWithError`
+   vyhazuje `InvalidPluginExecutionException`, tedy `Error` + `Error`).
+3. `DataverseValidationException.cs` — doplněna XML dokumentace typu se stejným vysvětlením.
+   Typ dosud žádnou neměl, přitom je to veřejné API, které vývojář volá nejčastěji.
+4. `examples/…/ValidateNames.cs` — oba zavádějící komentáře nahrazeny.
+5. `docs/plugins/task-model.md:271–274` — `TaskStatus.NotValid` → `TaskStatus.Success`
+   plus jedna věta proč.
 
-> [!WARNING]
-> Jde o **změnu chování**, ne o opravu dokumentace: `CHANGELOG.md` + posouzení podle
-> `docs/versioning.md`. Kdokoli dnes filtruje logy na `Info`, přestane tyto záznamy vidět tam
-> a začne je vidět v `Warning`.
+**Zbývá:** test, který kontrakt zafixuje pro oba vstupy (přímý `throw` v `DoExecute()`
+i `ThrowWithWarning(...)` ve validačním řetězu), aby se rozpor nemohl vrátit.
+Do pravidel patří i **negativní** varianta: `InvalidPluginExecutionException` pro business
+zamítnutí vytvoří falešný `Error` v monitoringu — právě proto `DataverseValidationException`
+existuje.
 
-**Otevřená návazná otázka — `TaskStatus` (D3b, §12).** Rozhodnutí D3 řeší severitu, ne stav.
-Ten je dnes `Success` pro oba případy, což u `ThrowWithWarning(...)` neodpovídá logice:
-výjimka je vyhozena už během `Validate(...)`, tělo tasku se nikdy nespustí, a přesto je
-výsledek `Success`. Podle stejného principu („musí odpovídat funkčně i logicky“) by tento
-případ měl být `NotValid`, zatímco `throw` z `DoExecute()` `Success` zůstat může.
-Implementačně je to oddělení `try` bloku kolem `Validate(...)` od bloku kolem
-`ExecuteInternal(...)`. Nedělám to bez rozhodnutí, protože stav se propisuje do statistik
-model-driven aplikace a do vyhodnocování „task se často spouští naprázdno“.
-
-**Hotovo když:** kód, obě dokumentace i XML doc tvrdí `Warning`, test to fixuje a změna je
-v `CHANGELOG.md`.
-
----
+**Hotovo když:** kód, XML dokumentace, příklad i oba dokumenty tvrdí `Success` + `Info`
+a existuje test, který to fixuje.
 
 ### F1-03 · Pravidlo unikátnosti názvů images je nepřesné · **S**
 
@@ -531,7 +524,7 @@ Aby plán nepřerostl. Tyto věci **nejsou** předpokladem funkčních AI instru
 
 | Krok | Obsah | Odhad | Výstup |
 |---|---|---|---|
-| 1 | F1 (všech 9 položek; F1-02 a F1-04 včetně změny kódu a šablony) | 1–1,5 dne | Dokumentace i kód tvrdí totéž |
+| 1 | F1 (všech 9 položek; F1-02 hotová, F1-04 včetně úpravy šablony) | 0,5–1 den | Dokumentace i kód tvrdí totéž |
 | 2 | F2-01 … F2-06 + srovnání `/examples` | 1–1,5 dne | Jediná kanonická forma pro každý úkon |
 | 3 | F3-01, F3-02, F3-04 | 0,5 dne | AI si umí sama ověřit build i registrační metadata |
 | 4 | **Napsat instrukce** (P0 z analýzy: `AGENTS.md` + katalog pravidel) | 1–2 dny | Použitelná instrukční sada |
@@ -554,8 +547,7 @@ jinak vzniknou konflikty v `/examples` a v `validation.md`.
 | Riziko | Dopad | Mitigace |
 |---|---|---|
 | F2 mění vzorový kód, který se buildí v PR pipeline | Rozbitý build examples | Po každé změně `/examples` build + nightly testy; změny po jednom tasku |
-| F1-02 mění chování logování (D3) | Kdo filtruje na `Info`, přestane záznamy vidět; v produkci naopak přibudou | `CHANGELOG.md`, posouzení verze, test fixující severitu, poznámka o objemu produkčních logů |
-| F1-02 zůstane nedotažené bez D3b | Severita bude `Warning`, ale stav dál `Success` i tam, kde tělo tasku neproběhlo | Rozhodnout D3b spolu s D3 a opravit jednou změnou |
+| Rozpor u `DataverseValidationException` se vrátí | Dokumentace se znovu rozejde s kódem na nejdůležitějším kontraktu | Kontrakt je nově vysvětlený přímo v `TaskBase.cs` a v XML dokumentaci typu; doplnit test |
 | F3-01 může narazit na nedokončenou funkcionalitu | Ze S se stane M–L | Ověřit `CreateFromAssembly` na reálné assembly před zapojením |
 | Instrukce se v čase rozejdou s frameworkem | Návrat do dnešního stavu | F6-02 + vlastník katalogu (otevřená otázka analýzy) |
 | Agent má přístup do dev prostředí (Q4) | Nechtěný zápis do jiného prostředí | F3-05 před předáním credentials, nikdy ne obráceně |
@@ -572,14 +564,13 @@ odsouhlasit „jdi s doporučením“.
 | # | Rozhodnutí | Výsledek | Dopad |
 |---|---|---|---|
 | **D1** | Kde leží early-bound klasy | **`Logic`.** V šabloně a příkladech nejsou commitnuté, protože závisí na prostředí — generují se toolingem. | F1-04 přepsáno; přidán návrh vypnout scaffolding v `Plugins` |
-| **D3** | Severita u `DataverseValidationException` | **`Warning`.** Chování musí odpovídat funkčně i logicky, takže se opravuje kód, ne dokumentace. | F1-02 z opravy textu na změnu kódu (S → M), + `CHANGELOG.md` a dopad na produkční objem logů |
+| **D3** | Chování `DataverseValidationException` | **Kód je správně: `Success` + `Info`.** „Warning“ v `ThrowWithWarning(...)` je povaha hlášky pro uživatele, ne úroveň logu; task splnil svou práci. | F1-02 zůstává opravou dokumentace (S), bez změny chování. Kontrakt je nově vysvětlený v kódu. |
 
 ### Zbývá rozhodnout
 
 | # | Rozhodnutí | Doporučení | Blokuje |
 |---|---|---|---|
 | **D2** | Kanonická forma názvu atributu | **`Contact.Fields.X`**, `nameof(...)` zakázat, string jen jako fallback | F2-01, F2-06 |
-| **D3b** | `TaskStatus` u `DataverseValidationException` — dnes `Success` pro oba případy | **`NotValid`** pro `ThrowWithWarning(...)` (vyhozeno ve `Validate`, tělo tasku neproběhlo), **`Success`** pro `throw` z `DoExecute()`. Plyne ze stejného principu jako D3, ale mění statistiky v model-driven aplikaci. | F1-02 |
 | **D4** | Konvence pojmenování stepů — máme navrhnout, nebo existuje dohoda? | Navrhneme `{Prefix} {Stage} {Message} {Entity}` podle `/examples` | F5-01 |
 | **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen AI/CI profil**, aby to nebrzdilo lokální rozpracovaný kód | F3-02 |
 | **D6** | Smí se měnit vzorový kód v `/examples`? | Ano — pro AI je to autoritativnější zdroj než próza | celé F2 |

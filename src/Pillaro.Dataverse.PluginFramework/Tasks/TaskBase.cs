@@ -79,6 +79,14 @@ public abstract class TaskBase<TEntity> : ITask
 
             Log.Status = TaskStatus.Success;
         }
+        // DataverseValidationException is a controlled business outcome, not a failure.
+        // The task did exactly what it was written to do: it evaluated a business rule and
+        // reported the result to the user, so the status stays Success.
+        // The severity is Info because the log record is purely informational. The word
+        // "warning" in ThrowWithWarning(...) describes the message shown to the user,
+        // not the log severity. Real failures arrive as InvalidPluginExecutionException
+        // and are logged as Error below.
+        // The exception is rethrown so Dataverse surfaces the message to the user.
         catch (DataverseValidationException ex)
         {
             Log.Status = TaskStatus.Success;

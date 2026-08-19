@@ -26,11 +26,17 @@ public interface IBreakValidation : ICompleteValidation
     /// </summary>
     IBreakValidation ThrowWithError(Lazy<string> message, Func<TaskContext, bool> predicate);
     /// <summary>
-    /// Checks predicate. If it is not valid, throw DataverseValidationException filled by error message for user. This error will be logged as Warning
+    /// Checks predicate. If it is not valid, throw DataverseValidationException filled by message for user.
+    /// "Warning" describes the message shown to the user, not the log severity. Reporting the business rule
+    /// to the user is the intended outcome, so the task is logged as Success with Info severity.
+    /// Use ThrowWithError(...) when the situation is a real failure that should be logged as Error.
     /// </summary>
     IBreakValidation ThrowWithWarning(string message, Func<TaskContext, bool> predicate);
     /// <summary>
-    /// Checks predicate. If it is not valid, throw DataverseValidationException filled by error message for user. This error will be logged as Warning
+    /// Checks predicate. If it is not valid, throw DataverseValidationException filled by message for user.
+    /// "Warning" describes the message shown to the user, not the log severity. Reporting the business rule
+    /// to the user is the intended outcome, so the task is logged as Success with Info severity.
+    /// Use ThrowWithError(...) when the situation is a real failure that should be logged as Error.
     /// The input message is Lazy string, so it can be activated during validation
     /// </summary>
     IBreakValidation ThrowWithWarning(Lazy<string> message, Func<TaskContext, bool> predicate);

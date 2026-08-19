@@ -270,8 +270,12 @@ This is appropriate when:
 
 In this case, the task is logged as:
 
-- `TaskStatus.NotValid`
+- `TaskStatus.Success`
 - `LogSeverity.Info`
+
+The task is `Success` because it did what it was written to do: it evaluated a business rule and
+reported the result to the user. The severity is `Info` because the log record is purely
+informational.
 
 This makes it useful for normal business validation outcomes that should be visible to the user without being treated as unexpected runtime errors.
 

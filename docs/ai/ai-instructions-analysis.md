@@ -285,16 +285,16 @@ je důvod, proč pravidlo v katalogu je — a zároveň důkaz, že si nic nevym
 | PF-LOG-001 | Task-level diagnostiku psát přes `AddLogMessageLine(...)` / `AddLogDetail(...)`, ne přes `LogService`. | task-model.md, logging.md |
 | PF-LOG-002 | Nelogovat vstupní parametry a images — framework je loguje automaticky. | task-model.md |
 | PF-LOG-003 | Do logu NIKDY tajemství, tokeny ani osobní údaje nad rámec business potřeby. | SECURITY.md, step-configuration.md |
-| PF-ERR-001 | Očekávané business zastavení = `DataverseValidationException` (log **`Warning`**, uživatel vidí zprávu). | error-handling.md, task-model.md, rozhodnutí D3 |
+| PF-ERR-001 | Očekávané business zastavení = `DataverseValidationException`: uživatel vidí zprávu, task je `Success` + `Info`. Ne `InvalidPluginExecutionException` — ten vytvoří falešný `Error` v monitoringu. | error-handling.md, execution-pipeline.md, rozhodnutí D3 |
 | PF-ERR-002 | `InvalidPluginExecutionException` v task kódu jen výjimečně — framework převod řeší sám. | error-handling.md |
 | PF-ERR-003 | Nebudovat vlastní try/catch pipeline v tasku. | error-handling.md |
 
 > [!NOTE]
-> `PF-ERR-001` uvádí cílový stav po rozhodnutí **D3**. Dnešní kód
-> (`TaskBase.cs:82–88`) nastavuje `LogSeverity.Info`; oprava je položka
-> [F1-02 plánu oprav](./ai-readiness-fix-plan.md#f1-02--dataversevalidationexception-loguje-info-má-logovat-warning--m--změna-kódu).
-> Pravidlo nesmí do instrukcí odejít dřív, než změna kódu vyjde — jinak by instrukce
-> popisovaly chování, které framework ještě nemá.
+> `PF-ERR-001` odpovídá skutečnému chování v `TaskBase.cs:82–88` (rozhodnutí **D3**).
+> „Warning“ v `ThrowWithWarning(...)` označuje povahu hlášky pro uživatele, ne úroveň logu —
+> task splnil svou práci, takže `Success`, a záznam je informativní, takže `Info`.
+> Dokumentace, která tvrdila něco jiného, je opravená v položce
+> [F1-02 plánu oprav](./ai-readiness-fix-plan.md#f1-02--dokumentace-i-xml-doc-popisují-dataversevalidationexception-jinak-než-kód--s).
 
 ### 5.7 Registrační metadata (nejrizikovější oblast pro AI)
 
