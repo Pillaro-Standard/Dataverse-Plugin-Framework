@@ -55,6 +55,13 @@
    Instrukční sada proto musí být součástí `dotnet new` šablony a generovaného tooling
    v NuGet balíčku (`Tools/`), jinak ji dostane jen tým frameworku.
 
+> [!NOTE]
+> Prováděcí plán vyplývající z této analýzy je v samostatném dokumentu:
+> **[Plán oprav a zlepšení před zavedením AI instrukcí](./ai-readiness-fix-plan.md)**.
+> Obsahuje ověřené nálezy včetně dvou rozporů dokumentace vs. kód, které analýza
+> ještě neobsahovala (nekompilovatelný příklad ve `validation.md` a nekonzistentní popis
+> chování `DataverseValidationException`).
+
 ### 1.1 Potvrzená rozhodnutí zadavatele
 
 | # | Otázka | Rozhodnutí |
@@ -400,13 +407,15 @@ pouštět i slow loop. Tím se ale mění charakter rizika — agent teď může
 
 ### 7.2 Co je potřeba dodělat (konkrétní návrhy)
 
-1. **Offline validace registračního manifestu.**
-   `PluginRegistrationDiscovery` + validátor pravidel už existují a
-   `PluginRegistrationDiscoveryTests` dokazují, že běží bez připojení. Doporučení:
-   vystavit v `Pillaro.Dataverse.PluginFramework.Cli` příkaz typu
-   `pillaro validate --assembly <path>`, který **nepotřebuje Dataverse** a vrací
-   nenulový exit code. To je nejcennější jediná věc, kterou lze pro AI vývoj postavit:
+1. **Offline validace registračního manifestu — už je naprogramovaná, jen není dosažitelná.**
+   V `Pillaro.Dataverse.PluginFramework.Cli` existují hotové příkazy `PluginManifestCommand`
+   (assembly → manifest JSON, **bez připojení**) a `PluginValidateCommand`
+   (manifest → validace, **bez připojení**), oba s nenulovými exit kódy. Router
+   (`PluginCommandRouter.cs:13–20`) ale routuje **pouze `deploy`** — `manifest`, `validate`
+   i `diff` jsou nedosažitelný kód a nejsou v helpu.
+   Zprovoznění je tedy otázka několika řádků, ne nové funkcionality, a dává rovnou
    deterministický gate na nejrizikovější oblast (§5.7).
+   Detail a postup: [F3-01 v plánu oprav](./ai-readiness-fix-plan.md#f3-01--zprovoznit-validate-a-manifest-v-cli-routeru--s--nejlepší-poměr-cenapřínos).
 2. **`docs/ai/verify.md` s doslovnými příkazy.** Nikdy „spusť build“, vždy konkrétní
    příkazová řádka pro `Logic`, pro test projekty a pro validaci — včetně toho,
    co dělat při jednotlivých typech selhání.
@@ -505,6 +514,11 @@ vlastní analyzer politiku z `CONTRIBUTING.md`.
 katalogu pravidel to zafixovat jako PF-REG-007 / PF-DATA-004. Pro AI vývoj má
 `/examples` větší váhu než próza — je to spustitelný kód.
 
+> [!NOTE]
+> Nálezy z této sekce jsou rozpracované do konkrétních opravných položek
+> v [plánu oprav](./ai-readiness-fix-plan.md) (F1 a F4), včetně dalších, které
+> vznikly až ověřením příkladů proti zdrojovému kódu.
+
 ### 9.3 Nefunkční / nepřesné odkazy a názvy
 | Nález | Dopad na AI |
 |---|---|
@@ -579,7 +593,8 @@ Pouštět po každé změně katalogu pravidel — to je jediná ochrana proti t
 
 ### P1 — Vynucení a tooling (obsahuje prerekvizitu z Q3)
 - **`pillaro new-step` — generátor step/image ID.** Prerekvizita zvolené GUID politiky (§6.1).
-- Offline `validate` příkaz v CLI (§7.2/1), včetně odmítnutí GUIDů z dokumentace a příkladů.
+- Zprovoznění existujících offline příkazů `manifest` a `validate` v CLI routeru (§7.2/1)
+  a rozšíření validátoru o odmítnutí GUIDů z dokumentace a příkladů.
 - `-warnaserror` profil pro AI/CI běh.
 - Pravidla `PF-ENV-*` pro práci s dev prostředím (§7.1) — nutná dřív, než agent dostane credentials.
 - Skills / slash commands: `new-task`, `new-step`, `new-test`, `review-pf`.
