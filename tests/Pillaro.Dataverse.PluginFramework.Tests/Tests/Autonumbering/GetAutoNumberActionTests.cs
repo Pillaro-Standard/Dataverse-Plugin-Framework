@@ -35,11 +35,17 @@ public class GetAutoNumberActionTests : TestBase
     {
         var rows = TestDataService.Query<pl_AutoNumbering>()
             .Where(x => x.pl_EntityName == entityName)
-            .OrderByDescending(x => x.CreatedOn)
-            .Select(x => new pl_AutoNumbering { pl_AutoNumberingId = x.pl_AutoNumberingId })
+            .Select(x => new pl_AutoNumbering
+            {
+                pl_AutoNumberingId = x.pl_AutoNumberingId,
+                pl_ParentAutoNumberingId = x.pl_ParentAutoNumberingId
+            })
             .ToList();
 
-        OrganizationService.Delete(rows);
+        // Child configurations restrict deleting their parent configuration,
+        // so they must be deleted first.
+        OrganizationService.Delete(rows.Where(x => x.pl_ParentAutoNumberingId != null));
+        OrganizationService.Delete(rows.Where(x => x.pl_ParentAutoNumberingId == null));
     }
 
     private pl_AutoNumbering CreateConfig(
