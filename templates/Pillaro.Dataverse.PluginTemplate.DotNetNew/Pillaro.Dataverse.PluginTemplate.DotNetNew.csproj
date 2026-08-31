@@ -21,7 +21,7 @@
     <PackageTags>dotnet-new;template;templates;dataverse;plugin;vscode</PackageTags>
     <PackageType>Template</PackageType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <RepositoryUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
