@@ -424,4 +424,4 @@ We provide practical support for teams adopting the Pillaro Dataverse Plugin Fra
 
 ## License
 
-See `LICENSE` file.
+Licensed under the [Apache License, Version 2.0](LICENSE).
