@@ -67,6 +67,8 @@ F4–F6 lze dělat paralelně s instrukcemi.
 | F2-06 | Výběr atributů v registraci: typovaně vs. stringy — vyřešeno v F2-01 | B | M | ✅ |
 | F3-01 | **Zprovoznit `validate` a `manifest` v CLI routeru** | C | S | ✅ |
 | F3-02 | `-warnaserror` profil pro AI/CI běh | C | S | — |
+| F3-02a | Šablona generuje projekt s 10× `CS1591` — „nula varování“ tam neplatí | C | S | — |
+| F3-02b | `.editorconfig` sekce pro early-bound nematchuje žádný soubor | C/D | S | — |
 | F3-03 | Odmítnutí GUIDů z dokumentace a příkladů ve validátoru | C | M | — |
 | F3-04 | `docs/ai/verify.md` — doslovné příkazy ověření | C | M | ✅ |
 | F3-05 | Pojistka identity dev prostředí (`PF-ENV-006`) | C | M | — |
@@ -491,6 +493,47 @@ s `TreatWarningsAsErrors`, aby pravidlo bylo vynutitelné, ne aspirační. Vypnu
 ponechat vypnuté (mají důvod), ale **explicitně to zdůvodnit** — jinak je model bude
 navrhovat zapínat.
 
+**Změřeno na celé solution** (MSBuild 18.9.1, `-t:Rebuild`, 11/11 projektů):
+
+| Měření | Výsledek |
+|---|---|
+| Rebuild `Release` i `Debug` | 2 varování, obě `CS2008` z `…PluginTemplate.DotNetNew` — packaging projekt bez zdrojáků |
+| `-p:TreatWarningsAsErrors=true` | **exit 0** — `CS2008` se na chybu nepovyšuje (je na seznamu výjimek SDK) |
+| `-p:EnforceCodeStyleInBuild=true` | **0 dalších diagnostik** — `IDE####` mají default severity „suggestion“ a `.editorconfig` je nenastavuje |
+
+Zapnutí tedy dnes nerozbije nic; cena varianty „všude“ leží až v rozpracovaném kódu
+(`CS0168`, `CS0219`, nedosažitelný kód při ladění). Implementačně stačí
+`Directory.Build.props` — v repu dnes žádný není — s `Condition="'$(Configuration)'=='Release'"`.
+CI i AI staví Release, lokální `Debug` zůstane bez tření a není potřeba zvláštní profil
+ani flag, který si musí někdo pamatovat. Zapínat k tomu `EnforceCodeStyleInBuild` je bez
+explicitních severit placebo.
+
+#### F3-02a · Šablona pravidlo porušuje hned po vygenerování
+
+Projekt vygenerovaný ze šablony a přebuilděný **mimo tento repozitář** hlásí **10× `CS1591`**
+(`ExamplePlugin.cs` 3, `ExampleTask.cs` 4, `PluginBase.cs` 3). `Logic` projekt má
+`GenerateDocumentationFile=true`, vzorové soubory nemají jediný `///` a šablona nedodává
+vlastní `.editorconfig`. Uvnitř repa se to nepozná, protože na `artifacts/` dosáhne kořenový
+`.editorconfig`, který `CS1591` vypíná.
+
+Tedy: v projektu, kde AI reálně píše kód, „nula varování“ dnes neplatí. Vynutit pravidlo
+jen ve frameworkovém repu znamená vynutit ho tam, kde na něm záleží nejmíň.
+
+**Oprava:** odstranit `GenerateDocumentationFile` ze šablony — ověřeno, že generovaný `.xml`
+nikdo nekonzumuje a plugin assembly není knihovna pro cizí spotřebu. Alternativa je přibalit
+do šablony `.editorconfig` s `CS1591 = none`; nutit XML dokumentaci na každý public člen by
+AI jen zatěžovalo.
+
+#### F3-02b · Sekce `[**/*EarlyBound*.cs]` v `.editorconfig` nematchuje ani jeden soubor
+
+Glob míří na soubory, které mají „EarlyBound“ ve *jménu* — takové v repu nejsou (0).
+Generované třídy leží ve *složkách* `EarlyBound/` pod jmény typu `contact.cs`; jen
+v `/examples` je jich 358. Suppression (analyzery off, `CS8981`, `CS0436`) je dnes
+neúčinná. Nevadí to, protože dotčené projekty mají vlastní `NoWarn`, ale při jakémkoli
+zpřísnění dopadne přesně na generovaný kód, do kterého nesmí sahat vývojář ani AI.
+
+**Oprava:** `[**/EarlyBound/**.cs]`.
+
 ### F3-03 · Validátor musí odmítnout GUIDy z dokumentace · **M**
 Validátor dnes odmítá `Guid.Empty` a placeholder vzory, ale **nikoli reálné GUIDy
 z `/examples`** (`4e56ef4c-0e08-f111-8407-000d3ab261ac`, `f94d984d-0f31-f111-88b4-000d3ab2695d`, …).
@@ -705,7 +748,7 @@ odsouhlasit „jdi s doporučením“.
 
 | # | Rozhodnutí | Doporučení | Blokuje |
 |---|---|---|---|
-| **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen AI/CI profil**, aby to nebrzdilo lokální rozpracovaný kód | F3-02 |
+| **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen konfigurace `Release`**, přes `Directory.Build.props`. Změřeno, že celá solution dnes s `TreatWarningsAsErrors` projde, takže cena je nulová a zvláštní profil není potřeba; lokální `Debug` zůstává bez tření. Součástí i srovnání šablony (F3-02a). | F3-02 |
 
 ---
 
