@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.1.2
+
+### Pillaro.Dataverse.PluginFramework
+
+- Relicensed from the Pillaro Community License (PCL) v1.0 to the Apache License, Version 2.0. NuGet package metadata now uses the `Apache-2.0` SPDX license expression, and a `NOTICE` file was added to the repository.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Relicensed from the Pillaro Community License (PCL) v1.0 to the Apache License, Version 2.0. NuGet package metadata now uses the `Apache-2.0` SPDX license expression.
+
+### Templates
+
+- Relicensed the template license file (`dotnet new` package and Visual Studio VSIX) to the Apache License, Version 2.0.
+- Updated generated projects to reference `Pillaro.Dataverse.PluginFramework` and `Pillaro.Dataverse.PluginFramework.Testing` version `1.1.2`.
+
 ## 1.1.1
 
 ### Pillaro.Dataverse.PluginFramework

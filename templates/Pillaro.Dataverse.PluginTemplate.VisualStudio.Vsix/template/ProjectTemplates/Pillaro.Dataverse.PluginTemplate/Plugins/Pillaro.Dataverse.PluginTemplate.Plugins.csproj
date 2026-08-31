@@ -59,7 +59,7 @@ popd
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Pillaro.Dataverse.PluginFramework" Version="1.1.0" GeneratePathProperty="true" />
+		<PackageReference Include="Pillaro.Dataverse.PluginFramework" Version="1.1.2" GeneratePathProperty="true" />
 		<PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.60" />
 	</ItemGroup>
 
