@@ -699,13 +699,13 @@ odsouhlasit „jdi s doporučením“.
 | **D4** | Konvence pojmenování stepů | **Koordináty, ne účel:** `{StepPrefix} {entity} {Message} {Stage} {Mode}`, bez entity u custom API/action. `WithName` vždy nastavit. Frameworkový autonumbering step přejmenován. | F5-01 hotová |
 | **D1** | Kde leží early-bound klasy | **`Logic`.** V šabloně a příkladech nejsou commitnuté, protože závisí na prostředí — generují se toolingem. | F1-04 přepsáno; přidán návrh vypnout scaffolding v `Plugins` |
 | **D3** | Chování `DataverseValidationException` | **Kód je správně: `Success` + `Info`.** „Warning“ v `ThrowWithWarning(...)` je povaha hlášky pro uživatele, ne úroveň logu; task splnil svou práci. | F1-02 zůstává opravou dokumentace (S), bez změny chování. Kontrakt je nově vysvětlený v kódu. |
+| **D6** | Smí se měnit vzorový kód v `/examples`? | **Ano.** Pro AI je vzorový kód autoritativnější zdroj než próza — musí tedy ukazovat kanonickou formu, ne historickou. Podmínka: po každé změně `/examples` musí projít build i testy. | Odblokovává celé F2; F2-01 už podle toho postupovala |
 
 ### Zbývá rozhodnout
 
 | # | Rozhodnutí | Doporučení | Blokuje |
 |---|---|---|---|
 | **D5** | `TreatWarningsAsErrors` — jen pro AI/CI profil, nebo pro všechny buildy? | **Jen AI/CI profil**, aby to nebrzdilo lokální rozpracovaný kód | F3-02 |
-| **D6** | Smí se měnit vzorový kód v `/examples`? | Ano — pro AI je to autoritativnější zdroj než próza | celé F2 |
 
 ---
 
