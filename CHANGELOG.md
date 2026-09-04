@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.1.3-rc
+
+### Pillaro.Dataverse.PluginFramework
+
+- Fixed step image registration so `MessagePropertyName` is derived from the step message instead of always sending `Target` (#57). Post-images on `Create` steps now register with `Id`; `SetState`/`SetStateDynamicEntity` use `EntityMoniker` and `Send`/`DeliverIncoming`/`DeliverPromote` use `EmailId`.
+- Added support for Custom API MainOperation handlers in the deployment manifest (#56). A step registered with `OnMessage(...).MainOperation()` keeps the plugin type in the manifest so the assembly and plugin type are deployed, but no `SdkMessageProcessingStep` is created, updated, or deleted for it; the diff output marks it as `[TYPE-ONLY]`. Stage-30 steps auto-created by Dataverse for Custom APIs are never touched by step synchronization.
+- Manifest validation now rejects MainOperation registrations that define images or target the platform messages `Create`, `Update`, or `Delete`.
+
+## 1.1.2
+
+### Pillaro.Dataverse.PluginFramework
+
+- Relicensed from the Pillaro Community License (PCL) v1.0 to the Apache License, Version 2.0. NuGet package metadata now uses the `Apache-2.0` SPDX license expression, and a `NOTICE` file was added to the repository.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Relicensed from the Pillaro Community License (PCL) v1.0 to the Apache License, Version 2.0. NuGet package metadata now uses the `Apache-2.0` SPDX license expression.
+
+### Templates
+
+- Relicensed the template license file (`dotnet new` package and Visual Studio VSIX) to the Apache License, Version 2.0.
+- Updated generated projects to reference `Pillaro.Dataverse.PluginFramework` and `Pillaro.Dataverse.PluginFramework.Testing` version `1.1.2`.
+
+## 1.1.1
+
+### Pillaro.Dataverse.PluginFramework
+
+- Fixed generated Windows deployment wrappers when NuGet package or project paths contain diacritics or other non-ASCII characters.
+- Improved the local NuGet package build helper so it resolves repository paths correctly when run from the `scripts` directory and keeps the downloaded NuGet CLI outside the repository.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- Added Windows deployment scaffolding coverage for Unicode paths, profile forwarding, settings resolution, working directory handling, and exit code propagation.
+
 ## 1.1.1-rc
 
 ### Pillaro.Dataverse.PluginFramework

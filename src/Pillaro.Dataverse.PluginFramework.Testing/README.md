@@ -204,8 +204,4 @@ Result:
 
 ## License
 
-This project is published under the Pillaro Community License (PCL) v1.0.
-
-Attribution is required when the framework is used in delivered solutions:
-
-> "This solution is built using Pillaro Dataverse Plugin Framework."
+This project is licensed under the Apache License, Version 2.0. See the LICENSE file for details.

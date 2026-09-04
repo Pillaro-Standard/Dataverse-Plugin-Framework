@@ -13,7 +13,7 @@ Source-open, AI-ready standard for building scalable Dynamics 365 and Power Plat
 
 Pillaro Framework provides a structured and production-proven approach to developing Dataverse plugins using C#.
 
-For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://www.pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
+For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
 
 It introduces a task-based execution model with explicit validation and execution phases, together with a precise deployment model for plugin assemblies, plugin steps, images, filtering attributes, and related registration metadata.
 
@@ -424,4 +424,4 @@ We provide practical support for teams adopting the Pillaro Dataverse Plugin Fra
 
 ## License
 
-See `LICENSE` file.
+Licensed under the [Apache License, Version 2.0](LICENSE).

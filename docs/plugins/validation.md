@@ -101,7 +101,7 @@ The fluent validation API builds its validation chain on top of dedicated valida
 | Validator | Purpose | Typical use | Relative cost | Notes |
 |---|---|---|---|---|
 | `ModeValidator` | Checks plugin mode | Sync vs async separation | Very low | First execution filter |
-| `StageValidator` | Checks plugin stage | PreValidation / PreOperation / PostOperation | Very low | Cheap execution filter |
+| `StageValidator` | Checks plugin stage | PreValidation / PreOperation / MainOperation (Custom API) / PostOperation | Very low | Cheap execution filter |
 | `MessageValidator` | Checks message name | Create / Update / Delete / custom message filtering | Very low | Supports single or multiple messages |
 | `EntityValidator` | Checks primary entity name | Entity-specific task or multi-entity capability task | Very low | Useful for both single-entity and multi-entity registration |
 | `ImageValidator` | Checks required pre/post image presence | Update comparison logic, post-operation logic | Low | Used when image presence is always required |

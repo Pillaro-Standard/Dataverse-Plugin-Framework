@@ -94,6 +94,7 @@ Use the naming convention:
 - `feature/your-feature-name` — New features
 - `bugfix/issue-description` — Bug fixes
 - `docs/documentation-topic` — Documentation updates
+- `release/{version}-rc` — Release candidate branches created from `develop` by maintainers (see [Versioning Strategy](versioning.md))
 
 ---
 

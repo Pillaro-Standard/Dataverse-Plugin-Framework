@@ -5,18 +5,28 @@ internal static class PluginRegistrationDiffWriter
     public static void Write(PluginRegistrationDiff diff, PluginManifestDocument manifest)
     {
         var stepsByPlugin = new Dictionary<string, List<(PluginManifestStep? Step, PluginStepDiff Diff)>>();
+        var mainOperationStepsByPlugin = new Dictionary<string, List<PluginManifestStep>>();
 
         foreach (var plugin in manifest.Plugins)
         {
             var pluginSteps = new List<(PluginManifestStep? Step, PluginStepDiff Diff)>();
+            var mainOperationSteps = new List<PluginManifestStep>();
 
             foreach (var step in plugin.Steps)
             {
+                // Custom API MainOperation handlers have no step diff - only the plugin type is deployed.
+                if (step.IsMainOperation)
+                {
+                    mainOperationSteps.Add(step);
+                    continue;
+                }
+
                 var stepDiff = diff.StepChanges.First(d => d.StepId == step.StepId);
                 pluginSteps.Add((step, stepDiff));
             }
 
             stepsByPlugin[plugin.TypeName] = pluginSteps;
+            mainOperationStepsByPlugin[plugin.TypeName] = mainOperationSteps;
         }
 
         var deletedSteps = diff.StepChanges.Where(d => d.Action == PluginDiffAction.Delete).ToList();
@@ -77,6 +87,17 @@ internal static class PluginRegistrationDiffWriter
                     Console.WriteLine($"       [{imageStatus}] {imageDiff.Type,-9}: {imageDiff.Name}");
                 }
             }
+
+            if (mainOperationStepsByPlugin.TryGetValue(pluginTypeName, out var mainOperationSteps))
+            {
+                foreach (var mainOperationStep in mainOperationSteps.OrderBy(s => s.MessageName))
+                {
+                    var mainOperationName = !string.IsNullOrWhiteSpace(mainOperationStep.Name)
+                        ? mainOperationStep.Name
+                        : $"MainOperation {mainOperationStep.MessageName}";
+                    Console.WriteLine($"  [TYPE-ONLY] {mainOperationName} (Custom API MainOperation - associated via CustomAPI.PluginTypeId, no processing step deployed)");
+                }
+            }
         }
 
         foreach (var skipped in manifest.PluginTypesWithoutRegistration)
@@ -110,6 +131,7 @@ internal static class PluginRegistrationDiffWriter
         {
             "Prevalidation" => "PreValidation ",
             "Preoperation" => "PreOperation  ",
+            "Mainoperation" => "MainOperation ",
             "Postoperation" => "PostOperation ",
             _ => string.Empty
         };
