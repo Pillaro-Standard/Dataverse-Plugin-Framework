@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.3-rc
 
 ### Pillaro.Dataverse.PluginFramework
 
