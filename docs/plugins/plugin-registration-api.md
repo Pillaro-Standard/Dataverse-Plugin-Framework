@@ -289,6 +289,37 @@ registration
 
 The fluent chain keeps every image attached to the exact step where it is declared. No additional linking attribute or registration ID is needed.
 
+## Custom API MainOperation Registration
+
+A Custom API main operation is associated with the plugin type through `CustomAPI.PluginTypeId` in Dataverse. It must not be registered as a normal `SdkMessageProcessingStep` - Dataverse rejects such a step for Custom API messages.
+
+Declare the handler with `OnMessage(...)` and the `MainOperation()` stage:
+
+~~~csharp
+public sealed class InvoicePlugin : PluginBase
+{
+    public const string MessageName = "pil_CopyInvoice";
+
+    public InvoicePlugin(string unsecureConfig, string secureConfig)
+        : base(unsecureConfig, secureConfig)
+    {
+        RegisterTask<CopyInvoiceTask>(PluginStage.Mainoperation, [MessageName], Invoice.EntityLogicalName, PluginMode.Synchronous);
+    }
+
+    public override void Register(IPluginRegistration registration)
+    {
+        registration
+            .OnMessage<Invoice>("00000000-0000-0000-0000-000000000000", MessageName)
+            .MainOperation()
+            .Synchronous();
+    }
+}
+~~~
+
+During deployment, a MainOperation registration keeps the plugin type in the manifest so the assembly and plugin type are deployed and updated, but no `SdkMessageProcessingStep` is created, updated, or deleted for it. Associate the Custom API with the plugin type by setting `CustomAPI.PluginTypeId` (typically as part of the solution that defines the Custom API). The deployment diff output marks these registrations as `[TYPE-ONLY]`.
+
+MainOperation registrations cannot define images and are supported only for Custom API messages - the validator rejects `MainOperation()` combined with the platform messages `Create`, `Update`, or `Delete`.
+
 ## Runtime vs Deployment Metadata
 
 The constructor remains responsible for runtime task registration:
@@ -350,6 +381,8 @@ The deployment manifest validator enforces basic safety rules:
 - images should be used only in PreOperation or PostOperation stages.
 - Create steps cannot define pre-images.
 - Delete steps cannot define post-images.
+- MainOperation registrations cannot define images.
+- MainOperation registrations are supported only for Custom API messages, not for `Create`, `Update`, or `Delete`.
 
 ## Notes
 
@@ -358,6 +391,7 @@ The deployment manifest validator enforces basic safety rules:
 - string-based registration methods accept entity logical names directly as parameters.
 - typed attribute selection reads logical names from `AttributeLogicalNameAttribute` on early-bound entity properties.
 - custom API and custom action messages can be registered with `OnMessage(...)` or `OnMessage<TEntity>(...)`.
+- image `MessagePropertyName` is derived automatically from the step message during deployment (`Id` for Create, `EntityMoniker` for SetState, `EmailId` for Send/DeliverIncoming/DeliverPromote, otherwise `Target`).
 - both early-bound and string-based registration modes generate identical deployment metadata.
 - string-based registration validates that the entity logical name is not null, empty, or whitespace.
 

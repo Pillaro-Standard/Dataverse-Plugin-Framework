@@ -26,6 +26,8 @@ internal sealed class PluginManifestPlugin
 
 internal sealed class PluginManifestStep
 {
+    internal const int MainOperationStage = 30;
+
     public Guid StepId { get; set; }
 
     public string MessageName { get; set; } = string.Empty;
@@ -51,6 +53,11 @@ internal sealed class PluginManifestStep
     public List<PluginManifestImage> Images { get; set; } = [];
 
     public PluginManifestDeploymentPolicy? DeploymentPolicy { get; set; }
+
+    // Custom API MainOperation handlers are associated through CustomAPI.PluginTypeId;
+    // only the assembly and plugin type are deployed, never an SdkMessageProcessingStep.
+    [JsonIgnore]
+    public bool IsMainOperation => Stage == MainOperationStage;
 }
 
 internal sealed class PluginManifestImage

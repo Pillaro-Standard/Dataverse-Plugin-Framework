@@ -88,6 +88,11 @@ internal static class PluginManifestValidator
         {
             errors.Add($"Synchronous Update step '{step.StepId}' on entity '{step.EntityName}' should define filtering attributes using WhenChanged(...) to avoid unnecessarily broad execution.");
         }
+
+        if (step.IsMainOperation && (IsCreate(step) || IsUpdate(step) || IsDelete(step)))
+        {
+            errors.Add($"Step '{step.StepId}' registers the MainOperation stage for platform message '{step.MessageName}'. MainOperation is supported only for Custom API messages; use PreValidation, PreOperation, or PostOperation for platform messages.");
+        }
     }
 
     private static void ValidateImages(
@@ -98,6 +103,11 @@ internal static class PluginManifestValidator
         if (step.Images.Count > 0 && step.Stage == PreValidationStage)
         {
             errors.Add($"Step '{step.StepId}' defines images in PreValidation stage. Images should be used only in PreOperation or PostOperation stages.");
+        }
+
+        if (step.Images.Count > 0 && step.IsMainOperation)
+        {
+            errors.Add($"Step '{step.StepId}' defines images in MainOperation stage. A Custom API MainOperation registration deploys the plugin type only and cannot register images.");
         }
 
         var imageNameTypeInStep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

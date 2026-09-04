@@ -59,4 +59,23 @@ public class DataverseRegistrationUpserterTests
         Assert.Same(image, operation.Image);
         Assert.Equal(PluginDiffAction.Update, operation.Action);
     }
+
+    [Theory]
+    [InlineData("Create", "Id")]
+    [InlineData("create", "Id")]
+    [InlineData("Update", "Target")]
+    [InlineData("Delete", "Target")]
+    [InlineData("Assign", "Target")]
+    [InlineData("Merge", "Target")]
+    [InlineData("Route", "Target")]
+    [InlineData("SetState", "EntityMoniker")]
+    [InlineData("SetStateDynamicEntity", "EntityMoniker")]
+    [InlineData("Send", "EmailId")]
+    [InlineData("DeliverIncoming", "EmailId")]
+    [InlineData("DeliverPromote", "EmailId")]
+    [InlineData("pil_MyCustomApi", "Target")]
+    public void GetMessagePropertyName_DerivesValueFromStepMessage(string messageName, string expected)
+    {
+        Assert.Equal(expected, DataverseRegistrationUpserter.GetMessagePropertyName(messageName));
+    }
 }

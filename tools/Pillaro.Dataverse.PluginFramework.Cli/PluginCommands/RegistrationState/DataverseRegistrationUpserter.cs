@@ -85,7 +85,7 @@ internal static class DataverseRegistrationUpserter
         PluginManifestDocument manifest,
         string solutionName)
     {
-        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).OrderBy(step => step.StepId))
+        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !step.IsMainOperation).OrderBy(step => step.StepId))
         {
             await DataverseSolutionComponentService.EnsureAddedWithSubcomponentRetryAsync(
                 service,
@@ -125,7 +125,7 @@ internal static class DataverseRegistrationUpserter
 
     private static async Task<Dictionary<string, Guid>> LoadMessageIdsAsync(IOrganizationServiceAsync2 service, PluginManifestDocument manifest)
     {
-        var names = manifest.Plugins.SelectMany(plugin => plugin.Steps).Select(step => step.MessageName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        var names = manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !step.IsMainOperation).Select(step => step.MessageName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         var result = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
         foreach (var batch in names.Chunk(500))
         {
@@ -154,7 +154,7 @@ internal static class DataverseRegistrationUpserter
     private static async Task<Dictionary<string, Guid>> LoadMessageFilterIdsAsync(IOrganizationServiceAsync2 service, PluginManifestDocument manifest, IReadOnlyDictionary<string, Guid> messageIds)
     {
         var result = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
-        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !string.IsNullOrWhiteSpace(step.EntityName)))
+        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !step.IsMainOperation && !string.IsNullOrWhiteSpace(step.EntityName)))
         {
             var key = GetMessageFilterKey(step.MessageName, step.EntityName!);
             if (result.ContainsKey(key))
@@ -223,7 +223,7 @@ internal static class DataverseRegistrationUpserter
         entity["sdkmessageprocessingstepid"] = new EntityReference("sdkmessageprocessingstep", step.StepId);
         entity["name"] = image.Name;
         entity["entityalias"] = image.Name;
-        entity["messagepropertyname"] = "Target";
+        entity["messagepropertyname"] = GetMessagePropertyName(step.MessageName);
         entity["imagetype"] = new OptionSetValue(ToImageTypeValue(image.Type));
         entity["attributes"] = string.Join(",", image.Attributes);
         if (action == PluginDiffAction.Create)
@@ -235,6 +235,31 @@ internal static class DataverseRegistrationUpserter
         {
             await service.UpdateAsync(entity);
         }
+    }
+
+    // Dataverse accepts only message-specific property names on step images; e.g. images on the
+    // Create message must use "Id" because the created record is returned in the Id output parameter.
+    internal static string GetMessagePropertyName(string messageName)
+    {
+        if (string.Equals(messageName, "Create", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Id";
+        }
+
+        if (string.Equals(messageName, "SetState", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(messageName, "SetStateDynamicEntity", StringComparison.OrdinalIgnoreCase))
+        {
+            return "EntityMoniker";
+        }
+
+        if (string.Equals(messageName, "Send", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(messageName, "DeliverIncoming", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(messageName, "DeliverPromote", StringComparison.OrdinalIgnoreCase))
+        {
+            return "EmailId";
+        }
+
+        return "Target";
     }
 
     private static string GetMessageFilterKey(string messageName, string entityName) => $"{messageName}:{entityName}";
