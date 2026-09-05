@@ -6,6 +6,9 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState
 
 internal static class DataverseRegistrationUpserter
 {
+    private const int EnabledStateCode = 0;
+    private const int EnabledStatusCode = 1;
+
     internal sealed record ImageUpsertOperation(PluginManifestStep Step, PluginManifestImage Image, PluginDiffAction Action);
 
     public static async Task ApplyAsync(
@@ -213,6 +216,10 @@ internal static class DataverseRegistrationUpserter
         }
         else
         {
+            // Deployment is authoritative: an updated step must end up enabled,
+            // even when it was manually disabled in Dataverse.
+            entity["statecode"] = new OptionSetValue(EnabledStateCode);
+            entity["statuscode"] = new OptionSetValue(EnabledStatusCode);
             await service.UpdateAsync(entity);
         }
     }

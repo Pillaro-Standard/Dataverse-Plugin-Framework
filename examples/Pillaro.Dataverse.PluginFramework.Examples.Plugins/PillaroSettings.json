@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "solution": "PillaroPluginFrameworkExamples",
   "dataverse": {
-    "connectionStringEnvironmentVariable": "DV_CONN"
+    "connectionStringEnvironmentVariable": "PillaroFramework_DV_CONN"
   },
   "defaultProfile": "debug",
   "profiles": {
