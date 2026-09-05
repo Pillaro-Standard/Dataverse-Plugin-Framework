@@ -7,6 +7,7 @@
 - Fixed step image registration so `MessagePropertyName` is derived from the step message instead of always sending `Target` (#57). Post-images on `Create` steps now register with `Id`; `SetState`/`SetStateDynamicEntity` use `EntityMoniker` and `Send`/`DeliverIncoming`/`DeliverPromote` use `EmailId`.
 - Added support for Custom API MainOperation handlers in the deployment manifest (#56). A step registered with `OnMessage(...).MainOperation()` keeps the plugin type in the manifest so the assembly and plugin type are deployed, but no `SdkMessageProcessingStep` is created, updated, or deleted for it; the diff output marks it as `[TYPE-ONLY]`. Stage-30 steps auto-created by Dataverse for Custom APIs are never touched by step synchronization.
 - Manifest validation now rejects MainOperation registrations that define images or target the platform messages `Create`, `Update`, or `Delete`.
+- Deployment now re-enables steps that were manually disabled in Dataverse. A disabled step in the manifest is reported in the diff output (`State: step was disabled in Dataverse and will be re-enabled by deployment.`) and updated back to enabled, so deployed registrations always end up active.
 
 ## 1.1.2
 

@@ -189,6 +189,8 @@ For a release build:
 
 The script deploys the plugin assembly and synchronizes plugin registration metadata defined in code.
 
+Deployment is authoritative for step state: a step present in the registration metadata always ends up **enabled**. If a step was manually disabled in Dataverse, the deployment diff reports it (`State: step was disabled in Dataverse and will be re-enabled by deployment.`) and the step is re-enabled during synchronization.
+
 The generated wrappers are the recommended entry point. Direct CLI usage is `pillaro-dv deploy [options]` and is configured by `PillaroSettings.json`; supported options are `--settings`, `--profile`, `--just-assembly`, and `-h`/`--help`. The solution unique name comes from `solution`, the plugin assembly path comes from `profiles.<profile>.pluginAssemblyPath`, and the Dataverse connection string variable comes from `dataverse.connectionStringEnvironmentVariable`.
 
 ---

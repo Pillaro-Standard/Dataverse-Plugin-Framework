@@ -114,6 +114,12 @@ internal static class PluginRegistrationDiffCalculator
             result.Reasons.Add($"UnsecureConfiguration changed.");
         }
 
+        // Deployment is authoritative: a step present in the manifest must end up enabled.
+        if (current.IsDisabled)
+        {
+            result.Reasons.Add("State: step was disabled in Dataverse and will be re-enabled by deployment.");
+        }
+
         if (result.Reasons.Count > 0)
         {
             result.Action = PluginDiffAction.Update;

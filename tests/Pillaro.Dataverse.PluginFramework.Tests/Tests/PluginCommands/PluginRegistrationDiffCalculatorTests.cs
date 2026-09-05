@@ -127,6 +127,79 @@ public class PluginRegistrationDiffCalculatorTests
         Assert.Equal(PluginDiffAction.Create, change.Action);
     }
 
+    [Fact]
+    public void Calculate_DisabledStepWithNoOtherChanges_IsUpdatedAndReasonExplainsReEnable()
+    {
+        var stepId = Guid.NewGuid();
+        var manifest = CreateManifest(new PluginManifestStep
+        {
+            StepId = stepId,
+            MessageName = "Update",
+            EntityName = "account",
+            Stage = 20,
+            StageName = "Preoperation",
+            Mode = 0,
+            ModeName = "Synchronous",
+            Rank = 1,
+            FilteringAttributes = ["name"],
+        });
+        var currentState = new DataverseRegistrationState();
+        currentState.StepsById[stepId] = new DataverseStepState
+        {
+            StepId = stepId,
+            PluginTypeName = "SamplePlugin",
+            MessageName = "Update",
+            EntityName = "account",
+            Stage = 20,
+            Mode = 0,
+            Rank = 1,
+            FilteringAttributes = ["name"],
+            IsDisabled = true,
+        };
+
+        var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
+
+        var change = Assert.Single(diff.StepChanges);
+        Assert.Equal(PluginDiffAction.Update, change.Action);
+        Assert.Contains(change.Reasons, reason => reason.Contains("disabled in Dataverse and will be re-enabled"));
+    }
+
+    [Fact]
+    public void Calculate_EnabledStepWithNoChanges_StaysUnchanged()
+    {
+        var stepId = Guid.NewGuid();
+        var manifest = CreateManifest(new PluginManifestStep
+        {
+            StepId = stepId,
+            MessageName = "Update",
+            EntityName = "account",
+            Stage = 20,
+            StageName = "Preoperation",
+            Mode = 0,
+            ModeName = "Synchronous",
+            Rank = 1,
+            FilteringAttributes = ["name"],
+        });
+        var currentState = new DataverseRegistrationState();
+        currentState.StepsById[stepId] = new DataverseStepState
+        {
+            StepId = stepId,
+            PluginTypeName = "SamplePlugin",
+            MessageName = "Update",
+            EntityName = "account",
+            Stage = 20,
+            Mode = 0,
+            Rank = 1,
+            FilteringAttributes = ["name"],
+            IsDisabled = false,
+        };
+
+        var diff = PluginRegistrationDiffCalculator.Calculate(manifest, currentState);
+
+        var change = Assert.Single(diff.StepChanges);
+        Assert.Equal(PluginDiffAction.Unchanged, change.Action);
+    }
+
     private static PluginManifestDocument CreateManifest(params PluginManifestStep[] steps)
     {
         return new PluginManifestDocument
