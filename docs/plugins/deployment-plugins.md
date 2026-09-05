@@ -191,7 +191,7 @@ The script deploys the plugin assembly and synchronizes plugin registration meta
 
 Deployment is authoritative for step state: a step present in the registration metadata always ends up **enabled**. If a step was manually disabled in Dataverse, the deployment diff reports it (`State: step was disabled in Dataverse and will be re-enabled by deployment.`) and the step is re-enabled during synchronization.
 
-The deployment output colors status labels for quick scanning: `CREATE` is green, `UPDATE`, `CHANGE`, and `WARN` are yellow, `DELETE` and `ERROR` are red, `TYPE-ONLY` is cyan, and `OK` is dimmed. Set the standard `NO_COLOR` environment variable to disable colored output.
+The deployment output colors status labels for quick scanning: `CREATE` is green, `UPDATE` is yellow, `CHANGE` and `WARN` are orange, `DELETE` and `ERROR` are red, `TYPE-ONLY` is cyan, and `OK` is dimmed. Set the standard `NO_COLOR` environment variable to disable colored output.
 
 The generated wrappers are the recommended entry point. Direct CLI usage is `pillaro-dv deploy [options]` and is configured by `PillaroSettings.json`; supported options are `--settings`, `--profile`, `--just-assembly`, and `-h`/`--help`. The solution unique name comes from `solution`, the plugin assembly path comes from `profiles.<profile>.pluginAssemblyPath`, and the Dataverse connection string variable comes from `dataverse.connectionStringEnvironmentVariable`.
 

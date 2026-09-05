@@ -12,6 +12,7 @@ internal static class ConsoleStatusFormatter
     private static readonly string Green = $"{Escape}[32m";
     private static readonly string Yellow = $"{Escape}[33m";
     private static readonly string Red = $"{Escape}[31m";
+    private static readonly string Orange = $"{Escape}[38;2;255;140;0m";
     private static readonly string Cyan = $"{Escape}[36m";
     private static readonly string Gray = $"{Escape}[90m";
 
@@ -30,8 +31,8 @@ internal static class ConsoleStatusFormatter
             "CREATE" => Green,
             "OK" => Gray,
             "UPDATE" => Yellow,
-            "CHANGE" => Yellow,
-            "WARN" => Yellow,
+            "CHANGE" => Orange,
+            "WARN" => Orange,
             "DELETE" => Red,
             "ERROR" => Red,
             "TYPE-ONLY" => Cyan,
