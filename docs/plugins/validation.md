@@ -104,7 +104,7 @@ The fluent validation API builds its validation chain on top of dedicated valida
 | `StageValidator` | Checks plugin stage | PreValidation / PreOperation / MainOperation (Custom API) / PostOperation | Very low | Cheap execution filter |
 | `MessageValidator` | Checks message name | Create / Update / Delete / custom message filtering | Very low | Supports single or multiple messages |
 | `EntityValidator` | Checks primary entity name | Entity-specific task or multi-entity capability task | Very low | Useful for both single-entity and multi-entity registration |
-| `ImageValidator` | Checks required pre/post image presence | Update comparison logic, post-operation logic | Low | Used when image presence is always required |
+| `ImageValidator` | Checks that the required pre/post image is registered and carries data | Update comparison logic, post-operation logic, delete logic | Low | Used when image presence is always required |
 | `ImageWithConditionValidator` | Checks required image only when a predicate applies | Update-only or branch-specific image requirements | Low | Conditional image validation |
 | `EntityAttributesValidator` | Checks whether required attributes are present | Update-trigger optimization, required input fields | Low | Supports both “at least one” and “all attributes” checks |
 | `EntityAttributesWithConditionValidator` | Checks required attributes only when a predicate applies | Branch-specific attribute requirements | Low | Conditional attribute validation |

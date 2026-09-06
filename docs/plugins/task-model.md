@@ -98,16 +98,31 @@ The most important prepared members are:
 | Member | Purpose |
 |---|---|
 | `TaskContext` | Shared execution context for the current task run |
-| `ContextEntity` | Current entity target for supported message flows |
-| `PreImage` | Pre-image when available |
-| `PostImage` | Post-image when available |
-| `ContextEntityReference` | Reference to the current primary entity record |
+| `ContextEntity` | Current entity target for supported message flows (`Create`, `Update` by default) |
+| `PreImage` | Pre-image when available, for every message |
+| `PostImage` | Post-image when available, for every message |
+| `ContextEntityReference` | Reference to the current primary entity record, for every message |
 | `TracingService` | Dataverse tracing support |
 | `SettingService` | Runtime settings access |
 | `OrganizationServiceProvider` | Prepared access to Dataverse organization services |
 | `DataServiceProvider` | Prepared access to higher-level framework data services |
 | `AddLogMessageLine(...)` | Adds a line to the task execution message stored in the task log |
 | `AddLogDetail(...)` | Adds a structured detail record to the task log |
+
+> [!IMPORTANT]
+> Images are independent of the entity target.
+> `PreImage` and `PostImage` are initialized for every message, including messages without an
+> `Entity` target such as `Delete`, where `ContextEntity` stays `null` and the image is the only
+> source of the record values. Use `ContextEntityReference` to identify the record itself.
+
+By default, `PreImage` and `PostImage` are loaded from the image named `image`.
+When a step registers its images under different names, override `GetPreImageName()` or
+`GetPostImageName()` in the task, or read the image directly with `GetPreImage("name")`.
+
+    protected override string GetPreImageName()
+    {
+        return "deletedQuoteDetail";
+    }
 
 This means a task can focus on:
 
