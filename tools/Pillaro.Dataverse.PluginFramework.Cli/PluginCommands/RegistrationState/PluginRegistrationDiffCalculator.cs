@@ -148,9 +148,16 @@ internal static class PluginRegistrationDiffCalculator
             return result;
         }
 
+        // Alias and message property name are compared against the values the upserter would write, so an
+        // image that leaves them to the defaults does not show up as drift on every deployment.
         var hasChanges = !string.Equals(current.StepId.ToString(), step.StepId.ToString(), StringComparison.OrdinalIgnoreCase)
             || !string.Equals(Normalize(current.Name), Normalize(desired.Name), StringComparison.OrdinalIgnoreCase)
             || !string.Equals(Normalize(current.Type), Normalize(desired.Type), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(Normalize(current.EntityAlias), Normalize(desired.ResolvedEntityAlias), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(
+                Normalize(current.MessagePropertyName),
+                Normalize(DataverseRegistrationUpserter.ResolveMessagePropertyName(step, desired)),
+                StringComparison.OrdinalIgnoreCase)
             || !NormalizeCollection(current.Attributes).SequenceEqual(NormalizeCollection(desired.Attributes), StringComparer.OrdinalIgnoreCase);
 
         if (hasChanges)

@@ -171,6 +171,8 @@ internal static class DataverseRegistrationStateReader
                     "sdkmessageprocessingstepimageid",
                     "sdkmessageprocessingstepid",
                     "name",
+                    "entityalias",
+                    "messagepropertyname",
                     "imagetype",
                     "attributes")
             };
@@ -187,6 +189,8 @@ internal static class DataverseRegistrationStateReader
                     StepId = entity.GetAttributeValue<EntityReference>("sdkmessageprocessingstepid")?.Id ?? Guid.Empty,
                     Name = entity.GetAttributeValue<string>("name") ?? string.Empty,
                     Type = ToImageType(entity.GetAttributeValue<OptionSetValue>("imagetype")?.Value),
+                    EntityAlias = entity.GetAttributeValue<string>("entityalias"),
+                    MessagePropertyName = entity.GetAttributeValue<string>("messagepropertyname"),
                     Attributes = SplitAttributes(entity.GetAttributeValue<string>("attributes")),
                 };
             }

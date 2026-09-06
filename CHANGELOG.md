@@ -1,4 +1,17 @@
-# Changelog
+﻿# Changelog
+
+## Unreleased
+
+### Pillaro.Dataverse.PluginFramework
+
+- Entity-typed registration is now available for every message, not only `Update`. `OnCreate<TEntity>(...)`, `OnDelete<TEntity>(...)` and `OnMessage<TEntity>(...)` return an entity-typed builder, so typed filtering attributes (`WhenChanged(c => c.FirstName)`, `WithFilteringAttributes(c => c.FirstName)`) and typed images (`WithPreImage(..., c => c.FirstName)`) work for all of them. `WhenChanged(...)` is also available on the string-based builders.
+- Added `WithBothImage(...)` and `PluginImageType.Both`, exposing the Dataverse `Both` image type (value 2) that the deployer could already write but no registration could produce.
+- Added `WithImage(PluginImageOptions)` for the image combinations the shorthands cannot express: a distinct `EntityAlias` and an explicit `MessagePropertyName` (for example `Merge` with `SubordinateId`).
+- Image `EntityAlias` is now registered from the registration instead of always being forced to the image name.
+- Image `MessagePropertyName` derivation now handles `Send` per entity (`FaxId` for `fax`, `TemplateId` for `template`, otherwise `EmailId`) and documents `Target` as the default for `Assign`, `Delete`, `Merge`, `Route` and `Update`.
+- Fixed manifest validation, which rejected every image on a PreValidation step. Pre-images are valid in PreValidation, PreOperation and PostOperation; the rule that was missing is that post-images (and `Both`) are available only in PostOperation, and that is now enforced instead.
+- Image uniqueness within a step is now checked per image collection using the entity alias, so a pre-image and a post-image may share a key while duplicates within one collection are rejected.
+- The deployment diff now compares image `EntityAlias` and `MessagePropertyName`, so drift in either is detected.
 
 ## 1.1.3-rc
 

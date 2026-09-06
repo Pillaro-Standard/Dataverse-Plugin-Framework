@@ -5,7 +5,7 @@ namespace Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
 public interface IPluginRegistration
 {
-    IPluginStepStageBuilder OnCreate<TEntity>(string stepId)
+    IPluginStepStageBuilder<TEntity> OnCreate<TEntity>(string stepId)
         where TEntity : Entity;
 
     IPluginStepStageBuilder OnCreate(string entityLogicalName, string stepId);
@@ -15,14 +15,14 @@ public interface IPluginRegistration
 
     IPluginUpdateStepStageBuilder OnUpdate(string entityLogicalName, string stepId);
 
-    IPluginStepStageBuilder OnDelete<TEntity>(string stepId)
+    IPluginStepStageBuilder<TEntity> OnDelete<TEntity>(string stepId)
         where TEntity : Entity;
 
     IPluginStepStageBuilder OnDelete(string entityLogicalName, string stepId);
 
     IPluginStepStageBuilder OnMessage(string stepId, string messageName);
 
-    IPluginStepStageBuilder OnMessage<TEntity>(string stepId, string messageName)
+    IPluginStepStageBuilder<TEntity> OnMessage<TEntity>(string stepId, string messageName)
         where TEntity : Entity;
 
     IPluginStepStageBuilder OnMessage(string entityLogicalName, string stepId, string messageName);
@@ -39,49 +39,11 @@ public interface IPluginStepStageBuilder
     IPluginStepModeBuilder PostOperation();
 }
 
-public interface IPluginUpdateStepStageBuilder<TEntity>
-    where TEntity : Entity
-{
-    IPluginUpdateStepModeBuilder<TEntity> PreValidation();
-
-    IPluginUpdateStepModeBuilder<TEntity> PreOperation();
-
-    IPluginUpdateStepModeBuilder<TEntity> MainOperation();
-
-    IPluginUpdateStepModeBuilder<TEntity> PostOperation();
-}
-
-public interface IPluginUpdateStepStageBuilder
-{
-    IPluginUpdateStepModeBuilder PreValidation();
-
-    IPluginUpdateStepModeBuilder PreOperation();
-
-    IPluginUpdateStepModeBuilder MainOperation();
-
-    IPluginUpdateStepModeBuilder PostOperation();
-}
-
 public interface IPluginStepModeBuilder
 {
     IPluginStepBuilder Synchronous();
 
     IPluginStepBuilder Asynchronous();
-}
-
-public interface IPluginUpdateStepModeBuilder<TEntity>
-    where TEntity : Entity
-{
-    IPluginUpdateStepBuilder<TEntity> Synchronous();
-
-    IPluginUpdateStepBuilder<TEntity> Asynchronous();
-}
-
-public interface IPluginUpdateStepModeBuilder
-{
-    IPluginUpdateStepBuilder Synchronous();
-
-    IPluginUpdateStepBuilder Asynchronous();
 }
 
 public interface IPluginStepBuilder
@@ -92,51 +54,112 @@ public interface IPluginStepBuilder
 
     IPluginStepBuilder WithFilteringAttributes(params string[] attributes);
 
+    /// <summary>
+    /// Alias of <see cref="WithFilteringAttributes(string[])"/>. Dataverse stores filtering attributes on
+    /// <c>sdkmessageprocessingstep.filteringattributes</c> regardless of the message, so this is available
+    /// for every message, not only <c>Update</c>.
+    /// </summary>
+    IPluginStepBuilder WhenChanged(params string[] attributes);
+
     IPluginStepBuilder WithUnsecureConfiguration(string unsecureConfiguration);
 
     IPluginStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
 
     IPluginStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
+
+    /// <summary>
+    /// Registers a single image with Dataverse image type <c>Both</c> (value 2), which is exposed to the
+    /// plugin through both <c>PreEntityImages</c> and <c>PostEntityImages</c>.
+    /// </summary>
+    IPluginStepBuilder WithBothImage(string imageId, string name, params string[] attributes);
+
+    IPluginStepBuilder WithImage(PluginImageOptions image);
 }
 
-public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder
+/// <summary>
+/// Entity-typed stage builder. Returned by every entity-typed registration entry point so that typed
+/// filtering attributes and typed images are available for all messages, not only <c>Update</c>.
+/// </summary>
+public interface IPluginStepStageBuilder<TEntity> : IPluginStepStageBuilder
     where TEntity : Entity
 {
-    new IPluginUpdateStepBuilder<TEntity> Rank(int rank);
+    new IPluginStepModeBuilder<TEntity> PreValidation();
 
-    new IPluginUpdateStepBuilder<TEntity> WithName(string name);
+    new IPluginStepModeBuilder<TEntity> PreOperation();
 
-    new IPluginUpdateStepBuilder<TEntity> WithFilteringAttributes(params string[] attributes);
+    new IPluginStepModeBuilder<TEntity> MainOperation();
 
-    new IPluginUpdateStepBuilder<TEntity> WithUnsecureConfiguration(string unsecureConfiguration);
+    new IPluginStepModeBuilder<TEntity> PostOperation();
+}
 
-    IPluginUpdateStepBuilder<TEntity> WhenChanged(params string[] attributes);
+public interface IPluginStepModeBuilder<TEntity> : IPluginStepModeBuilder
+    where TEntity : Entity
+{
+    new IPluginStepBuilder<TEntity> Synchronous();
 
-    IPluginUpdateStepBuilder<TEntity> WhenChanged(params Expression<Func<TEntity, object>>[] attributes);
+    new IPluginStepBuilder<TEntity> Asynchronous();
+}
 
-    new IPluginUpdateStepBuilder<TEntity> WithPreImage(string imageId, string name, params string[] attributes);
+public interface IPluginStepBuilder<TEntity> : IPluginStepBuilder
+    where TEntity : Entity
+{
+    new IPluginStepBuilder<TEntity> Rank(int rank);
 
-    IPluginUpdateStepBuilder<TEntity> WithPreImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+    new IPluginStepBuilder<TEntity> WithName(string name);
 
-    new IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params string[] attributes);
+    new IPluginStepBuilder<TEntity> WithFilteringAttributes(params string[] attributes);
 
-    IPluginUpdateStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+    IPluginStepBuilder<TEntity> WithFilteringAttributes(params Expression<Func<TEntity, object>>[] attributes);
 
+    new IPluginStepBuilder<TEntity> WhenChanged(params string[] attributes);
+
+    IPluginStepBuilder<TEntity> WhenChanged(params Expression<Func<TEntity, object>>[] attributes);
+
+    new IPluginStepBuilder<TEntity> WithUnsecureConfiguration(string unsecureConfiguration);
+
+    new IPluginStepBuilder<TEntity> WithPreImage(string imageId, string name, params string[] attributes);
+
+    IPluginStepBuilder<TEntity> WithPreImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+
+    new IPluginStepBuilder<TEntity> WithPostImage(string imageId, string name, params string[] attributes);
+
+    IPluginStepBuilder<TEntity> WithPostImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+
+    new IPluginStepBuilder<TEntity> WithBothImage(string imageId, string name, params string[] attributes);
+
+    IPluginStepBuilder<TEntity> WithBothImage(string imageId, string name, params Expression<Func<TEntity, object>>[] attributes);
+
+    new IPluginStepBuilder<TEntity> WithImage(PluginImageOptions image);
+
+    IPluginStepBuilder<TEntity> WithImage(PluginImageOptions image, params Expression<Func<TEntity, object>>[] attributes);
+}
+
+// The IPluginUpdateStep* interfaces predate the entity-typed builders above, which now cover every message.
+// They are retained so that existing registration code that names them explicitly keeps compiling.
+
+public interface IPluginUpdateStepStageBuilder<TEntity> : IPluginStepStageBuilder<TEntity>
+    where TEntity : Entity
+{
+}
+
+public interface IPluginUpdateStepModeBuilder<TEntity> : IPluginStepModeBuilder<TEntity>
+    where TEntity : Entity
+{
+}
+
+public interface IPluginUpdateStepBuilder<TEntity> : IPluginStepBuilder<TEntity>
+    where TEntity : Entity
+{
+}
+
+public interface IPluginUpdateStepStageBuilder : IPluginStepStageBuilder
+{
+}
+
+public interface IPluginUpdateStepModeBuilder : IPluginStepModeBuilder
+{
 }
 
 public interface IPluginUpdateStepBuilder : IPluginStepBuilder
 {
-    new IPluginUpdateStepBuilder Rank(int rank);
-
-    new IPluginUpdateStepBuilder WithName(string name);
-
-    new IPluginUpdateStepBuilder WithFilteringAttributes(params string[] attributes);
-
-    new IPluginUpdateStepBuilder WithUnsecureConfiguration(string unsecureConfiguration);
-
-    IPluginUpdateStepBuilder WhenChanged(params string[] attributes);
-
-    new IPluginUpdateStepBuilder WithPreImage(string imageId, string name, params string[] attributes);
-
-    new IPluginUpdateStepBuilder WithPostImage(string imageId, string name, params string[] attributes);
 }

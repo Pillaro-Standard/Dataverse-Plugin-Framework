@@ -1,4 +1,4 @@
-using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
+﻿using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
 using Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
 
 namespace Pillaro.Dataverse.PluginFramework.Tests.Tests.PluginCommands;
@@ -77,5 +77,38 @@ public class DataverseRegistrationUpserterTests
     public void GetMessagePropertyName_DerivesValueFromStepMessage(string messageName, string expected)
     {
         Assert.Equal(expected, DataverseRegistrationUpserter.GetMessagePropertyName(messageName));
+    }
+
+    [Theory]
+    [InlineData("fax", "FaxId")]
+    [InlineData("template", "TemplateId")]
+    [InlineData("email", "EmailId")]
+    public void GetMessagePropertyName_ForSendMessage_DerivesValueFromEntity(string entityName, string expected)
+    {
+        Assert.Equal(expected, DataverseRegistrationUpserter.GetMessagePropertyName("Send", entityName));
+    }
+
+    [Fact]
+    public void GetMessagePropertyName_ForMergeMessage_DefaultsToTarget()
+    {
+        Assert.Equal("Target", DataverseRegistrationUpserter.GetMessagePropertyName("Merge", "account"));
+    }
+
+    [Fact]
+    public void ResolveMessagePropertyName_WhenImageSetsItExplicitly_UsesTheImageValue()
+    {
+        var step = new PluginManifestStep { MessageName = "Merge", EntityName = "account" };
+        var image = new PluginManifestImage { MessagePropertyName = " SubordinateId " };
+
+        Assert.Equal("SubordinateId", DataverseRegistrationUpserter.ResolveMessagePropertyName(step, image));
+    }
+
+    [Fact]
+    public void ResolveMessagePropertyName_WhenImageLeavesItUnset_DerivesFromStep()
+    {
+        var step = new PluginManifestStep { MessageName = "Create", EntityName = "contact" };
+        var image = new PluginManifestImage();
+
+        Assert.Equal("Id", DataverseRegistrationUpserter.ResolveMessagePropertyName(step, image));
     }
 }
