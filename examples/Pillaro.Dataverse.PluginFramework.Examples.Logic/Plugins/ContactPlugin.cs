@@ -1,4 +1,4 @@
-using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
+﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
@@ -21,7 +21,8 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName("Pillaro Examples PreVal Create Contact")
                 .Rank(1)
-                .WithFilteringAttributes("firstname", "lastname")
+                // Typed attribute selection is available on Create steps too, not only on Update.
+                .WithFilteringAttributes(c => c.FirstName, c => c.LastName)
                 ;
 
             registration                

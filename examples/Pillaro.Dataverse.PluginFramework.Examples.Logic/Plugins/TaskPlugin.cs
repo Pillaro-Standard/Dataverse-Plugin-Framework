@@ -1,4 +1,4 @@
-using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
+﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
@@ -20,7 +20,8 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName("Pillaro Examples Pre Create Task")
                 .Rank(1)
-                .WithFilteringAttributes("subject");
+                // Typed attribute selection is available on Create steps too, not only on Update.
+                .WithFilteringAttributes(t => t.Subject);
 
             registration
                 .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
