@@ -194,7 +194,7 @@ To avoid that, a task queues its changes on the task context instead of writing 
 - attributes queued for the same record by several tasks are merged, so the record is written once
 - in **PreValidation** and **PreOperation**, values for the record the plugin is running on are merged
   into the message target, so they take part in the current operation without any write at all
-- everything else is written with a single `Update` per record, under the calling user
+- everything else is written with a single `Update` per record, as the user the step runs as
 - when a task fails, nothing is written — the queue is applied only after all tasks succeed
 
 `GetActualEntityToUpdate(entityName, id)` returns what has been queued for a record so far, so a later
@@ -205,6 +205,22 @@ task can build on the values an earlier one queued:
         ContextEntityReference.Id);
 
     var tax = queued.GetAttributeValue<Money>("pl_tax");
+
+### Writing as another user
+
+By default the queued values are written as the user the step runs as, so the audit shows who really
+changed the record. When a task computes a value the calling user is not allowed to write, it can ask
+for the system user instead:
+
+    TaskContext.AddEntityToUpdate(update, ServiceUser.Admin);
+
+`ServiceUser` mirrors `OrganizationServiceProvider`: `User` (default), `Admin` and `InitiatingUser`.
+
+A record queued for several service users is written once **per service user**, and each service user
+has its own queue — `GetActualEntityToUpdate(name, id, ServiceUser.Admin)` returns what was queued for
+the system user. Values queued for a user other than the calling one are never merged into the message
+target in a pre-stage; they always stay a write of their own, so the requested user is the one that
+performs it.
 
 > [!NOTE]
 > Queuing is for changes that belong to the current operation.

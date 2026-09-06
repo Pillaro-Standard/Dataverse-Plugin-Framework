@@ -10,18 +10,20 @@ internal class FakeServiceProvider : IServiceProvider
 {
     private readonly IPluginExecutionContext _pluginExecutionContext;
 
-    public FakeServiceProvider(IPluginExecutionContext pluginExecutionContext, RecordingOrganizationService? organizationService = null)
+    public FakeServiceProvider(IPluginExecutionContext pluginExecutionContext)
     {
         _pluginExecutionContext = pluginExecutionContext;
-        OrganizationService = organizationService ?? new RecordingOrganizationService();
-        OrganizationServiceFactory = new FakeOrganizationServiceFactory(OrganizationService);
+        OrganizationServiceFactory = new FakeOrganizationServiceFactory();
     }
-
-    public RecordingOrganizationService OrganizationService { get; }
 
     public FakeOrganizationServiceFactory OrganizationServiceFactory { get; }
 
     public ITracingService TracingService { get; } = new FakeTracingService();
+
+    /// <summary>Writes performed by the plugin, in order, with the user they were performed as.</summary>
+    public IReadOnlyList<RecordedUpdate> Updates => OrganizationServiceFactory.Updates;
+
+    public IReadOnlyList<Entity> UpdatedEntities => [.. OrganizationServiceFactory.Updates.Select(o => o.Entity)];
 
     public object? GetService(Type serviceType)
     {
@@ -40,21 +42,21 @@ internal class FakeServiceProvider : IServiceProvider
 
 internal class FakeOrganizationServiceFactory : IOrganizationServiceFactory
 {
-    private readonly RecordingOrganizationService _organizationService;
+    private readonly List<RecordedUpdate> _updates = [];
 
-    public FakeOrganizationServiceFactory(RecordingOrganizationService organizationService)
-    {
-        _organizationService = organizationService;
-    }
+    public IReadOnlyList<RecordedUpdate> Updates => _updates;
 
     public List<Guid?> RequestedUserIds { get; } = [];
 
     public IOrganizationService CreateOrganizationService(Guid? userId)
     {
         RequestedUserIds.Add(userId);
-        return _organizationService;
+        return new RecordingOrganizationService(_updates, userId);
     }
 }
+
+/// <summary>A write performed by the plugin. <c>UserId</c> is null for the system (admin) service.</summary>
+internal record RecordedUpdate(Entity Entity, Guid? UserId);
 
 internal class FakeTracingService : ITracingService
 {
@@ -72,11 +74,18 @@ internal class FakeTracingService : ITracingService
 /// </summary>
 internal class RecordingOrganizationService : IOrganizationService
 {
-    public List<Entity> UpdatedEntities { get; } = [];
+    private readonly List<RecordedUpdate> _updates;
+    private readonly Guid? _userId;
+
+    public RecordingOrganizationService(List<RecordedUpdate> updates, Guid? userId)
+    {
+        _updates = updates;
+        _userId = userId;
+    }
 
     public void Update(Entity entity)
     {
-        UpdatedEntities.Add(entity);
+        _updates.Add(new RecordedUpdate(entity, _userId));
     }
 
     public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)

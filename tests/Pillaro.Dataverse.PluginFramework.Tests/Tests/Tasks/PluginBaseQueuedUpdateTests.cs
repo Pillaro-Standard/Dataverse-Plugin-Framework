@@ -18,7 +18,7 @@ public class PluginBaseQueuedUpdateTests
 
         new QueueingPlugin(PluginStage.Postoperation).Execute(serviceProvider);
 
-        var update = Assert.Single(serviceProvider.OrganizationService.UpdatedEntities);
+        var update = Assert.Single(serviceProvider.UpdatedEntities);
         Assert.Equal(QuoteDetail, update.LogicalName);
         Assert.Equal(context.PrimaryEntityId, update.Id);
         Assert.Equal(new Money(210M), update["tax"]);
@@ -34,7 +34,7 @@ public class PluginBaseQueuedUpdateTests
         new QueueingPlugin(PluginStage.Postoperation).Execute(serviceProvider);
 
         // The second task reads what the first one queued and derives its own value from it.
-        var update = Assert.Single(serviceProvider.OrganizationService.UpdatedEntities);
+        var update = Assert.Single(serviceProvider.UpdatedEntities);
         Assert.Equal(new Money(220M), update["taxwithrounding"]);
     }
 
@@ -48,7 +48,7 @@ public class PluginBaseQueuedUpdateTests
 
         new QueueingPlugin(PluginStage.Preoperation).Execute(serviceProvider);
 
-        Assert.Empty(serviceProvider.OrganizationService.UpdatedEntities);
+        Assert.Empty(serviceProvider.UpdatedEntities);
         Assert.Equal(new Money(210M), target["tax"]);
         Assert.Equal("recalculated", target["note"]);
     }
@@ -63,7 +63,7 @@ public class PluginBaseQueuedUpdateTests
 
         new OtherRecordPlugin(otherRecord).Execute(serviceProvider);
 
-        var update = Assert.Single(serviceProvider.OrganizationService.UpdatedEntities);
+        var update = Assert.Single(serviceProvider.UpdatedEntities);
         Assert.Equal("quote", update.LogicalName);
         Assert.Equal(otherRecord, update.Id);
     }
@@ -76,7 +76,7 @@ public class PluginBaseQueuedUpdateTests
 
         Assert.Throws<InvalidPluginExecutionException>(() => new FailingPlugin().Execute(serviceProvider));
 
-        Assert.Empty(serviceProvider.OrganizationService.UpdatedEntities);
+        Assert.Empty(serviceProvider.UpdatedEntities);
     }
 
     [Fact]
@@ -87,7 +87,79 @@ public class PluginBaseQueuedUpdateTests
 
         new NoQueuePlugin().Execute(serviceProvider);
 
-        Assert.Empty(serviceProvider.OrganizationService.UpdatedEntities);
+        Assert.Empty(serviceProvider.UpdatedEntities);
+    }
+
+    [Fact]
+    public void QueuedUpdate_IsWrittenAsTheCallingUser()
+    {
+        var context = CreateContext(PluginStage.Postoperation);
+        var serviceProvider = new FakeServiceProvider(context);
+
+        new QueueingPlugin(PluginStage.Postoperation).Execute(serviceProvider);
+
+        var update = Assert.Single(serviceProvider.Updates);
+        Assert.Equal(context.UserId, update.UserId);
+    }
+
+    [Fact]
+    public void QueuedUpdateForAdmin_IsWrittenAsTheSystemUser()
+    {
+        var context = CreateContext(PluginStage.Postoperation);
+        var serviceProvider = new FakeServiceProvider(context);
+
+        new AdminQueueingPlugin().Execute(serviceProvider);
+
+        var update = Assert.Single(serviceProvider.Updates);
+        Assert.Null(update.UserId);
+        Assert.Equal(new Money(210M), update.Entity["tax"]);
+    }
+
+    [Fact]
+    public void QueuedUpdateForInitiatingUser_IsWrittenAsTheInitiatingUser()
+    {
+        var context = CreateContext(PluginStage.Postoperation);
+        var serviceProvider = new FakeServiceProvider(context);
+
+        new InitiatingUserQueueingPlugin().Execute(serviceProvider);
+
+        var update = Assert.Single(serviceProvider.Updates);
+        Assert.Equal(context.InitiatingUserId, update.UserId);
+    }
+
+    [Fact]
+    public void PreOperation_DoesNotMergeAdminQueuedValuesIntoTarget()
+    {
+        var context = CreateContext(PluginStage.Preoperation);
+        var target = GetTarget(context);
+        var serviceProvider = new FakeServiceProvider(context);
+
+        new AdminQueueingPlugin().Execute(serviceProvider);
+
+        // The task asked for a write the calling user may not be allowed to make,
+        // so it stays a write of its own instead of joining the current operation.
+        var update = Assert.Single(serviceProvider.Updates);
+        Assert.Null(update.UserId);
+        Assert.False(target.Contains("tax"));
+    }
+
+    [Fact]
+    public void SameRecordQueuedForUserAndAdmin_IsWrittenOncePerServiceUser()
+    {
+        var context = CreateContext(PluginStage.Postoperation);
+        var serviceProvider = new FakeServiceProvider(context);
+
+        new MixedQueueingPlugin().Execute(serviceProvider);
+
+        Assert.Equal(2, serviceProvider.Updates.Count);
+
+        var userUpdate = Assert.Single(serviceProvider.Updates, o => o.UserId == context.UserId);
+        Assert.Equal("recalculated", userUpdate.Entity["note"]);
+        Assert.False(userUpdate.Entity.Contains("tax"));
+
+        var adminUpdate = Assert.Single(serviceProvider.Updates, o => o.UserId == null);
+        Assert.Equal(new Money(210M), adminUpdate.Entity["tax"]);
+        Assert.False(adminUpdate.Entity.Contains("note"));
     }
 
     private static FakePluginExecutionContext CreateContext(PluginStage stage)
@@ -130,6 +202,32 @@ public class PluginBaseQueuedUpdateTests
         {
             RecordId = recordId;
             RegisterTask<QueueParentTask>(PluginStage.Preoperation, DataverseMessages.Update, QuoteDetail, PluginMode.Synchronous);
+        }
+    }
+
+    private class AdminQueueingPlugin : PluginBase
+    {
+        public AdminQueueingPlugin() : base(null, null)
+        {
+            RegisterTask<QueueTaxAsAdminTask>(PluginStage.Preoperation, DataverseMessages.Update, QuoteDetail, PluginMode.Synchronous);
+            RegisterTask<QueueTaxAsAdminTask>(PluginStage.Postoperation, DataverseMessages.Update, QuoteDetail, PluginMode.Synchronous);
+        }
+    }
+
+    private class InitiatingUserQueueingPlugin : PluginBase
+    {
+        public InitiatingUserQueueingPlugin() : base(null, null)
+        {
+            RegisterTask<QueueTaxAsInitiatingUserTask>(PluginStage.Postoperation, DataverseMessages.Update, QuoteDetail, PluginMode.Synchronous);
+        }
+    }
+
+    private class MixedQueueingPlugin : PluginBase
+    {
+        public MixedQueueingPlugin() : base(null, null)
+        {
+            RegisterTask<QueueTaxAsAdminTask>(PluginStage.Postoperation, DataverseMessages.Update, QuoteDetail, PluginMode.Synchronous);
+            RegisterTask<QueueNoteTask>(PluginStage.Postoperation, DataverseMessages.Update, QuoteDetail, PluginMode.Synchronous);
         }
     }
 
@@ -200,9 +298,44 @@ public class PluginBaseQueuedUpdateTests
 
             var update = new Entity(ContextEntityReference.LogicalName) { Id = ContextEntityReference.Id };
             update["note"] = "recalculated";
-            update["taxwithrounding"] = new Money(tax.Value + 10M);
+
+            // Nothing is queued for this service user when the value was queued for another one.
+            if (tax != null)
+                update["taxwithrounding"] = new Money(tax.Value + 10M);
 
             TaskContext.AddEntityToUpdate(update);
+        }
+    }
+
+    private class QueueTaxAsAdminTask : QueueTaskBase
+    {
+        public QueueTaxAsAdminTask(IServiceProvider serviceProvider, TaskContext taskContext)
+            : base(serviceProvider, taskContext)
+        {
+        }
+
+        protected override void DoExecute()
+        {
+            var update = new Entity(ContextEntityReference.LogicalName) { Id = ContextEntityReference.Id };
+            update["tax"] = new Money(210M);
+
+            TaskContext.AddEntityToUpdate(update, ServiceUser.Admin);
+        }
+    }
+
+    private class QueueTaxAsInitiatingUserTask : QueueTaskBase
+    {
+        public QueueTaxAsInitiatingUserTask(IServiceProvider serviceProvider, TaskContext taskContext)
+            : base(serviceProvider, taskContext)
+        {
+        }
+
+        protected override void DoExecute()
+        {
+            var update = new Entity(ContextEntityReference.LogicalName) { Id = ContextEntityReference.Id };
+            update["tax"] = new Money(210M);
+
+            TaskContext.AddEntityToUpdate(update, ServiceUser.InitiatingUser);
         }
     }
 

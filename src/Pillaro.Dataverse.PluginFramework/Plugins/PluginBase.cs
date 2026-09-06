@@ -95,7 +95,7 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
                         task.Execute();
                     });
 
-                    queuedUpdatesMessage = ApplyEntitiesToUpdate(taskContext, userOrgSvc);
+                    queuedUpdatesMessage = ApplyEntitiesToUpdate(taskContext, orgServiceFactory, userOrgSvc, adminOrgSvc);
                 }
                 catch
                 {
@@ -153,26 +153,37 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
 
     /// <summary>
     /// Writes the entities queued by the tasks through <see cref="TaskContext.AddEntityToUpdate"/>.
-    /// Each record is written once, no matter how many tasks contributed attributes to it, so the
-    /// registered steps are not triggered repeatedly. In a pre-stage, values for the record the plugin
-    /// is running on are merged into the message target instead of being written separately.
+    /// Each record is written once per service user, no matter how many tasks contributed attributes to
+    /// it, so the registered steps are not triggered repeatedly. Writes go through the service of the
+    /// requested <see cref="ServiceUser"/>, which is the calling user unless a task asked for another one.
+    /// In a pre-stage, values written as the calling user for the record the plugin is running on are
+    /// merged into the message target instead of being written separately.
     /// </summary>
-    private static string ApplyEntitiesToUpdate(TaskContext taskContext, IOrganizationService organizationService)
+    private static string ApplyEntitiesToUpdate(
+        TaskContext taskContext,
+        IOrganizationServiceFactory organizationServiceFactory,
+        IOrganizationService userOrganizationService,
+        IOrganizationService adminOrganizationService)
     {
-        var entitiesToUpdate = taskContext.EntitiesToUpdate;
+        var queuedUpdates = taskContext.QueuedEntityUpdates;
 
-        if (entitiesToUpdate == null || entitiesToUpdate.Count == 0)
+        if (queuedUpdates == null || queuedUpdates.Count == 0)
             return "Queued updates: none";
 
         var mergeTarget = GetTargetForQueuedUpdates(taskContext);
+        IOrganizationService initiatingUserOrganizationService = null;
         var mergedCount = 0;
         var updatedCount = 0;
 
-        foreach (var entityToUpdate in entitiesToUpdate)
+        foreach (var queuedUpdate in queuedUpdates)
         {
-            if (mergeTarget != null && IsSameRecord(mergeTarget, entityToUpdate))
+            // Only values written as the calling user can take part in the current operation.
+            // A write requested for another service user has to stay a write of its own.
+            if (queuedUpdate.ServiceUser == ServiceUser.User
+                && mergeTarget != null
+                && IsSameRecord(mergeTarget, queuedUpdate.Entity))
             {
-                foreach (var attribute in entityToUpdate.Attributes)
+                foreach (var attribute in queuedUpdate.Entity.Attributes)
                 {
                     mergeTarget[attribute.Key] = attribute.Value;
                 }
@@ -181,7 +192,23 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
                 continue;
             }
 
-            organizationService.Update(entityToUpdate);
+            switch (queuedUpdate.ServiceUser)
+            {
+                case ServiceUser.Admin:
+                    adminOrganizationService.Update(queuedUpdate.Entity);
+                    break;
+
+                case ServiceUser.InitiatingUser:
+                    initiatingUserOrganizationService ??= organizationServiceFactory
+                        .CreateOrganizationService(taskContext.InitiatingUserId);
+                    initiatingUserOrganizationService.Update(queuedUpdate.Entity);
+                    break;
+
+                default:
+                    userOrganizationService.Update(queuedUpdate.Entity);
+                    break;
+            }
+
             updatedCount++;
         }
 

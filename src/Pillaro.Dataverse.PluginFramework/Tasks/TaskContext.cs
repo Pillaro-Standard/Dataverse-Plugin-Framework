@@ -32,7 +32,7 @@ public class TaskContext
     public int CountOfTasks { get; set; }
     public int TaskOrder { get; set; }
 
-    private readonly Dictionary<string, Entity> _entitiesToUpdate = [];
+    private readonly Dictionary<string, QueuedEntityUpdate> _entitiesToUpdate = [];
     private readonly IList<Log> _logs = [];
     private readonly Dictionary<string, object> _items = [];
 
@@ -75,10 +75,13 @@ public class TaskContext
 
     /// <summary>
     /// Entities queued by the tasks of the current plugin execution.
-    /// They are written by <c>PluginBase</c> after all tasks have run, once per record.
+    /// They are written by <c>PluginBase</c> after all tasks have run, once per record and service user.
     /// </summary>
     public IReadOnlyList<Entity> EntitiesToUpdate =>
-        new ReadOnlyCollection<Entity>([.. _entitiesToUpdate.Values]);
+        new ReadOnlyCollection<Entity>([.. _entitiesToUpdate.Values.Select(o => o.Entity)]);
+
+    internal IReadOnlyList<QueuedEntityUpdate> QueuedEntityUpdates =>
+        new ReadOnlyCollection<QueuedEntityUpdate>([.. _entitiesToUpdate.Values]);
 
     /// <summary>
     /// Queues an entity to be written at the end of the plugin execution.
@@ -87,7 +90,15 @@ public class TaskContext
     /// In a pre-stage, values for the record the plugin is running on are merged into the message
     /// target instead, so they take part in the current operation without any additional write.
     /// </summary>
-    public void AddEntityToUpdate(Entity entity)
+    /// <param name="entity">Record and attributes to write. Logical name and id are required.</param>
+    /// <param name="serviceUser">
+    /// The user the write is performed as. The default <see cref="ServiceUser.User"/> keeps the audit
+    /// on the user who triggered the operation; use <see cref="ServiceUser.Admin"/> for values the
+    /// calling user is not allowed to write. A record queued for several service users is written once
+    /// per service user, and only the <see cref="ServiceUser.User"/> part can be merged into the
+    /// message target in a pre-stage.
+    /// </param>
+    public void AddEntityToUpdate(Entity entity, ServiceUser serviceUser = ServiceUser.User)
     {
         if (entity == null)
             throw new ArgumentNullException(nameof(entity));
@@ -101,22 +112,25 @@ public class TaskContext
         if (!entity.Attributes.Any())
             return;
 
-        var key = GetEntityUpdateKey(entity.LogicalName, entity.Id);
+        var key = GetEntityUpdateKey(entity.LogicalName, entity.Id, serviceUser);
 
-        if (_entitiesToUpdate.TryGetValue(key, out var existingEntity))
+        if (_entitiesToUpdate.TryGetValue(key, out var existingUpdate))
         {
-            _entitiesToUpdate[key] = MergeEntities(existingEntity, entity);
+            _entitiesToUpdate[key] = new QueuedEntityUpdate(
+                MergeEntities(existingUpdate.Entity, entity),
+                serviceUser);
             return;
         }
 
-        _entitiesToUpdate[key] = CloneEntity(entity);
+        _entitiesToUpdate[key] = new QueuedEntityUpdate(CloneEntity(entity), serviceUser);
     }
 
     /// <summary>
-    /// Returns the attributes queued for the given record so far, so a later task can see what an
-    /// earlier one queued. When nothing is queued yet, an empty entity with the given identity is returned.
+    /// Returns the attributes queued for the given record and service user so far, so a later task can
+    /// see what an earlier one queued. When nothing is queued yet, an empty entity with the given
+    /// identity is returned.
     /// </summary>
-    public Entity GetActualEntityToUpdate(string entityName, Guid id)
+    public Entity GetActualEntityToUpdate(string entityName, Guid id, ServiceUser serviceUser = ServiceUser.User)
     {
         if (string.IsNullOrWhiteSpace(entityName))
             throw new ArgumentException("Entity name is required.", nameof(entityName));
@@ -124,10 +138,10 @@ public class TaskContext
         if (id == Guid.Empty)
             throw new ArgumentException("Entity Id is required.", nameof(id));
 
-        var key = GetEntityUpdateKey(entityName, id);
+        var key = GetEntityUpdateKey(entityName, id, serviceUser);
 
-        if (_entitiesToUpdate.TryGetValue(key, out var entity))
-            return CloneEntity(entity);
+        if (_entitiesToUpdate.TryGetValue(key, out var queuedUpdate))
+            return CloneEntity(queuedUpdate.Entity);
 
         return new Entity(entityName) { Id = id };
     }
@@ -151,9 +165,9 @@ public class TaskContext
         return _logs.Select(item => (Log)item.Clone()).ToList();
     }
 
-    private static string GetEntityUpdateKey(string logicalName, Guid id)
+    private static string GetEntityUpdateKey(string logicalName, Guid id, ServiceUser serviceUser)
     {
-        return $"{logicalName}:{id:D}";
+        return $"{serviceUser}:{logicalName}:{id:D}";
     }
 
     private static Entity MergeEntities(Entity targetEntity, Entity entityToMerge)
@@ -217,4 +231,17 @@ public class TaskContext
 
         return clone;
     }
+}
+
+internal class QueuedEntityUpdate
+{
+    public QueuedEntityUpdate(Entity entity, ServiceUser serviceUser)
+    {
+        Entity = entity;
+        ServiceUser = serviceUser;
+    }
+
+    public Entity Entity { get; }
+
+    public ServiceUser ServiceUser { get; }
 }
