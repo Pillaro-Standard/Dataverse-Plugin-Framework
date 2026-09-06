@@ -17,6 +17,10 @@
 - Image uniqueness within a step is now checked per image collection using the entity alias, so a pre-image and a post-image may share a key while duplicates within one collection are rejected.
 - The deployment diff now compares image `EntityAlias` and `MessagePropertyName`, so drift in either is detected.
 
+### Examples
+
+- Added two example tasks that cover the runtime behavior fixed in this release, with functional tests against a Dataverse environment: `ArchiveDeletedContact` records a deleted contact on its parent account (pre-image on a `Delete` step, written through the update queue) and `RecordJobTitleChange` queues a value in a pre-stage, where it is merged into the message target. Both need the examples solution to be deployed before the tests can pass.
+
 ## 1.1.3-rc
 
 ### Pillaro.Dataverse.PluginFramework
