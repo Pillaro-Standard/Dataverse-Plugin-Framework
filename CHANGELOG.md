@@ -4,6 +4,7 @@
 
 ### Pillaro.Dataverse.PluginFramework
 
+- `TaskContext.AddEntityToUpdate(...)` is now actually written (#63). `PluginBase` applies the queued entities once all tasks of the execution have run: attributes queued for the same record by several tasks are merged and written with a single `Update`, so the registered steps are not triggered repeatedly, and in a pre-stage values for the record the plugin is running on are merged into the message target instead of being written separately. Nothing is written when a task fails. Writes are performed as the user the step runs as, so the audit keeps showing who changed the record; a task can ask for another one with `AddEntityToUpdate(entity, ServiceUser.Admin)` (`ServiceUser` mirrors `OrganizationServiceProvider`: `User`, `Admin`, `InitiatingUser`), in which case the record is written once per service user and never merged into the message target. The queue members are now documented, in the API and in `docs/plugins/task-model.md`.
 - Fixed `TaskBase<TEntity>` so pre-images and post-images are initialized for every message (#61). They used to be loaded only for messages that also carry an `Entity` target (`Create`, `Update`), so a task registered on `Delete` got `null` in `PreImage` even though the image was registered on the step. `ContextEntity` initialization is unchanged.
 - Added `GetPreImageName()` and `GetPostImageName()` to `TaskBase<TEntity>`, so a task whose step registers images under a name other than `image` can have them loaded into `PreImage` and `PostImage`.
 - `HasPreImage(...)` and `HasPostImage(...)` validation now also fails when the image is registered on the step but carries no data, instead of reporting a valid step for an image the task would read as `null`.
@@ -15,6 +16,10 @@
 - Fixed manifest validation, which rejected every image on a PreValidation step. Pre-images are valid in PreValidation, PreOperation and PostOperation; the rule that was missing is that post-images (and `Both`) are available only in PostOperation, and that is now enforced instead.
 - Image uniqueness within a step is now checked per image collection using the entity alias, so a pre-image and a post-image may share a key while duplicates within one collection are rejected.
 - The deployment diff now compares image `EntityAlias` and `MessagePropertyName`, so drift in either is detected.
+
+### Examples
+
+- Added two example tasks that cover the runtime behavior fixed in this release, with functional tests against a Dataverse environment: `ArchiveDeletedContact` records a deleted contact on its parent account (pre-image on a `Delete` step, written through the update queue) and `RecordJobTitleChange` queues a value in a pre-stage, where it is merged into the message target. Both need the examples solution to be deployed before the tests can pass.
 
 ## 1.1.3-rc
 

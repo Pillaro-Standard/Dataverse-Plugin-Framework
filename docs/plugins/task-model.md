@@ -13,6 +13,7 @@
 - [🎯 Responsibilities of a task](#-responsibilities-of-a-task)
 - [📦 What belongs in a task](#-what-belongs-in-a-task)
 - [🧰 Prepared services and runtime context](#-prepared-services-and-runtime-context)
+- [📝 Writing changes once per record](#-writing-changes-once-per-record)
 - [🧭 Task scope patterns](#-task-scope-patterns)
 - [🔗 Relationship between task, validation, and plugin](#-relationship-between-task-validation-and-plugin)
 - [💻 Example](#-example)
@@ -170,6 +171,69 @@ Use it for:
 > [!NOTE]
 > Data access, settings, service contexts, and task logging helpers are documented separately in dedicated documents.
 > This section only explains that these services and helpers are already available in the task runtime model.
+
+---
+
+## 📝 Writing changes once per record
+
+Several tasks of the same plugin often touch the same record. If each of them calls `Update` on its
+own, the record is written several times and every write triggers the registered steps again.
+
+To avoid that, a task queues its changes on the task context instead of writing them itself:
+
+    protected override void DoExecute()
+    {
+        var update = new Entity(ContextEntityReference.LogicalName) { Id = ContextEntityReference.Id };
+        update["pl_tax"] = new Money(210M);
+
+        TaskContext.AddEntityToUpdate(update);
+    }
+
+`PluginBase` writes the queue once, after all tasks of the execution have run:
+
+- attributes queued for the same record by several tasks are merged, so the record is written once
+- in **PreValidation** and **PreOperation**, values for the record the plugin is running on are merged
+  into the message target, so they take part in the current operation without any write at all
+- everything else is written with a single `Update` per record, as the user the step runs as
+- when a task fails, nothing is written — the queue is applied only after all tasks succeed
+
+`GetActualEntityToUpdate(entityName, id)` returns what has been queued for a record so far, so a later
+task can build on the values an earlier one queued:
+
+    var queued = TaskContext.GetActualEntityToUpdate(
+        ContextEntityReference.LogicalName,
+        ContextEntityReference.Id);
+
+    var tax = queued.GetAttributeValue<Money>("pl_tax");
+
+### Writing as another user
+
+By default the queued values are written as the user the step runs as, so the audit shows who really
+changed the record. When a task computes a value the calling user is not allowed to write, it can ask
+for the system user instead:
+
+    TaskContext.AddEntityToUpdate(update, ServiceUser.Admin);
+
+`ServiceUser` mirrors `OrganizationServiceProvider`: `User` (default), `Admin` and `InitiatingUser`.
+
+> [!IMPORTANT]
+> `User` is the user the **pipeline** runs as, which is not always the person who triggered the
+> operation. On a post-operation `Delete`, for example, the pipeline can run as `SYSTEM` while the
+> person who deleted the record is the initiating user. When the audit has to show that person, queue
+> the write with `ServiceUser.InitiatingUser`.
+>
+>     TaskContext.AddEntityToUpdate(update, ServiceUser.InitiatingUser);
+
+A record queued for several service users is written once **per service user**, and each service user
+has its own queue — `GetActualEntityToUpdate(name, id, ServiceUser.Admin)` returns what was queued for
+the system user. Values queued for a user other than the calling one are never merged into the message
+target in a pre-stage; they always stay a write of their own, so the requested user is the one that
+performs it.
+
+> [!NOTE]
+> Queuing is for changes that belong to the current operation.
+> For everything else — reads, creates, deletes, records written outside the plugin transaction —
+> use `OrganizationServiceProvider` or `DataServiceProvider` directly.
 
 ---
 
