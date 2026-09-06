@@ -216,6 +216,14 @@ for the system user instead:
 
 `ServiceUser` mirrors `OrganizationServiceProvider`: `User` (default), `Admin` and `InitiatingUser`.
 
+> [!IMPORTANT]
+> `User` is the user the **pipeline** runs as, which is not always the person who triggered the
+> operation. On a post-operation `Delete`, for example, the pipeline can run as `SYSTEM` while the
+> person who deleted the record is the initiating user. When the audit has to show that person, queue
+> the write with `ServiceUser.InitiatingUser`.
+>
+>     TaskContext.AddEntityToUpdate(update, ServiceUser.InitiatingUser);
+
 A record queued for several service users is written once **per service user**, and each service user
 has its own queue — `GetActualEntityToUpdate(name, id, ServiceUser.Admin)` returns what was queued for
 the system user. Values queued for a user other than the calling one are never merged into the message

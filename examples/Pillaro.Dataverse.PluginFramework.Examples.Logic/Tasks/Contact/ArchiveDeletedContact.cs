@@ -46,11 +46,16 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 
             // Queued instead of written directly, so the account is written once even when
             // several tasks of this execution contribute to it.
-            TaskContext.AddEntityToUpdate(new Logic.Account
-            {
-                Id = parentCustomer.Id,
-                Description = $"Deleted contact: {deletedContact}"
-            });
+            // Written as the initiating user on purpose: on a post-operation Delete the pipeline
+            // runs as SYSTEM, so the default ServiceUser.User would put SYSTEM in the audit
+            // instead of the person who deleted the contact.
+            TaskContext.AddEntityToUpdate(
+                new Logic.Account
+                {
+                    Id = parentCustomer.Id,
+                    Description = $"Deleted contact: {deletedContact}"
+                },
+                ServiceUser.InitiatingUser);
         }
 
         private static string BuildContactName(Logic.Contact contact)

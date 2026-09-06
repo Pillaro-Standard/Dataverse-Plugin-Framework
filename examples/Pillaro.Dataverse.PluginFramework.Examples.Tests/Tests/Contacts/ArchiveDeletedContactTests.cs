@@ -35,7 +35,8 @@ public class ArchiveDeletedContactTests(TestFixture<TestAutofacModule> testFixtu
         // and writes the account through the update queue.
         Assert.Equal("Deleted contact: Deleted Contact", loaded.GetAttributeValue<string>(Account.Fields.Description));
 
-        // The queued update is written as the user who triggered the operation, so the audit stays honest.
+        // The task queues the write for the initiating user, because a post-operation Delete runs
+        // as SYSTEM. The audit therefore shows the person who deleted the contact.
         var currentUserId = ((WhoAmIResponse)OrganizationService.Execute(new WhoAmIRequest())).UserId;
         Assert.Equal(currentUserId, loaded.GetAttributeValue<EntityReference>(Account.Fields.ModifiedBy)?.Id);
     }
