@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 ## 1.2.0-rc
 
@@ -8,10 +8,16 @@
 - Added `WithBothImage(...)` and `PluginImageType.Both`, exposing the Dataverse `Both` image type (value 2) that the deployer could already write but no registration could produce.
 - Added `WithImage(PluginImageOptions)` for the image combinations the shorthands cannot express: a distinct `EntityAlias` and an explicit `MessagePropertyName` (for example `Merge` with `SubordinateId`).
 - Image `EntityAlias` is now registered from the registration instead of always being forced to the image name.
+- Image `MessagePropertyName` derivation now handles `Send` per entity (`FaxId` for `fax`, `TemplateId` for `template`, otherwise `EmailId`), refining the derivation added in 1.1.3-rc. The derived value can also be overridden per image with `WithImage(PluginImageOptions)`.
 - Fixed manifest validation, which rejected every image on a PreValidation step. Pre-images are valid in PreValidation, PreOperation and PostOperation; the rule that was missing is that post-images (and `Both`) are available only in PostOperation, and that is now enforced instead.
 - Image uniqueness within a step is now checked per image collection using the entity alias, so a pre-image and a post-image may share a key while duplicates within one collection are rejected.
 - The deployment diff now compares image `EntityAlias` and `MessagePropertyName`, so drift in either is detected.
-- Fixed step image registration so `MessagePropertyName` is derived from the step message instead of always sending `Target` (#57). Post-images on `Create` steps now register with `Id`; `SetState`/`SetStateDynamicEntity` use `EntityMoniker`; `DeliverIncoming`/`DeliverPromote` use `EmailId`; `Send` uses `FaxId`, `TemplateId` or `EmailId` depending on the entity; `Assign`, `Delete`, `Merge`, `Route` and `Update` use `Target`. The derived value can be overridden per image with `WithImage(PluginImageOptions)`.
+
+## 1.1.3-rc
+
+### Pillaro.Dataverse.PluginFramework
+
+- Fixed step image registration so `MessagePropertyName` is derived from the step message instead of always sending `Target` (#57). Post-images on `Create` steps now register with `Id`; `SetState`/`SetStateDynamicEntity` use `EntityMoniker` and `Send`/`DeliverIncoming`/`DeliverPromote` use `EmailId`.
 - Added support for Custom API MainOperation handlers in the deployment manifest (#56). A step registered with `OnMessage(...).MainOperation()` keeps the plugin type in the manifest so the assembly and plugin type are deployed, but no `SdkMessageProcessingStep` is created, updated, or deleted for it; the diff output marks it as `[TYPE-ONLY]`. Stage-30 steps auto-created by Dataverse for Custom APIs are never touched by step synchronization.
 - Manifest validation now rejects MainOperation registrations that define images or target the platform messages `Create`, `Update`, or `Delete`.
 - Deployment now re-enables steps that were manually disabled in Dataverse. A disabled step in the manifest is reported in the diff output (`State: step was disabled in Dataverse and will be re-enabled by deployment.`) and updated back to enabled, so deployed registrations always end up active.
