@@ -4,6 +4,9 @@
 
 ### Pillaro.Dataverse.PluginFramework
 
+- Fixed `TaskBase<TEntity>` so pre-images and post-images are initialized for every message (#61). They used to be loaded only for messages that also carry an `Entity` target (`Create`, `Update`), so a task registered on `Delete` got `null` in `PreImage` even though the image was registered on the step. `ContextEntity` initialization is unchanged.
+- Added `GetPreImageName()` and `GetPostImageName()` to `TaskBase<TEntity>`, so a task whose step registers images under a name other than `image` can have them loaded into `PreImage` and `PostImage`.
+- `HasPreImage(...)` and `HasPostImage(...)` validation now also fails when the image is registered on the step but carries no data, instead of reporting a valid step for an image the task would read as `null`.
 - Entity-typed registration is now available for every message, not only `Update`. `OnCreate<TEntity>(...)`, `OnDelete<TEntity>(...)` and `OnMessage<TEntity>(...)` return an entity-typed builder, so typed filtering attributes (`WhenChanged(c => c.FirstName)`, `WithFilteringAttributes(c => c.FirstName)`) and typed images (`WithPreImage(..., c => c.FirstName)`) work for all of them. `WhenChanged(...)` is also available on the string-based builders.
 - Added `WithBothImage(...)` and `PluginImageType.Both`, exposing the Dataverse `Both` image type (value 2) that the deployer could already write but no registration could produce.
 - Added `WithImage(PluginImageOptions)` for the image combinations the shorthands cannot express: a distinct `EntityAlias` and an explicit `MessagePropertyName` (for example `Merge` with `SubordinateId`).
