@@ -57,25 +57,26 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .WithName("Pillaro Examples Pre Update Contact")
                 .Rank(1)
                 .WhenChanged(
-                    "firstname",
-                    "lastname",
-                    "address1_line1",
-                    "address1_line2",
-                    "address1_line3",
-                    "address1_city",
-                    "address1_postalcode",
-                    "address1_stateorprovince",
-                    "address1_country")
+                    c => c.FirstName,
+                    c => c.LastName,
+                    c => c.Address1_Line1,
+                    c => c.Address1_Line2,
+                    c => c.Address1_Line3,
+                    c => c.Address1_City,
+                    c => c.Address1_PostalCode,
+                    c => c.Address1_StateOrProvince,
+                    c => c.Address1_Country)
+                // Image attributes can be selected the typed way as well.
                 .WithPreImage(
                     "d79f2630-9be7-4b0c-9fe3-bf5fc4d7d4f1",
                     "image",
-                    "address1_line1",
-                    "address1_line2",
-                    "address1_line3",
-                    "address1_city",
-                    "address1_postalcode",
-                    "address1_stateorprovince",
-                    "address1_country");
+                    c => c.Address1_Line1,
+                    c => c.Address1_Line2,
+                    c => c.Address1_Line3,
+                    c => c.Address1_City,
+                    c => c.Address1_PostalCode,
+                    c => c.Address1_StateOrProvince,
+                    c => c.Address1_Country);
         }
     }
 }
