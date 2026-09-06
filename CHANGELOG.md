@@ -4,6 +4,7 @@
 
 ### Pillaro.Dataverse.PluginFramework
 
+- `TaskContext.AddEntityToUpdate(...)` is now actually written (#63). `PluginBase` applies the queued entities once all tasks of the execution have run: attributes queued for the same record by several tasks are merged and written with a single `Update`, so the registered steps are not triggered repeatedly, and in a pre-stage values for the record the plugin is running on are merged into the message target instead of being written separately. Nothing is written when a task fails. The three queue members are now documented, in the API and in `docs/plugins/task-model.md`.
 - Fixed `TaskBase<TEntity>` so pre-images and post-images are initialized for every message (#61). They used to be loaded only for messages that also carry an `Entity` target (`Create`, `Update`), so a task registered on `Delete` got `null` in `PreImage` even though the image was registered on the step. `ContextEntity` initialization is unchanged.
 - Added `GetPreImageName()` and `GetPostImageName()` to `TaskBase<TEntity>`, so a task whose step registers images under a name other than `image` can have them loaded into `PreImage` and `PostImage`.
 - `HasPreImage(...)` and `HasPostImage(...)` validation now also fails when the image is registered on the step but carries no data, instead of reporting a valid step for an image the task would read as `null`.

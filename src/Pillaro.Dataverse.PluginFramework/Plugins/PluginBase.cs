@@ -46,6 +46,7 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
             var logService = new LogService(execContext, adminOrgSvc, tracingService);
 
             var logData = true;
+            var queuedUpdatesMessage = "Queued updates: none";
 
             try
             {
@@ -93,6 +94,8 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
 
                         task.Execute();
                     });
+
+                    queuedUpdatesMessage = ApplyEntitiesToUpdate(taskContext, userOrgSvc);
                 }
                 catch
                 {
@@ -102,6 +105,7 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
                 }
 
                 var checkSumMessage = $"Execution: {stop.ElapsedMilliseconds} ms{Environment.NewLine}";
+                checkSumMessage += queuedUpdatesMessage + Environment.NewLine;
                 stop.Restart();
 
                 if (entityAction.Count == 0)
@@ -145,6 +149,68 @@ public abstract class PluginBase(string unsecureConfig, string secureConfig) : I
             tracingService?.Trace($"Plugin: {GetVersion()} | Critical error: {ex}");
             throw new InvalidPluginExecutionException(ex.Message, ex);
         }
+    }
+
+    /// <summary>
+    /// Writes the entities queued by the tasks through <see cref="TaskContext.AddEntityToUpdate"/>.
+    /// Each record is written once, no matter how many tasks contributed attributes to it, so the
+    /// registered steps are not triggered repeatedly. In a pre-stage, values for the record the plugin
+    /// is running on are merged into the message target instead of being written separately.
+    /// </summary>
+    private static string ApplyEntitiesToUpdate(TaskContext taskContext, IOrganizationService organizationService)
+    {
+        var entitiesToUpdate = taskContext.EntitiesToUpdate;
+
+        if (entitiesToUpdate == null || entitiesToUpdate.Count == 0)
+            return "Queued updates: none";
+
+        var mergeTarget = GetTargetForQueuedUpdates(taskContext);
+        var mergedCount = 0;
+        var updatedCount = 0;
+
+        foreach (var entityToUpdate in entitiesToUpdate)
+        {
+            if (mergeTarget != null && IsSameRecord(mergeTarget, entityToUpdate))
+            {
+                foreach (var attribute in entityToUpdate.Attributes)
+                {
+                    mergeTarget[attribute.Key] = attribute.Value;
+                }
+
+                mergedCount++;
+                continue;
+            }
+
+            organizationService.Update(entityToUpdate);
+            updatedCount++;
+        }
+
+        taskContext.ClearEntitiesToUpdate();
+
+        return $"Queued updates: {mergedCount} merged into target, {updatedCount} updated";
+    }
+
+    /// <summary>
+    /// Returns the message target the queued values can be merged into, or null when the queued
+    /// entities have to be written separately.
+    /// </summary>
+    private static Entity GetTargetForQueuedUpdates(TaskContext taskContext)
+    {
+        if (taskContext.Stage != PluginStage.Prevalidation && taskContext.Stage != PluginStage.Preoperation)
+            return null;
+
+        var inputParameters = taskContext.PluginExecutionContext?.InputParameters;
+
+        if (inputParameters == null || !inputParameters.ContainsKey(ExecutionContextParameters.TargetParam))
+            return null;
+
+        return inputParameters[ExecutionContextParameters.TargetParam] as Entity;
+    }
+
+    private static bool IsSameRecord(Entity target, Entity entity)
+    {
+        return string.Equals(target.LogicalName, entity.LogicalName, StringComparison.OrdinalIgnoreCase)
+               && target.Id == entity.Id;
     }
 
     private static void EnrichLogWithParametersAndImages(Log log, IPluginExecutionContext ctx)

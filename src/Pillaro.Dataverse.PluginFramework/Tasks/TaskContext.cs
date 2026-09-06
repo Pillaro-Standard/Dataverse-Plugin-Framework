@@ -73,9 +73,20 @@ public class TaskContext
         return _items.ContainsKey(key);
     }
 
+    /// <summary>
+    /// Entities queued by the tasks of the current plugin execution.
+    /// They are written by <c>PluginBase</c> after all tasks have run, once per record.
+    /// </summary>
     public IReadOnlyList<Entity> EntitiesToUpdate =>
         new ReadOnlyCollection<Entity>([.. _entitiesToUpdate.Values]);
 
+    /// <summary>
+    /// Queues an entity to be written at the end of the plugin execution.
+    /// Attributes queued for the same record by several tasks are merged, so the record is written
+    /// only once and does not trigger the registered steps repeatedly.
+    /// In a pre-stage, values for the record the plugin is running on are merged into the message
+    /// target instead, so they take part in the current operation without any additional write.
+    /// </summary>
     public void AddEntityToUpdate(Entity entity)
     {
         if (entity == null)
@@ -101,6 +112,10 @@ public class TaskContext
         _entitiesToUpdate[key] = CloneEntity(entity);
     }
 
+    /// <summary>
+    /// Returns the attributes queued for the given record so far, so a later task can see what an
+    /// earlier one queued. When nothing is queued yet, an empty entity with the given identity is returned.
+    /// </summary>
     public Entity GetActualEntityToUpdate(string entityName, Guid id)
     {
         if (string.IsNullOrWhiteSpace(entityName))
@@ -117,6 +132,11 @@ public class TaskContext
         return new Entity(entityName) { Id = id };
     }
 
+
+    internal void ClearEntitiesToUpdate()
+    {
+        _entitiesToUpdate.Clear();
+    }
 
     public void AddLog(Log log)
     {
