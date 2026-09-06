@@ -2,7 +2,7 @@
 
 internal static class PluginManifestValidator
 {
-    private const int PreValidationStage = 10;
+    private const int PostOperationStage = 40;
     private const int SynchronousMode = 0;
 
     public static IReadOnlyCollection<string> Validate(PluginManifestDocument manifest)
@@ -100,17 +100,16 @@ internal static class PluginManifestValidator
         Dictionary<Guid, string> imageIds,
         List<string> errors)
     {
-        if (step.Images.Count > 0 && step.Stage == PreValidationStage)
-        {
-            errors.Add($"Step '{step.StepId}' defines images in PreValidation stage. Images should be used only in PreOperation or PostOperation stages.");
-        }
-
         if (step.Images.Count > 0 && step.IsMainOperation)
         {
             errors.Add($"Step '{step.StepId}' defines images in MainOperation stage. A Custom API MainOperation registration deploys the plugin type only and cannot register images.");
         }
 
-        var imageNameTypeInStep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        // Dataverse keys the pre-image and post-image collections by entity alias, so a key may repeat
+        // across the two collections but not within one. A 'Both' image occupies a key in both.
+        var preImageKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var postImageKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         foreach (var image in step.Images)
         {
             var imageLabel = $"{step.StepId} / {image.Name}";
@@ -138,10 +137,15 @@ internal static class PluginManifestValidator
             }
             else
             {
-                var imageNameTypeKey = $"{image.Name}:{image.Type}";
-                if (!imageNameTypeInStep.Add(imageNameTypeKey))
+                var key = image.ResolvedEntityAlias;
+                if (image.IsPreImage && !preImageKeys.Add(key))
                 {
-                    errors.Add($"Duplicate {image.Type} image named '{image.Name}' in step '{step.StepId}'.");
+                    errors.Add($"Duplicate pre-image key '{key}' in step '{step.StepId}'. Entity aliases must be unique within the pre-image collection.");
+                }
+
+                if (image.IsPostImage && !postImageKeys.Add(key))
+                {
+                    errors.Add($"Duplicate post-image key '{key}' in step '{step.StepId}'. Entity aliases must be unique within the post-image collection.");
                 }
             }
 
@@ -150,20 +154,31 @@ internal static class PluginManifestValidator
                 errors.Add($"Image '{image.Name}' in step '{step.StepId}' must define at least one attribute.");
             }
 
+            ValidateImageStageCompatibility(step, image, errors);
             ValidateImageMessageCompatibility(step, image, errors);
+        }
+    }
+
+    private static void ValidateImageStageCompatibility(PluginManifestStep step, PluginManifestImage image, List<string> errors)
+    {
+        // A post-image can only be produced once the main operation has completed. Pre-images are valid in
+        // every stage, PreValidation included.
+        if (image.IsPostImage && !step.IsMainOperation && step.Stage != PostOperationStage)
+        {
+            errors.Add($"Step '{step.StepId}' defines {image.Type} image '{image.Name}' in the {step.StageName} stage. Post-images are available only in the PostOperation stage.");
         }
     }
 
     private static void ValidateImageMessageCompatibility(PluginManifestStep step, PluginManifestImage image, List<string> errors)
     {
-        if (IsCreate(step) && IsPreImage(image))
+        if (IsCreate(step) && image.IsPreImage)
         {
-            errors.Add($"Create step '{step.StepId}' cannot define pre-image '{image.Name}'. Use a post-image for Create steps.");
+            errors.Add($"Create step '{step.StepId}' cannot define {image.Type} image '{image.Name}'. The record does not exist before the operation, so use a post-image for Create steps.");
         }
 
-        if (IsDelete(step) && IsPostImage(image))
+        if (IsDelete(step) && image.IsPostImage)
         {
-            errors.Add($"Delete step '{step.StepId}' cannot define post-image '{image.Name}'. Use a pre-image for Delete steps.");
+            errors.Add($"Delete step '{step.StepId}' cannot define {image.Type} image '{image.Name}'. The record no longer exists after the operation, so use a pre-image for Delete steps.");
         }
     }
 
@@ -172,10 +187,6 @@ internal static class PluginManifestValidator
     private static bool IsUpdate(PluginManifestStep step) => string.Equals(step.MessageName, "Update", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsDelete(PluginManifestStep step) => string.Equals(step.MessageName, "Delete", StringComparison.OrdinalIgnoreCase);
-
-    private static bool IsPreImage(PluginManifestImage image) => string.Equals(image.Type, "PreImage", StringComparison.OrdinalIgnoreCase);
-
-    private static bool IsPostImage(PluginManifestImage image) => string.Equals(image.Type, "PostImage", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsPlaceholderGuid(Guid id)
     {

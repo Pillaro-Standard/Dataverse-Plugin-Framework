@@ -1,4 +1,4 @@
-# Plugin Registration API
+﻿# Plugin Registration API
 
 This document describes the fluent registration API for Dataverse plugin deployment metadata.
 
@@ -12,7 +12,7 @@ The goal is to keep plugin registration readable for developers while preserving
 - one Dataverse step can define multiple images
 - step and image IDs are explicit and match Dataverse IDs
 - IntelliSense guides the developer through valid registration order
-- filtering attributes can be declared for Create and Update steps
+- filtering attributes and images can be declared for every message, not only `Update`
 - attributes can be selected either by logical-name constants or by typed early-bound entity properties
 - entity registration supports both early-bound types and logical name strings
 
@@ -147,7 +147,7 @@ With string-based registration:
 - The first parameter is always the entity logical name (e.g., "contact", "account", "new_customentity")
 - The second parameter is always the step ID
 - For `OnMessage`, the third parameter is the message name
-- Filtering attributes must be specified as strings (typed expressions are not available)
+- Filtering attributes and image attributes must be specified as strings (typed expressions are not available)
 - The fluent API returns non-generic builder interfaces
 
 Both registration modes generate identical deployment metadata. Choose the mode that best fits your project structure and entity availability.
@@ -194,15 +194,15 @@ registration
         c => c.LastName);
 ```
 
-Typed selection is available for `OnUpdate<TEntity>(...)` steps. It keeps the entity type from `OnUpdate<Contact>(...)` through the fluent chain, so only properties from `Contact` are offered by IntelliSense.
+Typed selection is available for every entity-typed entry point - `OnCreate<TEntity>(...)`, `OnUpdate<TEntity>(...)`, `OnDelete<TEntity>(...)` and `OnMessage<TEntity>(...)`. The entity type flows through the fluent chain, so only properties from `Contact` are offered by IntelliSense.
 
 If you need to generate these types for your solution, see [Early-Bound Entity Generation](./early-bound-generation.md).
 
 ## Filtering Attributes
 
-Filtering attributes can be declared for Create and Update steps in this framework registration metadata.
+Filtering attributes are stored on `sdkmessageprocessingstep.filteringattributes`, which Dataverse accepts for any message. They can be declared on every step this API can register, with either `WithFilteringAttributes(...)` or its alias `WhenChanged(...)`, and with either string constants or typed expressions.
 
-For Create steps, use `WithFilteringAttributes(...)`:
+For Create steps:
 
 ~~~csharp
 // Early-bound with constants
@@ -213,6 +213,14 @@ registration
     .Rank(1)
     .WithFilteringAttributes(Contact.Fields.FirstName, Contact.Fields.LastName);
 
+// Early-bound with typed expressions
+registration
+    .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
+    .PreValidation()
+    .Synchronous()
+    .Rank(1)
+    .WithFilteringAttributes(c => c.FirstName, c => c.LastName);
+
 // String-based
 registration
     .OnCreate("contact", "00000000-0000-0000-0000-000000000000")
@@ -222,7 +230,7 @@ registration
     .WithFilteringAttributes("firstname", "lastname");
 ~~~
 
-For Update steps, use `WhenChanged(...)` or `WithFilteringAttributes(...)`. `WhenChanged(...)` is preferred for readability and keeps the entity-specific fluent flow:
+For Update steps, use `WhenChanged(...)` or `WithFilteringAttributes(...)`. `WhenChanged(...)` is preferred for readability:
 
 ~~~csharp
 // Early-bound with constants
@@ -247,15 +255,28 @@ registration
     .WhenChanged("firstname", "lastname");
 ~~~
 
-## Multiple Images Per Step
+## Images
 
 A step can have multiple images. Each image has its own Dataverse `SdkMessageProcessingStepImageId`.
+
+Which images a step can carry follows the Dataverse rules, and the manifest validator enforces them:
+
+| Message | Pre-image | Post-image | `Both` |
+| --- | --- | --- | --- |
+| `Create` | not available - the record does not exist yet | PostOperation only | not available |
+| `Update` | any stage | PostOperation only | PostOperation only |
+| `Delete` | any stage | not available - the record is gone | not available |
+| `Assign`, `Route`, `Merge`, `SetState`, `Send`, `DeliverIncoming`, `DeliverPromote` | any stage | PostOperation only | PostOperation only |
+
+Images are keyed by entity alias, which defaults to the image name. A key must be unique within the pre-image collection and within the post-image collection, but the same key may appear in both - the plugin reads them from `PreEntityImages` and `PostEntityImages` separately.
+
+Images are not available for `MainOperation()` (Custom API) registrations.
 
 ~~~csharp
 // Early-bound with typed expressions
 registration
     .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
-    .PreOperation()
+    .PostOperation()
     .Synchronous()
     .WhenChanged(c => c.FirstName, c => c.LastName)
     .WithPreImage(
@@ -272,7 +293,7 @@ registration
 // String-based
 registration
     .OnUpdate("contact", "00000000-0000-0000-0000-000000000000")
-    .PreOperation()
+    .PostOperation()
     .Synchronous()
     .WhenChanged("firstname", "lastname")
     .WithPreImage(
@@ -288,6 +309,43 @@ registration
 ~~~
 
 The fluent chain keeps every image attached to the exact step where it is declared. No additional linking attribute or registration ID is needed.
+
+### `Both` Images
+
+`WithBothImage(...)` registers a single image with Dataverse image type `Both`, which the platform exposes through `PreEntityImages` and `PostEntityImages` at once. It is valid only where both halves are valid, that is a PostOperation step on a message other than `Create` or `Delete`:
+
+~~~csharp
+registration
+    .OnUpdate<Contact>("00000000-0000-0000-0000-000000000000")
+    .PostOperation()
+    .Synchronous()
+    .WhenChanged(c => c.FirstName)
+    .WithBothImage(
+        "00000000-0000-0000-0000-000000000000",
+        "target",
+        c => c.FirstName,
+        c => c.LastName);
+~~~
+
+### Entity Alias And Message Property Name
+
+`WithImage(PluginImageOptions)` is the full form. Use it when the key in `PreEntityImages`/`PostEntityImages` should differ from the image name, or when the message exposes the record under more than one request property and the derived default is not the one you need:
+
+~~~csharp
+registration
+    .OnMessage<Account>("00000000-0000-0000-0000-000000000000", "Merge")
+    .PreOperation()
+    .Synchronous()
+    .WithImage(
+        new PluginImageOptions("00000000-0000-0000-0000-000000000000", PluginImageType.PreImage, "subordinate")
+        {
+            EntityAlias = "subordinate",
+            MessagePropertyName = "SubordinateId",
+        },
+        a => a.Name);
+~~~
+
+Both properties are optional. Left unset, the alias falls back to the image name and the message property name is derived from the step message.
 
 ## Custom API MainOperation Registration
 
@@ -375,23 +433,26 @@ The deployment manifest validator enforces basic safety rules:
 - image IDs must be non-empty GUIDs and should be Dataverse `SdkMessageProcessingStepImageId` values.
 - placeholder-looking GUIDs such as `00000000-0000-0000-0000-000000000001` are rejected.
 - synchronous Update steps on an entity should define filtering attributes; `WhenChanged(...)` is preferred for readability and typed update flow.
-- filtering attributes are supported for Create and Update steps. Use `WithFilteringAttributes(...)` for Create steps; use `WhenChanged(...)` or `WithFilteringAttributes(...)` for Update steps.
-- image names must be unique within a step.
+- filtering attributes are supported for every message. Use `WithFilteringAttributes(...)` or `WhenChanged(...)`.
+- image keys (entity alias, defaulting to the image name) must be unique within the pre-image collection and within the post-image collection of a step. The same key may appear in both.
 - image IDs must be unique across the manifest.
-- images should be used only in PreOperation or PostOperation stages.
-- Create steps cannot define pre-images.
-- Delete steps cannot define post-images.
+- post-images are available only in the PostOperation stage; pre-images are valid in PreValidation, PreOperation and PostOperation.
+- Create steps cannot define pre-images (nor `Both` images, which include a pre-image).
+- Delete steps cannot define post-images (nor `Both` images, which include a post-image).
 - MainOperation registrations cannot define images.
 - MainOperation registrations are supported only for Custom API messages, not for `Create`, `Update`, or `Delete`.
 
 ## Notes
 
 - a step can define multiple pre-images and/or post-images when the Dataverse step supports them.
+- `WithBothImage(...)` registers a single image with Dataverse image type `Both`, exposed through both `PreEntityImages` and `PostEntityImages`.
+- `WithImage(PluginImageOptions)` is the full form, for a distinct `EntityAlias` or an explicit `MessagePropertyName`.
 - entity logical names are read from `EntityLogicalNameAttribute` on early-bound entity classes for generic registration methods.
 - string-based registration methods accept entity logical names directly as parameters.
 - typed attribute selection reads logical names from `AttributeLogicalNameAttribute` on early-bound entity properties.
 - custom API and custom action messages can be registered with `OnMessage(...)` or `OnMessage<TEntity>(...)`.
-- image `MessagePropertyName` is derived automatically from the step message during deployment (`Id` for Create, `EntityMoniker` for SetState, `EmailId` for Send/DeliverIncoming/DeliverPromote, otherwise `Target`).
+- image `EntityAlias` defaults to the image name; set it explicitly through `WithImage(PluginImageOptions)` when the key in `PreEntityImages`/`PostEntityImages` should differ from the name.
+- image `MessagePropertyName` is derived automatically from the step message during deployment (`Id` for Create, `EntityMoniker` for SetState, `EmailId`/`FaxId`/`TemplateId` for Send depending on the entity, `EmailId` for DeliverIncoming/DeliverPromote, otherwise `Target`). Override it through `WithImage(PluginImageOptions)` for messages that expose the record under more than one property, such as `Merge` (`Target` or `SubordinateId`).
 - both early-bound and string-based registration modes generate identical deployment metadata.
 - string-based registration validates that the entity logical name is not null, empty, or whitespace.
 

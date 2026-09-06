@@ -46,5 +46,9 @@ internal sealed class DataverseImageState
 
     public string Type { get; init; } = string.Empty;
 
+    public string? EntityAlias { get; init; }
+
+    public string? MessagePropertyName { get; init; }
+
     public IReadOnlyCollection<string> Attributes { get; init; } = [];
 }

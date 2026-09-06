@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
 namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands;
@@ -44,6 +44,8 @@ internal static class PluginManifestFactory
                         image.ImageId,
                         image.Type.ToString(),
                         image.Name,
+                        image.EntityAlias,
+                        image.MessagePropertyName,
                         image.Attributes)).ToArray(),
                     step.DeploymentPolicy == null
                         ? null
@@ -119,6 +121,8 @@ internal static class PluginManifestFactory
                                     ImageId = image.ImageId,
                                     Type = image.Type,
                                     Name = image.Name,
+                                    EntityAlias = image.EntityAlias,
+                                    MessagePropertyName = image.MessagePropertyName,
                                     Attributes = image.Attributes.OrderBy(attribute => attribute, StringComparer.OrdinalIgnoreCase).ToList(),
                                 })
                                 .ToList(),
@@ -169,6 +173,9 @@ internal static class PluginManifestFactory
             GetRequiredProperty<Guid>(image, "ImageId"),
             GetEnumName(image, "Type"),
             GetRequiredProperty<string>(image, "Name"),
+            // Optional: assemblies built against an older framework version do not expose these properties.
+            GetOptionalProperty<string>(image, "EntityAlias"),
+            GetOptionalProperty<string>(image, "MessagePropertyName"),
             GetStringCollection(image, "Attributes"));
     }
 
@@ -248,6 +255,8 @@ internal static class PluginManifestFactory
         Guid ImageId,
         string Type,
         string Name,
+        string? EntityAlias,
+        string? MessagePropertyName,
         IReadOnlyCollection<string> Attributes);
 
     private sealed record ReflectedDeploymentPolicy(

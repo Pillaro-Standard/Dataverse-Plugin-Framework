@@ -1,4 +1,4 @@
-using Microsoft.PowerPlatform.Dataverse.Client;
+﻿using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
@@ -229,8 +229,8 @@ internal static class DataverseRegistrationUpserter
         var entity = new Entity("sdkmessageprocessingstepimage") { Id = image.ImageId };
         entity["sdkmessageprocessingstepid"] = new EntityReference("sdkmessageprocessingstep", step.StepId);
         entity["name"] = image.Name;
-        entity["entityalias"] = image.Name;
-        entity["messagepropertyname"] = GetMessagePropertyName(step.MessageName);
+        entity["entityalias"] = image.ResolvedEntityAlias;
+        entity["messagepropertyname"] = ResolveMessagePropertyName(step, image);
         entity["imagetype"] = new OptionSetValue(ToImageTypeValue(image.Type));
         entity["attributes"] = string.Join(",", image.Attributes);
         if (action == PluginDiffAction.Create)
@@ -244,9 +244,18 @@ internal static class DataverseRegistrationUpserter
         }
     }
 
+    internal static string ResolveMessagePropertyName(PluginManifestStep step, PluginManifestImage image)
+    {
+        // An explicit value wins: some messages expose the record under more than one property and only
+        // the registration knows which one the plugin needs (Merge: Target vs SubordinateId).
+        return string.IsNullOrWhiteSpace(image.MessagePropertyName)
+            ? GetMessagePropertyName(step.MessageName, step.EntityName)
+            : image.MessagePropertyName!.Trim();
+    }
+
     // Dataverse accepts only message-specific property names on step images; e.g. images on the
     // Create message must use "Id" because the created record is returned in the Id output parameter.
-    internal static string GetMessagePropertyName(string messageName)
+    internal static string GetMessagePropertyName(string messageName, string? entityName = null)
     {
         if (string.Equals(messageName, "Create", StringComparison.OrdinalIgnoreCase))
         {
@@ -259,13 +268,30 @@ internal static class DataverseRegistrationUpserter
             return "EntityMoniker";
         }
 
-        if (string.Equals(messageName, "Send", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(messageName, "DeliverIncoming", StringComparison.OrdinalIgnoreCase)
+        if (string.Equals(messageName, "DeliverIncoming", StringComparison.OrdinalIgnoreCase)
             || string.Equals(messageName, "DeliverPromote", StringComparison.OrdinalIgnoreCase))
         {
             return "EmailId";
         }
 
+        // Send carries the record under a property named after the entity being sent.
+        if (string.Equals(messageName, "Send", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.Equals(entityName, "fax", StringComparison.OrdinalIgnoreCase))
+            {
+                return "FaxId";
+            }
+
+            if (string.Equals(entityName, "template", StringComparison.OrdinalIgnoreCase))
+            {
+                return "TemplateId";
+            }
+
+            return "EmailId";
+        }
+
+        // Assign, Delete, Merge, Route and Update all expose the record as Target. Merge can also image
+        // the subordinate record, which callers select through the explicit MessagePropertyName override.
         return "Target";
     }
 
