@@ -16,6 +16,21 @@
 - Fixed manifest validation, which rejected every image on a PreValidation step. Pre-images are valid in PreValidation, PreOperation and PostOperation; the rule that was missing is that post-images (and `Both`) are available only in PostOperation, and that is now enforced instead.
 - Image uniqueness within a step is now checked per image collection using the entity alias, so a pre-image and a post-image may share a key while duplicates within one collection are rejected.
 - The deployment diff now compares image `EntityAlias` and `MessagePropertyName`, so drift in either is detected.
+- Cleaned up the README packed into the NuGet package: it no longer opens by explaining that it is included in the NuGet package. The `pillaro-dv` CLI bundled under `tools/Deployment` now carries `Company` and `Copyright` assembly metadata; its behavior is unchanged.
+
+### Templates
+
+- Rewrote the README packed into `Pillaro.Dataverse.PluginTemplate.DotNetNew` for first-time users. It was internal build documentation describing how the package is assembled from shared source and an overlay; it now covers the install and create commands, the generated solution structure, what the first build scaffolds into `Tools/`, the steps needed before a first deployment, and prerequisites. The packaging details moved to `docs/contributing/template-packaging.md`.
+- Set `PackageProjectUrl` on the `dotnet new` template package. It was missing from the packed nuspec, so nuget.org showed no link to the repository.
+- The Visual Studio Marketplace listing now states the Apache-2.0 license, through a `Microsoft.VisualStudio.Services.Content.License` asset. The manifest `<License>` element already pointed at the license text, but that is only shown in the Visual Studio install dialog, not on the listing.
+- Fixed the VSIX `<Tags>` metadata. It was space-separated, and the Marketplace reads that element as a comma-separated list, so the extension carried the single tag `Dataverse Power Platform Dynamics 365 Plugin` and matched neither `dataverse` nor `plugin` in search.
+- The Marketplace overview is now maintained in the repository as `Overview.md` and published through a `Microsoft.VisualStudio.Services.Content.Details` asset. Publishing replaces the overview text previously entered by hand in the publisher portal. `<MoreInfo>` now points at the repository instead of the company site.
+- Removed the pre-relicensing "source-open" wording from the generated solution's `Logic/README.md`, which is shared template content and therefore shipped in both delivery formats.
+
+### Documentation
+
+- Corrected the root README tagline, which still called the project "source-open" after the 1.1.2 relicensing to the Apache License, Version 2.0, and added a license badge to the badge block.
+- Added `docs/contributing/template-packaging.md`, covering the shared template source, the two delivery formats and how they differ, the shared-source staging that runs during pack, the VSIX build flow, and how the packaging projects are versioned.
 
 ### Examples
 

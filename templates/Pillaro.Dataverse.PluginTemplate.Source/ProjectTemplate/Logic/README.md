@@ -275,6 +275,6 @@ More information about Pillaro Labs and our work is available at:
 
 https://www.pillaro.cz
 
-The full source-open project documentation is available in the GitHub repository:
+The full project documentation is available in the GitHub repository, which is licensed under the Apache License, Version 2.0:
 
 https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework

@@ -6,7 +6,9 @@
 [![Template - Visual Studio VSIX](https://img.shields.io/badge/Template-Visual%20Studio%20VSIX-blue?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
 [![Template - dotnet new](https://img.shields.io/badge/Template-dotnet%20new-blue?logo=visualstudiocode)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
 
-Source-open, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/LICENSE)
+
+Apache-2.0 licensed, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
 
 
 ## Overview
