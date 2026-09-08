@@ -23,6 +23,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
+    <PackageProjectUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
