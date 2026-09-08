@@ -2,8 +2,6 @@
 
 A task-based framework for building predictable and testable Microsoft Dataverse plugins in C#.
 
-This README is included in the NuGet package so consumers can understand package intent, quick-start usage and key constraints directly from NuGet.org.
-
 ---
 
 ## What this package provides
