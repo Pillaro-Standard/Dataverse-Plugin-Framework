@@ -1,22 +1,34 @@
-﻿namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
+﻿using Pillaro.Dataverse.PluginFramework.Cli.Infrastructure;
+
+namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState;
 
 internal static class PluginRegistrationDiffWriter
 {
     public static void Write(PluginRegistrationDiff diff, PluginManifestDocument manifest)
     {
         var stepsByPlugin = new Dictionary<string, List<(PluginManifestStep? Step, PluginStepDiff Diff)>>();
+        var mainOperationStepsByPlugin = new Dictionary<string, List<PluginManifestStep>>();
 
         foreach (var plugin in manifest.Plugins)
         {
             var pluginSteps = new List<(PluginManifestStep? Step, PluginStepDiff Diff)>();
+            var mainOperationSteps = new List<PluginManifestStep>();
 
             foreach (var step in plugin.Steps)
             {
+                // Custom API MainOperation handlers have no step diff - only the plugin type is deployed.
+                if (step.IsMainOperation)
+                {
+                    mainOperationSteps.Add(step);
+                    continue;
+                }
+
                 var stepDiff = diff.StepChanges.First(d => d.StepId == step.StepId);
                 pluginSteps.Add((step, stepDiff));
             }
 
             stepsByPlugin[plugin.TypeName] = pluginSteps;
+            mainOperationStepsByPlugin[plugin.TypeName] = mainOperationSteps;
         }
 
         var deletedSteps = diff.StepChanges.Where(d => d.Action == PluginDiffAction.Delete).ToList();
@@ -50,7 +62,7 @@ internal static class PluginRegistrationDiffWriter
 
                 var status = GetStatusLabel(stepDiff.Action);
 
-                Console.WriteLine($"  [{status}] {stepName}");
+                Console.WriteLine($"  {ConsoleStatusFormatter.Label(status)} {stepName}");
 
                 if (stepDiff.UnsecureConfigurationDiff != null
                     && !(stepDiff.UnsecureConfigurationDiff.Action == PluginDiffAction.Unchanged
@@ -61,7 +73,7 @@ internal static class PluginRegistrationDiffWriter
 
                 foreach (var reason in stepDiff.Reasons.Where(r => !r.StartsWith("UnsecureConfiguration changed", StringComparison.Ordinal)))
                 {
-                    Console.WriteLine($"       [CHANGE] {reason}");
+                    Console.WriteLine($"       {ConsoleStatusFormatter.Label("CHANGE")} {reason}");
                 }
 
                 var stepId = step?.StepId ?? stepDiff.StepId;
@@ -74,7 +86,18 @@ internal static class PluginRegistrationDiffWriter
                 foreach (var imageDiff in allImagesForStep)
                 {
                     var imageStatus = GetStatusLabel(imageDiff.Action);
-                    Console.WriteLine($"       [{imageStatus}] {imageDiff.Type,-9}: {imageDiff.Name}");
+                    Console.WriteLine($"       {ConsoleStatusFormatter.Label(imageStatus)} {imageDiff.Type,-9}: {imageDiff.Name}");
+                }
+            }
+
+            if (mainOperationStepsByPlugin.TryGetValue(pluginTypeName, out var mainOperationSteps))
+            {
+                foreach (var mainOperationStep in mainOperationSteps.OrderBy(s => s.MessageName))
+                {
+                    var mainOperationName = !string.IsNullOrWhiteSpace(mainOperationStep.Name)
+                        ? mainOperationStep.Name
+                        : $"MainOperation {mainOperationStep.MessageName}";
+                    Console.WriteLine($"  {ConsoleStatusFormatter.Label("TYPE-ONLY")} {mainOperationName} (Custom API MainOperation - associated via CustomAPI.PluginTypeId, no processing step deployed)");
                 }
             }
         }
@@ -82,7 +105,7 @@ internal static class PluginRegistrationDiffWriter
         foreach (var skipped in manifest.PluginTypesWithoutRegistration)
         {
             Console.WriteLine();
-            Console.WriteLine($"[WARN] {GetPluginDisplayName(skipped)} - no steps registered via Register(IPluginRegistration), skipped from deployment.");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("WARN")} {GetPluginDisplayName(skipped)} - no steps registered via Register(IPluginRegistration), skipped from deployment.");
         }
     }
 
@@ -92,7 +115,7 @@ internal static class PluginRegistrationDiffWriter
             return;
 
         var status = GetStatusLabel(diff.Action);
-        Console.WriteLine($"       [{status}] {label}: {diff.DisplayValue}");
+        Console.WriteLine($"       {ConsoleStatusFormatter.Label(status)} {label}: {diff.DisplayValue}");
     }
 
     private static string GetPluginDisplayName(string fullTypeName)
@@ -110,6 +133,7 @@ internal static class PluginRegistrationDiffWriter
         {
             "Prevalidation" => "PreValidation ",
             "Preoperation" => "PreOperation  ",
+            "Mainoperation" => "MainOperation ",
             "Postoperation" => "PostOperation ",
             _ => string.Empty
         };

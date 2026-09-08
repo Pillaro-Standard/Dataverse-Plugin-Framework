@@ -86,11 +86,11 @@ internal static class PluginDeployCommand
 
             Console.WriteLine($"Dataverse Plugin Registration v{GetCliVersion()}");
             Console.WriteLine();
-            Console.WriteLine($"[OK] Profile   : {activeProfileName}");
-            Console.WriteLine($"[OK] Solution  : {solutionName}");
-            Console.WriteLine($"[OK] Connection: {connectionStringEnvironmentVariableName}");
-            Console.WriteLine($"[OK] Assembly  : {assemblyPath}");
-            Console.WriteLine($"[OK] Manifest  : {Path.GetFileName(manifestPath)}");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Profile   : {activeProfileName}");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Solution  : {solutionName}");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Connection: {connectionStringEnvironmentVariableName}");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Assembly  : {assemblyPath}");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Manifest  : {Path.GetFileName(manifestPath)}");
             Console.WriteLine();
             Console.WriteLine("Summary");
             Console.WriteLine($"  Plugins  : {manifest.Plugins.Count}");
@@ -116,7 +116,7 @@ internal static class PluginDeployCommand
             if (justAssembly)
             {
                 Console.WriteLine();
-                Console.WriteLine("[OK] Assembly deployed (--just-assembly mode)");
+                Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Assembly deployed (--just-assembly mode)");
                 return 0;
             }
 
@@ -134,14 +134,14 @@ internal static class PluginDeployCommand
             await DataverseRegistrationUpserter.EnsureDesiredSolutionMembershipAsync(service, manifest, solutionName!);
 
             Console.WriteLine();
-            Console.WriteLine("[OK] Registration completed");
+            Console.WriteLine($"{ConsoleStatusFormatter.Label("OK")} Registration completed");
 
             return 0;
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine();
-            Console.Error.WriteLine($"[ERROR] {ex.Message}");
+            Console.Error.WriteLine($"{ConsoleStatusFormatter.Label("ERROR")} {ex.Message}");
             return 1;
         }
     }

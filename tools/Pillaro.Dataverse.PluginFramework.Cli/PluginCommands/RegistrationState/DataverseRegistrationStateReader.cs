@@ -6,6 +6,8 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState
 
 internal static class DataverseRegistrationStateReader
 {
+    private const int DisabledStateCode = 1;
+
     public static async Task<DataverseRegistrationState> ReadAsync(
         IOrganizationServiceAsync2 service,
         PluginManifestDocument manifest,
@@ -90,7 +92,8 @@ internal static class DataverseRegistrationStateReader
                     "sdkmessageprocessingstepsecureconfigid",
                     "plugintypeid",
                     "sdkmessageid",
-                    "sdkmessagefilterid")
+                    "sdkmessagefilterid",
+                    "statecode")
             };
 
             query.Criteria.AddCondition("plugintypeid", ConditionOperator.Equal, pluginType.Value);
@@ -144,6 +147,7 @@ internal static class DataverseRegistrationStateReader
                     Rank = entity.GetAttributeValue<int?>("rank") ?? 0,
                     FilteringAttributes = SplitAttributes(entity.GetAttributeValue<string>("filteringattributes")),
                     UnsecureConfiguration = entity.GetAttributeValue<string>("configuration"),
+                    IsDisabled = entity.GetAttributeValue<OptionSetValue>("statecode")?.Value == DisabledStateCode,
                 };
             }
         }
@@ -167,6 +171,8 @@ internal static class DataverseRegistrationStateReader
                     "sdkmessageprocessingstepimageid",
                     "sdkmessageprocessingstepid",
                     "name",
+                    "entityalias",
+                    "messagepropertyname",
                     "imagetype",
                     "attributes")
             };
@@ -183,6 +189,8 @@ internal static class DataverseRegistrationStateReader
                     StepId = entity.GetAttributeValue<EntityReference>("sdkmessageprocessingstepid")?.Id ?? Guid.Empty,
                     Name = entity.GetAttributeValue<string>("name") ?? string.Empty,
                     Type = ToImageType(entity.GetAttributeValue<OptionSetValue>("imagetype")?.Value),
+                    EntityAlias = entity.GetAttributeValue<string>("entityalias"),
+                    MessagePropertyName = entity.GetAttributeValue<string>("messagepropertyname"),
                     Attributes = SplitAttributes(entity.GetAttributeValue<string>("attributes")),
                 };
             }

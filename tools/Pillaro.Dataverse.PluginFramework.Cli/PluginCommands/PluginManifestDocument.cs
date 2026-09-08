@@ -26,6 +26,8 @@ internal sealed class PluginManifestPlugin
 
 internal sealed class PluginManifestStep
 {
+    internal const int MainOperationStage = 30;
+
     public Guid StepId { get; set; }
 
     public string MessageName { get; set; } = string.Empty;
@@ -51,6 +53,11 @@ internal sealed class PluginManifestStep
     public List<PluginManifestImage> Images { get; set; } = [];
 
     public PluginManifestDeploymentPolicy? DeploymentPolicy { get; set; }
+
+    // Custom API MainOperation handlers are associated through CustomAPI.PluginTypeId;
+    // only the assembly and plugin type are deployed, never an SdkMessageProcessingStep.
+    [JsonIgnore]
+    public bool IsMainOperation => Stage == MainOperationStage;
 }
 
 internal sealed class PluginManifestImage
@@ -61,7 +68,25 @@ internal sealed class PluginManifestImage
 
     public string Name { get; set; } = string.Empty;
 
+    /// <summary>Key into PreEntityImages/PostEntityImages. Null falls back to <see cref="Name"/>.</summary>
+    public string? EntityAlias { get; set; }
+
+    /// <summary>Explicit sdkmessageprocessingstepimage.messagepropertyname. Null is derived from the message.</summary>
+    public string? MessagePropertyName { get; set; }
+
     public List<string> Attributes { get; set; } = [];
+
+    [JsonIgnore]
+    public string ResolvedEntityAlias => string.IsNullOrWhiteSpace(EntityAlias) ? Name : EntityAlias!;
+
+    [JsonIgnore]
+    public bool IsPreImage => string.Equals(Type, "PreImage", StringComparison.OrdinalIgnoreCase) || IsBothImage;
+
+    [JsonIgnore]
+    public bool IsPostImage => string.Equals(Type, "PostImage", StringComparison.OrdinalIgnoreCase) || IsBothImage;
+
+    [JsonIgnore]
+    public bool IsBothImage => string.Equals(Type, "Both", StringComparison.OrdinalIgnoreCase);
 }
 
 internal sealed class PluginManifestDeploymentPolicy
