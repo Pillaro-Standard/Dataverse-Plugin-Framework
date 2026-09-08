@@ -26,6 +26,8 @@
 - Fixed the VSIX `<Tags>` metadata. It was space-separated, and the Marketplace reads that element as a comma-separated list, so the extension carried the single tag `Dataverse Power Platform Dynamics 365 Plugin` and matched neither `dataverse` nor `plugin` in search.
 - The Marketplace overview is now maintained in the repository as `Overview.md` and published through a `Microsoft.VisualStudio.Services.Content.Details` asset. Publishing replaces the overview text previously entered by hand in the publisher portal. `<MoreInfo>` now points at the repository instead of the company site.
 - Removed the pre-relicensing "source-open" wording from the generated solution's `Logic/README.md`, which is shared template content and therefore shipped in both delivery formats.
+- The framework version that generated projects reference is now stamped by the pipeline from a new `frameworkVersion` parameter, via `scripts/Set-TemplateFrameworkVersion.ps1`. It was a manual edit across six overlay csproj files, which is why released templates kept referencing an older framework than the one shipping alongside them. The parameter is required for `packageType: release`; the versions committed in the repository are now only a fallback for local builds. The references stay pinned rather than floating, because the `Plugins` project ILMerges the framework into the signed assembly that gets deployed, and a minor-version drift can change plugin behaviour in a working solution.
+- Added links to the framework and testing NuGet packages to the `dotnet new` package README and the Marketplace overview.
 
 ### Documentation
 
