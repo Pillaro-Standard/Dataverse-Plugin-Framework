@@ -1,4 +1,4 @@
-using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
+﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
@@ -20,7 +20,8 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName("Pillaro Examples Pre Create Task")
                 .Rank(1)
-                .WithFilteringAttributes("subject");
+                // Typed attribute selection is available on Create steps too, not only on Update.
+                .WithFilteringAttributes(t => t.Subject);
 
             registration
                 .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
@@ -36,26 +37,21 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .WithName("Pillaro Examples Post Update Task")
                 .Rank(3)
                 .WhenChanged(
-                    "regardingobjectid",
-                    "scheduledend",
-                    "statecode",
-                    "statuscode")
-                .WithPreImage(
+                    t => t.RegardingObjectId,
+                    t => t.ScheduledEnd,
+                    t => t.StateCode,
+                    t => t.StatusCode)
+                // A pre-image and a post-image with the same key and the same attributes are one
+                // Both image. SummarySync still reads it as PreEntityImages["image"] and
+                // PostEntityImages["image"], so the task code is unchanged.
+                .WithBothImage(
                     "b34d984d-0f31-f111-88b4-000d3ab2695d",
                     "image",
-                    "regardingobjectid",
-                    "scheduledend",
-                    "statecode",
-                    "statuscode",
-                    "actualend")
-                .WithPostImage(
-                    "b44d984d-0f31-f111-88b4-000d3ab2695d",
-                    "image",
-                    "regardingobjectid",
-                    "scheduledend",
-                    "statecode",
-                    "statuscode",
-                    "actualend");
+                    t => t.RegardingObjectId,
+                    t => t.ScheduledEnd,
+                    t => t.StateCode,
+                    t => t.StatusCode,
+                    t => t.ActualEnd);
         }
     }
 }

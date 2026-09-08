@@ -1,4 +1,4 @@
-using Microsoft.PowerPlatform.Dataverse.Client;
+﻿using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
@@ -6,6 +6,9 @@ namespace Pillaro.Dataverse.PluginFramework.Cli.PluginCommands.RegistrationState
 
 internal static class DataverseRegistrationUpserter
 {
+    private const int EnabledStateCode = 0;
+    private const int EnabledStatusCode = 1;
+
     internal sealed record ImageUpsertOperation(PluginManifestStep Step, PluginManifestImage Image, PluginDiffAction Action);
 
     public static async Task ApplyAsync(
@@ -85,7 +88,7 @@ internal static class DataverseRegistrationUpserter
         PluginManifestDocument manifest,
         string solutionName)
     {
-        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).OrderBy(step => step.StepId))
+        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !step.IsMainOperation).OrderBy(step => step.StepId))
         {
             await DataverseSolutionComponentService.EnsureAddedWithSubcomponentRetryAsync(
                 service,
@@ -125,7 +128,7 @@ internal static class DataverseRegistrationUpserter
 
     private static async Task<Dictionary<string, Guid>> LoadMessageIdsAsync(IOrganizationServiceAsync2 service, PluginManifestDocument manifest)
     {
-        var names = manifest.Plugins.SelectMany(plugin => plugin.Steps).Select(step => step.MessageName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        var names = manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !step.IsMainOperation).Select(step => step.MessageName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         var result = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
         foreach (var batch in names.Chunk(500))
         {
@@ -154,7 +157,7 @@ internal static class DataverseRegistrationUpserter
     private static async Task<Dictionary<string, Guid>> LoadMessageFilterIdsAsync(IOrganizationServiceAsync2 service, PluginManifestDocument manifest, IReadOnlyDictionary<string, Guid> messageIds)
     {
         var result = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
-        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !string.IsNullOrWhiteSpace(step.EntityName)))
+        foreach (var step in manifest.Plugins.SelectMany(plugin => plugin.Steps).Where(step => !step.IsMainOperation && !string.IsNullOrWhiteSpace(step.EntityName)))
         {
             var key = GetMessageFilterKey(step.MessageName, step.EntityName!);
             if (result.ContainsKey(key))
@@ -213,6 +216,10 @@ internal static class DataverseRegistrationUpserter
         }
         else
         {
+            // Deployment is authoritative: an updated step must end up enabled,
+            // even when it was manually disabled in Dataverse.
+            entity["statecode"] = new OptionSetValue(EnabledStateCode);
+            entity["statuscode"] = new OptionSetValue(EnabledStatusCode);
             await service.UpdateAsync(entity);
         }
     }
@@ -222,8 +229,8 @@ internal static class DataverseRegistrationUpserter
         var entity = new Entity("sdkmessageprocessingstepimage") { Id = image.ImageId };
         entity["sdkmessageprocessingstepid"] = new EntityReference("sdkmessageprocessingstep", step.StepId);
         entity["name"] = image.Name;
-        entity["entityalias"] = image.Name;
-        entity["messagepropertyname"] = "Target";
+        entity["entityalias"] = image.ResolvedEntityAlias;
+        entity["messagepropertyname"] = ResolveMessagePropertyName(step, image);
         entity["imagetype"] = new OptionSetValue(ToImageTypeValue(image.Type));
         entity["attributes"] = string.Join(",", image.Attributes);
         if (action == PluginDiffAction.Create)
@@ -235,6 +242,57 @@ internal static class DataverseRegistrationUpserter
         {
             await service.UpdateAsync(entity);
         }
+    }
+
+    internal static string ResolveMessagePropertyName(PluginManifestStep step, PluginManifestImage image)
+    {
+        // An explicit value wins: some messages expose the record under more than one property and only
+        // the registration knows which one the plugin needs (Merge: Target vs SubordinateId).
+        return string.IsNullOrWhiteSpace(image.MessagePropertyName)
+            ? GetMessagePropertyName(step.MessageName, step.EntityName)
+            : image.MessagePropertyName!.Trim();
+    }
+
+    // Dataverse accepts only message-specific property names on step images; e.g. images on the
+    // Create message must use "Id" because the created record is returned in the Id output parameter.
+    internal static string GetMessagePropertyName(string messageName, string? entityName = null)
+    {
+        if (string.Equals(messageName, "Create", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Id";
+        }
+
+        if (string.Equals(messageName, "SetState", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(messageName, "SetStateDynamicEntity", StringComparison.OrdinalIgnoreCase))
+        {
+            return "EntityMoniker";
+        }
+
+        if (string.Equals(messageName, "DeliverIncoming", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(messageName, "DeliverPromote", StringComparison.OrdinalIgnoreCase))
+        {
+            return "EmailId";
+        }
+
+        // Send carries the record under a property named after the entity being sent.
+        if (string.Equals(messageName, "Send", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.Equals(entityName, "fax", StringComparison.OrdinalIgnoreCase))
+            {
+                return "FaxId";
+            }
+
+            if (string.Equals(entityName, "template", StringComparison.OrdinalIgnoreCase))
+            {
+                return "TemplateId";
+            }
+
+            return "EmailId";
+        }
+
+        // Assign, Delete, Merge, Route and Update all expose the record as Target. Merge can also image
+        // the subordinate record, which callers select through the explicit MessagePropertyName override.
+        return "Target";
     }
 
     private static string GetMessageFilterKey(string messageName, string entityName) => $"{messageName}:{entityName}";

@@ -1,67 +1,113 @@
-# Pillaro Dataverse Plugin Template DotNetNew
+# Pillaro Dataverse Plugin Template (dotnet new)
 
-This project builds the CLI-oriented [`dotnet new`](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) template package for the Pillaro Dataverse plugin solution.
+Generates a Microsoft Dataverse plugin solution — a `.NET Framework 4.6.2` plugin
+assembly plus an integration test project — for C# developers building Dataverse
+plug-ins with the Pillaro Dataverse Plugin Framework.
 
-This is the recommended starting point for new solutions.
-
-## Install
-
-This template is published on NuGet.org:
-
-- [Pillaro.Dataverse.PluginTemplate.DotNetNew](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
-
-Install it with:
+## Install and create
 
 ```powershell
 dotnet new install Pillaro.Dataverse.PluginTemplate.DotNetNew
+dotnet new pillaro-dataverse-plugin-dotnet -n MySolution -o MySolution
 ```
 
-The generated solution works with both Visual Studio Code and Visual Studio, so the same template fits CLI-first and IDE-first workflows.
+`-n` sets the solution name. It is substituted into namespaces, assembly names,
+project file names and the solution file, so `-n MySolution` produces
+`MySolution.Logic`, `MySolution.Plugins` and `MySolution.Tests`.
 
-## Purpose
-
-This package is the CLI-friendly delivery format for the shared template source stored in:
+## Generated solution
 
 ```text
-templates/Pillaro.Dataverse.PluginTemplate.Source/ProjectTemplate
+MySolution/
+├── MySolution.slnx
+├── LICENSE.txt
+├── .vscode/
+│   ├── extensions.json          # recommends the C# Dev Kit
+│   └── settings.json            # points OmniSharp at MySolution.slnx
+├── Logic/                       # net462 – all business logic lives here
+│   ├── MySolution.Logic.csproj
+│   ├── README.md                # in-solution guide to the task model
+│   ├── Plugins/
+│   │   ├── PluginBase.cs        # solution-wide plugin base, returns GetVersion()
+│   │   └── ExamplePlugin.cs     # registers ExampleTask + declarative step metadata
+│   └── Tasks/Example/
+│       └── ExampleTask.cs       # validation rules + DoExecute() business logic
+├── Plugins/                     # net462 – the assembly deployed to Dataverse
+│   ├── MySolution.Plugins.csproj # signed, with an ILMerge post-build event
+│   └── key.snk                  # strong-name key (replace before release)
+└── Tests/                       # net8.0 – xUnit v3 integration tests
+    ├── MySolution.Tests.csproj
+    ├── appsettings.json          # Dataverse connection string placeholder
+    ├── appsettings.Development.json
+    ├── TestAutofacModule.cs      # Autofac registrations for test data + cleanup
+    └── Tests/
+        ├── TestBase.cs           # shared fixture, settings, cleanup handlers
+        └── ConnectionTests.cs    # WhoAmI smoke test against your environment
 ```
 
-It reuses the same shared files as the [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate), but adds the `dotnet new` packaging metadata, a package icon, and the CLI-oriented project overlays.
+`Logic` holds the plugins and tasks; `Plugins` produces the single merged,
+strong-name signed DLL that Dataverse requires; `Tests` runs against a real
+Dataverse environment and cleans up the data it creates.
 
-## What this package does
+The first build of `Logic` and `Plugins` scaffolds package-managed tooling into
+each of those projects — `Tools/ILMerge/` (merge tooling and two post-build
+script variants), `Tools/Deployment/` (`DeployPlugins.bat`, `DeployPlugins.ps1`),
+`Tools/EarlyBound/` (`GenerateEarlyBound.bat`, `EarlyBoundSettings.json`) and a
+`PillaroSettings.json`. These are regenerated on build; configure behaviour in
+`PillaroSettings.json` rather than editing them.
 
-The package produces a NuGet template package that can be installed locally with `dotnet new install`.
+## What to do next
 
-After installation, create a new solution with:
+1. Build the solution. This restores the framework package and writes the
+   deployment and ILMerge tooling described above.
 
-```powershell
-dotnet new pillaro-dataverse-plugin-dotnet -n MySolution
-```
+   ```powershell
+   dotnet build MySolution.slnx
+   ```
 
-The generated solution is intended for Visual Studio Code and other CLI-based workflows.
-It is the default template we recommend for starting new projects quickly.
+2. Point the deployment at your environment. Edit `Plugins/PillaroSettings.json`
+   and set `solution` to your Dataverse solution's unique name. It reads the
+   connection string from the environment variable named in
+   `dataverse.connectionStringEnvironmentVariable` (`DV_CONN` by default):
 
-## Package layout
+   ```powershell
+   $env:DV_CONN = "Url=https://yourorg.crm4.dynamics.com/;AuthType=ClientSecret;ClientId=...;ClientSecret=..."
+   ```
 
-The package content is assembled from two places:
+3. Replace `Plugins/key.snk` with your own strong-name key before you ship.
 
-1. Shared generated-project source from `Pillaro.Dataverse.PluginTemplate.Source`
-2. Dotnet-specific overlay files from `template/ProjectTemplate`
+4. Deploy the assembly and synchronize the registered steps:
 
-The shared source remains the single source of truth for all common files. During pack, the `dotnet new` project stages a package-specific copy of the shared template source and applies the CLI-specific namespace and documentation tweaks there.
+   ```powershell
+   .\Plugins\Tools\Deployment\DeployPlugins.bat
+   ```
 
-The overlay provides:
+   The wrapper uses the `debug` profile; pass `release` for the release profile.
 
-- `.template.config/template.json`
-- package and template icon metadata
-- `Pillaro.Dataverse.PluginTemplate.slnx`
-- `Logic`, `Plugins`, and `Tests` project files
-- optional VS Code workspace hints
+5. To run the tests, put your connection string into
+   `Tests/appsettings.Development.json` (or set `ConnectionStrings__Dataverse`),
+   then `dotnet test`. `ConnectionTests` verifies the connection with `WhoAmI`.
 
-## Relationship to other template formats
+6. Replace `ExamplePlugin` and `ExampleTask` with your own. The example registers
+   a synchronous PreValidation step on `contact` Create/Update; the GUIDs in
+   `Register(...)` are step identifiers you should regenerate for your own steps.
 
-This project owns only the `dotnet new` delivery format.
+## Prerequisites
 
-The shared generated-project files remain in `Pillaro.Dataverse.PluginTemplate.Source`, and the [Visual Studio VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) stays in `Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix`.
+- .NET SDK 8.0 or later, to run `dotnet new` and build the test project
+- .NET Framework 4.6.2 targeting pack, for the `Logic` and `Plugins` projects
+  (Dataverse plug-ins run only on `.NET Framework 4.6.2`)
+- A Dataverse environment and an application user, to deploy and to run the tests
+- Power Platform CLI (`pac`), only if you use the early-bound entity generation
+  in `Tools/EarlyBound/`
 
-The [VSIX template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate) exists primarily for Visual Studio installability and Marketplace presence. If you are starting a new solution, use [`dotnet new`](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew) unless you specifically need the VSIX distribution path.
+Windows is required for deployment and ILMerge: both tools are Windows-only.
+
+## Links
+
+- [Framework repository](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework)
+- [Documentation](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/tree/main/docs)
+- [Getting started](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/docs/plugins/getting-started.md)
+- [Deploying plugins](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/docs/plugins/deployment-plugins.md)
+- [Visual Studio version of this template](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
+- License: Apache-2.0 — [LICENSE](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/LICENSE)

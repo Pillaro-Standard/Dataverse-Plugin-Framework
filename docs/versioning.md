@@ -96,9 +96,10 @@ Examples:
 
 ---
 
-### `dev`
+### `develop`
 
 * Used for active development
+* All pull requests target this branch (never `main` directly)
 * Produces **preview versions**
 
 Format:
@@ -118,9 +119,17 @@ Examples:
 
 ### Release Candidate (optional)
 
-Before merging to `main`, release candidates can be produced:
+Before merging to `main`, release candidates can be produced.
 
-Format:
+A release candidate is built from a dedicated release branch created from `develop`:
+
+```
+release/{version}-rc
+```
+
+Example: `release/1.1.3-rc`.
+
+Format of the produced package version:
 
 ```
 {version}-rc.{build}
@@ -259,11 +268,15 @@ This approach ensures:
 
 Typical release flow:
 
-1. Development happens in `dev`
-2. Preview versions are published (`preview`)
-3. Optional release candidates (`rc`)
-4. Merge to `main`
-5. Stable version is released (no suffix)
+1. Development happens in feature/fix branches; pull requests always target `develop` (never `main`)
+2. Preview versions can be published from `develop` (`preview`)
+3. For a release candidate:
+   1. Add a `{version}-rc` section to `CHANGELOG.md` in `develop`
+   2. Create a `release/{version}-rc` branch from `develop`
+   3. Queue the **Packages – Build & Package** pipeline on that branch with `baseVersion = {version}` and `packageType = rc`
+4. After the release candidate is validated, merge the release branch to `main`
+5. Rename the changelog section to the stable `{version}`, queue the pipeline from `main` with `packageType = release`, and tag the release
+6. Stable version is released (no suffix)
 
 ---
 

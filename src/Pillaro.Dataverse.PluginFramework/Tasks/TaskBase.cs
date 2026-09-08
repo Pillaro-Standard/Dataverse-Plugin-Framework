@@ -127,6 +127,24 @@ public abstract class TaskBase<TEntity> : ITask
         return ["Create", "Update"];
     }
 
+    /// <summary>
+    /// Name of the pre-image loaded into <see cref="PreImage"/>.
+    /// Override it when the step registers the pre-image under a different name.
+    /// </summary>
+    protected virtual string GetPreImageName()
+    {
+        return DefaultImageName;
+    }
+
+    /// <summary>
+    /// Name of the post-image loaded into <see cref="PostImage"/>.
+    /// Override it when the step registers the post-image under a different name.
+    /// </summary>
+    protected virtual string GetPostImageName()
+    {
+        return DefaultImageName;
+    }
+
     protected virtual TEntity GetContextEntity(TaskContext taskContext, Log log)
     {
         if (taskContext == null)
@@ -208,16 +226,18 @@ public abstract class TaskBase<TEntity> : ITask
 
     private void InitializeContextData()
     {
-        if (!ShouldInitializeContextEntity())
-            return;
+        // Images are independent of the target entity. They must be initialized for every message,
+        // otherwise messages without an entity target (Delete, Merge, ...) never receive them.
+        if (ShouldInitializeContextEntity())
+            ContextEntity = GetContextEntity(TaskContext, Log);
 
-        ContextEntity = GetContextEntity(TaskContext, Log);
+        var preImageName = GetPreImageName();
+        if (HasPreImage(preImageName))
+            PreImage = GetPreImage(preImageName);
 
-        if (HasPreImage())
-            PreImage = GetPreImage();
-
-        if (HasPostImage())
-            PostImage = GetPostImage();
+        var postImageName = GetPostImageName();
+        if (HasPostImage(postImageName))
+            PostImage = GetPostImage(postImageName);
     }
 
     private void Validate(StringBuilder message)

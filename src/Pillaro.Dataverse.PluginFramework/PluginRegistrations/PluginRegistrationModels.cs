@@ -4,8 +4,14 @@ namespace Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 
 public enum PluginImageType
 {
-    PreImage,
-    PostImage,
+    PreImage = 0,
+    PostImage = 1,
+
+    /// <summary>
+    /// Dataverse image type <c>Both</c>. A single image registration that the platform exposes through
+    /// both <c>PreEntityImages</c> and <c>PostEntityImages</c>.
+    /// </summary>
+    Both = 2,
 }
 
 public enum PluginRisk
@@ -47,7 +53,37 @@ public sealed record PluginImageRegistrationDescriptor(
     Guid ImageId,
     PluginImageType Type,
     string Name,
-    IReadOnlyCollection<string> Attributes);
+    IReadOnlyCollection<string> Attributes)
+{
+    /// <summary>
+    /// Key used to read the image from <c>PreEntityImages</c>/<c>PostEntityImages</c>. When null, the
+    /// image name is used, which keeps the behaviour of registrations that never set an alias.
+    /// </summary>
+    public string EntityAlias { get; init; }
+
+    /// <summary>
+    /// Request property the image is taken from (<c>sdkmessageprocessingstepimage.messagepropertyname</c>).
+    /// When null, it is derived from the message; set it explicitly for messages that expose the record
+    /// under more than one property, such as <c>Merge</c> (<c>Target</c> or <c>SubordinateId</c>).
+    /// </summary>
+    public string MessagePropertyName { get; init; }
+}
+
+/// <summary>
+/// Full image registration input, for the combinations that the WithPreImage/WithPostImage/WithBothImage
+/// shorthands cannot express (a distinct entity alias, or an explicit message property name).
+/// </summary>
+public sealed record PluginImageOptions(
+    string ImageId,
+    PluginImageType Type,
+    string Name)
+{
+    public string EntityAlias { get; init; }
+
+    public string MessagePropertyName { get; init; }
+
+    public IReadOnlyCollection<string> Attributes { get; init; } = [];
+}
 
 public sealed record PluginDeploymentPolicyDescriptor(
     PluginRisk Risk,
