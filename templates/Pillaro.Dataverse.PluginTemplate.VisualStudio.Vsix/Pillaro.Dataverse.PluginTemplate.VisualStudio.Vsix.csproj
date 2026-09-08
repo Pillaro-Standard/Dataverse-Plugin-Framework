@@ -65,6 +65,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Overview.md">
+			<Link>Assets\Overview.md</Link>
+			<VSIXSubPath>Assets\</VSIXSubPath>
+			<IncludeInVSIX>true</IncludeInVSIX>
+		</Content>
 		<Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt">
 			<Link>Assets\LICENSE.txt</Link>
 			<VSIXSubPath>Assets\</VSIXSubPath>
