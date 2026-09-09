@@ -106,6 +106,8 @@ Windows is required for deployment and ILMerge: both tools are Windows-only.
 ## Links
 
 - [Framework repository](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework)
+- [Pillaro.Dataverse.PluginFramework on NuGet](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework)
+- [Pillaro.Dataverse.PluginFramework.Testing on NuGet](https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing)
 - [Documentation](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/tree/main/docs)
 - [Getting started](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/docs/plugins/getting-started.md)
 - [Deploying plugins](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/docs/plugins/deployment-plugins.md)

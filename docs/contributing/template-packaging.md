@@ -95,6 +95,28 @@ time. The VSIX version is written into `source.extension.vsixmanifest`
 `/p:PackageVersion`. For a local Visual Studio rebuild, edit the manifest
 `Version` by hand.
 
+### Framework version referenced by generated projects
+
+The generated projects reference `Pillaro.Dataverse.PluginFramework` and
+`Pillaro.Dataverse.PluginFramework.Testing` with a pinned version, in six overlay
+csproj files — three per delivery format, because each format owns its own project
+files. The pipeline stamps them from the `frameworkVersion` parameter via
+`scripts/Set-TemplateFrameworkVersion.ps1`, which fails the build if any of the six
+files is missing, has no Pillaro package reference left to stamp, or ends up on a
+version other than the one requested.
+
+`frameworkVersion` is required for `packageType: release` and optional otherwise;
+when it is blank the committed versions are used unchanged. The value committed in
+the repository is therefore only a fallback for local builds, and should be the
+latest published stable release.
+
+Pin rather than float. `Version="1.*"` would keep the template current on its own,
+but the `Plugins` project ILMerges the framework into a single signed assembly that
+is deployed to Dataverse, so a floating reference makes the deployed binary depend
+on when the consumer last restored. It would also carry minor-version behaviour
+changes into working customer solutions: 1.2.0, for one, made `HasPreImage(...)`
+fail for an image that is registered but carries no data.
+
 ## Build and validate locally
 
 ```powershell
