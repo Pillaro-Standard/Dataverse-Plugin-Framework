@@ -104,6 +104,16 @@ jobs:
           Add-Result 'Microsoft.VsSDK.targets' ($vssdkTargets.Count -gt 0) `
             (($vssdkTargets | ForEach-Object { $_.FullName }) -join '; ')
 
+          # The targets file can be present while $(VSToolsPath) still resolves to the
+          # x86 fallback that does not contain it, which is what MSB4226 reports. Export
+          # the directory two levels above the targets file so the build can be pointed
+          # at the real one.
+          if ($vssdkTargets.Count -gt 0) {
+            $vsToolsPath = Split-Path -Parent (Split-Path -Parent $vssdkTargets[0].FullName)
+            Add-Result 'Derived VSToolsPath' $true $vsToolsPath
+            "vstoolspath=$vsToolsPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          }
+
           # --- VsixPublisher, used by the Marketplace deploy today -----------------
           $publisher = @()
 
@@ -146,6 +156,7 @@ jobs:
             -t:Restore,Build `
             -p:Configuration=Release `
             -p:ArtifactsDirectory=artifacts/spike `
+            -p:VSToolsPath='${{ steps.toolchain.outputs.vstoolspath }}' `
             -v:minimal
 
           if ($LASTEXITCODE -ne 0) {
@@ -181,6 +192,17 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             throw "MSBuild exited with $LASTEXITCODE."
           }
+
+      - name: Publish the CLI, which the framework nuspec includes
+        id: publish-cli
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          # The nuspec packs tools/...Cli/bin/Release/net8.0/publish/**, so the pack
+          # cannot succeed without this. The Azure DevOps pipeline has the same step.
+          dotnet publish tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj `
+            -c Release -f net8.0 --no-self-contained `
+            -o tools/Pillaro.Dataverse.PluginFramework.Cli/bin/Release/net8.0/publish
 
       - name: Pack the framework nuspec with nuget.exe
         id: pack-nuspec
@@ -222,6 +244,7 @@ jobs:
             @{ Name = 'Framework via dotnet build (baseline)'; Result = '${{ steps.build-framework.outcome }}'; Blocking = $false },
             @{ Name = 'VSIX via VS MSBuild';                   Result = '${{ steps.build-vsix.outcome }}';      Blocking = $true },
             @{ Name = 'Legacy examples via VS MSBuild';        Result = '${{ steps.build-examples.outcome }}';  Blocking = $true },
+            @{ Name = 'CLI publish (nuspec prerequisite)';     Result = '${{ steps.publish-cli.outcome }}';    Blocking = $true },
             @{ Name = 'nuspec pack via nuget.exe';             Result = '${{ steps.pack-nuspec.outcome }}';     Blocking = $true }
           )
 
