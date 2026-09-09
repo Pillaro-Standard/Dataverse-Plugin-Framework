@@ -278,6 +278,31 @@ Typical release flow:
 5. Rename the changelog section to the stable `{version}`, queue the pipeline from `main` with `packageType = release`, and tag the release
 6. Stable version is released (no suffix)
 
+### Merging to `main` must use a merge commit
+
+Release pull requests into `main` have to be merged with **Create a merge commit**.
+The `Protect main` ruleset allows no other method, on purpose.
+
+A squash or rebase merge produces a commit on `main` that `develop` does not contain,
+so the two branches end up sharing no history for anything already released. Every
+later merge from `develop` to `main` then conflicts again on each file the previous
+release touched, and the conflicts accumulate. A merge commit keeps `develop` an
+ancestor of `main`, which is also the precondition for the sync described below.
+
+### `develop` is synced back automatically
+
+The `Sync develop after release` workflow runs on every merged pull request into
+`main`. When `develop` is an ancestor of `main` it fast-forwards `develop` to `main`
+using a deploy key, which is a bypass actor on the `Protect develop` ruleset. The push
+is never forced, so git itself rejects anything that is not a fast-forward.
+
+When it cannot sync, the workflow **fails** rather than skipping. That is deliberate:
+an earlier version only ran when the release pull request came straight from `develop`,
+so every release made through an intermediate branch reported "skipped" and the
+branches drifted apart for three months unnoticed. If the workflow fails with
+`develop is not an ancestor of main`, a pull request into `main` was squashed, rebased,
+or pushed directly; merge `develop` into `main` with a merge commit and re-run it.
+
 ---
 
 ## Notes
