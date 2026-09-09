@@ -18,10 +18,15 @@ on:
         description: 'Released version, for example 1.2.0'
         required: true
         type: string
-      ref:
-        description: 'Commit or branch to tag'
+      target:
+        description: 'Commit or branch the release was built from, and where the tag goes'
         required: false
         default: main
+        type: string
+      changelog_version:
+        description: 'Changelog section to take the notes from. Blank uses the released version. For templates this is the framework version they ship with, since the changelog is kept per framework version.'
+        required: false
+        default: ''
         type: string
       prerelease:
         description: 'Mark the GitHub Release as a prerelease'
@@ -42,11 +47,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checks out the ref this workflow was dispatched on, not the release target.
+      # A target can be a historical release commit that predates both this workflow
+      # and scripts/Get-ChangelogSection.ps1, so the tooling and the changelog are read
+      # from here while the tag is placed on the target commit.
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref }}
           fetch-depth: 0
+
+      - name: Resolve the target commit
+        id: target
+        run: |
+          set -euo pipefail
+
+          TARGET="${{ inputs.target }}"
+
+          if ! SHA="$(git rev-parse --verify "$TARGET" 2>/dev/null)"; then
+            echo "::error::'$TARGET' is not a commit or branch in this repository."
+            exit 1
+          fi
+
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Target: $TARGET -> $SHA"
+          git log --oneline -1 "$SHA"
 
       - name: Resolve names
         id: names
@@ -122,10 +146,22 @@ jobs:
           done
 
       - name: Extract release notes from the changelog
+        id: notes
         shell: pwsh
         run: |
+          # The changelog is kept per framework version, so a template release has no
+          # section of its own and has to name the framework version it ships with.
+          $section = '${{ inputs.changelog_version }}'
+
+          if ([string]::IsNullOrWhiteSpace($section)) {
+            $section = '${{ inputs.version }}'
+          }
+
+          Write-Host "Reading release notes from the '## $section' section."
+          "section=$section" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
           ./scripts/Get-ChangelogSection.ps1 `
-            -Version "${{ inputs.version }}" `
+            -Version $section `
             -OutputPath "$env:RUNNER_TEMP/release-notes.md"
 
       - name: Build the release body
@@ -138,7 +174,7 @@ jobs:
           if [ "${{ inputs.component }}" = "templates" ]; then
             {
               printf 'Template packages %s.\n\n' "${{ inputs.version }}"
-              printf 'The changelog is kept per framework version, so the notes below cover the release this template ships alongside.\n\n'
+              printf 'The changelog is kept per framework version. These notes are the %s section, the release this template ships alongside.\n\n' "${{ steps.notes.outputs.section }}"
               printf -- '---\n\n'
             } > "$BODY"
           else
@@ -169,21 +205,31 @@ jobs:
             PRERELEASE="--prerelease"
           fi
 
+          # Only a package release claims "Latest". GitHub marks whatever was created
+          # most recently, so without this a template release outranks the framework
+          # release on the repository landing page.
+          LATEST="--latest"
+
+          if [ "${{ inputs.component }}" != "packages" ] || [ "${{ inputs.prerelease }}" = "true" ]; then
+            LATEST="--latest=false"
+          fi
+
           # gh creates the tag at --target, so there is no separate git push.
           gh release create "$TAG" \
-            --target "$(git rev-parse HEAD)" \
+            --target "${{ steps.target.outputs.sha }}" \
             --title "${{ steps.names.outputs.title }}" \
             --notes-file "$RUNNER_TEMP/release-body.md" \
+            $LATEST \
             $PRERELEASE
 
-          echo "Created release $TAG at $(git rev-parse HEAD)."
+          echo "Created release $TAG at ${{ steps.target.outputs.sha }}."
 
       - name: Summary
         run: |
           {
             printf '### Released %s %s\n\n' "${{ inputs.component }}" "${{ inputs.version }}"
-            printf '- Tag: `%s`\n' "${{ steps.names.outputs.tag }}"
-            printf '- Commit: `%s`\n' "$(git rev-parse HEAD)"
-            printf '- Release: https://github.com/%s/releases/tag/%s\n' \
+            printf -- '- Tag: `%s`\n' "${{ steps.names.outputs.tag }}"
+            printf -- '- Commit: `%s`\n' "${{ steps.target.outputs.sha }}"
+            printf -- '- Release: https://github.com/%s/releases/tag/%s\n' \
               "$GITHUB_REPOSITORY" "${{ steps.names.outputs.tag }}"
           } >> "$GITHUB_STEP_SUMMARY"
