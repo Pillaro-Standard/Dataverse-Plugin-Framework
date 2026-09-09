@@ -1,0 +1,189 @@
+name: Tag and publish a GitHub Release
+
+# Run this after the packages are actually on nuget.org. The job refuses to create a
+# tag for a version that is not published, so a tag can never claim a release that
+# does not exist.
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'What is being released'
+        required: true
+        type: choice
+        options:
+          - packages
+          - templates
+      version:
+        description: 'Released version, for example 1.2.0'
+        required: true
+        type: string
+      ref:
+        description: 'Commit or branch to tag'
+        required: false
+        default: main
+        type: string
+      prerelease:
+        description: 'Mark the GitHub Release as a prerelease'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-and-release-${{ inputs.component }}-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  tag-and-release:
+    name: Tag ${{ inputs.component }} ${{ inputs.version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Resolve names
+        id: names
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ inputs.version }}"
+
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([-+].*)?$'; then
+            echo "::error::Version '$VERSION' is not a valid NuGet version."
+            exit 1
+          fi
+
+          # The packages and the templates version independently, so the template tags
+          # are prefixed to keep them out of the package version sequence.
+          case "${{ inputs.component }}" in
+            packages)
+              TAG="$VERSION"
+              TITLE="$VERSION"
+              PACKAGES="pillaro.dataverse.pluginframework pillaro.dataverse.pluginframework.testing"
+              ;;
+            templates)
+              TAG="templates-$VERSION"
+              TITLE="Templates $VERSION"
+              PACKAGES="pillaro.dataverse.plugintemplate.dotnetnew"
+              ;;
+            *)
+              echo "::error::Unknown component '${{ inputs.component }}'."
+              exit 1
+              ;;
+          esac
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+          echo "packages=$PACKAGES" >> "$GITHUB_OUTPUT"
+
+          echo "Tag:   $TAG"
+          echo "Title: $TITLE"
+
+      - name: Refuse to overwrite an existing tag
+        run: |
+          set -euo pipefail
+
+          TAG="${{ steps.names.outputs.tag }}"
+
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag '$TAG' already exists. Delete it first if you really mean to move it."
+            exit 1
+          fi
+
+          echo "Tag '$TAG' is free."
+
+      - name: Verify the version is published on nuget.org
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ inputs.version }}"
+
+          for id in ${{ steps.names.outputs.packages }}; do
+            echo "Checking $id"
+
+            if ! curl -fsSL --max-time 30 "https://api.nuget.org/v3-flatcontainer/$id/index.json" -o index.json; then
+              echo "::error::Could not read the version index for '$id' from nuget.org."
+              exit 1
+            fi
+
+            if ! jq -e --arg v "$VERSION" '.versions | index($v)' index.json >/dev/null; then
+              echo "::error::'$id' version $VERSION is not on nuget.org. Publish the package before tagging, so the tag cannot claim a release that does not exist. Note that nuget.org indexing can lag a few minutes behind an upload."
+              exit 1
+            fi
+
+            echo "  $id $VERSION is published."
+          done
+
+      - name: Extract release notes from the changelog
+        shell: pwsh
+        run: |
+          ./scripts/Get-ChangelogSection.ps1 `
+            -Version "${{ inputs.version }}" `
+            -OutputPath "$env:RUNNER_TEMP/release-notes.md"
+
+      - name: Build the release body
+        run: |
+          set -euo pipefail
+
+          NOTES="$RUNNER_TEMP/release-notes.md"
+          BODY="$RUNNER_TEMP/release-body.md"
+
+          if [ "${{ inputs.component }}" = "templates" ]; then
+            {
+              printf 'Template packages %s.\n\n' "${{ inputs.version }}"
+              printf 'The changelog is kept per framework version, so the notes below cover the release this template ships alongside.\n\n'
+              printf -- '---\n\n'
+            } > "$BODY"
+          else
+            : > "$BODY"
+          fi
+
+          cat "$NOTES" >> "$BODY"
+
+          {
+            printf '\n\n'
+            printf 'Full changelog: https://github.com/%s/blob/%s/CHANGELOG.md\n' \
+              "$GITHUB_REPOSITORY" "${{ steps.names.outputs.tag }}"
+          } >> "$BODY"
+
+          echo "Release body:"
+          cat "$BODY"
+
+      - name: Create the tag and the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          TAG="${{ steps.names.outputs.tag }}"
+          PRERELEASE=""
+
+          if [ "${{ inputs.prerelease }}" = "true" ]; then
+            PRERELEASE="--prerelease"
+          fi
+
+          # gh creates the tag at --target, so there is no separate git push.
+          gh release create "$TAG" \
+            --target "$(git rev-parse HEAD)" \
+            --title "${{ steps.names.outputs.title }}" \
+            --notes-file "$RUNNER_TEMP/release-body.md" \
+            $PRERELEASE
+
+          echo "Created release $TAG at $(git rev-parse HEAD)."
+
+      - name: Summary
+        run: |
+          {
+            printf '### Released %s %s\n\n' "${{ inputs.component }}" "${{ inputs.version }}"
+            printf '- Tag: `%s`\n' "${{ steps.names.outputs.tag }}"
+            printf '- Commit: `%s`\n' "$(git rev-parse HEAD)"
+            printf '- Release: https://github.com/%s/releases/tag/%s\n' \
+              "$GITHUB_REPOSITORY" "${{ steps.names.outputs.tag }}"
+          } >> "$GITHUB_STEP_SUMMARY"

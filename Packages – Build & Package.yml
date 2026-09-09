@@ -82,7 +82,10 @@ jobs:
             $minor = [int]$parts[1]
             $patch = [int]$parts[2]
 
-            if ($ref -match "^refs/tags/v(.+)$") {
+            # Optional "v" prefix: the tags in this repository are written without one
+            # (1.1.0, 1.1.1), while this check used to require it, so a tag-triggered run
+            # silently fell through to the parameters instead of using the tag version.
+            if ($ref -match "^refs/tags/v?(.+)$") {
               $packageVersion = $Matches[1]
 
               if ($packageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
