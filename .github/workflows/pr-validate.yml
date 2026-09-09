@@ -1,0 +1,148 @@
+name: PR Validate
+
+# Replaces the Azure DevOps "PR – Validate" pipeline, which was removed as the required
+# status check on main and develop. Mirrors what it did: restore, build both test
+# projects with full MSBuild, and run the tests.
+#
+# The examples tests need a Dataverse environment. They run only when the
+# DATAVERSE_CONNECTION_STRING secret is set, and are reported as skipped when it is not,
+# so the framework unit tests still gate every pull request either way.
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CONFIGURATION: Release
+  # Referenced through env so the steps below can branch on whether it is set. A secret
+  # cannot be used directly in a step-level `if`.
+  DATAVERSE_CONNECTION_STRING: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+
+jobs:
+  validate:
+    name: Build and test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      # examples/*.Logic is a legacy non-SDK project, so the examples test project cannot
+      # be restored or built by the dotnet CLI. It needs full MSBuild, which is what the
+      # Azure DevOps pipeline used through VSBuild.
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore test projects
+        run: |
+          dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+
+      - name: Build the framework test project
+        run: >
+          msbuild tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          -t:Restore,Build
+          -p:Configuration=${{ env.CONFIGURATION }}
+          -m
+          -v:minimal
+
+      - name: Build the example test project
+        run: >
+          msbuild examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          -t:Restore,Build
+          -p:Configuration=${{ env.CONFIGURATION }}
+          -m
+          -v:minimal
+
+      - name: Run framework tests
+        run: >
+          dotnet test tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          --configuration ${{ env.CONFIGURATION }}
+          --no-build
+          --no-restore
+          --logger trx
+          --results-directory ${{ runner.temp }}/TestResults
+          --collect "XPlat Code Coverage"
+
+      - name: Report that the example tests were skipped
+        if: env.DATAVERSE_CONNECTION_STRING == ''
+        run: |
+          "> The example tests did not run: the DATAVERSE_CONNECTION_STRING secret is not set." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "> They need a Dataverse environment with the examples solution deployed. The framework unit tests ran." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+          Write-Host "::warning::Example tests skipped because DATAVERSE_CONNECTION_STRING is not set."
+        shell: pwsh
+
+      - name: Run example tests against Dataverse
+        if: env.DATAVERSE_CONNECTION_STRING != ''
+        env:
+          ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+        run: >
+          dotnet test examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          --configuration ${{ env.CONFIGURATION }}
+          --no-build
+          --no-restore
+          --logger trx
+          --results-directory ${{ runner.temp }}/TestResults
+          --collect "XPlat Code Coverage"
+
+      - name: Upload test results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            ${{ runner.temp }}/TestResults/**/*.trx
+            ${{ runner.temp }}/TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Summarize test results
+        if: always()
+        shell: pwsh
+        run: |
+          $results = @(Get-ChildItem -Path "$env:RUNNER_TEMP/TestResults" -Recurse -Filter '*.trx' -ErrorAction SilentlyContinue)
+
+          if ($results.Count -eq 0) {
+            "No test result files were produced." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            return
+          }
+
+          "## Tests"                          | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                                  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| Run | Total | Passed | Failed | Skipped |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| --- | --- | --- | --- | --- |"    | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+          foreach ($file in $results) {
+            try {
+              [xml]$trx = Get-Content -LiteralPath $file.FullName -Raw
+              $c = $trx.TestRun.ResultSummary.Counters
+              "| $($file.BaseName) | $($c.total) | $($c.passed) | $($c.failed) | $([int]$c.total - [int]$c.passed - [int]$c.failed) |" |
+                Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            }
+            catch {
+              "| $($file.BaseName) | could not be parsed | | | |" |
+                Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            }
+          }
