@@ -197,7 +197,7 @@ When changing the Visual Studio template:
 8. Do not add anything but the project template to the VSIX. The Marketplace
    listing is registered with extension type `Templates` and rejects an upload
    whose package carries payload besides the templates, so the listing logo,
-   overview (`Overview.md`) and license are maintained in the publisher portal.
+   overview and license are maintained in the publisher portal.
 
 ## Short summary
 
