@@ -52,9 +52,13 @@ jobs:
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      # Both projects, as the Azure DevOps pipeline did. Restoring only the framework one
+      # left the example test run failing to resolve Autofac from its deps.json: MSBuild's
+      # own -t:Restore was not enough for `dotnet test --no-restore` to find the packages.
       - name: Restore test projects
         run: |
           dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
 
       - name: Build the framework test project
         run: >
