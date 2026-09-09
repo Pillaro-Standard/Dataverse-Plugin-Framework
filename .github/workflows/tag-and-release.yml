@@ -205,11 +205,21 @@ jobs:
             PRERELEASE="--prerelease"
           fi
 
+          # Only a package release claims "Latest". GitHub marks whatever was created
+          # most recently, so without this a template release outranks the framework
+          # release on the repository landing page.
+          LATEST="--latest"
+
+          if [ "${{ inputs.component }}" != "packages" ] || [ "${{ inputs.prerelease }}" = "true" ]; then
+            LATEST="--latest=false"
+          fi
+
           # gh creates the tag at --target, so there is no separate git push.
           gh release create "$TAG" \
             --target "${{ steps.target.outputs.sha }}" \
             --title "${{ steps.names.outputs.title }}" \
             --notes-file "$RUNNER_TEMP/release-body.md" \
+            $LATEST \
             $PRERELEASE
 
           echo "Created release $TAG at ${{ steps.target.outputs.sha }}."
