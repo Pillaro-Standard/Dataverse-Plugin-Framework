@@ -17,47 +17,70 @@ concurrency:
 
 jobs:
   sync-develop:
-    name: Fast-forward develop to main after release PR
+    name: Fast-forward develop to main after release
     runs-on: ubuntu-latest
-    if: >
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.ref == 'develop'
+
+    # Deliberately does not filter on the head branch. An earlier version only ran when
+    # the release PR came straight from develop, so every release made through an
+    # intermediate branch was reported as "skipped" and the branches drifted apart for
+    # months without anyone noticing. This job now runs for every merged PR into main and
+    # fails when it cannot sync, so a broken release flow is visible.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
 
     steps:
-      - name: Checkout main
+      - name: Checkout
         uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Verify develop can be fast-forwarded to main
+      - name: Decide whether develop can be fast-forwarded to main
+        id: decide
         run: |
+          set -euo pipefail
+
           git fetch origin main develop
 
-          EXPECTED_DEVELOP_SHA="${{ github.event.pull_request.head.sha }}"
-          CURRENT_DEVELOP_SHA="$(git rev-parse origin/develop)"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          DEVELOP_SHA="$(git rev-parse origin/develop)"
 
-          echo "Expected develop SHA from merged PR: $EXPECTED_DEVELOP_SHA"
-          echo "Current origin/develop SHA: $CURRENT_DEVELOP_SHA"
+          echo "origin/main:    $MAIN_SHA"
+          echo "origin/develop: $DEVELOP_SHA"
 
-          if [ "$CURRENT_DEVELOP_SHA" != "$EXPECTED_DEVELOP_SHA" ]; then
-            echo "::error::develop moved after the release PR was merged. Refusing to sync automatically."
-            exit 1
+          if [ "$MAIN_SHA" = "$DEVELOP_SHA" ]; then
+            echo "Branches are already identical. Nothing to do."
+            echo "action=none" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-          if git merge-base --is-ancestor origin/develop origin/main; then
-            echo "develop can be fast-forwarded to main."
-          else
-            echo "::error::develop cannot be fast-forwarded to main."
-            exit 1
+          if git merge-base --is-ancestor "$DEVELOP_SHA" "$MAIN_SHA"; then
+            echo "develop is an ancestor of main and can be fast-forwarded."
+            echo "action=sync" >> "$GITHUB_OUTPUT"
+            echo "main_sha=$MAIN_SHA" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
+          AHEAD="$(git rev-list --count "$MAIN_SHA..$DEVELOP_SHA")"
+
+          # Reaching this point means main carries a commit that develop does not contain,
+          # which is what a squash or rebase merge into main produces. The release PR has
+          # to be merged with a merge commit for develop to stay an ancestor of main.
+          echo "::error::develop is not an ancestor of main, so it cannot be fast-forwarded. develop is $AHEAD commit(s) ahead of main. This happens when a PR into main is squashed or rebased instead of merged, or when a commit is pushed to main directly. Merge develop into main with a merge commit, then re-run this workflow."
+          exit 1
 
       - name: Configure deploy key
+        if: steps.decide.outputs.action == 'sync'
         env:
           SYNC_DEPLOY_KEY: ${{ secrets.SYNC_DEVELOP_DEPLOY_KEY }}
         run: |
+          set -euo pipefail
+
+          if [ -z "${SYNC_DEPLOY_KEY:-}" ]; then
+            echo "::error::Secret SYNC_DEVELOP_DEPLOY_KEY is not set, so develop cannot be updated."
+            exit 1
+          fi
+
           mkdir -p ~/.ssh
           printf "%s\n" "$SYNC_DEPLOY_KEY" > ~/.ssh/sync_develop_after_release
           chmod 600 ~/.ssh/sync_develop_after_release
@@ -68,5 +91,27 @@ jobs:
           git remote set-url origin git@github.com:Pillaro-Standard/Dataverse-Plugin-Framework.git
 
       - name: Fast-forward develop to main
+        if: steps.decide.outputs.action == 'sync'
         run: |
-          git push origin HEAD:refs/heads/develop
+          set -euo pipefail
+
+          # No --force. Git rejects anything that is not a fast-forward, so this cannot
+          # discard work even if develop moved between the check and the push.
+          git push origin "${{ steps.decide.outputs.main_sha }}:refs/heads/develop"
+
+      - name: Verify develop matches main
+        if: steps.decide.outputs.action == 'sync'
+        run: |
+          set -euo pipefail
+
+          git fetch origin main develop
+
+          MAIN_SHA="$(git rev-parse origin/main)"
+          DEVELOP_SHA="$(git rev-parse origin/develop)"
+
+          if [ "$MAIN_SHA" != "$DEVELOP_SHA" ]; then
+            echo "::error::develop is $DEVELOP_SHA but main is $MAIN_SHA. The sync did not take effect."
+            exit 1
+          fi
+
+          echo "develop is now at $DEVELOP_SHA, matching main."
