@@ -4,10 +4,12 @@ name: PR Validate
 # status check on main and develop. Mirrors what it did: restore, build both test
 # projects with full MSBuild, and run the tests.
 #
-# Some of these tests need a Dataverse environment: the whole example test project, and
-# 50 of the 134 tests in the framework project. They run only when the
-# DATAVERSE_CONNECTION_STRING secret is set. Without it the job still runs the 84
-# framework tests that need no connection, so every pull request gets a gate either way.
+# Deliberately runs only the tests that need no Dataverse connection. The rest are
+# Dataverse-backed against a shared environment, which makes them flaky by construction:
+# two pull requests running at once compete for the same test data, and the concurrency
+# test in particular passed one run and failed the next. Those live in nightly-tests.yml.
+#
+# Both test projects are still built, so a compile break in the examples is caught here.
 
 on:
   pull_request:
@@ -26,9 +28,6 @@ concurrency:
 
 env:
   CONFIGURATION: Release
-  # Referenced through env so the steps below can branch on whether it is set. A secret
-  # cannot be used directly in a step-level `if`.
-  DATAVERSE_CONNECTION_STRING: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
 
 jobs:
   validate:
@@ -52,9 +51,13 @@ jobs:
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      # Both projects, as the Azure DevOps pipeline did. Restoring only the framework one
+      # left the example test run failing to resolve Autofac from its deps.json: MSBuild's
+      # own -t:Restore was not enough for `dotnet test --no-restore` to find the packages.
       - name: Restore test projects
         run: |
           dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
 
       - name: Build the framework test project
         run: >
@@ -72,13 +75,11 @@ jobs:
           -m
           -v:minimal
 
-      # The framework test project is not purely unit tests: GetAutoNumberActionTests and
-      # DataServiceQueryIntegrationTests derive from TestBase and talk to Dataverse, which
-      # is 50 of the 134 tests. Both carry Category traits, so they can be excluded when
-      # there is no connection. A new Dataverse-backed test needs a Category trait too, or
-      # it will fail this job when the secret is absent.
-      - name: Run framework unit tests
-        if: env.DATAVERSE_CONNECTION_STRING == ''
+      # GetAutoNumberActionTests and DataServiceQueryIntegrationTests derive from
+      # TestBase and talk to Dataverse. Both carry Category traits, so they can be
+      # excluded by category. A new Dataverse-backed test needs a Category trait as well,
+      # or it will fail this job.
+      - name: Run tests that need no Dataverse connection
         run: >
           dotnet test tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
           --configuration ${{ env.CONFIGURATION }}
@@ -89,43 +90,15 @@ jobs:
           --results-directory ${{ runner.temp }}/TestResults
           --collect "XPlat Code Coverage"
 
-      - name: Run all framework tests
-        if: env.DATAVERSE_CONNECTION_STRING != ''
-        env:
-          ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
-        run: >
-          dotnet test tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
-          --configuration ${{ env.CONFIGURATION }}
-          --no-build
-          --no-restore
-          --logger trx
-          --results-directory ${{ runner.temp }}/TestResults
-          --collect "XPlat Code Coverage"
-
-      - name: Report which tests were skipped
-        if: env.DATAVERSE_CONNECTION_STRING == ''
+      - name: Note what this job does not cover
+        if: always()
+        shell: pwsh
         run: |
-          "> The Dataverse-backed tests did not run: the DATAVERSE_CONNECTION_STRING secret is not set." |
+          "> The Dataverse-backed tests are not part of this gate: the DataService and Autonumbering categories in the framework project, and the whole example test project." |
             Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           ""  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-          "> Skipped: the whole example test project, plus the DataService and Autonumbering categories in the framework project. The other 84 framework tests ran." |
+          "> They run in the nightly workflow, where a flaky shared environment blocks nobody." |
             Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-
-          Write-Host "::warning::Dataverse-backed tests skipped because DATAVERSE_CONNECTION_STRING is not set."
-        shell: pwsh
-
-      - name: Run example tests against Dataverse
-        if: env.DATAVERSE_CONNECTION_STRING != ''
-        env:
-          ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
-        run: >
-          dotnet test examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
-          --configuration ${{ env.CONFIGURATION }}
-          --no-build
-          --no-restore
-          --logger trx
-          --results-directory ${{ runner.temp }}/TestResults
-          --collect "XPlat Code Coverage"
 
       - name: Upload test results
         if: always()
