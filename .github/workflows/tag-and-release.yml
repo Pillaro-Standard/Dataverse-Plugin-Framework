@@ -18,8 +18,8 @@ on:
         description: 'Released version, for example 1.2.0'
         required: true
         type: string
-      ref:
-        description: 'Commit or branch to tag'
+      target:
+        description: 'Commit or branch the release was built from, and where the tag goes'
         required: false
         default: main
         type: string
@@ -42,11 +42,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checks out the ref this workflow was dispatched on, not the release target.
+      # A target can be a historical release commit that predates both this workflow
+      # and scripts/Get-ChangelogSection.ps1, so the tooling and the changelog are read
+      # from here while the tag is placed on the target commit.
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref }}
           fetch-depth: 0
+
+      - name: Resolve the target commit
+        id: target
+        run: |
+          set -euo pipefail
+
+          TARGET="${{ inputs.target }}"
+
+          if ! SHA="$(git rev-parse --verify "$TARGET" 2>/dev/null)"; then
+            echo "::error::'$TARGET' is not a commit or branch in this repository."
+            exit 1
+          fi
+
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Target: $TARGET -> $SHA"
+          git log --oneline -1 "$SHA"
 
       - name: Resolve names
         id: names
@@ -171,19 +190,19 @@ jobs:
 
           # gh creates the tag at --target, so there is no separate git push.
           gh release create "$TAG" \
-            --target "$(git rev-parse HEAD)" \
+            --target "${{ steps.target.outputs.sha }}" \
             --title "${{ steps.names.outputs.title }}" \
             --notes-file "$RUNNER_TEMP/release-body.md" \
             $PRERELEASE
 
-          echo "Created release $TAG at $(git rev-parse HEAD)."
+          echo "Created release $TAG at ${{ steps.target.outputs.sha }}."
 
       - name: Summary
         run: |
           {
             printf '### Released %s %s\n\n' "${{ inputs.component }}" "${{ inputs.version }}"
             printf '- Tag: `%s`\n' "${{ steps.names.outputs.tag }}"
-            printf '- Commit: `%s`\n' "$(git rev-parse HEAD)"
+            printf '- Commit: `%s`\n' "${{ steps.target.outputs.sha }}"
             printf '- Release: https://github.com/%s/releases/tag/%s\n' \
               "$GITHUB_REPOSITORY" "${{ steps.names.outputs.tag }}"
           } >> "$GITHUB_STEP_SUMMARY"
