@@ -201,8 +201,8 @@ jobs:
         run: |
           {
             printf '### Released %s %s\n\n' "${{ inputs.component }}" "${{ inputs.version }}"
-            printf '- Tag: `%s`\n' "${{ steps.names.outputs.tag }}"
-            printf '- Commit: `%s`\n' "${{ steps.target.outputs.sha }}"
-            printf '- Release: https://github.com/%s/releases/tag/%s\n' \
+            printf -- '- Tag: `%s`\n' "${{ steps.names.outputs.tag }}"
+            printf -- '- Commit: `%s`\n' "${{ steps.target.outputs.sha }}"
+            printf -- '- Release: https://github.com/%s/releases/tag/%s\n' \
               "$GITHUB_REPOSITORY" "${{ steps.names.outputs.tag }}"
           } >> "$GITHUB_STEP_SUMMARY"
