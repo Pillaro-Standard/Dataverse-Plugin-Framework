@@ -20,6 +20,11 @@ parameters:
       - rc
       - release
 
+  - name: frameworkVersion
+    displayName: 'Framework package version to reference from generated projects (blank = keep the value committed in the repository)'
+    type: string
+    default: ''
+
   - name: visualStudioArtifactName
     displayName: 'Visual Studio artifact name'
     type: string
@@ -144,6 +149,27 @@ jobs:
             Write-Host "##vso[task.setvariable variable=dotnetAssemblyVersion]$dotnetAssemblyVersion"
             Write-Host "##vso[task.setvariable variable=dotnetFileVersion]$dotnetFileVersion"
             Write-Host "##vso[task.setvariable variable=dotnetInformationalVersion]$dotnetInformationalVersion"
+
+      - task: PowerShell@2
+        displayName: Stamp framework version into template projects
+        inputs:
+          targetType: inline
+          script: |
+            $frameworkVersion = '${{ parameters.frameworkVersion }}'
+            $packageType = '${{ parameters.packageType }}'
+
+            if ([string]::IsNullOrWhiteSpace($frameworkVersion)) {
+              if ($packageType -eq 'release') {
+                throw "frameworkVersion is required for packageType 'release'. A released template must pin the framework version it was validated against instead of whatever happens to be committed."
+              }
+
+              Write-Host "frameworkVersion was not supplied. Generated projects keep the version committed in the repository."
+              return
+            }
+
+            & "$(Build.SourcesDirectory)/scripts/Set-TemplateFrameworkVersion.ps1" `
+              -FrameworkVersion $frameworkVersion `
+              -RepositoryRoot "$(Build.SourcesDirectory)"
 
       - task: PowerShell@2
         displayName: Stamp VSIX manifest version
