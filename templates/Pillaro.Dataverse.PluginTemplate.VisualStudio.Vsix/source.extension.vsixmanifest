@@ -5,28 +5,23 @@
         <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
         <Description xml:space="preserve">Creates a Microsoft Dataverse plugin solution with separate Logic, Plugins and Tests projects, built on the Pillaro Dataverse Plugin Framework. Licensed under Apache-2.0.</Description>
         <MoreInfo>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</MoreInfo>
-        <License>Assets\LICENSE.txt</License>
-        <Icon>Assets\PillaroLogo128.png</Icon>
-        <PreviewImage>Assets\PillaroLogo128.png</PreviewImage>
         <Tags>dataverse, dynamics-365, Dynamics 365, power-platform, Power Platform, plugin, plug-in, template, csharp</Tags>
     </Metadata>
     <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,19.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,19.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" d:Source="File" d:TargetPath="ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip" />
-        <Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="Assets\Overview.md" d:Source="File" />
-        <Asset Type="Microsoft.VisualStudio.Services.Content.License" Path="Assets\LICENSE.txt" d:Source="File" />
     </Assets>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
 </PackageManifest>

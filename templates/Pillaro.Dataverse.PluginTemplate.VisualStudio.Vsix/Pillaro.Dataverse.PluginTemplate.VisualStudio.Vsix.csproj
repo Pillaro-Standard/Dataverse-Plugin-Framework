@@ -64,24 +64,6 @@
 		<None Include="template\ProjectTemplates\Pillaro.Dataverse.PluginTemplate\Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Content Include="Overview.md">
-			<Link>Assets\Overview.md</Link>
-			<VSIXSubPath>Assets\</VSIXSubPath>
-			<IncludeInVSIX>true</IncludeInVSIX>
-		</Content>
-		<Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\LICENSE.txt">
-			<Link>Assets\LICENSE.txt</Link>
-			<VSIXSubPath>Assets\</VSIXSubPath>
-			<IncludeInVSIX>true</IncludeInVSIX>
-		</Content>
-		<Content Include="..\Pillaro.Dataverse.PluginTemplate.Source\ProjectTemplate\PillaroLogo128.png">
-			<Link>Assets\PillaroLogo128.png</Link>
-			<VSIXSubPath>Assets\</VSIXSubPath>
-			<IncludeInVSIX>true</IncludeInVSIX>
-		</Content>
-	</ItemGroup>
-
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 	<Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
 
