@@ -230,7 +230,6 @@ function Test-VisualStudioVsix {
             '[Content_Types].xml',
             'manifest.json',
             'catalog.json',
-            'Assets\PillaroLogo128.png',
             'ProjectTemplates\templateManifest0.noloc.vstman',
             "ProjectTemplates\$TemplateName\$TemplateName.vstemplate",
             "ProjectTemplates\$TemplateName\Logic\Logic.vstemplate",
@@ -256,7 +255,6 @@ function Test-VisualStudioVsix {
         $ns.AddNamespace('vsx', 'http://schemas.microsoft.com/developer/vsx-schema/2011')
 
         $identity = $manifest.SelectSingleNode('//vsx:Identity', $ns)
-        $icon = $manifest.SelectSingleNode('//vsx:Icon', $ns)
         $packageManifest = $manifest.SelectSingleNode('/vsx:PackageManifest', $ns)
 
         if (-not $identity) {
@@ -271,8 +269,29 @@ function Test-VisualStudioVsix {
             throw "VSIX manifest version is '$($identity.Version)', expected '$VsixVersion'."
         }
 
-        if (-not $icon -or $icon.InnerText -ne 'Assets\PillaroLogo128.png') {
-            throw 'VSIX manifest icon must point to Assets\PillaroLogo128.png.'
+        # The Marketplace only accepts the "Templates" extension type when the VSIX
+        # carries nothing besides the templates, so the package must declare a single
+        # project template asset and ship no payload outside ProjectTemplates.
+        $assets = @($manifest.SelectNodes('//vsx:Assets/vsx:Asset', $ns))
+        if ($assets.Count -ne 1 -or $assets[0].Type -ne 'Microsoft.VisualStudio.ProjectTemplate') {
+            $declared = ($assets | ForEach-Object { $_.Type }) -join ', '
+            throw "VSIX manifest must declare only a Microsoft.VisualStudio.ProjectTemplate asset, found: $declared"
+        }
+
+        $packagingEntries = @(
+            'extension.vsixmanifest',
+            '[Content_Types].xml',
+            'manifest.json',
+            'catalog.json'
+        )
+
+        $unexpected = $entries.Keys | Where-Object {
+            $packagingEntries -notcontains $_ -and $_ -notlike 'ProjectTemplates\*'
+        }
+
+        if ($unexpected) {
+            $paths = ($unexpected | Sort-Object) -join ', '
+            throw "VSIX package contains files outside the project template, which forces the Marketplace to classify it as Tools: $paths"
         }
 
         $contentTypesEntry = $entries['[Content_Types].xml']

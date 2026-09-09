@@ -86,6 +86,23 @@ differ from it. The `Content` items in the csproj that point at
 5. `PublishPillaroVisualStudioArtifacts` copies the ZIP and the `.vsix` into the
    artifacts directory.
 
+### Marketplace extension type
+
+The Marketplace listing is registered with extension type `Templates`, and that
+type cannot be changed after the extension is created. The Marketplace derives
+its own type from the uploaded package and rejects the upload with *"Your
+extension type does not match the VSIX type"* unless the VSIX carries nothing
+besides the templates.
+
+The VSIX therefore ships only `extension.vsixmanifest`, `[Content_Types].xml`,
+`manifest.json`, `catalog.json` and `ProjectTemplates/`, and the manifest
+declares a single `Microsoft.VisualStudio.ProjectTemplate` asset. Do not add
+`Icon`, `PreviewImage`, `License` or `Microsoft.VisualStudio.Services.Content.*`
+assets back: the listing logo, overview and license are maintained in the
+publisher portal instead. `Test-VisualStudioVsix` in
+`scripts/Test-PluginTemplateArtifacts.ps1` fails the build if extra payload
+reappears.
+
 ## Versioning
 
 Both packaging projects carry placeholder versions in the repository; the

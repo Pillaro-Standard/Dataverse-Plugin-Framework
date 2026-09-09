@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Templates
+
+- Fixed the Visual Studio Marketplace upload, which the Marketplace rejected with "Your extension type does not match the VSIX type. It should be uploaded as a Tools". The listing is registered with extension type `Templates` and that type cannot be changed after the extension is created, but the Marketplace only recognizes a package as a template extension when it carries nothing besides the templates. The VSIX shipped the listing logo, the `Overview.md` details asset and the license asset alongside the template, so it was classified as a tool. Those are now maintained in the publisher portal instead, and the VSIX ships only the project template: the manifest declares a single `Microsoft.VisualStudio.ProjectTemplate` asset, and `Icon`, `PreviewImage`, `License` and both `Microsoft.VisualStudio.Services.Content.*` assets are gone. This reverts the 1.2.0 changes that moved the listing overview and license into the package. `Test-VisualStudioVsix` now fails the build if any payload outside `ProjectTemplates/` reappears.
+
 ## 1.2.0
 
 First stable release since 1.1.2. It also carries the changes from 1.1.3-rc, which was never released as a stable version, so everything below reaches a 1.1.2 consumer for the first time.
