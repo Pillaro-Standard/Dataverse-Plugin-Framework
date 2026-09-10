@@ -1,0 +1,286 @@
+name: Project Templates – Build Artifacts
+
+# Port of the Azure DevOps "Templates - Build Template Artifacts" pipeline, step for
+# step. Produces the two template artifacts and validates both; it publishes nothing.
+# Uploading to nuget.org and the Marketplace is a separate concern.
+#
+# The Azure DevOps pipeline stays in place until this one is proven.
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseVersion:
+        description: 'Base version, for example 1.0.3'
+        required: true
+        default: '1.0.0'
+        type: string
+      packageType:
+        description: 'Template package type'
+        required: true
+        default: ci
+        type: choice
+        options:
+          - ci
+          - preview
+          - rc
+          - release
+      frameworkVersion:
+        description: 'Framework package version the generated projects reference. Required for a release.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-templates-build-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CONFIGURATION: Release
+  TEMPLATE_NAME: Pillaro.Dataverse.PluginTemplate
+  TEMPLATE_PACKAGE_ID: Pillaro.Dataverse.PluginTemplate.DotNetNew
+  TEMPLATE_SHORT_NAME: pillaro-dataverse-plugin-dotnet
+  VSIX_PROJECT: templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj
+  DOTNET_TEMPLATE_PROJECT: templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/Pillaro.Dataverse.PluginTemplate.DotNetNew.csproj
+
+jobs:
+  build:
+    name: Build template artifacts
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Validate inputs and calculate versions
+        id: versions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $baseVersion  = '${{ inputs.baseVersion }}'
+          $packageType  = '${{ inputs.packageType }}'
+          # github.run_number stands in for Build.BuildId: monotonic per workflow, which is
+          # all the VSIX revision and the prerelease suffix need.
+          $buildId      = [int]'${{ github.run_number }}'
+
+          if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+            throw "baseVersion must be Major.Minor.Patch, for example 1.0.3. Got '$baseVersion'."
+          }
+
+          $parts = $baseVersion.Split('.')
+          $major = [int]$parts[0]
+          $minor = [int]$parts[1]
+          $patch = [int]$parts[2]
+
+          $vsixVersion = "$baseVersion.$buildId"
+
+          switch ($packageType) {
+            'ci'      { $packageVersion = "$baseVersion-ci.$buildId" }
+            'preview' { $packageVersion = "$baseVersion-preview.$buildId" }
+            'rc'      { $packageVersion = "$baseVersion-rc.$buildId" }
+            'release' { $packageVersion = $baseVersion }
+            default   { throw "Unsupported packageType '$packageType'." }
+          }
+
+          $assemblyVersion = "$major.$minor.$patch.0"
+          $fileVersion     = "$major.$minor.$patch.$buildId"
+
+          @(
+            "vsix_version=$vsixVersion"
+            "package_version=$packageVersion"
+            "assembly_version=$assemblyVersion"
+            "file_version=$fileVersion"
+            "informational_version=$packageVersion"
+          ) | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+          "## Versions"                            | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                                       | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| What | Value |"                       | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| --- | --- |"                          | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| Package type | ``$packageType`` |"    | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| VSIX | ``$vsixVersion`` |"            | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| dotnet new package | ``$packageVersion`` |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Stamp the framework version into the template projects
+        shell: pwsh
+        run: |
+          $frameworkVersion = '${{ inputs.frameworkVersion }}'
+
+          if ([string]::IsNullOrWhiteSpace($frameworkVersion)) {
+            if ('${{ inputs.packageType }}' -eq 'release') {
+              throw "frameworkVersion is required for packageType 'release'. A released template must pin the framework version it was validated against instead of whatever happens to be committed."
+            }
+
+            Write-Host "frameworkVersion was not supplied. Generated projects keep the version committed in the repository."
+            exit 0
+          }
+
+          ./scripts/Set-TemplateFrameworkVersion.ps1 `
+            -FrameworkVersion $frameworkVersion `
+            -RepositoryRoot "${{ github.workspace }}"
+
+      - name: Stamp the VSIX manifest version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $manifestPath = 'templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/source.extension.vsixmanifest'
+
+          [xml]$manifest = Get-Content -LiteralPath $manifestPath -Raw
+          $ns = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+          $ns.AddNamespace('vsx', 'http://schemas.microsoft.com/developer/vsx-schema/2011')
+
+          $identity = $manifest.SelectSingleNode('//vsx:Identity', $ns)
+
+          if (-not $identity) {
+            throw "VSIX Identity node was not found in '$manifestPath'."
+          }
+
+          $identity.Version = '${{ steps.versions.outputs.vsix_version }}'
+          $manifest.Save((Resolve-Path -LiteralPath $manifestPath))
+
+          Write-Host "Stamped VSIX manifest version: ${{ steps.versions.outputs.vsix_version }}"
+
+      # `dotnet build`, not MSBuild. Microsoft.VSSDK.BuildTools supplies the VSSDK
+      # targets, so no Visual Studio workload is involved — which is how the Azure
+      # DevOps pipeline has always built this.
+      - name: Build the Visual Studio template artifacts
+        run: >
+          dotnet build ${{ env.VSIX_PROJECT }}
+          -p:ArtifactsDirectory=${{ runner.temp }}/templates/visual-studio
+
+      - name: Validate the Visual Studio artifacts and smoke build
+        shell: pwsh
+        run: |
+          ./scripts/Test-PluginTemplateArtifacts.ps1 `
+            -TemplateName '${{ env.TEMPLATE_NAME }}' `
+            -VsixVersion '${{ steps.versions.outputs.vsix_version }}' `
+            -ArtifactsDirectory '${{ runner.temp }}/templates/visual-studio'
+
+      - name: Prepare the Visual Studio publish artifact
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $source = '${{ runner.temp }}/templates/visual-studio'
+          $target = '${{ runner.temp }}/templates/visual-studio-publish'
+
+          New-Item -ItemType Directory -Path $target -Force | Out-Null
+
+          $vsixFiles = @(Get-ChildItem -LiteralPath $source -Filter '*.vsix' -File -Recurse -ErrorAction SilentlyContinue)
+
+          if ($vsixFiles.Count -eq 0) {
+            throw "No VSIX file was found in '$source'."
+          }
+
+          # The publish artifact is what gets uploaded to the Marketplace, so it must be
+          # unambiguous and must not carry the project template ZIP.
+          if ($vsixFiles.Count -ne 1) {
+            $found = ($vsixFiles | ForEach-Object { $_.FullName }) -join '; '
+            throw "Expected exactly one VSIX file, found $($vsixFiles.Count): $found"
+          }
+
+          Copy-Item -LiteralPath $vsixFiles[0].FullName -Destination $target -Force
+
+          if (@(Get-ChildItem -LiteralPath $target -Filter '*.zip' -File -Recurse -ErrorAction SilentlyContinue).Count -gt 0) {
+            throw 'Visual Studio publish artifact must not contain ZIP files.'
+          }
+
+          Write-Host "Prepared Visual Studio publish artifact: $($vsixFiles[0].Name)"
+
+      - name: Restore the dotnet new template project
+        run: dotnet restore ${{ env.DOTNET_TEMPLATE_PROJECT }}
+
+      - name: Build the dotnet new template package
+        run: >
+          dotnet build ${{ env.DOTNET_TEMPLATE_PROJECT }}
+          --configuration ${{ env.CONFIGURATION }}
+          --no-restore
+          -p:Version=${{ steps.versions.outputs.package_version }}
+          -p:PackageVersion=${{ steps.versions.outputs.package_version }}
+          -p:AssemblyVersion=${{ steps.versions.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.versions.outputs.file_version }}
+          -p:InformationalVersion=${{ steps.versions.outputs.informational_version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
+          -p:DebugType=portable
+          -p:DebugSymbols=true
+          -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
+          -p:IncludeSourceRevisionInInformationalVersion=false
+
+      - name: Resolve the dotnet new template package
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $binDir = 'templates/Pillaro.Dataverse.PluginTemplate.DotNetNew/bin/${{ env.CONFIGURATION }}'
+          $expected = Join-Path $binDir '${{ env.TEMPLATE_PACKAGE_ID }}.${{ steps.versions.outputs.package_version }}.nupkg'
+
+          if (-not (Test-Path -LiteralPath $expected)) {
+            Write-Host "Expected package was not found:"
+            Write-Host $expected
+            Write-Host ""
+            Write-Host "Existing packages in $binDir :"
+
+            Get-ChildItem -LiteralPath $binDir -Filter '*.nupkg' -File -ErrorAction SilentlyContinue |
+              ForEach-Object { Write-Host $_.FullName }
+
+            throw 'Expected dotnet new template NuGet package was not produced by build.'
+          }
+
+          $resolved = (Resolve-Path -LiteralPath $expected).Path
+          "path=$resolved" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+          Write-Host "Resolved dotnet new template package:"
+          Write-Host $resolved
+
+      - name: Validate the dotnet new template and smoke build
+        shell: pwsh
+        run: |
+          ./scripts/Test-DotNetTemplateArtifacts.ps1 `
+            -TemplatePackagePath '${{ steps.package.outputs.path }}' `
+            -TemplateShortName '${{ env.TEMPLATE_SHORT_NAME }}' `
+            -Configuration '${{ env.CONFIGURATION }}'
+
+      - name: Upload the Visual Studio template artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-studio-template
+          path: ${{ runner.temp }}/templates/visual-studio-publish/*.vsix
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload the dotnet new template package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.TEMPLATE_PACKAGE_ID }}
+          path: ${{ steps.package.outputs.path }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summarize
+        if: always()
+        shell: pwsh
+        run: |
+          ""                                  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "## Artifacts"                      | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                                  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- ``visual-studio-template`` — the .vsix to upload to the Marketplace" |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- ``${{ env.TEMPLATE_PACKAGE_ID }}`` — the .nupkg to upload to nuget.org" |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                                  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "> Nothing is published by this workflow. Upload the artifacts, then tag with ``Release – Tag and GitHub Release``." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
