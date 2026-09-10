@@ -1,4 +1,4 @@
-name: Tag and publish a GitHub Release
+name: Release – Tag and GitHub Release
 
 # Run this after the packages are actually on nuget.org. The job refuses to create a
 # tag for a version that is not published, so a tag can never claim a release that

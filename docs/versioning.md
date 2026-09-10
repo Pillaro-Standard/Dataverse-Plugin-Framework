@@ -291,7 +291,7 @@ ancestor of `main`, which is also the precondition for the sync described below.
 
 ### `develop` is synced back automatically
 
-The `Sync develop after release` workflow runs on every merged pull request into
+The `Release – Sync develop` workflow runs on every merged pull request into
 `main`. When `develop` is an ancestor of `main` it fast-forwards `develop` to `main`
 using a deploy key, which is a bypass actor on the `Protect develop` ruleset. The push
 is never forced, so git itself rejects anything that is not a fast-forward.
