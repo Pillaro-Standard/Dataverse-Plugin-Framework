@@ -1,0 +1,448 @@
+name: NuGet Packages – Build Artifacts
+
+# Port of the Azure DevOps "Packages – Build & Package" pipeline. Builds, tests, packs
+# the two nuspec-based packages and verifies them. It publishes nothing: the nuget.org
+# upload stays a separate, manual step, exactly as it is today.
+#
+# The two long verification steps were lifted into scripts/Test-PackageAssemblyMetadata.ps1
+# and scripts/Test-NuGetPackages.ps1 by extracting the pipeline's inline PowerShell
+# mechanically, so the checks are unchanged rather than reinterpreted.
+#
+# The Azure DevOps pipeline stays in place until this one is proven.
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseVersion:
+        description: 'Base version, for example 1.2.1'
+        required: true
+        default: '1.0.0'
+        type: string
+      packageType:
+        description: 'Package type'
+        required: true
+        default: ci
+        type: choice
+        options:
+          - ci
+          - preview
+          - rc
+          - release
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nuget-packages-build-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CONFIGURATION: Release
+  FRAMEWORK_PROJECT: src/Pillaro.Dataverse.PluginFramework/Pillaro.Dataverse.PluginFramework.csproj
+  FRAMEWORK_CONSTANTS: src/Pillaro.Dataverse.PluginFramework/FrameworkConstants.cs
+  FRAMEWORK_NUSPEC: src/Pillaro.Dataverse.PluginFramework/Tools/PluginPackaging/Pillaro.Dataverse.PluginFramework.nuspec
+  TESTING_PROJECT: src/Pillaro.Dataverse.PluginFramework.Testing/Pillaro.Dataverse.PluginFramework.Testing.csproj
+  TESTING_NUSPEC: src/Pillaro.Dataverse.PluginFramework.Testing/Tools/TestingPackaging/Pillaro.Dataverse.PluginFramework.Testing.nuspec
+  CLI_PROJECT: tools/Pillaro.Dataverse.PluginFramework.Cli/Pillaro.Dataverse.PluginFramework.Cli.csproj
+
+jobs:
+  build:
+    name: Build and pack packages
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      # examples/*.Logic is a legacy non-SDK project; the pipeline used VSBuild for the
+      # test projects for the same reason.
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Determine package and assembly versions
+        id: versions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $baseVersion = '${{ inputs.baseVersion }}'
+          $packageType = '${{ inputs.packageType }}'
+          $buildId     = [int]'${{ github.run_number }}'
+          $ref         = '${{ github.ref }}'
+
+          if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+            throw "baseVersion must be in format Major.Minor.Patch, e.g. 1.0.0"
+          }
+
+          $parts = $baseVersion.Split('.')
+          $major = [int]$parts[0]
+          $minor = [int]$parts[1]
+          $patch = [int]$parts[2]
+
+          if ($ref -match '^refs/tags/v?(.+)$') {
+            $packageVersion = $Matches[1]
+
+            if ($packageVersion -notmatch '^\d+\.\d+\.\d+([\-+].*)?$') {
+              throw "Tag version '$packageVersion' is not valid."
+            }
+
+            $assemblyVersion = "$major.$minor.$patch.0"
+            $fileVersion     = "$major.$minor.$patch.0"
+          }
+          else {
+            switch ($packageType) {
+              'ci'      { $packageVersion = "$baseVersion-ci.$buildId" }
+              'preview' { $packageVersion = "$baseVersion-preview.$buildId" }
+              'rc'      { $packageVersion = "$baseVersion-rc.$buildId" }
+              'release' { $packageVersion = $baseVersion }
+              default   { throw "Unsupported packageType '$packageType'." }
+            }
+
+            $assemblyVersion = "$major.$minor.$patch.0"
+            $fileVersion     = "$major.$minor.$patch.$buildId"
+          }
+
+          @(
+            "package_version=$packageVersion"
+            "assembly_version=$assemblyVersion"
+            "file_version=$fileVersion"
+            "informational_version=$packageVersion"
+          ) | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+          "## Versions"                                   | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                                              | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| What | Value |"                              | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| --- | --- |"                                 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| Package type | ``$packageType`` |"           | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| Package version | ``$packageVersion`` |"     | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| Assembly version | ``$assemblyVersion`` |"   | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Stamp FrameworkVersion
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $file = '${{ env.FRAMEWORK_CONSTANTS }}'
+          $packageVersion = '${{ steps.versions.outputs.package_version }}'
+          $utf8 = New-Object System.Text.UTF8Encoding -ArgumentList $false
+          $content = [System.IO.File]::ReadAllText((Resolve-Path $file), [System.Text.Encoding]::UTF8)
+          $pattern = '(FrameworkVersion\s*=\s*")[^"]*(")'
+
+          if (-not [regex]::IsMatch($content, $pattern)) {
+            throw "FrameworkVersion constant was not found in '$file'."
+          }
+
+          $updated = [regex]::Replace($content, $pattern, "`${1}$packageVersion`${2}", 1)
+          [System.IO.File]::WriteAllText((Resolve-Path $file), $updated, $utf8)
+
+          $expected = "FrameworkVersion = `"$packageVersion`""
+
+          if ($updated -notlike "*$expected*") {
+            throw "FrameworkVersion stamping failed. Expected '$expected' in '$file'."
+          }
+
+          Write-Host ([regex]::Match($updated, '.*FrameworkVersion\s*=.*').Value.Trim())
+
+      - name: Restore framework project
+        run: dotnet restore ${{ env.FRAMEWORK_PROJECT }}
+
+      - name: Build framework project
+        run: >
+          dotnet build ${{ env.FRAMEWORK_PROJECT }}
+          --configuration ${{ env.CONFIGURATION }}
+          --no-restore
+          -p:Version=${{ steps.versions.outputs.package_version }}
+          -p:PackageVersion=${{ steps.versions.outputs.package_version }}
+          -p:AssemblyVersion=${{ steps.versions.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.versions.outputs.file_version }}
+          -p:InformationalVersion=${{ steps.versions.outputs.informational_version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
+          -p:DebugType=portable
+          -p:DebugSymbols=true
+          -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
+          -p:IncludeSourceRevisionInInformationalVersion=false
+          -p:GeneratePackageOnBuild=false
+
+      - name: Restore testing project
+        run: dotnet restore ${{ env.TESTING_PROJECT }}
+
+      - name: Build testing project
+        run: >
+          dotnet build ${{ env.TESTING_PROJECT }}
+          --configuration ${{ env.CONFIGURATION }}
+          --no-restore
+          -p:Version=${{ steps.versions.outputs.package_version }}
+          -p:PackageVersion=${{ steps.versions.outputs.package_version }}
+          -p:AssemblyVersion=${{ steps.versions.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.versions.outputs.file_version }}
+          -p:InformationalVersion=${{ steps.versions.outputs.informational_version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
+          -p:DebugType=portable
+          -p:DebugSymbols=true
+          -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
+          -p:IncludeSourceRevisionInInformationalVersion=false
+          -p:GeneratePackageOnBuild=false
+
+      - name: Restore test projects
+        run: |
+          dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+
+      - name: Build framework test project
+        run: >
+          msbuild tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          -t:Restore,Build
+          -p:Configuration=${{ env.CONFIGURATION }}
+          -p:Version=${{ steps.versions.outputs.package_version }}
+          -p:PackageVersion=${{ steps.versions.outputs.package_version }}
+          -p:AssemblyVersion=${{ steps.versions.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.versions.outputs.file_version }}
+          -p:InformationalVersion=${{ steps.versions.outputs.informational_version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
+          -p:DebugType=portable
+          -p:DebugSymbols=true
+          -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
+          -p:IncludeSourceRevisionInInformationalVersion=false
+          -p:GeneratePackageOnBuild=false
+          -m
+          -v:minimal
+
+      - name: Build example test project
+        run: >
+          msbuild examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          -t:Restore,Build
+          -p:Configuration=${{ env.CONFIGURATION }}
+          -p:Version=${{ steps.versions.outputs.package_version }}
+          -p:PackageVersion=${{ steps.versions.outputs.package_version }}
+          -p:AssemblyVersion=${{ steps.versions.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.versions.outputs.file_version }}
+          -p:InformationalVersion=${{ steps.versions.outputs.informational_version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
+          -p:DebugType=portable
+          -p:DebugSymbols=true
+          -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
+          -p:IncludeSourceRevisionInInformationalVersion=false
+          -p:GeneratePackageOnBuild=false
+          -m
+          -v:minimal
+
+      # The pipeline runs the whole suite here, including the Dataverse-backed tests. That
+      # is why the secret is needed. Unlike the pull request gate, a release build should
+      # not skip them.
+      - name: Run all tests
+        env:
+          ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+        run: |
+          dotnet test tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx --results-directory ${{ runner.temp }}/TestResults
+          dotnet test examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx --results-directory ${{ runner.temp }}/TestResults
+
+      - name: Upload test results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-build-test-results
+          path: ${{ runner.temp }}/TestResults/**/*.trx
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Restore CLI project
+        run: dotnet restore ${{ env.CLI_PROJECT }}
+
+      # The framework nuspec packs this publish output into tools/Deployment/pillaro-dv,
+      # so the pack cannot succeed without it.
+      - name: Publish CLI for packaging
+        run: >
+          dotnet publish ${{ env.CLI_PROJECT }}
+          --configuration ${{ env.CONFIGURATION }}
+          --framework net8.0
+          --no-restore
+          --no-self-contained
+          --output tools/Pillaro.Dataverse.PluginFramework.Cli/bin/${{ env.CONFIGURATION }}/net8.0/publish
+          -p:Version=${{ steps.versions.outputs.package_version }}
+          -p:PackageVersion=${{ steps.versions.outputs.package_version }}
+          -p:AssemblyVersion=${{ steps.versions.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.versions.outputs.file_version }}
+          -p:InformationalVersion=${{ steps.versions.outputs.informational_version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
+          -p:DebugType=portable
+          -p:DebugSymbols=true
+          -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
+          -p:IncludeSourceRevisionInInformationalVersion=false
+          -p:GeneratePackageOnBuild=false
+
+      - name: Verify package DLL metadata
+        shell: pwsh
+        run: |
+          ./scripts/Test-PackageAssemblyMetadata.ps1 `
+            -AssemblyVersion '${{ steps.versions.outputs.assembly_version }}' `
+            -PackageVersion '${{ steps.versions.outputs.package_version }}' `
+            -RepositoryRoot '${{ github.workspace }}' `
+            -Configuration '${{ env.CONFIGURATION }}'
+
+      - name: Validate ILMerge README encoding
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $readme = 'src/Pillaro.Dataverse.PluginFramework/Tools/ILMerge/README.md'
+          $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $readme))
+          $utf8 = New-Object System.Text.UTF8Encoding -ArgumentList $false, $true
+
+          try {
+            $content = $utf8.GetString($bytes)
+          }
+          catch {
+            throw "ILMerge README is not valid UTF-8: $readme. $($_.Exception.Message)"
+          }
+
+          if ($content.Contains([string][char]0xFFFD)) {
+            throw "ILMerge README contains the Unicode replacement character U+FFFD: $readme"
+          }
+
+          Write-Host "ILMerge README is valid UTF-8 and contains no replacement characters: $readme"
+
+      # Informational in the pipeline as well: SourceLink testing needs network access to
+      # the raw file host, so a failure here is reported but does not fail the build.
+      - name: Validate SourceLink PDBs
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $toolPath = "$env:RUNNER_TEMP/sourcelink-tool"
+          $pdbs = @(
+            "src/Pillaro.Dataverse.PluginFramework/bin/${{ env.CONFIGURATION }}/net462/Pillaro.Dataverse.PluginFramework.pdb",
+            "src/Pillaro.Dataverse.PluginFramework/bin/${{ env.CONFIGURATION }}/net8.0/Pillaro.Dataverse.PluginFramework.pdb",
+            "src/Pillaro.Dataverse.PluginFramework.Testing/bin/${{ env.CONFIGURATION }}/net8.0/Pillaro.Dataverse.PluginFramework.Testing.pdb",
+            "tools/Pillaro.Dataverse.PluginFramework.Cli/bin/${{ env.CONFIGURATION }}/net8.0/publish/pillaro-dv.pdb"
+          )
+
+          dotnet tool install dotnet-sourcelink --tool-path $toolPath
+
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::dotnet-sourcelink install failed. SourceLink validation is informational and is skipped."
+            exit 0
+          }
+
+          foreach ($pdb in $pdbs) {
+            if (-not (Test-Path $pdb)) {
+              Write-Host "::warning::Skipping SourceLink validation, PDB not found: $pdb"
+              continue
+            }
+
+            Write-Host "Validating SourceLink for $pdb"
+            & "$toolPath/sourcelink.exe" test $pdb
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "::warning::SourceLink validation reported issues for '$pdb'. This is informational."
+            }
+          }
+
+          exit 0
+
+      - name: Set release notes URL
+        id: notes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # github.ref_name is the branch or tag name, which is what the pipeline derived
+          # from Build.SourceBranch. Pointing at a ref rather than a commit is deliberate:
+          # Test-NuGetPackages.ps1 rejects a releaseNotes URL that names the exact commit.
+          $releaseNotesRef = '${{ github.ref_name }}'
+
+          if ([string]::IsNullOrWhiteSpace($releaseNotesRef)) {
+            throw 'Could not determine the ref for the release notes URL.'
+          }
+
+          $releaseNotesUrl = "https://github.com/${{ github.repository }}/blob/$releaseNotesRef/CHANGELOG.md"
+          "url=$releaseNotesUrl" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+          foreach ($nuspecPath in @('${{ env.FRAMEWORK_NUSPEC }}', '${{ env.TESTING_NUSPEC }}')) {
+            if (-not (Test-Path $nuspecPath)) {
+              throw "Nuspec file was not found: $nuspecPath"
+            }
+
+            [xml]$nuspec = Get-Content -LiteralPath $nuspecPath -Raw
+            $metadata = $nuspec.SelectSingleNode("/*[local-name()='package']/*[local-name()='metadata']")
+
+            if (-not $metadata) {
+              throw "Metadata node was not found in nuspec file: $nuspecPath"
+            }
+
+            $releaseNotesNode = $metadata.SelectSingleNode("*[local-name()='releaseNotes']")
+
+            if (-not $releaseNotesNode) {
+              $releaseNotesNode = $nuspec.CreateElement('releaseNotes', $nuspec.DocumentElement.NamespaceURI)
+              [void]$metadata.AppendChild($releaseNotesNode)
+            }
+
+            $releaseNotesNode.InnerText = $releaseNotesUrl
+            $nuspec.Save((Resolve-Path -LiteralPath $nuspecPath))
+
+            Write-Host "Updated releaseNotes in $nuspecPath"
+          }
+
+          Write-Host "Final release notes URL: $releaseNotesUrl"
+
+      - name: Pack framework package
+        run: >
+          nuget pack ${{ env.FRAMEWORK_NUSPEC }}
+          -BasePath src/Pillaro.Dataverse.PluginFramework
+          -Properties "configuration=${{ env.CONFIGURATION }};version=${{ steps.versions.outputs.package_version }}"
+          -OutputDirectory ${{ runner.temp }}/packages
+          -NonInteractive
+
+      - name: Pack testing package
+        run: >
+          nuget pack ${{ env.TESTING_NUSPEC }}
+          -BasePath src/Pillaro.Dataverse.PluginFramework.Testing
+          -Properties "configuration=${{ env.CONFIGURATION }};version=${{ steps.versions.outputs.package_version }}"
+          -OutputDirectory ${{ runner.temp }}/packages
+          -NonInteractive
+
+      - name: Verify generated NuGet packages
+        shell: pwsh
+        run: |
+          ./scripts/Test-NuGetPackages.ps1 `
+            -PackageVersion '${{ steps.versions.outputs.package_version }}' `
+            -ExpectedReleaseNotes '${{ steps.notes.outputs.url }}' `
+            -PackageDirectory '${{ runner.temp }}/packages' `
+            -SourceCommit '${{ github.sha }}'
+
+      - name: Upload NuGet artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ${{ runner.temp }}/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summarize
+        if: always()
+        shell: pwsh
+        run: |
+          ""                        | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "## Artifacts"            | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                        | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- ``nuget-packages`` — the two .nupkg files to upload to nuget.org" |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                        | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "> Nothing is published by this workflow. Upload the packages, then tag with ``Release – Tag and GitHub Release``." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
