@@ -74,9 +74,17 @@ jobs:
           Write-Host "Connection string is present."
 
       - name: Restore test projects
+        shell: pwsh
         run: |
-          dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
-          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          # Checked individually: a pwsh block exits with the last command's code, so a
+          # failing first restore would otherwise be masked.
+          foreach ($project in @('tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj', 'examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj')) {
+            dotnet restore $project
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Restore failed for $project."
+            }
+          }
 
       - name: Build the framework test project
         run: >

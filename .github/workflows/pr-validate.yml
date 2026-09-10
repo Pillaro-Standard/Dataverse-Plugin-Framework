@@ -55,9 +55,17 @@ jobs:
       # left the example test run failing to resolve Autofac from its deps.json: MSBuild's
       # own -t:Restore was not enough for `dotnet test --no-restore` to find the packages.
       - name: Restore test projects
+        shell: pwsh
         run: |
-          dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
-          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          # Checked individually: a pwsh block exits with the last command's code, so a
+          # failing first restore would otherwise be masked.
+          foreach ($project in @('tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj', 'examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj')) {
+            dotnet restore $project
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Restore failed for $project."
+            }
+          }
 
       - name: Build the framework test project
         run: >
