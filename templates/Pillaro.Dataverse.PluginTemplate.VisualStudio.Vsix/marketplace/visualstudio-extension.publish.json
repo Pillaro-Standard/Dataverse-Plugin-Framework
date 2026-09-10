@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/vsix-publish.json",
+  "categories": [
+    "other templates",
+    "visual studio extensions"
+  ],
+  "identity": {
+    "internalName": "Pillaro.Dataverse.PluginTemplate.Template"
+  },
+  "overview": "overview.md",
+  "priceCategory": "free",
+  "publisher": "Pillaro",
+  "qna": true,
+  "repo": "https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework"
+}
