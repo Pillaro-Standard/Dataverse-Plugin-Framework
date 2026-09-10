@@ -18,6 +18,10 @@ Continuous integration is moving to GitHub Actions, in `.github/workflows`. The 
 DevOps pipelines stay in place until the replacements are proven, so for now some work
 runs in both places.
 
+The Azure DevOps `PR – Validate` pipeline is retired: both its triggers are `none`, so pull
+requests get one validation rather than two. It remains in the repository and can still be
+queued by hand. The other pipelines still run.
+
 ### Workflow naming
 
 GitHub Actions workflows are named `Area – Action`, with an en dash, matching the
@@ -26,7 +30,7 @@ rather than by verb.
 
 | Workflow | File | Status |
 | --- | --- | --- |
-| `Pull Request – Validate` | `pr-validate.yml` | in Actions |
+| `Pull Request – Validate` | `pr-validate.yml` | in Actions, required status check `Build and test` |
 | `Nightly – Dataverse Tests` | `nightly-tests.yml` | in Actions |
 | `Release – Tag and GitHub Release` | `tag-and-release.yml` | in Actions |
 | `Release – Sync develop` | `sync-develop-after-release.yml` | in Actions |
