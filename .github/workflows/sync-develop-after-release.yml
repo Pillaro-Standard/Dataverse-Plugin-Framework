@@ -1,4 +1,4 @@
-name: Sync develop after release
+name: Release – Sync develop
 
 on:
   pull_request:

@@ -1,0 +1,180 @@
+name: Nightly – Dataverse Tests
+
+# The Dataverse-backed tests: the DataService and Autonumbering categories in the
+# framework project, plus the whole example test project. They run here rather than on
+# pull requests because they share one Dataverse environment, so concurrent runs compete
+# for the same test data — the concurrency test passed one pull request run and failed the
+# next with leftover state.
+#
+# Mirrors the Azure DevOps "Nightly – Tests Only" pipeline, including its 02:00 UTC
+# schedule and its main-and-develop scope.
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch to test'
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  # One at a time. Two runs against the same Dataverse environment would collide on test
+  # data, which is the failure this workflow exists to keep away from pull requests.
+  group: nightly-tests
+  cancel-in-progress: false
+
+env:
+  CONFIGURATION: Release
+
+jobs:
+  test:
+    name: All tests against Dataverse
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The scheduled run covers both branches, as the pipeline did. A manual run tests
+        # only the ref that was asked for.
+        branch: ${{ github.event_name == 'schedule' && fromJSON('["main","develop"]') || fromJSON('[""]') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ matrix.branch != '' && matrix.branch || inputs.ref }}
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      # examples/*.Logic is a legacy non-SDK project that the dotnet CLI cannot build.
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Fail early if the connection string is missing
+        shell: pwsh
+        env:
+          DV: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:DV)) {
+            Write-Host "::error::The DATAVERSE_CONNECTION_STRING secret is not set, so there is nothing for this workflow to test."
+            exit 1
+          }
+
+          Write-Host "Connection string is present."
+
+      - name: Restore test projects
+        run: |
+          dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+
+      - name: Build the framework test project
+        run: >
+          msbuild tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          -t:Restore,Build
+          -p:Configuration=${{ env.CONFIGURATION }}
+          -m
+          -v:minimal
+
+      - name: Build the example test project
+        run: >
+          msbuild examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          -t:Restore,Build
+          -p:Configuration=${{ env.CONFIGURATION }}
+          -m
+          -v:minimal
+
+      - name: Run all framework tests
+        id: framework
+        continue-on-error: true
+        env:
+          ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+        run: >
+          dotnet test tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
+          --configuration ${{ env.CONFIGURATION }}
+          --no-build
+          --no-restore
+          --logger trx
+          --results-directory ${{ runner.temp }}/TestResults
+          --collect "XPlat Code Coverage"
+
+      # continue-on-error above so a framework failure does not hide the example results.
+      # The job still fails, decided at the end.
+      - name: Run example tests
+        id: examples
+        continue-on-error: true
+        env:
+          ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+        run: >
+          dotnet test examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          --configuration ${{ env.CONFIGURATION }}
+          --no-build
+          --no-restore
+          --logger trx
+          --results-directory ${{ runner.temp }}/TestResults
+          --collect "XPlat Code Coverage"
+
+      - name: Upload test results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-test-results${{ matrix.branch != '' && format('-{0}', matrix.branch) || '' }}
+          path: |
+            ${{ runner.temp }}/TestResults/**/*.trx
+            ${{ runner.temp }}/TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarize and decide the outcome
+        if: always()
+        shell: pwsh
+        run: |
+          $branch = '${{ matrix.branch }}'
+          if ([string]::IsNullOrWhiteSpace($branch)) { $branch = '${{ inputs.ref }}' }
+
+          "## Nightly tests on $branch" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                            | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| Run | Total | Passed | Failed |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| --- | --- | --- | --- |"    | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+          foreach ($file in @(Get-ChildItem -Path "$env:RUNNER_TEMP/TestResults" -Recurse -Filter '*.trx' -ErrorAction SilentlyContinue)) {
+            try {
+              [xml]$trx = Get-Content -LiteralPath $file.FullName -Raw
+              $c = $trx.TestRun.ResultSummary.Counters
+              "| $($file.BaseName) | $($c.total) | $($c.passed) | $($c.failed) |" |
+                Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            }
+            catch {
+              "| $($file.BaseName) | could not be parsed | | |" |
+                Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            }
+          }
+
+          $framework = '${{ steps.framework.outcome }}'
+          $examples  = '${{ steps.examples.outcome }}'
+
+          ""                                              | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Framework tests: $framework"                 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Example tests: $examples"                    | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+          if ($framework -ne 'success' -or $examples -ne 'success') {
+            ""  | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            "> These tests share one Dataverse environment. A failure can be leftover test data rather than a code defect, so check the failure before treating it as a regression." |
+              Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+            Write-Host "::error::Nightly tests failed. Framework: $framework. Examples: $examples."
+            exit 1
+          }
+
+          Write-Host "All Dataverse-backed tests passed."

@@ -14,6 +14,33 @@ The repository uses Azure DevOps pipelines for:
 
 All pipelines are defined in YAML files at the repository root.
 
+Continuous integration is moving to GitHub Actions, in `.github/workflows`. The Azure
+DevOps pipelines stay in place until the replacements are proven, so for now some work
+runs in both places.
+
+### Workflow naming
+
+GitHub Actions workflows are named `Area – Action`, with an en dash, matching the
+Azure DevOps pipeline names. The area comes first so the Actions list groups by subject
+rather than by verb.
+
+| Workflow | File | Status |
+| --- | --- | --- |
+| `Pull Request – Validate` | `pr-validate.yml` | in Actions |
+| `Nightly – Dataverse Tests` | `nightly-tests.yml` | in Actions |
+| `Release – Tag and GitHub Release` | `tag-and-release.yml` | in Actions |
+| `Release – Sync develop` | `sync-develop-after-release.yml` | in Actions |
+| `Spike – Windows runner capability` | `spike-windows-runner-capability.yml` | diagnostic, safe to delete once the migration is settled |
+| `NuGet Packages – Build Artifacts` | not yet migrated | Azure DevOps: `Packages – Build & Package` |
+| `NuGet Packages – Deploy` | not yet migrated | manual upload to nuget.org today |
+| `Project Templates – Build Artifacts` | not yet migrated | Azure DevOps: `Templates - Build Template Artifacts` |
+| `Project Templates – Deploy` | not yet migrated | Azure DevOps classic release, currently failing |
+
+The name of a required status check is the **job** name, not the workflow name. The
+`Protect main` and `Protect develop` rulesets require `Build and test`, the job in
+`pr-validate.yml`. Renaming that job without updating both rulesets in the same change
+leaves every pull request waiting for a check that will never report.
+
 ---
 
 ## Nightly Test Pipeline
