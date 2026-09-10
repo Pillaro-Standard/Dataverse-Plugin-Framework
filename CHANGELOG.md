@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Pillaro.Dataverse.PluginFramework
+
+- Autonumbering no longer resolves deactivated configurations (#88). Both the `GetAutoNumber` Custom API task and `AutoNumberingService` looked configurations up without any condition on `statecode`, so deactivating a `pl_autonumbering` record did not take it out of service. With a deactivated leftover beside a current configuration, the Custom API reported *More than one primary autonumbering configuration exists* even though only one was in use, and `AutoNumberingService` picked one of them at random: its query had no `Orders`, so `FirstOrDefault()` over `RetrieveMultiple` returned whichever row the platform happened to return first. Both now filter to active configurations, and `AutoNumberingService` orders its results so repeated calls resolve the same configuration, and reports more than one match as an error instead of choosing silently — the behaviour the Custom API task already had.
+
 ## 1.2.1
 
 ### Templates

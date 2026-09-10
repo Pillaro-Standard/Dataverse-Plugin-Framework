@@ -527,4 +527,31 @@ public class GetAutoNumberActionTests : TestBase
 
         Assert.True(Regex.IsMatch(number, @"^\d{4}-JAN-\d{2}-0028$"), $"Unexpected generated number '{number}'.");
     }
+    [Fact]
+    public void Deactivated_configuration_is_not_used()
+    {
+        // A deactivated configuration must not serve numbers. Without this, deactivating a
+        // configuration does not take it out of service, and a leftover keeps producing
+        // numbers alongside the current one. Created first, so the deterministic ordering in
+        // the lookup would otherwise select it.
+        var deactivated = CreateConfig("contact", 3, 6, "{NUM}");
+        Deactivate(deactivated);
+
+        CreateConfig("contact", 4, 100, "P-{NUM}");
+
+        var contact = CreateContact();
+        var number = ExecuteGetAutoNumber(contact.ToEntityReference());
+
+        Assert.Equal("P-0101", number);
+    }
+
+    private void Deactivate(pl_AutoNumbering config)
+    {
+        OrganizationService.Update(new pl_AutoNumbering
+        {
+            Id = config.Id,
+            statecode = pl_autonumbering_statecode.Inactive,
+            statuscode = pl_autonumbering_statuscode.Inactive
+        });
+    }
 }
