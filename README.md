@@ -17,8 +17,6 @@ deployment without duplicate steps. Licensed under Apache-2.0 and free for comme
 
 Pillaro Framework provides a structured and production-proven approach to developing Dataverse plugins using C#.
 
-For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
-
 It introduces a task-based execution model with explicit validation and execution phases, together with a precise deployment model for plugin assemblies, plugin steps, images, filtering attributes, and related registration metadata.
 
 This enables:
