@@ -1,0 +1,383 @@
+name: Project Templates – Deploy
+
+# Publishes what "Project Templates – Build Artifacts" produced: the dotnet new template
+# package to nuget.org and the VSIX to the Visual Studio Marketplace.
+#
+# Takes the run id of that workflow instead of building again. The VSIX version is
+# derived from the build's run number, so a rebuild would produce a different version
+# than the artifact that was validated and smoke-built.
+#
+# Runs on Windows because VsixPublisher.exe is a Windows executable. It ships inside the
+# Microsoft.VSSDK.BuildTools package, the same one that builds the VSIX, so no Visual
+# Studio installation is involved.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Run id of the Project Templates – Build Artifacts run to publish'
+        required: true
+        type: string
+      version:
+        description: 'dotnet new package version that run produced, for example 1.0.3'
+        required: true
+        type: string
+      targets:
+        description: 'What to publish'
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - nuget only
+          - marketplace only
+
+permissions:
+  contents: read
+  # Needed to download an artifact from a different workflow run.
+  actions: read
+
+concurrency:
+  group: project-templates-deploy
+  cancel-in-progress: false
+
+env:
+  TEMPLATE_PACKAGE_ID: Pillaro.Dataverse.PluginTemplate.DotNetNew
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+  VSIX_PROJECT: templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix.csproj
+  PUBLISH_MANIFEST: templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/marketplace/visualstudio-extension.publish.json
+
+jobs:
+  deploy:
+    name: Publish template packages
+    runs-on: windows-latest
+
+    # Add required reviewers to this environment in the repository settings to gate the
+    # publish behind an approval. The workflow works either way.
+    environment: template-publish
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Check the secrets needed for the chosen targets
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          VS_MARKETPLACE_PAT: ${{ secrets.VS_MARKETPLACE_PAT }}
+        run: |
+          $targets = '${{ inputs.targets }}'
+          $missing = @()
+
+          if ($targets -ne 'marketplace only' -and [string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
+            $missing += 'NUGET_API_KEY'
+          }
+
+          if ($targets -ne 'nuget only' -and [string]::IsNullOrWhiteSpace($env:VS_MARKETPLACE_PAT)) {
+            $missing += 'VS_MARKETPLACE_PAT'
+          }
+
+          if ($missing.Count -gt 0) {
+            Write-Host "::error::Missing secret(s) for targets '$targets': $($missing -join ', ')."
+            exit 1
+          }
+
+          Write-Host "Secrets for '$targets' are present."
+
+      - name: Download the dotnet new package
+        if: inputs.targets != 'marketplace only'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TEMPLATE_PACKAGE_ID }}
+          path: artifacts/nuget
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Download the VSIX
+        if: inputs.targets != 'nuget only'
+        uses: actions/download-artifact@v4
+        with:
+          name: visual-studio-template
+          path: artifacts/vsix
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Verify the downloaded artifacts
+        id: verify
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $version = '${{ inputs.version }}'
+          $targets = '${{ inputs.targets }}'
+
+          if ($version -notmatch '^\d+\.\d+\.\d+([-+].*)?$') {
+            throw "Version '$version' is not a valid NuGet version."
+          }
+
+          if ($targets -ne 'marketplace only') {
+            # Named, not globbed: a glob would publish whatever the artifact contained,
+            # including a version other than the one being released.
+            $expected = "artifacts/nuget/${{ env.TEMPLATE_PACKAGE_ID }}.$version.nupkg"
+
+            if (-not (Test-Path -LiteralPath $expected)) {
+              Write-Host "Artifact contains:"
+              Get-ChildItem -Path artifacts/nuget -Recurse | ForEach-Object { Write-Host "  $($_.Name)" }
+              throw "Expected '$expected' from run ${{ inputs.run_id }}. Check that the run built version $version."
+            }
+
+            "package_path=$expected" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "dotnet new package: $expected"
+          }
+
+          if ($targets -ne 'nuget only') {
+            $vsixFiles = @(Get-ChildItem -Path artifacts/vsix -Filter '*.vsix' -File -Recurse)
+
+            if ($vsixFiles.Count -ne 1) {
+              throw "Expected exactly one VSIX in the artifact, found $($vsixFiles.Count)."
+            }
+
+            $vsix = $vsixFiles[0]
+
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($vsix.FullName)
+
+            try {
+              $entry = $archive.GetEntry('extension.vsixmanifest')
+
+              if (-not $entry) {
+                throw "'$($vsix.Name)' has no extension.vsixmanifest."
+              }
+
+              $reader = New-Object System.IO.StreamReader($entry.Open())
+
+              try {
+                [xml]$manifest = $reader.ReadToEnd()
+              }
+              finally {
+                $reader.Dispose()
+              }
+
+              # The payload guard the build already applies is repeated here, because this
+              # is the step that actually reaches the Marketplace: anything outside
+              # ProjectTemplates/ makes the Marketplace classify the package as a tool and
+              # reject it against the Templates extension type this listing is registered
+              # with.
+              $allowed = @('extension.vsixmanifest', '[Content_Types].xml', 'manifest.json', 'catalog.json')
+
+              $stray = @($archive.Entries |
+                Where-Object { $_.FullName -notlike 'ProjectTemplates/*' -and $allowed -notcontains $_.FullName })
+
+              if ($stray.Count -gt 0) {
+                $names = ($stray | ForEach-Object { $_.FullName }) -join '; '
+                throw "The VSIX carries payload outside ProjectTemplates/, which the Marketplace rejects for a Templates extension: $names"
+              }
+            }
+            finally {
+              $archive.Dispose()
+            }
+
+            # The Marketplace takes the version from inside the package, so that is what
+            # gets reported rather than the workflow input.
+            $identity = $manifest.PackageManifest.Metadata.Identity
+
+            "vsix_path=$($vsix.FullName)"            | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            "vsix_version=$($identity.Version)"      | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            "vsix_id=$($identity.Id)"                | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            "vsix_publisher=$($identity.Publisher)"  | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+            Write-Host "VSIX: $($vsix.Name)"
+            Write-Host "  Id:        $($identity.Id)"
+            Write-Host "  Publisher: $($identity.Publisher)"
+            Write-Host "  Version:   $($identity.Version)"
+          }
+
+      - name: Refuse to publish a package version already on nuget.org
+        if: inputs.targets != 'marketplace only'
+        shell: pwsh
+        run: |
+          $id = '${{ env.TEMPLATE_PACKAGE_ID }}'.ToLowerInvariant()
+          $version = '${{ inputs.version }}'
+
+          try {
+            $index = Invoke-RestMethod -Uri "https://api.nuget.org/v3-flatcontainer/$id/index.json" -TimeoutSec 30
+          }
+          catch {
+            # No index means no versions published yet, which is fine for a first publish.
+            Write-Host "No version index for '$id' on nuget.org yet."
+            exit 0
+          }
+
+          if ($index.versions -contains $version) {
+            Write-Host "::error::'$id' $version is already on nuget.org. A published version cannot be replaced; build and publish a new version instead."
+            exit 1
+          }
+
+          Write-Host "$id $version is free."
+
+      - name: Push the dotnet new package to nuget.org
+        if: inputs.targets != 'marketplace only'
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push '${{ steps.verify.outputs.package_path }}' `
+            --source '${{ env.NUGET_SOURCE }}' `
+            --api-key $env:NUGET_API_KEY `
+            --no-symbols
+
+          if ($LASTEXITCODE -ne 0) {
+            throw 'dotnet nuget push failed.'
+          }
+
+      - name: Report which listing is being published to
+        if: inputs.targets != 'nuget only'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $manifest = Get-Content -LiteralPath '${{ env.PUBLISH_MANIFEST }}' -Raw | ConvertFrom-Json
+          $fullName = "$($manifest.publisher).$($manifest.identity.internalName)"
+
+          Write-Host "Publish manifest targets: $fullName"
+          Write-Host "VSIX identity:            ${{ steps.verify.outputs.vsix_publisher }}.${{ steps.verify.outputs.vsix_id }}"
+
+          # VsixPublisher has no separate create command: publish creates the extension
+          # when it does not exist, so a wrong internalName produces a second public
+          # listing instead of an error. The public gallery query below would be the
+          # natural guard, but it does not return this extension even by its exact name —
+          # it appears to cover the VS Code marketplace only — so it is reported and not
+          # enforced. Confirm identity.internalName against "Copy ID" on the listing page
+          # before the first run of this workflow.
+          $body = @{
+            filters = @(@{ criteria = @(@{ filterType = 7; value = $fullName }) })
+            flags   = 914
+          } | ConvertTo-Json -Depth 6
+
+          try {
+            $response = Invoke-RestMethod `
+              -Method Post `
+              -Uri 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery' `
+              -ContentType 'application/json' `
+              -Headers @{ Accept = 'application/json;api-version=3.0-preview.1' } `
+              -Body $body `
+              -TimeoutSec 60
+
+            $extension = $response.results[0].extensions | Select-Object -First 1
+          }
+          catch {
+            Write-Host "Gallery query failed: $($_.Exception.Message)"
+            $extension = $null
+          }
+
+          if ($extension) {
+            Write-Host "Gallery reports listing '$($extension.displayName)' at version $($extension.versions[0].version)."
+          }
+          else {
+            Write-Host "::warning::The public gallery returned no listing for '$fullName'. That is expected for a Visual Studio extension and does not mean the listing is missing, so publishing continues. If this is the first publish from this workflow, check afterwards that the existing listing was updated and no second one appeared."
+          }
+
+      - name: Resolve VsixPublisher
+        id: publisher
+        if: inputs.targets != 'nuget only'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # The version is read from the project rather than pinned here, so bumping the
+          # package in one place cannot leave this workflow on the old tool.
+          $project = Get-Content -LiteralPath '${{ env.VSIX_PROJECT }}' -Raw
+          $match = [regex]::Match($project, 'Microsoft\.VSSDK\.BuildTools"\s+Version="([^"]+)"')
+
+          if (-not $match.Success) {
+            throw "Could not read the Microsoft.VSSDK.BuildTools version from '${{ env.VSIX_PROJECT }}'."
+          }
+
+          $version = $match.Groups[1].Value
+          $outputDir = Join-Path $env:RUNNER_TEMP 'vssdk'
+
+          Write-Host "Installing Microsoft.VSSDK.BuildTools $version"
+
+          nuget install Microsoft.VSSDK.BuildTools `
+            -Version $version `
+            -OutputDirectory $outputDir `
+            -DependencyVersion Ignore `
+            -NonInteractive
+
+          if ($LASTEXITCODE -ne 0) {
+            throw 'nuget install of Microsoft.VSSDK.BuildTools failed.'
+          }
+
+          # The package ships two copies of the tool and only the one in bin\lib runs.
+          # The one in bin crashes on startup with a FileLoadException for
+          # System.Runtime.CompilerServices.Unsafe 6.0.1.0: it resolves the 6.0.0.0 copy
+          # that sits next to it, while the matching 6.0.1.0 is in bin\lib. Verified by
+          # running both.
+          $exe = @(Get-ChildItem -Path $outputDir -Filter 'VsixPublisher.exe' -File -Recurse |
+            Where-Object { $_.Directory.Name -eq 'lib' } |
+            Select-Object -First 1)
+
+          if ($exe.Count -eq 0) {
+            throw "VsixPublisher.exe was not found under a 'lib' directory in '$outputDir'. The package layout changed; check which copy of the tool actually starts before publishing with it."
+          }
+
+          $path = $exe[0].FullName
+
+          # Proves the tool starts before a publish depends on it, so a broken copy fails
+          # here rather than half way through publishing.
+          & $path version
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "VsixPublisher at '$path' does not run: exit code $LASTEXITCODE."
+          }
+
+          "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "VsixPublisher: $path"
+
+      - name: Publish the VSIX to the Visual Studio Marketplace
+        if: inputs.targets != 'nuget only'
+        shell: pwsh
+        env:
+          VS_MARKETPLACE_PAT: ${{ secrets.VS_MARKETPLACE_PAT }}
+        run: |
+          # The token goes on the command line because VsixPublisher takes no other form
+          # of it. Actions masks the secret in the log.
+          & '${{ steps.publisher.outputs.path }}' publish `
+            -payload '${{ steps.verify.outputs.vsix_path }}' `
+            -publishManifest '${{ env.PUBLISH_MANIFEST }}' `
+            -personalAccessToken $env:VS_MARKETPLACE_PAT
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "VsixPublisher failed with exit code $LASTEXITCODE."
+          }
+
+          Write-Host "Published VSIX ${{ steps.verify.outputs.vsix_version }}."
+
+      - name: Summary
+        if: always()
+        shell: pwsh
+        run: |
+          $lines = @(
+            "### Project templates ${{ inputs.version }}"
+            ""
+            "- Targets: ``${{ inputs.targets }}``"
+            "- From run: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/${{ inputs.run_id }}"
+          )
+
+          if ('${{ inputs.targets }}' -ne 'marketplace only') {
+            $lines += "- https://www.nuget.org/packages/${{ env.TEMPLATE_PACKAGE_ID }}/${{ inputs.version }}"
+          }
+
+          if ('${{ inputs.targets }}' -ne 'nuget only') {
+            $lines += "- VSIX ``${{ steps.verify.outputs.vsix_version }}`` to the Visual Studio Marketplace"
+          }
+
+          $lines += ""
+          $lines += "Indexing on nuget.org lags a few minutes, and a Marketplace update takes a few minutes to appear. Once the package version is listed, run ``Release – Tag and GitHub Release`` with ``component=templates`` and ``changelog_version`` set to the framework version these templates ship with."
+
+          $lines | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8

@@ -35,10 +35,50 @@ rather than by verb.
 | `Release – Tag and GitHub Release` | `tag-and-release.yml` | in Actions |
 | `Release – Sync develop` | `sync-develop-after-release.yml` | in Actions |
 | `Spike – Windows runner capability` | `spike-windows-runner-capability.yml` | diagnostic, safe to delete once the migration is settled |
-| `NuGet Packages – Build Artifacts` | not yet migrated | Azure DevOps: `Packages – Build & Package` |
-| `NuGet Packages – Deploy` | not yet migrated | manual upload to nuget.org today |
-| `Project Templates – Build Artifacts` | not yet migrated | Azure DevOps: `Templates - Build Template Artifacts` |
-| `Project Templates – Deploy` | not yet migrated | Azure DevOps classic release, currently failing |
+| `NuGet Packages – Build Artifacts` | `nuget-packages-build.yml` | in Actions |
+| `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | in Actions, needs the `NUGET_API_KEY` secret |
+| `Project Templates – Build Artifacts` | `project-templates-build.yml` | in Actions |
+| `Project Templates – Deploy` | `project-templates-deploy.yml` | in Actions, needs `NUGET_API_KEY` and `VS_MARKETPLACE_PAT` |
+
+## Deploying
+
+A deploy workflow takes the **run id** of the matching build workflow and publishes that
+run's artifact. It does not build. The version a build produces depends on the run number
+(`github.run_number` stands in for `Build.BuildId`), so rebuilding from the same commit
+gives a different version than the artifact that was validated — and for the VSIX, than
+the package that was smoke-built.
+
+Neither deploy workflow can be repeated for a version: nuget.org does not allow a
+published version to be replaced, so both refuse to push a version that is already
+listed rather than failing part way through.
+
+Both run in a GitHub environment (`nuget-org` and `template-publish`). Adding required
+reviewers to those environments in the repository settings turns a publish into an
+approval gate; without reviewers they publish straight away.
+
+The order for a release is: build → deploy → `Release – Tag and GitHub Release`. The tag
+workflow refuses to tag a version that is not on nuget.org, so it has to come last.
+
+### Publishing the VSIX
+
+`Project Templates – Deploy` publishes the Marketplace listing with `VsixPublisher.exe`
+and `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/marketplace/visualstudio-extension.publish.json`.
+Two things about that are worth knowing before changing it:
+
+- The tool comes from the `Microsoft.VSSDK.BuildTools` package, the same one that builds
+  the VSIX, so no Visual Studio installation is needed. The package ships two copies of
+  the executable and **only the one in `bin\lib` runs**; the copy in `bin` crashes on
+  startup resolving the wrong `System.Runtime.CompilerServices.Unsafe`.
+- `VsixPublisher publish` creates the extension when it does not exist, so a wrong
+  `identity.internalName` in the publish manifest silently produces a second public
+  listing rather than updating the existing one. The public gallery API does not return
+  this extension even by its exact name, so the workflow reports the target identity but
+  cannot verify it. Confirm it against **Copy ID** on the listing page.
+
+The overview markdown next to the publish manifest is the Marketplace listing text. It is
+read at publish time and is **not** packed into the VSIX — a details asset inside the VSIX
+is what made the Marketplace reject the package as a tool. Both deploy and build fail if
+any payload outside `ProjectTemplates/` reappears.
 
 The name of a required status check is the **job** name, not the workflow name. The
 `Protect main` and `Protect develop` rulesets require `Build and test`, the job in
