@@ -23,8 +23,8 @@ Read the framework installation notes here: [`../framework/README.md`](../framew
 
 | File | Use when |
 |---|---|
-| `PillaroPluginFrameworkExamples_1_0_0_0_managed.zip` | You want to install and try the examples in an environment. This is the recommended option for most users. |
-| `PillaroPluginFrameworkExamples_1_0_0_0.zip` | You need the unmanaged solution for development or inspection. |
+| `PillaroPluginFrameworkExamples_1_0_0_1_managed.zip` | You want to install and try the examples in an environment. This is the recommended option for most users. |
+| `PillaroPluginFrameworkExamples_1_0_0_1.zip` | You need the unmanaged solution for development or inspection. |
 
 ## What the examples demonstrate
 
@@ -44,7 +44,7 @@ Install the **Pillaro Framework** solution from [`../framework`](../framework/RE
 
 1. Open Power Apps.
 2. Go to **Solutions**.
-3. Import `../framework/PillaroFramework_1_0_0_1_managed.zip`.
+3. Import `../framework/PillaroFramework_1_0_0_2_managed.zip`.
 4. Confirm that the **Pillaro Plugin Framework** model-driven app is available.
 
 This prerequisite provides the Runtime Settings, Autonumberings, Plugin Logs, and security roles used by the examples.
@@ -54,7 +54,7 @@ This prerequisite provides the Runtime Settings, Autonumberings, Plugin Logs, an
 Import the managed examples solution:
 
 ```text
-PillaroPluginFrameworkExamples_1_0_0_0_managed.zip
+PillaroPluginFrameworkExamples_1_0_0_1_managed.zip
 ```
 
 After import, the environment contains the example plugin assembly and plugin step registrations. The scenarios below are now ready to run after you configure the required framework records.

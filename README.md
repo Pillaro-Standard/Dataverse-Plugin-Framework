@@ -424,6 +424,11 @@ We provide practical support for teams adopting the Pillaro Dataverse Plugin Fra
 [Contact Pillaro](https://www.pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support)
 
 
+## Articles
+
+- [Why Dataverse Plug-in Steps Drift — and Why Stable IDs Fix It](https://dev.to/mucha/why-dataverse-plug-in-steps-drift-and-why-stable-ids-fix-it-eah) - why duplicate plugin steps appear after redeployment, and how declaring step identity in code makes deployment deterministic.
+
+
 ## License
 
 Licensed under the [Apache License, Version 2.0](LICENSE).

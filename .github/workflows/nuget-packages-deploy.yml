@@ -1,0 +1,160 @@
+name: NuGet Packages – Deploy
+
+# Publishes what "NuGet Packages – Build Artifacts" produced to nuget.org.
+#
+# Takes the run id of that workflow instead of building again, so the bytes that reach
+# nuget.org are the ones that were built, validated and tested in that run. Rebuilding
+# from a tag would produce a different assembly for the same version number.
+#
+# Nothing here is retryable by design: nuget.org does not allow a version to be
+# replaced, so the job refuses to push a version that is already published rather than
+# failing halfway through with one of the two packages live.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Run id of the NuGet Packages – Build Artifacts run to publish'
+        required: true
+        type: string
+      version:
+        description: 'Package version that run produced, for example 1.2.1'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  # Needed to download an artifact from a different workflow run.
+  actions: read
+  # Trusted Publishing: lets the job get a GitHub OIDC token, which nuget.org
+  # exchanges for an API key that lives one hour. No long-lived key is stored.
+  id-token: write
+
+concurrency:
+  group: nuget-packages-deploy
+  cancel-in-progress: false
+
+env:
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+
+jobs:
+  deploy:
+    name: Push packages to nuget.org
+    runs-on: ubuntu-latest
+
+    # Add required reviewers to this environment in the repository settings to gate the
+    # push behind an approval. The workflow works either way.
+    environment: nuget-org
+
+    steps:
+      - name: Fail early if the nuget.org user is not configured
+        run: |
+          set -euo pipefail
+
+          if [ -z "${{ vars.NUGET_USER }}" ]; then
+            echo "::error::The NUGET_USER repository variable is not set. Trusted Publishing needs the nuget.org profile name that owns the trusted publishing policy — the profile name, not the email address."
+            exit 1
+          fi
+
+          echo "Publishing as nuget.org user '${{ vars.NUGET_USER }}'."
+
+      - name: Download the packages from the build run
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: packages
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Verify what is about to be published
+        id: verify
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ inputs.version }}"
+
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([-+].*)?$'; then
+            echo "::error::Version '$VERSION' is not a valid NuGet version."
+            exit 1
+          fi
+
+          # Named explicitly rather than globbed: a glob would happily push whatever the
+          # artifact happened to contain, including a version other than the one being
+          # released.
+          EXPECTED=(
+            "packages/Pillaro.Dataverse.PluginFramework.$VERSION.nupkg"
+            "packages/Pillaro.Dataverse.PluginFramework.Testing.$VERSION.nupkg"
+          )
+
+          for f in "${EXPECTED[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Expected '$f' in run ${{ inputs.run_id }}, and it is not there. Check that the run built version $VERSION."
+              echo "Artifact contains:"
+              ls -1 packages
+              exit 1
+            fi
+
+            echo "  found $(basename "$f")"
+          done
+
+          FOUND="$(ls -1 packages/*.nupkg | wc -l)"
+
+          if [ "$FOUND" -ne "${#EXPECTED[@]}" ]; then
+            echo "::error::Artifact holds $FOUND .nupkg files, expected ${#EXPECTED[@]}. Refusing to guess which ones to publish."
+            ls -1 packages
+            exit 1
+          fi
+
+      - name: Refuse to publish a version that is already on nuget.org
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ inputs.version }}"
+
+          for id in pillaro.dataverse.pluginframework pillaro.dataverse.pluginframework.testing; do
+            # A 404 means the package has no versions at all, which is fine for a first
+            # publish, so only a readable index is checked for the version.
+            if curl -fsSL --max-time 30 "https://api.nuget.org/v3-flatcontainer/$id/index.json" -o index.json; then
+              if jq -e --arg v "$VERSION" '.versions | index($v)' index.json >/dev/null; then
+                echo "::error::'$id' $VERSION is already on nuget.org. A published version cannot be replaced; build and publish a new version instead."
+                exit 1
+              fi
+            fi
+
+            echo "  $id $VERSION is free."
+          done
+
+      # Deliberately the last step before the push: the key nuget.org hands back is
+      # valid for one hour, and each OIDC token buys exactly one key.
+      - name: Get a short-lived nuget.org API key
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push to nuget.org
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          for f in packages/*.nupkg; do
+            echo "Pushing $(basename "$f")"
+
+            dotnet nuget push "$f" \
+              --source "$NUGET_SOURCE" \
+              --api-key "$NUGET_API_KEY" \
+              --no-symbols
+          done
+
+      - name: Summary
+        run: |
+          {
+            printf '### Published %s to nuget.org\n\n' "${{ inputs.version }}"
+            printf -- '- From run: %s/actions/runs/%s\n' \
+              "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "${{ inputs.run_id }}"
+            printf -- '- https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework/%s\n' "${{ inputs.version }}"
+            printf -- '- https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing/%s\n' "${{ inputs.version }}"
+            printf '\n'
+            printf 'Indexing on nuget.org lags a few minutes. Once the versions are listed, run `Release – Tag and GitHub Release` with `component=packages` to create the tag and the release.\n'
+          } >> "$GITHUB_STEP_SUMMARY"
