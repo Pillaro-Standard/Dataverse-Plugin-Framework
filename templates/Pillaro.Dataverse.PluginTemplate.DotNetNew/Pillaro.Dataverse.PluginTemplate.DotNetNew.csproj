@@ -14,11 +14,11 @@
     <NoWarn>$(NoWarn);NU5128</NoWarn>
 
     <PackageId>Pillaro.Dataverse.PluginTemplate.DotNetNew</PackageId>
-    <Version>1.0.0-rc.1</Version>
+    <Version>1.0.0-rc.2</Version>
     <Authors>Pillaro Labs s.r.o.</Authors>
     <Company>Pillaro Labs s.r.o.</Company>
-    <Description>Dotnet new template package for the Pillaro Dataverse plugin solution, suitable for Visual Studio Code and CLI-based workflows.</Description>
-    <PackageTags>dotnet-new;template;templates;dataverse;plugin;vscode</PackageTags>
+    <Description>Project template that generates a complete Microsoft Dataverse (Dynamics 365) plug-in solution in C#: business logic, a signed plug-in assembly targeting .NET Framework 4.6.2, and an integration test project. Plug-in step registration is defined in code, with deterministic deployment that avoids duplicate steps. Apache-2.0 licensed, free for commercial use.</Description>
+    <PackageTags>dataverse;dynamics-365;power-platform;dataverse-plugin;plugin;plug-in;template;dotnet-new;csharp;xrm</PackageTags>
     <PackageType>Template</PackageType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
