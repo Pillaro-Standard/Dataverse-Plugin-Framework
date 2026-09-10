@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Packaging
+
+- Rewrote the NuGet `Description` of all four packages. nuget.org renders that field in search results and in `og:description`, not the package README, and every description still described how the package was built rather than the problem it solves. None of them contained "Dynamics 365" or the hyphenated "plug-in" spelling. Each description now opens with the problem domain, states what the artifact is, and ends with the license. The framework and testing descriptions live in the nuspec files, since those two packages are built with `nuget pack`.
+- Aligned `PackageTags` across all four packages. The template advertised `vscode` and `templates`, the framework `dynamics crm`, and the CLI spelled Dynamics without a hyphen. All four now carry `dataverse`, `dynamics-365`, `power-platform`, `dataverse-plugin` and `csharp`, plus terms specific to each package. Package content is unchanged; only the search-facing metadata moved.
+
+### Documentation
+
+- Replaced the root README tagline. It omitted "Dataverse", the most-searched term in this domain, and led with "AI-ready standard", a claim the reader cannot verify from the page.
+- Expanded the root README License section, which was a bare link. It now states that commercial use is free of charge, notes the Apache-2.0 patent grant and the NOTICE requirement, and links to the new `TRADEMARK.md`.
+- Added `TRADEMARK.md`, recording that the Apache-2.0 grant does not cover the names "Pillaro" and "Pillaro Dataverse Plugin Framework", what forks may and may not do with them, and where to send permission requests.
+
 ## 1.2.1
 
 ### Templates
