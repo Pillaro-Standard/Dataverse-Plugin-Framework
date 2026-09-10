@@ -195,9 +195,17 @@ jobs:
           -p:GeneratePackageOnBuild=false
 
       - name: Restore test projects
+        shell: pwsh
         run: |
-          dotnet restore tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj
-          dotnet restore examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj
+          # Checked individually: a pwsh block exits with the last command's code, so a
+          # failing first restore would otherwise be masked.
+          foreach ($project in @('tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj', 'examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj')) {
+            dotnet restore $project
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Restore failed for $project."
+            }
+          }
 
       - name: Build framework test project
         run: >
@@ -247,9 +255,24 @@ jobs:
       - name: Run all tests
         env:
           ConnectionStrings__Dataverse: ${{ secrets.DATAVERSE_CONNECTION_STRING }}
+        shell: pwsh
         run: |
+          # Both projects run, then the step decides. GitHub exits a pwsh block with the
+          # LAST command's exit code, so a failing first `dotnet test` followed by a
+          # passing second one reported success — which is exactly what happened on the
+          # first run: 1 of 134 framework tests failed and the job went green. The Azure
+          # DevOps task took both projects at once and failed if either did.
+          $failed = @()
+
           dotnet test tests/Pillaro.Dataverse.PluginFramework.Tests/Pillaro.Dataverse.PluginFramework.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx --results-directory ${{ runner.temp }}/TestResults
+          if ($LASTEXITCODE -ne 0) { $failed += 'framework' }
+
           dotnet test examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Pillaro.Dataverse.PluginFramework.Examples.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --logger trx --results-directory ${{ runner.temp }}/TestResults
+          if ($LASTEXITCODE -ne 0) { $failed += 'examples' }
+
+          if ($failed.Count -gt 0) {
+            throw "Test failures in: $($failed -join ', ')."
+          }
 
       - name: Upload test results
         if: always()
