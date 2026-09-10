@@ -26,6 +26,9 @@ permissions:
   contents: read
   # Needed to download an artifact from a different workflow run.
   actions: read
+  # Trusted Publishing: lets the job get a GitHub OIDC token, which nuget.org
+  # exchanges for an API key that lives one hour. No long-lived key is stored.
+  id-token: write
 
 concurrency:
   group: nuget-packages-deploy
@@ -44,18 +47,16 @@ jobs:
     environment: nuget-org
 
     steps:
-      - name: Fail early if the API key is missing
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      - name: Fail early if the nuget.org user is not configured
         run: |
           set -euo pipefail
 
-          if [ -z "${NUGET_API_KEY:-}" ]; then
-            echo "::error::The NUGET_API_KEY secret is not set, so nothing can be pushed."
+          if [ -z "${{ vars.NUGET_USER }}" ]; then
+            echo "::error::The NUGET_USER repository variable is not set. Trusted Publishing needs the nuget.org profile name that owns the trusted publishing policy — the profile name, not the email address."
             exit 1
           fi
 
-          echo "API key is present."
+          echo "Publishing as nuget.org user '${{ vars.NUGET_USER }}'."
 
       - name: Download the packages from the build run
         uses: actions/download-artifact@v4
@@ -123,9 +124,17 @@ jobs:
             echo "  $id $VERSION is free."
           done
 
+      # Deliberately the last step before the push: the key nuget.org hands back is
+      # valid for one hour, and each OIDC token buys exactly one key.
+      - name: Get a short-lived nuget.org API key
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Push to nuget.org
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           set -euo pipefail
 

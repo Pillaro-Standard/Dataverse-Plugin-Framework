@@ -36,9 +36,9 @@ rather than by verb.
 | `Release – Sync develop` | `sync-develop-after-release.yml` | in Actions |
 | `Spike – Windows runner capability` | `spike-windows-runner-capability.yml` | diagnostic, safe to delete once the migration is settled |
 | `NuGet Packages – Build Artifacts` | `nuget-packages-build.yml` | in Actions |
-| `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | in Actions, needs the `NUGET_API_KEY` secret |
+| `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | in Actions, publishes with Trusted Publishing |
 | `Project Templates – Build Artifacts` | `project-templates-build.yml` | in Actions |
-| `Project Templates – Deploy` | `project-templates-deploy.yml` | in Actions, needs `NUGET_API_KEY` and `VS_MARKETPLACE_PAT` |
+| `Project Templates – Deploy` | `project-templates-deploy.yml` | in Actions, needs the `VS_MARKETPLACE_PAT` secret |
 
 ## Deploying
 
@@ -55,6 +55,32 @@ listed rather than failing part way through.
 Both run in a GitHub environment (`nuget-org` and `template-publish`). Adding required
 reviewers to those environments in the repository settings turns a publish into an
 approval gate; without reviewers they publish straight away.
+
+### Publishing to nuget.org
+
+No API key is stored. Both workflows use nuget.org Trusted Publishing: the job requests a
+GitHub OIDC token, nuget.org validates it against a policy and hands back an API key that
+lives one hour. That is why the login step sits immediately before the push — each token
+buys exactly one key, and a key requested too early expires.
+
+What this needs configured, once:
+
+- A trusted publishing policy per workflow on nuget.org (**your profile → Trusted
+  Publishing**). A policy names the repository owner, the repository, the **workflow file
+  name** with no path, and optionally the environment. So there are two: one for
+  `nuget-packages-deploy.yml` with environment `nuget-org`, one for
+  `project-templates-deploy.yml` with environment `template-publish`.
+- A repository **variable** `NUGET_USER` holding the nuget.org profile name that owns
+  those policies. A variable rather than a secret, because a profile name is not one.
+  Note it is the profile name, not the email address.
+
+Renaming either workflow file breaks publishing until the matching policy is updated, the
+same coupling the required status check has with the job name.
+
+A policy on a private repository starts out *temporarily active* for 7 days: nuget.org
+needs the repository and owner ids from a real publish to pin the policy against a
+repository being deleted and recreated under the same name. If nothing is published in
+that window the policy goes inactive, and the window can be restarted.
 
 The order for a release is: build → deploy → `Release – Tag and GitHub Release`. The tag
 workflow refuses to tag a version that is not on nuget.org, so it has to come last.

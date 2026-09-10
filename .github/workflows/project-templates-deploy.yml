@@ -36,6 +36,9 @@ permissions:
   contents: read
   # Needed to download an artifact from a different workflow run.
   actions: read
+  # Trusted Publishing: lets the job get a GitHub OIDC token, which nuget.org
+  # exchanges for an API key that lives one hour. No long-lived key is stored.
+  id-token: write
 
 concurrency:
   group: project-templates-deploy
@@ -65,29 +68,30 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Check the secrets needed for the chosen targets
+      - name: Check what the chosen targets need
         shell: pwsh
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           VS_MARKETPLACE_PAT: ${{ secrets.VS_MARKETPLACE_PAT }}
         run: |
           $targets = '${{ inputs.targets }}'
           $missing = @()
 
-          if ($targets -ne 'marketplace only' -and [string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
-            $missing += 'NUGET_API_KEY'
+          # nuget.org is published with Trusted Publishing, so there is no API key to
+          # check — only the profile name the trusted publishing policy belongs to.
+          if ($targets -ne 'marketplace only' -and [string]::IsNullOrWhiteSpace('${{ vars.NUGET_USER }}')) {
+            $missing += 'NUGET_USER (repository variable, the nuget.org profile name)'
           }
 
           if ($targets -ne 'nuget only' -and [string]::IsNullOrWhiteSpace($env:VS_MARKETPLACE_PAT)) {
-            $missing += 'VS_MARKETPLACE_PAT'
+            $missing += 'VS_MARKETPLACE_PAT (secret)'
           }
 
           if ($missing.Count -gt 0) {
-            Write-Host "::error::Missing secret(s) for targets '$targets': $($missing -join ', ')."
+            Write-Host "::error::Missing for targets '$targets': $($missing -join '; ')."
             exit 1
           }
 
-          Write-Host "Secrets for '$targets' are present."
+          Write-Host "Everything '$targets' needs is configured."
 
       - name: Download the dotnet new package
         if: inputs.targets != 'marketplace only'
@@ -220,11 +224,20 @@ jobs:
 
           Write-Host "$id $version is free."
 
+      # Deliberately the last step before the push: the key nuget.org hands back is
+      # valid for one hour, and each OIDC token buys exactly one key.
+      - name: Get a short-lived nuget.org API key
+        id: login
+        if: inputs.targets != 'marketplace only'
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Push the dotnet new package to nuget.org
         if: inputs.targets != 'marketplace only'
         shell: pwsh
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           dotnet nuget push '${{ steps.verify.outputs.package_path }}' `
             --source '${{ env.NUGET_SOURCE }}' `
