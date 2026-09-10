@@ -76,7 +76,7 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
         var autoNumName = "pl_autonumbering";
 
         // Find the primary configuration for the given entity
-        var primaryAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_parentautonumberingid", "pl_parentlookupid"], [entityName, null, null]) ?? throw new InvalidPluginExecutionException($"Primary autonumbering configuration does not exist for entity '{entityName}'.");
+        var primaryAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_parentautonumberingid", "pl_parentlookupid"], [entityName, null, null], $"primary autonumbering configuration for entity '{entityName}'") ?? throw new InvalidPluginExecutionException($"Primary autonumbering configuration does not exist for entity '{entityName}'.");
 
         // Determines where the current sequence number comes from
         var currentAutoNum = primaryAutoNum;
@@ -86,7 +86,7 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
             if (parentEntityId == null)
                 throw new InvalidPluginExecutionException($"Attribute '{primaryAutoNum["pl_parentlookupattribute"]}' is required for entity '{entityName}'.");
 
-            currentAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_parentlookupid"], [entityName, parentEntityId]);
+            currentAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_parentlookupid"], [entityName, parentEntityId], $"child autonumbering configuration for entity '{entityName}' and ParentLookupId='{parentEntityId}'");
             if (currentAutoNum == null)
             {
                 // If no configuration exists for this parent entity yet, create one
@@ -105,7 +105,7 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
         // A grouping value exists (e.g. year) that separates numbering sequences
         else if (!string.IsNullOrEmpty(groupingValue))
         {
-            currentAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_groupingvalue"], [entityName, groupingValue]);
+            currentAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_groupingvalue"], [entityName, groupingValue], $"child autonumbering configuration for entity '{entityName}' and GroupingValue='{groupingValue}'");
             if (currentAutoNum == null)
             {
                 // If no configuration exists for this grouping value yet, create one
@@ -255,18 +255,19 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
     /// needs live here instead.
     ///
     /// Only active configurations are considered, so deactivating a configuration takes it out of service.
-    /// Results are ordered so that when several configurations match, the same one is chosen every time —
-    /// an unordered <c>RetrieveMultiple</c> returns whichever row the platform happens to return first,
-    /// which made numbering non-deterministic whenever a duplicate configuration existed.
+    /// More than one match is an error rather than a silent choice, matching the <c>GetAutoNumber</c>
+    /// Custom API task. Taking whichever row came back first made numbering non-deterministic when a
+    /// duplicate configuration existed, and hid the duplicate instead of reporting it.
     /// </remarks>
-    private Entity LoadActiveConfiguration(string entityName, string[] searchAttributes, object[] searchValues)
+    private Entity LoadActiveConfiguration(string tableName, string[] searchAttributes, object[] searchValues, string description)
     {
         QueryExpression query = new()
         {
-            EntityName = entityName,
+            EntityName = tableName,
             ColumnSet = new ColumnSet(true),
             Criteria = new FilterExpression(),
-            TopCount = 1
+            // Two rows are enough to tell "exactly one" from "more than one".
+            TopCount = 2
         };
 
         for (var i = 0; i < searchAttributes.Length; i++)
@@ -283,9 +284,11 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
 
         query.Criteria.AddCondition("statecode", ConditionOperator.Equal, ActiveStateCode);
 
-        query.AddOrder("createdon", OrderType.Ascending);
-        query.AddOrder(entityName + "id", OrderType.Ascending);
+        var results = _organizationService.RetrieveMultiple(query).Entities;
 
-        return _organizationService.RetrieveMultiple(query).Entities.FirstOrDefault();
+        if (results.Count > 1)
+            throw new InvalidPluginExecutionException($"More than one {description} exists.");
+
+        return results.Count == 0 ? null : results[0];
     }
 }
