@@ -11,6 +11,8 @@
 
 - Replaced the root README tagline. It omitted "Dataverse", the most-searched term in this domain, and led with "AI-ready standard", a claim the reader cannot verify from the page.
 - Expanded the root README License section, which was a bare link. It now states that commercial use is free of charge, notes the Apache-2.0 patent grant and the NOTICE requirement, and links to the new `TRADEMARK.md`.
+- The template package README now tells the reader to import the Pillaro framework solution into the Dataverse environment. `docs/plugins/getting-started.md` makes that a prerequisite for the runtime features — without it settings and logging do not work — but the step list went straight from build to deployment, so a reader who only ever sees the package README had no way to learn it. It is now step 4, ahead of the deployment step.
+- Removed the commercial support paragraph from the root README `Overview`, where it sat as the second paragraph, before the reader knew what the framework does. The same offer, with the same link, already appears in `Support & Partnership` and again in `Need help?`.
 - Added `TRADEMARK.md`, recording that the Apache-2.0 grant does not cover the names "Pillaro" and "Pillaro Dataverse Plugin Framework", what forks may and may not do with them, and where to send permission requests.
 
 ## 1.2.1
