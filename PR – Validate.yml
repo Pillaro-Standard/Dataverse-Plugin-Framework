@@ -1,16 +1,11 @@
 name: PR Validate
 
-trigger:
-  branches:
-    include:
-      - develop
-      - main
+# Superseded by the "Pull Request – Validate" GitHub Actions workflow, which is the required
+# status check on main and develop. Both triggers are off so this no longer reports a second,
+# redundant check on every pull request. Kept queueable by hand until the migration is finished.
+trigger: none
 
-pr:
-  branches:
-    include:
-      - develop
-      - main
+pr: none
 
 variables:
   - group: dataverse-test-secrets

@@ -17,7 +17,7 @@
     <ToolCommandName>pillaro-dv</ToolCommandName>
     <PackageId>Pillaro.Dataverse.PluginFramework.Cli</PackageId>
     <Title>Pillaro Dataverse CLI</Title>
-    <Description>Command-line tool that deploys a Microsoft Dataverse plugin assembly and synchronizes its plugin step and image registrations. Bundled inside the Pillaro.Dataverse.PluginFramework package; install this package only to put pillaro-dv on PATH.</Description>
+    <Description>Command-line tool that deploys a Microsoft Dataverse (Dynamics 365) plug-in assembly and synchronizes its plug-in step and image registrations from metadata defined in code. Bundled inside the Pillaro.Dataverse.PluginFramework package; install this package only to put pillaro-dv on PATH. Apache-2.0 licensed, free for commercial use.</Description>
     <Authors>Pillaro Labs s.r.o.</Authors>
     <Company>Pillaro Labs s.r.o.</Company>
     <Copyright>Copyright © 2026 Pillaro Labs s.r.o.</Copyright>
@@ -28,7 +28,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageTags>dataverse;dynamics365;power-platform;plugin;deployment;cli;dotnet-tool</PackageTags>
+    <PackageTags>dataverse;dynamics-365;power-platform;dataverse-plugin;plugin-registration;deployment;cli;dotnet-tool;csharp</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -16,13 +16,11 @@
 		<readme>docs\README.md</readme>
 		<icon>icon.png</icon>
 
-		<description>
-			Testing support package for integration and end-to-end testing of solutions built with Pillaro Dataverse Plugin Framework.
-		</description>
+		<description>Integration testing library for Microsoft Dataverse (Dynamics 365) plug-ins built with the Pillaro framework. Runs xUnit v3 tests against a real environment, prepares test data through repositories and automatically cleans up everything a test creates. Apache-2.0 licensed, free for commercial use.</description>
 
 		<releaseNotes>CHANGELOG.md in the release branch used to build this package.</releaseNotes>
 
-		<tags>dataverse dynamics365 plugin testing integration-testing</tags>
+		<tags>dataverse dynamics-365 power-platform dataverse-plugin plugin-testing integration-testing xunit csharp</tags>
 
 		<dependencies>
 			<group targetFramework="net8.0">

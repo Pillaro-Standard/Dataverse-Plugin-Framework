@@ -76,7 +76,13 @@ script variants), `Tools/Deployment/` (`DeployPlugins.bat`, `DeployPlugins.ps1`)
 
 3. Replace `Plugins/key.snk` with your own strong-name key before you ship.
 
-4. Deploy the assembly and synchronize the registered steps:
+4. Import the Pillaro framework solution into your Dataverse environment. It ships in
+   the framework repository under `power-platform-solutions/framework`. Without it the
+   framework's runtime features — settings, logging and their supporting components —
+   do not work. See
+   [Getting started](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/docs/plugins/getting-started.md#1-import-the-framework-solution).
+
+5. Deploy the assembly and synchronize the registered steps:
 
    ```powershell
    .\Plugins\Tools\Deployment\DeployPlugins.bat
@@ -84,11 +90,11 @@ script variants), `Tools/Deployment/` (`DeployPlugins.bat`, `DeployPlugins.ps1`)
 
    The wrapper uses the `debug` profile; pass `release` for the release profile.
 
-5. To run the tests, put your connection string into
+6. To run the tests, put your connection string into
    `Tests/appsettings.Development.json` (or set `ConnectionStrings__Dataverse`),
    then `dotnet test`. `ConnectionTests` verifies the connection with `WhoAmI`.
 
-6. Replace `ExamplePlugin` and `ExampleTask` with your own. The example registers
+7. Replace `ExamplePlugin` and `ExampleTask` with your own. The example registers
    a synchronous PreValidation step on `contact` Create/Update; the GUIDs in
    `Register(...)` are step identifiers you should regenerate for your own steps.
 

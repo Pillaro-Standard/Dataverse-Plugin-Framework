@@ -16,15 +16,11 @@
 		<readme>docs\README.md</readme>
 		<icon>icon.png</icon>
 
-		<description>
-			Lightweight framework for building Microsoft Dataverse plugins with focus on testability,
-			structure, and maintainability. Designed for real-world enterprise usage with support for
-			logging and consistent plugin architecture.
-		</description>
+		<description>Framework for building testable Microsoft Dataverse (Dynamics 365) plug-ins in C#. Task-based execution model with validation separated from business logic, logging and runtime configuration. Plug-in step registration is defined in code, with deterministic deployment that avoids duplicate steps. Apache-2.0 licensed, free for commercial use.</description>
 
 		<releaseNotes>CHANGELOG.md in the release branch used to build this package.</releaseNotes>
 
-		<tags>dataverse dynamics crm plugin framework xrm</tags>
+		<tags>dataverse dynamics-365 power-platform dataverse-plugin plugin plug-in plugin-framework iplugin csharp xrm</tags>
 
 		<dependencies>
 			<group targetFramework=".NETFramework4.6.2">

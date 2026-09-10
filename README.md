@@ -8,14 +8,14 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/LICENSE)
 
-Apache-2.0 licensed, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
+Open-source framework for building scalable, testable Microsoft Dataverse and Dynamics 365
+plug-ins in C#. Task-based structure, plug-in step registration defined in code, deterministic
+deployment without duplicate steps. Licensed under Apache-2.0 and free for commercial use.
 
 
 ## Overview
 
 Pillaro Framework provides a structured and production-proven approach to developing Dataverse plugins using C#.
-
-For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
 
 It introduces a task-based execution model with explicit validation and execution phases, together with a precise deployment model for plugin assemblies, plugin steps, images, filtering attributes, and related registration metadata.
 
@@ -427,3 +427,14 @@ We provide practical support for teams adopting the Pillaro Dataverse Plugin Fra
 ## License
 
 Licensed under the [Apache License, Version 2.0](LICENSE).
+
+You may use, modify, and distribute the framework, including in commercial projects and paid
+client deliverables, free of charge. Apache-2.0 includes an explicit patent grant and requires
+that copyright and NOTICE attributions be preserved in redistributions.
+
+The names "Pillaro" and "Pillaro Dataverse Plugin Framework" are not covered by the
+Apache-2.0 grant — see [TRADEMARK.md](TRADEMARK.md).
+
+Attribution is appreciated but not required beyond what Apache-2.0 mandates. If you find the
+framework useful, a mention in your technical documentation or a public reference helps others
+discover it.

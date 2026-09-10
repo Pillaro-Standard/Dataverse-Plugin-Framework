@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Pillaro.Dataverse.PluginFramework
+
+- Autonumbering no longer resolves deactivated configurations (#88). Both the `GetAutoNumber` Custom API task and `AutoNumberingService` looked configurations up without any condition on `statecode`, so deactivating a `pl_autonumbering` record did not take it out of service. With a deactivated leftover beside a current configuration, the Custom API reported *More than one primary autonumbering configuration exists* even though only one was in use, and `AutoNumberingService` picked one of them at random: its query had no `Orders`, so `FirstOrDefault()` over `RetrieveMultiple` returned whichever row the platform happened to return first. Both now filter to active configurations, and `AutoNumberingService` orders its results so repeated calls resolve the same configuration, and reports more than one match as an error instead of choosing silently — the behaviour the Custom API task already had.
+
+### Packaging
+
+- Rewrote the NuGet `Description` of all four packages. nuget.org renders that field in search results and in `og:description`, not the package README, and every description still described how the package was built rather than the problem it solves. None of them contained "Dynamics 365" or the hyphenated "plug-in" spelling. Each description now opens with the problem domain, states what the artifact is, and ends with the license. The framework and testing descriptions live in the nuspec files, since those two packages are built with `nuget pack`.
+- Aligned `PackageTags` across all four packages. The template advertised `vscode` and `templates`, the framework `dynamics crm`, and the CLI spelled Dynamics without a hyphen. All four now carry `dataverse`, `dynamics-365`, `power-platform`, `dataverse-plugin` and `csharp`, plus terms specific to each package. Package content is unchanged; only the search-facing metadata moved.
+
+### Documentation
+
+- Replaced the root README tagline. It omitted "Dataverse", the most-searched term in this domain, and led with "AI-ready standard", a claim the reader cannot verify from the page.
+- Expanded the root README License section, which was a bare link. It now states that commercial use is free of charge, notes the Apache-2.0 patent grant and the NOTICE requirement, and links to the new `TRADEMARK.md`.
+- The template package README now tells the reader to import the Pillaro framework solution into the Dataverse environment. `docs/plugins/getting-started.md` makes that a prerequisite for the runtime features — without it settings and logging do not work — but the step list went straight from build to deployment, so a reader who only ever sees the package README had no way to learn it. It is now step 4, ahead of the deployment step.
+- Removed the commercial support paragraph from the root README `Overview`, where it sat as the second paragraph, before the reader knew what the framework does. The same offer, with the same link, already appears in `Support & Partnership` and again in `Need help?`.
+- Added `TRADEMARK.md`, recording that the Apache-2.0 grant does not cover the names "Pillaro" and "Pillaro Dataverse Plugin Framework", what forks may and may not do with them, and where to send permission requests.
+
+
 ## 1.2.1
 
 ### Templates
