@@ -18,8 +18,8 @@ The examples solution does not replace this solution. It only adds example plugi
 
 | File | Use when |
 |---|---|
-| `PillaroFramework_1_0_0_1_managed.zip` | You want to install the framework into an environment. This is the recommended option for most users. |
-| `PillaroFramework_1_0_0_1.zip` | You need the unmanaged solution for development or inspection. |
+| `PillaroFramework_1_0_0_2_managed.zip` | You want to install the framework into an environment. This is the recommended option for most users. |
+| `PillaroFramework_1_0_0_2.zip` | You need the unmanaged solution for development or inspection. |
 
 ## Versions and releases
 
@@ -45,7 +45,7 @@ Ensure that users or service accounts executing plugins have at least one of the
 
 ## Minimal deployment checklist
 
-- Import `PillaroFramework_1_0_0_1_managed.zip` into Dataverse.
+- Import `PillaroFramework_1_0_0_2_managed.zip` into Dataverse.
 - Confirm that the **Pillaro Plugin Framework** app is available.
 - Configure the `MinimalSeverityLevel` runtime setting to `0` or `1` for full debug-level logging, or `3` for the recommended production default.
 - Ensure appropriate security roles are assigned to users or service accounts.
