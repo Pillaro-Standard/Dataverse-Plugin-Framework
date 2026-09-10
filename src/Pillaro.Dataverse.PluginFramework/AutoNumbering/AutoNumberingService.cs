@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -14,6 +15,9 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
 {
     private readonly IOrganizationService _organizationService = organizationService;
     private readonly int _retryAttempts = retryAttempts;
+
+    /// <summary>Active <c>statecode</c> of a <c>pl_autonumbering</c> record.</summary>
+    private const int ActiveStateCode = 0;
 
     public virtual string GetAutoNumber(string entityName, Guid entityId, Guid? parentEntityId)
     {
@@ -69,12 +73,10 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
         if (entityId == Guid.Empty)
             throw new ArgumentNullException(nameof(entityId));
 
-        DataService dataService = new(_organizationService);
-
         var autoNumName = "pl_autonumbering";
 
         // Find the primary configuration for the given entity
-        var primaryAutoNum = dataService.LoadRecord(autoNumName, ["pl_entityname", "pl_parentautonumberingid", "pl_parentlookupid"], [entityName, null, null]) ?? throw new InvalidPluginExecutionException($"Primary autonumbering configuration does not exist for entity '{entityName}'.");
+        var primaryAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_parentautonumberingid", "pl_parentlookupid"], [entityName, null, null]) ?? throw new InvalidPluginExecutionException($"Primary autonumbering configuration does not exist for entity '{entityName}'.");
 
         // Determines where the current sequence number comes from
         var currentAutoNum = primaryAutoNum;
@@ -84,7 +86,7 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
             if (parentEntityId == null)
                 throw new InvalidPluginExecutionException($"Attribute '{primaryAutoNum["pl_parentlookupattribute"]}' is required for entity '{entityName}'.");
 
-            currentAutoNum = dataService.LoadRecord(autoNumName, ["pl_entityname", "pl_parentlookupid"], [entityName, parentEntityId]);
+            currentAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_parentlookupid"], [entityName, parentEntityId]);
             if (currentAutoNum == null)
             {
                 // If no configuration exists for this parent entity yet, create one
@@ -103,7 +105,7 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
         // A grouping value exists (e.g. year) that separates numbering sequences
         else if (!string.IsNullOrEmpty(groupingValue))
         {
-            currentAutoNum = dataService.LoadRecord(autoNumName, ["pl_entityname", "pl_groupingvalue"], [entityName, groupingValue]);
+            currentAutoNum = LoadActiveConfiguration(autoNumName, ["pl_entityname", "pl_groupingvalue"], [entityName, groupingValue]);
             if (currentAutoNum == null)
             {
                 // If no configuration exists for this grouping value yet, create one
@@ -242,5 +244,48 @@ public class AutoNumberingService(IOrganizationService organizationService, int 
                 break;
         }
         return format;
+    }
+
+    /// <summary>
+    /// Loads a single autonumbering configuration matching the supplied attributes.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately not <see cref="DataService.LoadRecord(string, string[], object[])"/>: that method is
+    /// general purpose and callers may legitimately want inactive rows, so the two constraints this lookup
+    /// needs live here instead.
+    ///
+    /// Only active configurations are considered, so deactivating a configuration takes it out of service.
+    /// Results are ordered so that when several configurations match, the same one is chosen every time —
+    /// an unordered <c>RetrieveMultiple</c> returns whichever row the platform happens to return first,
+    /// which made numbering non-deterministic whenever a duplicate configuration existed.
+    /// </remarks>
+    private Entity LoadActiveConfiguration(string entityName, string[] searchAttributes, object[] searchValues)
+    {
+        QueryExpression query = new()
+        {
+            EntityName = entityName,
+            ColumnSet = new ColumnSet(true),
+            Criteria = new FilterExpression(),
+            TopCount = 1
+        };
+
+        for (var i = 0; i < searchAttributes.Length; i++)
+        {
+            if (searchValues[i] == null)
+            {
+                query.Criteria.AddCondition(searchAttributes[i], ConditionOperator.Null);
+            }
+            else
+            {
+                query.Criteria.AddCondition(searchAttributes[i], ConditionOperator.Equal, searchValues[i]);
+            }
+        }
+
+        query.Criteria.AddCondition("statecode", ConditionOperator.Equal, ActiveStateCode);
+
+        query.AddOrder("createdon", OrderType.Ascending);
+        query.AddOrder(entityName + "id", OrderType.Ascending);
+
+        return _organizationService.RetrieveMultiple(query).Entities.FirstOrDefault();
     }
 }
