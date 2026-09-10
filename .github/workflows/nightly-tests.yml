@@ -1,4 +1,4 @@
-name: Nightly Tests
+name: Nightly – Dataverse Tests
 
 # The Dataverse-backed tests: the DataService and Autonumbering categories in the
 # framework project, plus the whole example test project. They run here rather than on

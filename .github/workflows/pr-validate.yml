@@ -1,4 +1,4 @@
-name: PR Validate
+name: Pull Request – Validate
 
 # Replaces the Azure DevOps "PR – Validate" pipeline, which was removed as the required
 # status check on main and develop. Mirrors what it did: restore, build both test

@@ -1,4 +1,4 @@
-name: 'Spike: GitHub-hosted Windows runner capability'
+name: Spike – Windows runner capability
 
 # Diagnostic only. Builds nothing that is kept, publishes nothing, deploys nothing.
 #
