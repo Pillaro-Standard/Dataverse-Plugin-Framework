@@ -15,12 +15,14 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: 'Run id of the Project Templates – Build Artifacts run to publish'
-        required: true
+        description: 'Run id of the Project Templates – Build Artifacts run to publish. Blank uses the most recent successful one.'
+        required: false
+        default: ''
         type: string
       version:
-        description: 'dotnet new package version that run produced, for example 1.0.3'
-        required: true
+        description: 'dotnet new package version to publish, for example 1.0.3. Blank uses whatever version that run built.'
+        required: false
+        default: ''
         type: string
       targets:
         description: 'What to publish'
@@ -93,13 +95,44 @@ jobs:
 
           Write-Host "Everything '$targets' needs is configured."
 
+      # Both inputs are optional so the common case — publish what was just built — needs
+      # nothing typed. workflow_dispatch cannot offer a list of runs to pick from: its
+      # choice inputs are a fixed list written into the file, so the run is resolved here.
+      - name: Resolve the build run
+        id: run
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $runId = '${{ inputs.run_id }}'
+
+          if ([string]::IsNullOrWhiteSpace($runId)) {
+            $runId = gh api "repos/$env:GITHUB_REPOSITORY/actions/workflows/project-templates-build.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].id // empty'
+
+            if ($LASTEXITCODE -ne 0) {
+              throw 'Could not list runs of the build workflow.'
+            }
+
+            if ([string]::IsNullOrWhiteSpace($runId)) {
+              throw "No successful 'Project Templates – Build Artifacts' run was found to publish. Run the build first, or name a run id."
+            }
+
+            Write-Host 'No run id given, using the most recent successful build.'
+          }
+
+          gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$runId" --jq '"Run \(.id): \(.display_title) on \(.head_branch), \(.created_at), \(.conclusion)"'
+
+          "run_id=$runId" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Download the dotnet new package
         if: inputs.targets != 'marketplace only'
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.TEMPLATE_PACKAGE_ID }}
           path: artifacts/nuget
-          run-id: ${{ inputs.run_id }}
+          run-id: ${{ steps.run.outputs.run_id }}
           github-token: ${{ github.token }}
 
       - name: Download the VSIX
@@ -108,7 +141,7 @@ jobs:
         with:
           name: visual-studio-template
           path: artifacts/vsix
-          run-id: ${{ inputs.run_id }}
+          run-id: ${{ steps.run.outputs.run_id }}
           github-token: ${{ github.token }}
 
       - name: Verify the downloaded artifacts
@@ -120,9 +153,26 @@ jobs:
           $version = '${{ inputs.version }}'
           $targets = '${{ inputs.targets }}'
 
-          if ($version -notmatch '^\d+\.\d+\.\d+([-+].*)?$') {
-            throw "Version '$version' is not a valid NuGet version."
+          if ([string]::IsNullOrWhiteSpace($version) -and $targets -ne 'marketplace only') {
+            $built = @(Get-ChildItem -Path artifacts/nuget -Filter '*.nupkg' -File -Recurse)
+
+            if ($built.Count -ne 1) {
+              throw "Expected exactly one .nupkg in the artifact to take the version from, found $($built.Count)."
+            }
+
+            $version = $built[0].BaseName -replace "^$([regex]::Escape('${{ env.TEMPLATE_PACKAGE_ID }}'))\.", ''
+            Write-Host "No version given, publishing what the run built: $version"
           }
+
+          # Only the nuget.org side needs a version; a Marketplace publish takes it from
+          # inside the VSIX.
+          if ($targets -ne 'marketplace only') {
+            if ($version -notmatch '^\d+\.\d+\.\d+([-+].*)?$') {
+              throw "Version '$version' is not a valid NuGet version."
+            }
+          }
+
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
           if ($targets -ne 'marketplace only') {
             # Named, not globbed: a glob would publish whatever the artifact contained,
@@ -132,7 +182,7 @@ jobs:
             if (-not (Test-Path -LiteralPath $expected)) {
               Write-Host "Artifact contains:"
               Get-ChildItem -Path artifacts/nuget -Recurse | ForEach-Object { Write-Host "  $($_.Name)" }
-              throw "Expected '$expected' from run ${{ inputs.run_id }}. Check that the run built version $version."
+              throw "Expected '$expected' from run ${{ steps.run.outputs.run_id }}. Check that the run built version $version."
             }
 
             "package_path=$expected" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
@@ -195,6 +245,12 @@ jobs:
             "vsix_id=$($identity.Id)"                | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
             "vsix_publisher=$($identity.Publisher)"  | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
+            # Marketplace-only publishes have no package version to report, so the
+            # summary uses the VSIX version rather than printing a blank.
+            if ([string]::IsNullOrWhiteSpace('${{ inputs.version }}') -and $targets -eq 'marketplace only') {
+              "version=$($identity.Version)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            }
+
             Write-Host "VSIX: $($vsix.Name)"
             Write-Host "  Id:        $($identity.Id)"
             Write-Host "  Publisher: $($identity.Publisher)"
@@ -206,7 +262,7 @@ jobs:
         shell: pwsh
         run: |
           $id = '${{ env.TEMPLATE_PACKAGE_ID }}'.ToLowerInvariant()
-          $version = '${{ inputs.version }}'
+          $version = '${{ steps.verify.outputs.version }}'
 
           try {
             $index = Invoke-RestMethod -Uri "https://api.nuget.org/v3-flatcontainer/$id/index.json" -TimeoutSec 30
@@ -376,14 +432,14 @@ jobs:
         shell: pwsh
         run: |
           $lines = @(
-            "### Project templates ${{ inputs.version }}"
+            "### Project templates ${{ steps.verify.outputs.version }}"
             ""
             "- Targets: ``${{ inputs.targets }}``"
-            "- From run: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/${{ inputs.run_id }}"
+            "- From run: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/${{ steps.run.outputs.run_id }}"
           )
 
           if ('${{ inputs.targets }}' -ne 'marketplace only') {
-            $lines += "- https://www.nuget.org/packages/${{ env.TEMPLATE_PACKAGE_ID }}/${{ inputs.version }}"
+            $lines += "- https://www.nuget.org/packages/${{ env.TEMPLATE_PACKAGE_ID }}/${{ steps.verify.outputs.version }}"
           }
 
           if ('${{ inputs.targets }}' -ne 'nuget only') {

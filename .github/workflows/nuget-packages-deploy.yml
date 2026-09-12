@@ -14,12 +14,14 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: 'Run id of the NuGet Packages – Build Artifacts run to publish'
-        required: true
+        description: 'Run id of the NuGet Packages – Build Artifacts run to publish. Blank uses the most recent successful one.'
+        required: false
+        default: ''
         type: string
       version:
-        description: 'Package version that run produced, for example 1.2.1'
-        required: true
+        description: 'Version to publish, for example 1.2.1. Blank uses whatever version that run built.'
+        required: false
+        default: ''
         type: string
 
 permissions:
@@ -58,12 +60,40 @@ jobs:
 
           echo "Publishing as nuget.org user '${{ vars.NUGET_USER }}'."
 
+      # Both inputs are optional so the common case — publish what was just built — needs
+      # nothing typed. workflow_dispatch cannot offer a list of runs to pick from: its
+      # choice inputs are a fixed list written into the file, so the run has to be
+      # resolved here instead.
+      - name: Resolve the build run
+        id: run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          RUN_ID="${{ inputs.run_id }}"
+
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID="$(gh api               "repos/$GITHUB_REPOSITORY/actions/workflows/nuget-packages-build.yml/runs?status=success&per_page=1"               --jq '.workflow_runs[0].id // empty')"
+
+            if [ -z "$RUN_ID" ]; then
+              echo "::error::No successful 'NuGet Packages – Build Artifacts' run was found to publish. Run the build first, or name a run id."
+              exit 1
+            fi
+
+            echo "No run id given, using the most recent successful build."
+          fi
+
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID"             --jq '"Run \(.id): \(.display_title) on \(.head_branch), \(.created_at), \(.conclusion)"'
+
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
       - name: Download the packages from the build run
         uses: actions/download-artifact@v4
         with:
           name: nuget-packages
           path: packages
-          run-id: ${{ inputs.run_id }}
+          run-id: ${{ steps.run.outputs.run_id }}
           github-token: ${{ github.token }}
 
       - name: Verify what is about to be published
@@ -73,10 +103,29 @@ jobs:
 
           VERSION="${{ inputs.version }}"
 
+          if [ -z "$VERSION" ]; then
+            # Derived from the framework package: the testing package shares its prefix,
+            # so it is excluded rather than matched by a looser glob.
+            FRAMEWORK="$(ls -1 packages/Pillaro.Dataverse.PluginFramework.*.nupkg 2>/dev/null | grep -v '\.Testing\.' | head -1 || true)"
+
+            if [ -z "$FRAMEWORK" ]; then
+              echo "::error::No Pillaro.Dataverse.PluginFramework package in the artifact, so the version cannot be derived."
+              ls -1 packages
+              exit 1
+            fi
+
+            VERSION="$(basename "$FRAMEWORK" .nupkg)"
+            VERSION="${VERSION#Pillaro.Dataverse.PluginFramework.}"
+
+            echo "No version given, publishing what the run built: $VERSION"
+          fi
+
           if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([-+].*)?$'; then
             echo "::error::Version '$VERSION' is not a valid NuGet version."
             exit 1
           fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
           # Named explicitly rather than globbed: a glob would happily push whatever the
           # artifact happened to contain, including a version other than the one being
@@ -88,7 +137,7 @@ jobs:
 
           for f in "${EXPECTED[@]}"; do
             if [ ! -f "$f" ]; then
-              echo "::error::Expected '$f' in run ${{ inputs.run_id }}, and it is not there. Check that the run built version $VERSION."
+              echo "::error::Expected '$f' in run ${{ steps.run.outputs.run_id }}, and it is not there. Check that the run built version $VERSION."
               echo "Artifact contains:"
               ls -1 packages
               exit 1
@@ -109,7 +158,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          VERSION="${{ inputs.version }}"
+          VERSION="${{ steps.verify.outputs.version }}"
 
           for id in pillaro.dataverse.pluginframework pillaro.dataverse.pluginframework.testing; do
             # A 404 means the package has no versions at all, which is fine for a first
@@ -150,11 +199,11 @@ jobs:
       - name: Summary
         run: |
           {
-            printf '### Published %s to nuget.org\n\n' "${{ inputs.version }}"
+            printf '### Published %s to nuget.org\n\n' "${{ steps.verify.outputs.version }}"
             printf -- '- From run: %s/actions/runs/%s\n' \
-              "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "${{ inputs.run_id }}"
-            printf -- '- https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework/%s\n' "${{ inputs.version }}"
-            printf -- '- https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing/%s\n' "${{ inputs.version }}"
+              "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "${{ steps.run.outputs.run_id }}"
+            printf -- '- https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework/%s\n' "${{ steps.verify.outputs.version }}"
+            printf -- '- https://www.nuget.org/packages/Pillaro.Dataverse.PluginFramework.Testing/%s\n' "${{ steps.verify.outputs.version }}"
             printf '\n'
             printf 'Indexing on nuget.org lags a few minutes. Once the versions are listed, run `Release – Tag and GitHub Release` with `component=packages` to create the tag and the release.\n'
           } >> "$GITHUB_STEP_SUMMARY"

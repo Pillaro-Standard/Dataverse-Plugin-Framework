@@ -43,7 +43,11 @@ rather than by verb.
 ## Deploying
 
 A deploy workflow takes the **run id** of the matching build workflow and publishes that
-run's artifact. It does not build. The version a build produces depends on the run number
+run's artifact. It does not build. Both the run id and the version can be left blank: the
+run id then resolves to the most recent successful build, and the version to whatever that
+run built. Fill them in to publish an older run or to assert which version is going out.
+`workflow_dispatch` cannot offer a list of runs to choose from — its `choice` inputs are a
+fixed list written into the workflow file — which is why the run is resolved in a step. The version a build produces depends on the run number
 (`github.run_number` stands in for `Build.BuildId`), so rebuilding from the same commit
 gives a different version than the artifact that was validated — and for the VSIX, than
 the package that was smoke-built.
