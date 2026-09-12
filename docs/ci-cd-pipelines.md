@@ -99,12 +99,13 @@ Two things about that are worth knowing before changing it:
   the VSIX, so no Visual Studio installation is needed. The package ships two copies of
   the executable and **only the one in `bin\lib` runs**; the copy in `bin` crashes on
   startup resolving the wrong `System.Runtime.CompilerServices.Unsafe`.
-- The VSIX manifest `<Tags>` element is sent as **one** tag, capped at 50 characters.
-  VsixPublisher splits it on nothing — not commas — so a comma-separated list fails the
-  publish with `VsixPub0023`. This broke the Marketplace publish in #44 and again in #99,
-  each time after someone made the element a list on the reasonable assumption that the
-  Marketplace splits it. The real tag list lives in `identity.tags` in the publish
-  manifest; `<Tags>` stays a single short value.
+- The VSIX manifest `<Tags>` element is **semicolon-delimited**, per the
+  [VSIX extension schema 2.0 reference](https://learn.microsoft.com/visualstudio/extensibility/vsix-extension-schema-2-0-reference?view=visualstudio#metadata-element):
+  the element is capped at 100 characters and the Marketplace caps each tag at 50. Commas
+  are not a separator, so a comma-separated list arrives as one oversized tag and fails
+  the publish with `VsixPub0023`. That broke the publish in #44 and again in #99. This
+  element is what reaches the listing; `identity.tags` in the publish manifest is ignored
+  for a VSIX, which is why it is not set there.
 - `identity.internalName` in the publish manifest is a Marketplace **slug**, not the VSIX
   identity: letters, digits and hyphens only, under 63 characters, so the dotted VSIX id
   is rejected with `VsixPub0033`. It cannot be derived from the package — take it from
