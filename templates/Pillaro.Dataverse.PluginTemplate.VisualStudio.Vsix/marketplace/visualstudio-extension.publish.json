@@ -5,7 +5,7 @@
     "visual studio extensions"
   ],
   "identity": {
-    "internalName": "Pillaro.Dataverse.PluginTemplate.Template",
+    "internalName": "PillaroDataversePluginVisualStudioTemplate",
     "tags": [
       "dataverse",
       "dynamics-365",

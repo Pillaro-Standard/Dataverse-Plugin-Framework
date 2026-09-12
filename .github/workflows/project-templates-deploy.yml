@@ -33,6 +33,11 @@ on:
           - both
           - nuget only
           - marketplace only
+      allow_new_listing:
+        description: 'Allow publishing when no Marketplace listing matches the publish manifest. Only for a genuinely new extension.'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -304,7 +309,7 @@ jobs:
             throw 'dotnet nuget push failed.'
           }
 
-      - name: Report which listing is being published to
+      - name: Confirm the Marketplace listing exists
         if: inputs.targets != 'nuget only'
         shell: pwsh
         run: |
@@ -314,15 +319,12 @@ jobs:
           $fullName = "$($manifest.publisher).$($manifest.identity.internalName)"
 
           Write-Host "Publish manifest targets: $fullName"
-          Write-Host "VSIX identity:            ${{ steps.verify.outputs.vsix_publisher }}.${{ steps.verify.outputs.vsix_id }}"
 
           # VsixPublisher has no separate create command: publish creates the extension
           # when it does not exist, so a wrong internalName produces a second public
-          # listing instead of an error. The public gallery query below would be the
-          # natural guard, but it does not return this extension even by its exact name —
-          # it appears to cover the VS Code marketplace only — so it is reported and not
-          # enforced. Confirm identity.internalName against "Copy ID" on the listing page
-          # before the first run of this workflow.
+          # listing instead of an error. internalName is a Marketplace slug, not the VSIX
+          # identity — letters, digits and hyphens only, no dots — so it cannot be derived
+          # from the package and has to be checked against the live listing.
           $body = @{
             filters = @(@{ criteria = @(@{ filterType = 7; value = $fullName }) })
             flags   = 914
@@ -336,20 +338,29 @@ jobs:
               -Headers @{ Accept = 'application/json;api-version=3.0-preview.1' } `
               -Body $body `
               -TimeoutSec 60
-
-            $extension = $response.results[0].extensions | Select-Object -First 1
           }
           catch {
-            Write-Host "Gallery query failed: $($_.Exception.Message)"
-            $extension = $null
+            # A gallery outage should not block a release, so this is the one case that
+            # only warns.
+            Write-Host "::warning::Could not reach the Marketplace gallery: $($_.Exception.Message). Publishing without the existence check."
+            exit 0
           }
 
+          $extension = $response.results[0].extensions | Select-Object -First 1
+
           if ($extension) {
-            Write-Host "Gallery reports listing '$($extension.displayName)' at version $($extension.versions[0].version)."
+            Write-Host "Found '$($extension.displayName)' by $($extension.publisher.publisherName), currently at $($extension.versions[0].version)."
+            Write-Host "Publishing ${{ steps.verify.outputs.vsix_version }} over it."
+            exit 0
           }
-          else {
-            Write-Host "::warning::The public gallery returned no listing for '$fullName'. That is expected for a Visual Studio extension and does not mean the listing is missing, so publishing continues. If this is the first publish from this workflow, check afterwards that the existing listing was updated and no second one appeared."
+
+          if ('${{ inputs.allow_new_listing }}' -eq 'true') {
+            Write-Host "::warning::No listing matches '$fullName'. Publishing will create one, as allow_new_listing was set."
+            exit 0
           }
+
+          Write-Host "::error::No Marketplace listing matches '$fullName'. Publishing would create a second listing rather than update the published extension. Take the id from 'Copy ID' on the listing page — it is the part after the publisher name — and correct identity.internalName in the publish manifest. Set allow_new_listing only if this really is a new extension."
+          exit 1
 
       - name: Resolve VsixPublisher
         id: publisher
