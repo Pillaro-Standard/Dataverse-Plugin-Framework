@@ -5,18 +5,7 @@
     "visual studio extensions"
   ],
   "identity": {
-    "internalName": "PillaroDataversePluginVisualStudioTemplate",
-    "tags": [
-      "dataverse",
-      "dynamics-365",
-      "Dynamics 365",
-      "power-platform",
-      "Power Platform",
-      "plugin",
-      "plug-in",
-      "template",
-      "csharp"
-    ]
+    "internalName": "PillaroDataversePluginVisualStudioTemplate"
   },
   "overview": "overview.md",
   "priceCategory": "free",
