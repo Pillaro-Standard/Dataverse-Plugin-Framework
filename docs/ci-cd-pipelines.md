@@ -34,7 +34,6 @@ rather than by verb.
 | `Nightly – Dataverse Tests` | `nightly-tests.yml` | in Actions |
 | `Release – Tag and GitHub Release` | `tag-and-release.yml` | in Actions |
 | `Release – Sync develop` | `sync-develop-after-release.yml` | in Actions |
-| `Spike – Windows runner capability` | `spike-windows-runner-capability.yml` | diagnostic, safe to delete once the migration is settled |
 | `NuGet Packages – Build Artifacts` | `nuget-packages-build.yml` | in Actions |
 | `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | in Actions, publishes with Trusted Publishing |
 | `Project Templates – Build Artifacts` | `project-templates-build.yml` | in Actions |
