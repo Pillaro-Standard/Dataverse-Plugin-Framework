@@ -4,8 +4,8 @@ This project creates the Microsoft Marketplace submission package for the Pillar
 
 The package contains only the existing managed solutions; it does not export solutions or import sample/configuration data:
 
-1. `PillaroFramework_1_0_0_1_managed.zip`
-2. `PillaroPluginFrameworkExamples_1_0_0_0_managed.zip`
+1. `PillaroFramework_1_0_0_2_managed.zip`
+2. `PillaroPluginFrameworkExamples_1_0_0_1_managed.zip`
 
 The Framework solution is imported first and is also used as the Marketplace solution anchor.
 

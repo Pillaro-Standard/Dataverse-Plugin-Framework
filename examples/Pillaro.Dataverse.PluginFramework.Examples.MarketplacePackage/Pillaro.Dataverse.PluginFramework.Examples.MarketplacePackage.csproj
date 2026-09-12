@@ -10,6 +10,12 @@
     <PdPackageFilenameIncludeVersion>false</PdPackageFilenameIncludeVersion>
     <PdPackageTargetFileName>package.zip</PdPackageTargetFileName>
     <MarketplacePackageFileName>Pillaro_Dataverse_Plugin_Framework.zip</MarketplacePackageFileName>
+
+    <!-- An exported solution carries its version in the file name, so every export renames
+         it and this project has to follow. Named once here; VerifyMarketplaceInputs below
+         fails the build if a file is missing or Input.xml disagrees. -->
+    <FrameworkSolutionFile>PillaroFramework_1_0_0_2_managed.zip</FrameworkSolutionFile>
+    <ExamplesSolutionFile>PillaroPluginFrameworkExamples_1_0_0_1_managed.zip</ExamplesSolutionFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,9 +32,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PdSolution Include="..\..\power-platform-solutions\framework\PillaroFramework_1_0_0_1_managed.zip" ImportOrder="1" />
-    <PdSolution Include="..\..\power-platform-solutions\examples\PillaroPluginFrameworkExamples_1_0_0_0_managed.zip" ImportOrder="2" />
+    <PdSolution Include="..\..\power-platform-solutions\framework\$(FrameworkSolutionFile)" ImportOrder="1" />
+    <PdSolution Include="..\..\power-platform-solutions\examples\$(ExamplesSolutionFile)" ImportOrder="2" />
   </ItemGroup>
+
+  <Target Name="VerifyMarketplaceInputs" BeforeTargets="Build">
+    <Error Condition="!Exists('..\..\power-platform-solutions\framework\$(FrameworkSolutionFile)')"
+           Text="The framework solution '$(FrameworkSolutionFile)' is not in power-platform-solutions\framework. A new export renames it; update FrameworkSolutionFile here and SolutionAnchorName in MarketplaceAssets\Input.xml." />
+    <Error Condition="!Exists('..\..\power-platform-solutions\examples\$(ExamplesSolutionFile)')"
+           Text="The examples solution '$(ExamplesSolutionFile)' is not in power-platform-solutions\examples. A new export renames it; update ExamplesSolutionFile." />
+
+    <!-- The anchor repeats a solution file name in Input.xml, where nothing else would
+         notice it going stale. -->
+    <XmlPeek XmlInputPath="MarketplaceAssets\Input.xml" Query="/PvsPackageData/SolutionAnchorName/text()">
+      <Output TaskParameter="Result" ItemName="_SolutionAnchor" />
+    </XmlPeek>
+
+    <Error Condition="'@(_SolutionAnchor)' != '$(FrameworkSolutionFile)'"
+           Text="SolutionAnchorName in MarketplaceAssets\Input.xml is '@(_SolutionAnchor)' but the package imports '$(FrameworkSolutionFile)'. The anchor must name the framework solution being shipped." />
+  </Target>
 
   <Target Name="GenerateMarketplacePackage"
           AfterTargets="GeneratePdPackage"
