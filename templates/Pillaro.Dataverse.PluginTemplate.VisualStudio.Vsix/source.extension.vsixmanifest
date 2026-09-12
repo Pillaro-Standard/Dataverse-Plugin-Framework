@@ -5,12 +5,13 @@
         <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
         <Description xml:space="preserve">Creates a Microsoft Dataverse plugin solution with separate Logic, Plugins and Tests projects, built on the Pillaro Dataverse Plugin Framework. Licensed under Apache-2.0.</Description>
         <MoreInfo>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</MoreInfo>
-        <!-- One tag, max 50 characters. VsixPublisher does not split this element on
-             anything: it sends the whole string as a single tag, so a comma-separated
-             list fails the publish with VsixPub0023. That has now broken the
-             Marketplace publish twice, in #44 and again here. The Marketplace tag list
-             lives in marketplace/visualstudio-extension.publish.json instead. -->
-        <Tags>dataverse</Tags>
+        <!-- Semicolon-delimited, per the VSIX schema reference; the whole element is
+             capped at 100 characters and the Marketplace caps each tag at 50. Commas
+             are not a separator: a comma-separated list arrives as one oversized tag
+             and fails the publish with VsixPub0023, which is what broke #44 and #99.
+             This element is what reaches the listing; identity.tags in the publish
+             manifest does not. -->
+        <Tags>Dataverse;Dynamics 365;Power Platform;Plugin;Pillaro;Project Template</Tags>
     </Metadata>
     <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
