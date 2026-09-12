@@ -105,11 +105,15 @@ Two things about that are worth knowing before changing it:
   each time after someone made the element a list on the reasonable assumption that the
   Marketplace splits it. The real tag list lives in `identity.tags` in the publish
   manifest; `<Tags>` stays a single short value.
+- `identity.internalName` in the publish manifest is a Marketplace **slug**, not the VSIX
+  identity: letters, digits and hyphens only, under 63 characters, so the dotted VSIX id
+  is rejected with `VsixPub0033`. It cannot be derived from the package — take it from
+  **Copy ID** on the listing page, the part after the publisher name.
 - `VsixPublisher publish` creates the extension when it does not exist, so a wrong
-  `identity.internalName` in the publish manifest silently produces a second public
-  listing rather than updating the existing one. The public gallery API does not return
-  this extension even by its exact name, so the workflow reports the target identity but
-  cannot verify it. Confirm it against **Copy ID** on the listing page.
+  `internalName` would produce a second public listing rather than updating the existing
+  one. The workflow queries the public gallery for `publisher.internalName` first and
+  fails if nothing matches, which is exactly the mistake above. A gallery outage only
+  warns; `allow_new_listing` is the escape hatch for a genuinely new extension.
 
 The overview markdown next to the publish manifest is the Marketplace listing text. It is
 read at publish time and is **not** packed into the VSIX — a details asset inside the VSIX
