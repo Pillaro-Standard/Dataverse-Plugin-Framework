@@ -99,6 +99,12 @@ Two things about that are worth knowing before changing it:
   the VSIX, so no Visual Studio installation is needed. The package ships two copies of
   the executable and **only the one in `bin\lib` runs**; the copy in `bin` crashes on
   startup resolving the wrong `System.Runtime.CompilerServices.Unsafe`.
+- The VSIX manifest `<Tags>` element is sent as **one** tag, capped at 50 characters.
+  VsixPublisher splits it on nothing — not commas — so a comma-separated list fails the
+  publish with `VsixPub0023`. This broke the Marketplace publish in #44 and again in #99,
+  each time after someone made the element a list on the reasonable assumption that the
+  Marketplace splits it. The real tag list lives in `identity.tags` in the publish
+  manifest; `<Tags>` stays a single short value.
 - `VsixPublisher publish` creates the extension when it does not exist, so a wrong
   `identity.internalName` in the publish manifest silently produces a second public
   listing rather than updating the existing one. The public gallery API does not return
