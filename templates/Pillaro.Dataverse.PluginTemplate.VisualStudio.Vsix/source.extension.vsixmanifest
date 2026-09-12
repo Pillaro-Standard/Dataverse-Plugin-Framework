@@ -5,7 +5,12 @@
         <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
         <Description xml:space="preserve">Creates a Microsoft Dataverse plugin solution with separate Logic, Plugins and Tests projects, built on the Pillaro Dataverse Plugin Framework. Licensed under Apache-2.0.</Description>
         <MoreInfo>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</MoreInfo>
-        <Tags>dataverse, dynamics-365, Dynamics 365, power-platform, Power Platform, plugin, plug-in, template, csharp</Tags>
+        <!-- One tag, max 50 characters. VsixPublisher does not split this element on
+             anything: it sends the whole string as a single tag, so a comma-separated
+             list fails the publish with VsixPub0023. That has now broken the
+             Marketplace publish twice, in #44 and again here. The Marketplace tag list
+             lives in marketplace/visualstudio-extension.publish.json instead. -->
+        <Tags>dataverse</Tags>
     </Metadata>
     <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
