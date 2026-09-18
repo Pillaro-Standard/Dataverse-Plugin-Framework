@@ -25,8 +25,10 @@ permissions:
   contents: read
 
 concurrency:
-  # One at a time. Two runs against the same Dataverse environment would collide on test
-  # data, which is the failure this workflow exists to keep away from pull requests.
+  # One run at a time. Two runs against the same Dataverse environment would collide on
+  # test data, which is the failure this workflow exists to keep away from pull requests.
+  # This covers separate runs only — the branches within one run are serialized by
+  # max-parallel on the matrix below, which is a different setting.
   group: nightly-tests
   cancel-in-progress: false
 
@@ -39,6 +41,18 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+
+      # The two branches share one Dataverse environment, so they cannot run at the same
+      # time: both seed pl_autonumbering configurations for contact, and each then sees
+      # the other's rows. That produced "More than one primary autonumbering configuration
+      # exists for entity 'contact'", deletes of rows the other job had already removed,
+      # and "More than one concurrent Delete requests detected" — four failed nights out of
+      # six, with the passing ones down to how the two jobs happened to interleave.
+      #
+      # The concurrency group above does not cover this: it serializes runs of the
+      # workflow, not the jobs inside one run.
+      max-parallel: 1
+
       matrix:
         # The scheduled run covers both branches, as the pipeline did. A manual run tests
         # only the ref that was asked for.
