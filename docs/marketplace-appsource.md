@@ -98,13 +98,20 @@ as the version-controlled original.
    **Dynamics 365 apps on Dataverse and Power Apps** offer.
 4. **Offer setup** — list only, no selling through Microsoft, no app license management,
    listing option **Get it now (free)**.
-5. **Properties** — categories, industries, legal terms.
-6. **Offer listing** — paste from `OfferListing.md` and upload the media.
-7. **Availability** — markets and preview audience. The package availability window itself
-   comes from `Input.xml`.
+5. **Properties** — categories, applicable products, app version and legal terms, all in
+   `OfferListing.md`. No industries: the offer is not industry-specific, and Microsoft
+   Clouds for Industry is only for managed partners and fails certification otherwise.
+6. **Offer listing** — paste from `OfferListing.md` and upload the media. The description
+   field ignores a value set any way other than typing into it, and appending to what is
+   already there scrambles the markup; type the whole HTML in one go into an empty editor,
+   save, and reload to confirm it comes back rendered.
+7. **Availability** — all 252 markets, matching the country list in `Input.xml`. The package
+   availability window itself comes from `Input.xml`.
 8. **Technical configuration** — paste the SAS URL from step 2. Base license model:
-   **Resource**. Leave the S2S / Secure Store box and the application configuration URL
-   empty; the package needs neither.
+   **Resource**. Leave the S2S / Secure Store box, the more-than-one-package box and the
+   application configuration URL empty; the package needs none of them. Under CRM package
+   availability add the public regions only — the sovereign clouds need their own validation.
+   The `CredentialsDetectedInUrlField` warning against the SAS URL is expected.
 9. **Supplemental content** — upload the key usage scenario PDF.
 10. **Review and publish**.
 
