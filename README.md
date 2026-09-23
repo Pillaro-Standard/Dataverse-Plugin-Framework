@@ -433,6 +433,7 @@ We provide practical support for teams adopting the Pillaro Dataverse Plugin Fra
 ## Articles
 
 - [Why Dataverse Plug-in Steps Drift — and Why Stable IDs Fix It](https://dev.to/mucha/why-dataverse-plug-in-steps-drift-and-why-stable-ids-fix-it-eah) - why duplicate plugin steps appear after redeployment, and how declaring step identity in code makes deployment deterministic.
+- [Moving from spkl to Pillaro: A Practical Migration Guide for Dataverse Plugins](https://dev.to/mucha/moving-from-spkl-to-pillaro-a-practical-migration-guide-for-dataverse-plugins-2aa6) - what Pillaro can replace in an existing spkl-based plugin project, what it deliberately does not try to replace, and how to migrate incrementally.
 
 
 ## License
