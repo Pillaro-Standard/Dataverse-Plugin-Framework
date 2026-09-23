@@ -64,6 +64,12 @@ dotnet new pillaro-dataverse-plugin-dotnet -n MySolution
 The generated solution works well in both Visual Studio Code and Visual Studio, so you can use the same template regardless of whether you prefer CLI-first or IDE-first workflows.
 
 
+## Requirements
+
+- **Target frameworks**: `net462` for plugin assemblies (required by the Dataverse plugin sandbox) and `net8.0` for client-side code, tooling, and tests.
+- **Dataverse SDK**: `Microsoft.CrmSdk.CoreAssemblies` 9.0.2.60 and `Microsoft.PowerPlatform.Dataverse.Client` 1.2.10.
+
+
 ## Proven in Production
 
 ✅ **Production Ready**
