@@ -175,6 +175,7 @@ Use this section when you need release and versioning information for the framew
 | [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
 | [Changelog](../CHANGELOG.md) | Release notes and change history | ✅ |
 | [CI/CD Pipelines](./ci-cd-pipelines.md) | Automated testing, building, and packaging | ✅ |
+| [AppSource Submission](./marketplace-appsource.md) | Publishing the framework to Microsoft AppSource | ✅ |
 
 ---
 

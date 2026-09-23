@@ -160,7 +160,7 @@ dotnet build "templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pilla
 
 The VSIX project stores its version directly in `source.extension.vsixmanifest`. For local Visual Studio rebuilds, edit the `Version` value in that manifest and rebuild the project.
 
-The Azure DevOps pipeline overwrites that manifest version at queue time with its own computed version before building.
+The `Project Templates – Build Artifacts` GitHub Actions workflow overwrites that manifest version at dispatch time with its own computed version before building.
 
 ## Validation command
 

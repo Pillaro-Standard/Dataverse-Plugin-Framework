@@ -100,7 +100,7 @@ Use the naming convention:
 
 ## CI/CD & Automated Testing
 
-The repository uses Azure DevOps pipelines to ensure code quality through automated testing and package building.
+The repository uses GitHub Actions workflows to ensure code quality through automated testing and package building.
 
 **Nightly tests** run automatically every night to validate all tests against a real Dataverse environment, ensuring continuous validation without blocking development.
 

@@ -3,8 +3,6 @@ name: Project Templates – Build Artifacts
 # Port of the Azure DevOps "Templates - Build Template Artifacts" pipeline, step for
 # step. Produces the two template artifacts and validates both; it publishes nothing.
 # Uploading to nuget.org and the Marketplace is a separate concern.
-#
-# The Azure DevOps pipeline stays in place until this one is proven.
 
 on:
   workflow_dispatch:
