@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Repository
+
+- Added `dynamics-365` and `csharp` to the repository's GitHub topics. 1.2.2 aligned the NuGet `PackageTags` across all four packages to include both, since neither term appeared in any of them and "Dynamics 365" is the most-searched term in this domain, but the repository's own GitHub topics were never updated to match.
+
 ## 1.2.2
 
 ### Pillaro.Dataverse.PluginFramework
