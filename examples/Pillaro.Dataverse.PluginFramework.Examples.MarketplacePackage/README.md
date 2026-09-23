@@ -24,10 +24,24 @@ The publish produces two ZIP files in the project's `bin/Release` directory:
 
 ## Marketplace metadata
 
-Marketplace metadata is stored under `MarketplaceAssets`. Before submitting a new release, review:
+Marketplace metadata is stored under `MarketplaceAssets`:
 
-- availability dates and supported countries in `Input.xml`;
+| File | Ships in the package | Used for |
+|---|---|---|
+| `Input.xml` | yes | Provider, solution anchor, availability window, supported countries |
+| `logo32x32.png` | yes | Package logo shown during installation |
+| `TermsOfUse.html` | yes | Terms the customer accepts when installing |
+| `OfferListing.md` | no | Partner Center offer listing content: name, description, links, media plan |
+| `E2E-FunctionalDocument.md` | no | The document certification tests the offer against; convert to PDF |
+| `KeyUsageScenarios.md` | no | Supplemental content in Partner Center; convert to PDF |
+
+Before submitting a new release, review:
+
+- availability dates and supported countries in `Input.xml`, and check `StartDate` is not in the past;
 - the managed solution filenames and versions in the project and `Input.xml`;
-- the English license terms and 32×32 package logo.
+- the license terms, the 32×32 package logo, and the version line in `E2E-FunctionalDocument.md`.
 
 The package structure follows the Microsoft Learn guidance for [creating a Marketplace package](https://learn.microsoft.com/power-platform/developer/marketplace/create-package-app).
+
+The full submission process and the Partner Center checklist are in
+[AppSource Submission](../../docs/marketplace-appsource.md).
