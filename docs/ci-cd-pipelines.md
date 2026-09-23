@@ -6,38 +6,32 @@ This document describes the automated pipelines used to ensure code quality, tes
 
 ## Overview
 
-The repository uses Azure DevOps pipelines for:
+CI/CD runs entirely in GitHub Actions, in `.github/workflows`, for:
 
 - automated testing
 - package building and versioning
 - quality assurance
 
-All pipelines are defined in YAML files at the repository root.
-
-Continuous integration is moving to GitHub Actions, in `.github/workflows`. The Azure
-DevOps pipelines stay in place until the replacements are proven, so for now some work
-runs in both places.
-
-The Azure DevOps `PR – Validate` pipeline is retired: both its triggers are `none`, so pull
-requests get one validation rather than two. It remains in the repository and can still be
-queued by hand. The other pipelines still run.
+The repository previously ran the same pipelines in Azure DevOps as well, while the
+GitHub Actions replacements were being proven out. That migration is complete and Azure
+DevOps is no longer used; all pipeline definitions now live under `.github/workflows`.
 
 ### Workflow naming
 
-GitHub Actions workflows are named `Area – Action`, with an en dash, matching the
-Azure DevOps pipeline names. The area comes first so the Actions list groups by subject
-rather than by verb.
+GitHub Actions workflows are named `Area – Action`, with an en dash, so the Actions list
+groups by subject rather than by verb. The name predates the Azure DevOps migration and
+originally matched the equivalent Azure DevOps pipeline name.
 
 | Workflow | File | Status |
 | --- | --- | --- |
-| `Pull Request – Validate` | `pr-validate.yml` | in Actions, required status check `Build and test` |
-| `Nightly – Dataverse Tests` | `nightly-tests.yml` | in Actions |
-| `Release – Tag and GitHub Release` | `tag-and-release.yml` | in Actions |
-| `Release – Sync develop` | `sync-develop-after-release.yml` | in Actions |
-| `NuGet Packages – Build Artifacts` | `nuget-packages-build.yml` | in Actions |
-| `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | in Actions, publishes with Trusted Publishing |
-| `Project Templates – Build Artifacts` | `project-templates-build.yml` | in Actions |
-| `Project Templates – Deploy` | `project-templates-deploy.yml` | in Actions, needs the `VS_MARKETPLACE_PAT` secret |
+| `Pull Request – Validate` | `pr-validate.yml` | required status check `Build and test` |
+| `Nightly – Dataverse Tests` | `nightly-tests.yml` | scheduled |
+| `Release – Tag and GitHub Release` | `tag-and-release.yml` | manual |
+| `Release – Sync develop` | `sync-develop-after-release.yml` | automatic, after a release |
+| `NuGet Packages – Build Artifacts` | `nuget-packages-build.yml` | manual |
+| `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | manual, publishes with Trusted Publishing |
+| `Project Templates – Build Artifacts` | `project-templates-build.yml` | manual |
+| `Project Templates – Deploy` | `project-templates-deploy.yml` | manual, needs the `VS_MARKETPLACE_PAT` secret |
 
 ## Deploying
 
@@ -129,7 +123,7 @@ leaves every pull request waiting for a check that will never report.
 
 ## Nightly Test Pipeline
 
-**File**: `Nightly – Tests Only.yml`
+**File**: `.github/workflows/nightly-tests.yml`
 
 ### Nightly Purpose
 
@@ -165,7 +159,7 @@ This includes:
 
 ### Test Environment
 
-Tests are executed against a live Dataverse environment using a secured connection string stored in Azure DevOps variable group `dataverse-test-secrets`.
+Tests are executed against a live Dataverse environment using a secured connection string stored in the GitHub Actions secret `DATAVERSE_CONNECTION_STRING`.
 
 Environment variable:
 
@@ -200,7 +194,7 @@ Running tests on a schedule (rather than on every commit) provides:
 
 ## Package Build Pipeline
 
-**File**: `Packages – Build & Package.yml`
+**File**: `.github/workflows/nuget-packages-build.yml`
 
 ### Package Purpose
 
@@ -237,7 +231,7 @@ Determines version suffix and target audience:
 3. **Version Calculation**: Determines package and assembly versions
 4. **Build**: Builds framework and testing projects
 5. **Pack**: Creates NuGet packages (`.nupkg` files)
-6. **Publish**: Uploads packages as pipeline artifacts
+6. **Publish**: Uploads packages as workflow run artifacts
 
 ### Packages Produced
 
@@ -268,40 +262,42 @@ Package verification rejects release notes that point to the exact source commit
 
 ### Environment Variables
 
-Stored in Azure DevOps variable group `dataverse-test-secrets`:
+Stored in the GitHub Actions secret `DATAVERSE_CONNECTION_STRING`:
 
-- **DataverseConnectionString**: Connection string for integration tests (if tests are executed during packaging)
+- Connection string for integration tests (if tests are executed during packaging)
 
 ---
 
 ## Template Artifact Pipeline
 
-**File**: `Templates - Build Template Artifacts.yml`
+**File**: `.github/workflows/project-templates-build.yml`
 
 ### Template Purpose
 
-Builds both official template deliveries in one Azure DevOps run:
+Builds both official template deliveries in one GitHub Actions run:
 
 - the Visual Studio template ZIP and VSIX package
 - the CLI-oriented `dotnet new` NuGet template package
 
-This pipeline prepares two separate Azure DevOps artifacts so both template formats can be published or downloaded together.
+This workflow uploads two separate workflow run artifacts, `visual-studio-template` and
+`Pillaro.Dataverse.PluginTemplate.DotNetNew`, so both template formats can be published or
+downloaded together.
 
 ### Trigger
 
-- **Manual only**: No automatic triggers
+- **Manual only**: `workflow_dispatch`
 - **On-demand**: Executed when either template artifact set is needed
 
-When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and `packageType` in the same style as the framework package pipeline.
+When you run the workflow manually, GitHub Actions prompts for `baseVersion` and
+`packageType` in the same style as the framework package workflow, plus `frameworkVersion`.
 
 ### Parameters
 
 | Parameter | Purpose |
 |-----------|---------|
-| `baseVersion` | Base version entered at queue time for both template packages, in `Major.Minor.Patch` format |
+| `baseVersion` | Base version entered at dispatch time for both template packages, in `Major.Minor.Patch` format |
 | `packageType` | Determines whether the NuGet template version becomes `ci`, `preview`, `rc`, or `release` |
-| `visualStudioArtifactName` | Name of the Azure DevOps artifact containing the Visual Studio template outputs |
-| `dotnetNewArtifactName` | Name of the Azure DevOps artifact containing the `dotnet new` package |
+| `frameworkVersion` | Framework package version the generated projects reference; required for a `release` |
 
 ### Template Execution Flow
 
@@ -314,7 +310,7 @@ When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and
 7. **NuGet restore**: Restores the `dotnet new` template project
 8. **NuGet pack**: Creates the `Pillaro.Dataverse.PluginTemplate.DotNetNew` template package
 9. **NuGet validation**: Confirms the package contains the expected template metadata and smoke-generates the template successfully
-10. **Artifact publishing**: Uploads the Visual Studio outputs and the `.nupkg` as two separate pipeline artifacts
+10. **Artifact publishing**: Uploads the Visual Studio outputs and the `.nupkg` as two separate workflow run artifacts
 
 ### Artifacts Produced
 
@@ -323,9 +319,9 @@ When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and
 
 ### Version Strategy
 
-The VSIX package uses the supplied base semantic version and appends the Azure DevOps build ID, for example `1.0.20.12345`.
+The VSIX package uses the supplied base semantic version and appends the GitHub Actions run number, for example `1.0.20.12345`.
 
-The NuGet template package uses the same versioning model as the framework package pipeline, including support for `ci`, `preview`, `rc`, and `release` package types. For tag builds, the tag version is used directly, while `AssemblyVersion` and `FileVersion` remain aligned to the `Major.Minor.Patch.0` scheme.
+The NuGet template package uses the same versioning model as the framework package workflow, including support for `ci`, `preview`, `rc`, and `release` package types. For tag builds, the tag version is used directly, while `AssemblyVersion` and `FileVersion` remain aligned to the `Major.Minor.Patch.0` scheme.
 
 ---
 

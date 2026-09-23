@@ -7,8 +7,6 @@ name: NuGet Packages – Build Artifacts
 # The two long verification steps were lifted into scripts/Test-PackageAssemblyMetadata.ps1
 # and scripts/Test-NuGetPackages.ps1 by extracting the pipeline's inline PowerShell
 # mechanically, so the checks are unchanged rather than reinterpreted.
-#
-# The Azure DevOps pipeline stays in place until this one is proven.
 
 on:
   workflow_dispatch:
