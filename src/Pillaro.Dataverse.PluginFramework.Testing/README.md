@@ -204,4 +204,4 @@ Result:
 
 ## License
 
-This project is licensed under the Apache License, Version 2.0. See the LICENSE file for details.
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/LICENSE) file for details.
