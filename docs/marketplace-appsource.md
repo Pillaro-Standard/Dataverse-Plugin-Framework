@@ -128,7 +128,7 @@ Microsoft validates the offer in five passes. What each one means for this offer
 | Code | Power Apps Checker against the Marketplace ruleset | Run it before submitting; findings come back by e-mail and can be argued as false positives |
 | Deployment | Install with Package Deployer, find the components, uninstall cleanly | Both solutions uninstall in reverse order, see section 7 of the functional document |
 | Functionality | Every scenario in the functional document must pass | Five scenarios on standard Contact and Task records |
-| Security | Custom Package Deployer code, external connections, service accounts, security roles | The package runs no custom deployment code, opens no outbound connection and creates no service account; documented in section 2 of the functional document |
+| Security | Custom Package Deployer code, external connections, service accounts, security roles | The package's only deployment code creates the three example configuration records, and it opens no outbound connection and creates no service account; documented in section 2 of the functional document |
 
 Published customisations must not change or remove any out-of-the-box site map. Neither
 solution does.

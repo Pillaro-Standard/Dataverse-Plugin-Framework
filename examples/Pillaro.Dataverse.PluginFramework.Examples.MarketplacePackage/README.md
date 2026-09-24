@@ -2,12 +2,29 @@
 
 This project creates the Microsoft Marketplace submission package for the Pillaro Dataverse Plugin Framework example experience.
 
-The package contains only the existing managed solutions; it does not export solutions or import sample/configuration data:
+The package installs the two existing managed solutions; it does not export them and imports no sample data:
 
 1. `PillaroFramework_1_0_0_2_managed.zip`
 2. `PillaroPluginFrameworkExamples_1_0_0_1_managed.zip`
 
 The Framework solution is imported first and is also used as the Marketplace solution anchor.
+
+## Example configuration
+
+A managed solution carries tables but not their rows, so the examples have no configuration to
+read after a plain solution import. `PackageImportExtension.AfterPrimaryImport` creates it once
+both solutions are in:
+
+| Record | Value |
+|---|---|
+| `MinimalSeverityLevel` runtime setting | `0`, debug-level logging |
+| `ForbiddenWords` runtime setting | `["Admin","Test"]` |
+| Primary autonumbering configuration for `task` | format `{date1}-{NUM}`, date format `yy-MM-dd`, 6 digits, starting at 1000 |
+
+Each is created only when it is missing, so re-running the package or installing over an
+environment where somebody already made these records by hand changes nothing. The same records
+are what [the examples solution README](../../power-platform-solutions/examples/README.md) asks
+you to create by hand when you import the solutions directly instead of using this package.
 
 ## Build
 

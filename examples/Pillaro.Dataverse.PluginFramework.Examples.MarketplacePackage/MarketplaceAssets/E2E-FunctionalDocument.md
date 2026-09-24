@@ -40,9 +40,12 @@ Neither solution changes or removes any out-of-the-box site map.
 For the security validation in the certification checklist:
 
 - **Custom deployment code.** The package contains a `PackageImportExtension` class required
-  by Package Deployer. Its `InitializeCustomExtension`, `BeforeImportStage` and
-  `AfterPrimaryImport` methods are empty or return `true`. The package runs no custom
-  deployment logic and reads no data from the target environment during import.
+  by Package Deployer. Its only logic runs in `AfterPrimaryImport` and creates the three
+  configuration records the examples read at runtime: the `MinimalSeverityLevel` and
+  `ForbiddenWords` runtime settings, and the primary autonumbering configuration for the
+  Task table. Each is created only when it is missing, so re-running the package changes
+  nothing. The code reads nothing but those three configuration records, writes nothing
+  else, and touches no business data in the environment. The values are listed in section 5.
 - **External data sources.** None. All plug-ins run inside the Dataverse sandbox and use only
   `IOrganizationService` against the installing environment.
 - **Outbound connections.** None. The offer does not require S2S outbound access or the CRM
@@ -66,40 +69,43 @@ For the security validation in the certification checklist:
    under **Solutions**.
 3. Confirm that the **Pillaro Plugin Framework** model-driven app appears in the app list.
 
-Expected result: two managed solutions installed, one model-driven app available, no import
-warnings that block the installation.
+Expected result: two managed solutions installed, one model-driven app available, the three
+configuration records listed in section 5 created, and no import warnings that block the
+installation.
 
 ## 5. Administrator journey
 
-The administrator configures the framework from the Pillaro Plugin Framework app before the
-example scenarios produce visible results.
+The package creates the configuration the examples read, so the scenarios in section 6 can be
+run straight after installing. This section is what to verify, and where an administrator
+changes the behaviour afterwards.
 
 ### 5.1 Runtime settings
 
-Open the **Pillaro Plugin Framework** app and go to **Runtime Settings**. Create two records:
+Open the **Pillaro Plugin Framework** app and go to **Runtime Settings**. Two records are
+present:
 
 | Key | Type | Value | Purpose |
 |---|---|---|---|
-| `MinimalSeverityLevel` | Int | `0` | Enables debug-level logging so the certification run sees every log entry. The recommended production value is `3`. |
+| `MinimalSeverityLevel` | Int | `0` | Debug-level logging, so every log entry from the scenarios below is visible. The recommended value outside a demo environment is `3`. |
 | `ForbiddenWords` | JSON | `["Admin","Test"]` | Values rejected by the Contact name validation example. |
 
-Expected result: both records save. `MinimalSeverityLevel` is a minimum severity threshold;
-lowering it increases the amount of logging.
+`MinimalSeverityLevel` is a minimum severity threshold; lowering it increases the amount of
+logging. Editing either record changes plug-in behaviour immediately and with no
+redeployment, which is what scenario 1 demonstrates.
 
 ### 5.2 Autonumbering
 
-Go to **Autonumberings** and create one record:
+Go to **Autonumberings**. One record is present:
 
 | Field | Value |
 |---|---|
-| Entity System Name | `Task` |
+| Entity System Name | `task` |
 | Last Used Number {NUM} | `1000` |
 | Number of Digits | `6` |
 | Format | `{date1}-{NUM}` |
 | Date 1 Format {date1} | `yy-MM-dd` |
 
-Expected result: the record saves and the sequence is ready to issue numbers such as
-`26-09-21-001000`.
+This is the sequence that issues numbers such as `26-09-21-001000` in scenario 3.
 
 ### 5.3 Security roles
 
@@ -111,7 +117,7 @@ Administrator.
 
 ## 6. End-to-end scenarios
 
-Each scenario is independent and can be run in any order once section 5 is complete.
+Each scenario is independent and can be run in any order, straight after installing.
 
 ### Scenario 1 — Validation driven by a runtime setting
 
