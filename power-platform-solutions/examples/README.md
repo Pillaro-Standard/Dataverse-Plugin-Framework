@@ -44,7 +44,7 @@ Install the **Pillaro Framework** solution from [`../framework`](../framework/RE
 
 1. Open Power Apps.
 2. Go to **Solutions**.
-3. Import `../framework/PillaroFramework_1_0_0_2_managed.zip`.
+3. Import `../framework/PillaroFramework_1_0_0_3_managed.zip`.
 4. Confirm that the **Pillaro Plugin Framework** model-driven app is available.
 
 This prerequisite provides the Runtime Settings, Autonumberings, Plugin Logs, and security roles used by the examples.

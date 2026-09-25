@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Solutions
+
+- Exported `PillaroFramework` 1.0.0.3, managed and unmanaged. The Autonumbering table carried Czech strings in its English (1033) labels: the forms were named *Informace*, the `pl_Customer` field *Zákazník*, `pl_UseParentConfiguration` *Konfigurace brát z nadřazené*, the parent-child relationship *Podřízené konfigurace*, the two default lookup views *Všechny aktivní Autoumbering*, and all ten business rules on the table had a Czech name and the Czech placeholder description. 1033 is the only language the solution declares, so every English-speaking user saw them — including the certification reviewer, whom the AppSource functional document sends to that exact table. The *Autoumbering* typo went with them, including where it appeared in strings that were already English. Labels only; no schema, registration or behaviour change. The legacy `NavBarArea` titles are still Czech under language code 1029, which the Unified Interface does not render. 1.0.0.2 moved into the `Archive` folder; per-solution notes are in `power-platform-solutions/framework/changelog.md`.
+
+### Marketplace
+
+- The AppSource package creates the example configuration during install (#123). A managed solution carries tables but not their rows, so installing into a clean environment left the examples unusable: saving a Contact failed with *Key 'ForbiddenWords' value is null or empty* and creating a Task with *Primary autonumbering configuration does not exist for entity 'task'*. `PackageImportExtension.AfterPrimaryImport` now creates the two runtime settings and the primary autonumbering configuration, each only when missing.
+
 ### Repository
 
 - Added `dynamics-365` and `csharp` to the repository's GitHub topics. 1.2.2 aligned the NuGet `PackageTags` across all four packages to include both, since neither term appeared in any of them and "Dynamics 365" is the most-searched term in this domain, but the repository's own GitHub topics were never updated to match.
