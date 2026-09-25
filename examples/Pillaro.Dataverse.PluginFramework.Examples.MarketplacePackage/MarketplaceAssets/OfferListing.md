@@ -161,7 +161,7 @@ Suggested screenshots, in order, all from the Pillaro Plugin Framework app:
 | Industries | none &mdash; the offer is not industry-specific |
 | Microsoft Clouds for Industry | off &mdash; only for managed partners, selecting it fails certification |
 | Applicable products | Power Apps |
-| App version | 1.0.0.2, tracking the framework solution |
+| App version | 1.0.0.3, tracking the framework solution |
 | Legal | Terms and conditions **text**, the plain-text rendering of [`TermsOfUse.html`](TermsOfUse.html) |
 
 Only Power Apps is claimed under applicable products. The plug-ins run on core Dataverse and

@@ -4,7 +4,7 @@
 **Offer:** Pillaro Dataverse Plugin Framework
 **Offer type:** Dynamics 365 apps on Dataverse and Power Apps
 **Listing option:** Get it now (free)
-**Document version:** 1.0 (framework solution 1.0.0.2, examples solution 1.0.0.1)
+**Document version:** 1.0 (framework solution 1.0.0.3, examples solution 1.0.0.1)
 
 This document is for the Microsoft certification team. It describes what the package
 installs, how to configure it, and the end-to-end scenarios that can be verified in a test
@@ -18,7 +18,7 @@ The Package Deployer package imports two managed solutions, in this order:
 
 | Order | Solution | Version | Role |
 |---|---|---|---|
-| 1 | Pillaro Framework (`PillaroFramework_1_0_0_2_managed.zip`) | 1.0.0.2 | Runtime and administration layer. Marketplace solution anchor. |
+| 1 | Pillaro Framework (`PillaroFramework_1_0_0_3_managed.zip`) | 1.0.0.3 | Runtime and administration layer. Marketplace solution anchor. |
 | 2 | Pillaro Plugin Framework Examples (`PillaroPluginFrameworkExamples_1_0_0_1_managed.zip`) | 1.0.0.1 | Example plug-in registrations that exercise the framework. |
 
 The **Pillaro Framework** solution contains:

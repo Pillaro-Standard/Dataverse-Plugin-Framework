@@ -14,7 +14,7 @@
     <!-- An exported solution carries its version in the file name, so every export renames
          it and this project has to follow. Named once here; VerifyMarketplaceInputs below
          fails the build if a file is missing or Input.xml disagrees. -->
-    <FrameworkSolutionFile>PillaroFramework_1_0_0_2_managed.zip</FrameworkSolutionFile>
+    <FrameworkSolutionFile>PillaroFramework_1_0_0_3_managed.zip</FrameworkSolutionFile>
     <ExamplesSolutionFile>PillaroPluginFrameworkExamples_1_0_0_1_managed.zip</ExamplesSolutionFile>
   </PropertyGroup>
 

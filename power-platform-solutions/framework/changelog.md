@@ -2,6 +2,22 @@
 
 All notable changes are documented in this file.
 
+## [1.0.0.3] - 2026-09-25
+
+- Replaced the Czech strings that sat in the English (1033) labels of the Autonumbering table.
+  The forms were named *Informace*, the `pl_Customer` field *Zákazník*, `pl_UseParentConfiguration`
+  *Konfigurace brát z nadřazené*, the parent-child relationship *Podřízené konfigurace*, and the two
+  default lookup views *Všechny aktivní Autoumbering* — all under language code 1033, the only
+  language the solution declares. All ten business rules on the table carried a Czech name and the
+  Czech placeholder description.
+- Fixed the *Autoumbering* typo, which also appeared in strings that were already English: the view
+  names and the `statecode` and `statuscode` descriptions.
+- Unchanged: the legacy `NavBarArea` titles on the main form are still Czech under language code
+  1029. They belong to the classic web client navigation bar, which the Unified Interface does not
+  render.
+- Labels only. No change to schema, plugin registrations or runtime behaviour.
+
+
 ## [1.0.0.2] - 2026-09-10
 
 - Autonumbering configuration lookup ignores deactivated configurations. The
