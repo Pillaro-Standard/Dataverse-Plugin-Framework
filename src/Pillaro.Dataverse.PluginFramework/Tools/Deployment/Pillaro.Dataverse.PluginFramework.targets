@@ -189,7 +189,7 @@
   "language": "CS",
   "messageNamesFilter": [],
   "messagesTypesFolder": "Messages",
-  "namespace": "$(RootNamespace).EarlyBound",
+  "namespace": "$(RootNamespace)",
   "optionSetsTypesFolder": "OptionSets",
   "serviceContextName": "ServiceContext",
   "suppressINotifyPattern": true

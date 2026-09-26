@@ -13,6 +13,9 @@
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<!-- Early-bound classes belong in Logic (see docs/plugins/early-bound-generation.md). Keep the
+		     generator tooling out of Plugins so it cannot be run from the wrong project by mistake. -->
+		<PillaroGenerateEarlyBoundTools>false</PillaroGenerateEarlyBoundTools>
 	</PropertyGroup>
 
 	<PropertyGroup>
