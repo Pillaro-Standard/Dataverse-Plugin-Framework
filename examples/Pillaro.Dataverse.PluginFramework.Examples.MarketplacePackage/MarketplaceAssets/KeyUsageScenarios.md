@@ -16,7 +16,8 @@ document submitted with this offer.
 | 5 | Diagnostic logging | Any of the above | Plugin Log records in the Pillaro Plugin Framework app show the plug-in and tasks that ran, their messages, input context, execution time and execution depth, including the reason a validation failed. |
 | 6 | Administration | Pillaro Plugin Framework model-driven app | Runtime Settings, Autonumberings and Plugin Logs are created, edited and read from the installed app. The four Pillaro security roles grant read-only or full access to those records. |
 
-**Prerequisites for all scenarios:** the package installed into a Dataverse environment, a
-System Administrator user, the `MinimalSeverityLevel` and `ForbiddenWords` runtime settings
-created, and one Autonumbering record for the Task table. No external service, licence key or
+**Prerequisites for all scenarios:** the package installed into a Dataverse environment and a
+System Administrator user. The install creates the configuration the scenarios need — the
+`MinimalSeverityLevel` and `ForbiddenWords` runtime settings and the Autonumbering record for
+the Task table — so there is nothing to set up by hand. No external service, licence key or
 sign-up is required.
