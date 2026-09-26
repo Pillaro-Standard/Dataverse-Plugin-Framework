@@ -8,7 +8,9 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Not a library published for external consumption, and nothing reads the generated XML —
+         requiring XML docs on every public member here just to keep PF-BUILD-001 (zero warnings)
+         would burden every generated project for no reader. -->
     <EnableDefaultItems>false</EnableDefaultItems>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
