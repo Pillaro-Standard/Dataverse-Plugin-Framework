@@ -15,6 +15,21 @@ internal static class PluginCommandRouter
             return await PluginDeployCommand.RunAsync(args.Skip(1).ToArray());
         }
 
+        if (string.Equals(args[0], "manifest", StringComparison.OrdinalIgnoreCase))
+        {
+            return await PluginManifestCommand.RunAsync(args.Skip(1).ToArray());
+        }
+
+        if (string.Equals(args[0], "validate", StringComparison.OrdinalIgnoreCase))
+        {
+            return await PluginValidateCommand.RunAsync(args.Skip(1).ToArray());
+        }
+
+        if (string.Equals(args[0], "diff", StringComparison.OrdinalIgnoreCase))
+        {
+            return await PluginDiffCommand.RunAsync(args.Skip(1).ToArray());
+        }
+
         Console.Error.WriteLine($"Unknown command '{args[0]}'.");
         PrintRootHelp();
         return 2;
@@ -34,6 +49,9 @@ internal static class PluginCommandRouter
         Console.WriteLine();
         Console.WriteLine("Commands:");
         Console.WriteLine("  deploy              Deploy Dataverse plugin assembly and synchronize plugin registration metadata.");
+        Console.WriteLine("  manifest            Generate a plugin registration manifest from an assembly (offline, no connection).");
+        Console.WriteLine("  validate            Validate a plugin registration manifest (offline, no connection).");
+        Console.WriteLine("  diff                Compare a plugin registration manifest against a Dataverse environment.");
         Console.WriteLine();
         Console.WriteLine("Options:");
         Console.WriteLine("  -h, --help          Show help.");
