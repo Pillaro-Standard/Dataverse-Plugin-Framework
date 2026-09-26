@@ -5,10 +5,11 @@ using System;
 
 namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
 {
-    public class UpdateAddressLabel : TaskBase<Logic.Contact>
+    public class UpdateAddressLabel(IServiceProvider serviceProvider, TaskContext taskContext)
+        : TaskBase<Logic.Contact>(serviceProvider, taskContext)
     {
         private static readonly string[] AddressAttributes =
-        {
+        [
             Logic.Contact.Fields.Address1_Line1,
             Logic.Contact.Fields.Address1_Line2,
             Logic.Contact.Fields.Address1_Line3,
@@ -16,21 +17,16 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
             Logic.Contact.Fields.Address1_PostalCode,
             Logic.Contact.Fields.Address1_StateOrProvince,
             Logic.Contact.Fields.Address1_Country
-        };
-
-        public UpdateAddressLabel(IServiceProvider serviceProvider, TaskContext taskContext)
-            : base(serviceProvider, taskContext)
-        {
-        }
+        ];
 
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {
             return validator
                 .WithMode(PluginMode.Synchronous)
                 .WithStage(PluginStage.Preoperation)
-                .WithMessages(new[] { "Create", "Update" })
+                .WithMessages(["Create", "Update"])
                 .ForEntity(ContextEntity.LogicalName)
-                .HasPreImageWhen(ctx => ctx.Message.Equals("Update", StringComparison.InvariantCultureIgnoreCase))
+                .HasPreImageWhen(ctx => ctx.Message == "Update")
                 .EntityWithAtLeastOneAttribute(ContextEntity, AddressAttributes);
         }
 
@@ -60,8 +56,8 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
                 return selector(ContextEntity);
 
             var preImage = ContextEntity;
-            if (TaskContext.Message.Equals("Update", StringComparison.InvariantCultureIgnoreCase))
-                preImage = GetPreImage();
+            if (TaskContext.Message == "Update")
+                preImage = PreImage;
 
             return preImage == null ? null : selector(preImage);
         }

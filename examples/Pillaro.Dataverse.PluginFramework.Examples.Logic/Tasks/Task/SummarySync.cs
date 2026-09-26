@@ -21,9 +21,8 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task
                 .EntityWithAtLeastOneAttributeWhen(
                     ctx => ctx.Message == "Update",
                     ContextEntity,
-                    Logic.Task.Fields.RegardingObjectId, 
-                    Logic.Task.Fields.ScheduledEnd, 
-                    Logic.Task.Fields.ScheduledStart, 
+                    Logic.Task.Fields.RegardingObjectId,
+                    Logic.Task.Fields.ScheduledEnd,
                     Logic.Task.Fields.StateCode,
                     Logic.Task.Fields.StatusCode);
         }
