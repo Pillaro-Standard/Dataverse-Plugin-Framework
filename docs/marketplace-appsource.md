@@ -60,6 +60,7 @@ Everything Partner Center needs that is not part of the package lives in
 | `OfferListing.md` | Offer name, search summary, HTML description, keywords, links, contacts, media plan. Paste into the **Offer listing** page. |
 | `E2E-FunctionalDocument.md` | The end-to-end functional document the certification team tests against. Convert to PDF. |
 | `KeyUsageScenarios.md` | The key usage scenario list. Convert to PDF and upload on the **Supplemental content** page. |
+| `CertificationNotes.md` | The **Notes for certification** text. Partner Center does not keep it across resubmissions, so it lives here. |
 | `Input.xml`, `TermsOfUse.html`, `logo32x32.png` | Part of the package, described above. |
 
 Partner Center keeps no history, so these files are the source of truth. Change them here
@@ -113,7 +114,10 @@ as the version-controlled original.
    availability add the public regions only — the sovereign clouds need their own validation.
    The `CredentialsDetectedInUrlField` warning against the SAS URL is expected.
 9. **Supplemental content** — upload the key usage scenario PDF.
-10. **Review and publish**.
+10. **Review and submit** — paste the notes from `CertificationNotes.md` into **Notes for
+    certification**, which takes 2,500 characters at most and is discarded on every
+    resubmission. Leave **Marketing only change** off whenever the package content changed,
+    even if it sits at the same blob URL.
 
 > [!IMPORTANT]
 > Edits made after an offer is live only reach AppSource when the offer is republished.

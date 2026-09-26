@@ -114,8 +114,8 @@ allowed. The text below is 2,900 characters including markup.
 | Field | Value |
 |---|---|
 | Help link for your app | `https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/tree/main/docs` |
-| Support URL (must differ from Help) | `https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/issues` |
-| Privacy policy link | **TODO** &mdash; a published privacy policy URL. Partner Center requires one and certification checks that it resolves. |
+| Support URL (must differ from Help) | `https://pillaro.cz/kontakty` &mdash; a page with a phone number, an email address and a contact form. The issue tracker was rejected under policy 100.5.13: a support link has to lead to contact details, and the report named this URL. |
+| Privacy policy link | `https://pillaro.cz/privacy-policy---dataverse-plugin-framework` |
 | Support contact | **TODO** &mdash; name, e-mail, phone (digits and spaces only, no dashes) |
 | Engineering contact | **TODO** &mdash; name, e-mail, phone (digits and spaces only, no dashes) |
 
