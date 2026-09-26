@@ -23,6 +23,9 @@ All notable changes are documented in this file.
   `Field "Parent Entity Attribute"` and rolled back. The strings are the same; the edit is now
   made on raw bytes, so the BOM, the line endings and every untouched byte are left alone. The
   version was not bumped, because no environment ever held the broken artifact.
+- The zips in this folder are a genuine export from the framework environment, taken after the
+  corrected unmanaged solution was imported there. The SolutionPackager repack was only the
+  vehicle for carrying the label changes into the environment.
 
 
 ## [1.0.0.2] - 2026-09-10
