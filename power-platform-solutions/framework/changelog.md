@@ -16,6 +16,16 @@ All notable changes are documented in this file.
   1029. They belong to the classic web client navigation bar, which the Unified Interface does not
   render.
 - Labels only. No change to schema, plugin registrations or runtime behaviour.
+- The first 1.0.0.3 zip published for this change could not be imported. The edit had been
+  made through a text-mode round trip that added a UTF-8 BOM to every file it touched and
+  rewrote CRLF as LF. The business rule `.xaml` files carry no BOM, and the platform's parser
+  rejected them: the import stopped at 60% with *Error generating UiData for workflow* on
+  `Field "Parent Entity Attribute"` and rolled back. The strings are the same; the edit is now
+  made on raw bytes, so the BOM, the line endings and every untouched byte are left alone. The
+  version was not bumped, because no environment ever held the broken artifact.
+- The zips in this folder are a genuine export from the framework environment, taken after the
+  corrected unmanaged solution was imported there. The SolutionPackager repack was only the
+  vehicle for carrying the label changes into the environment.
 
 
 ## [1.0.0.2] - 2026-09-10
