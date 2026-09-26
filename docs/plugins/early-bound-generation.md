@@ -17,7 +17,7 @@ See also [Plugin Registration API](./plugin-registration-api.md) for examples of
 
 ## 1. Install the Framework Package
 
-Install `Pillaro.Dataverse.PluginFramework` into the Dataverse plugin project and rebuild the project.
+Install `Pillaro.Dataverse.PluginFramework` into the `Logic` project (not `Plugins`) and rebuild the project. Early-bound classes are consumed by tasks and features, which live in `Logic` — generating them into `Plugins` produces a namespace and location that the rest of the solution cannot reach.
 
 After rebuild, the package creates:
 
@@ -112,7 +112,7 @@ Example entity-focused configuration:
 
 ## 4. Generate Classes
 
-Run the generated wrapper from the plugin project root:
+Run the generated wrapper from the `Logic` project root:
 
 ```bat
 .\Tools\EarlyBound\GenerateEarlyBound.bat
@@ -178,7 +178,12 @@ Typed registration reads logical names from generated early-bound attributes, wh
 
 If you intentionally do not want the package to refresh managed tool files, set `PillaroUpdateManagedToolFiles` to `false` in the project file.
 
-If you do not want the package to create early-bound tooling at all, set `PillaroGenerateEarlyBoundTools` to `false`.
+If you do not want the package to create early-bound tooling at all, set `PillaroGenerateEarlyBoundTools` to `false`. Set it to `false` in the `Plugins` project so the tooling exists in exactly one place and cannot be run from the wrong project by mistake.
+
+> [!NOTE]
+> The framework's own `src/` is not a layout example for this decision: it has no `Logic` project,
+> so its `EarlyBound/` folder lives in `Pillaro.Dataverse.PluginFramework.Plugins` out of necessity.
+> Solutions built from the template always have a `Logic` project — generate there.
 
 ---
 

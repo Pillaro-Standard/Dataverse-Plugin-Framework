@@ -172,7 +172,7 @@ Use this section when you need release and versioning information for the framew
 
 | Document | Description | Status |
 |---|---|---|
-| [Versioning](./VERSIONING.md) | Versioning strategy and release model | ✅ |
+| [Versioning](./versioning.md) | Versioning strategy and release model | ✅ |
 | [Changelog](../CHANGELOG.md) | Release notes and change history | ✅ |
 | [CI/CD Pipelines](./ci-cd-pipelines.md) | Automated testing, building, and packaging | ✅ |
 

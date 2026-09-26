@@ -192,7 +192,7 @@ Example:
 
     <ProjectReference Include="..\YourSolution.Logic\YourSolution.Logic.csproj" />
 
-### 4.3 Install the plugin package
+### 4.4 Install the plugin package
 
 Add the plugin package to the `Plugins` project.
 
@@ -234,23 +234,32 @@ Or use Visual Studio signing support.
 
 ## 6. Review the generated tooling
 
-After installing the plugin package into the `Plugins` project and rebuilding it, package-managed resources are generated in that project:
+After installing the plugin package and rebuilding, package-managed resources are generated — but not all in the same project, because `Logic` and `Plugins` play different roles:
+
+In the `Plugins` project (deployment concerns):
 
     Tools/Deployment/
     Tools/ILMerge/
-    Tools/EarlyBound/
     PillaroSettings.json
-
-These resources are added by the package and include:
 
 - deployment wrappers and deployment README in `Tools/Deployment/`
 - ILMerge binaries and post-build action templates in `Tools/ILMerge/`
-- early-bound generation helper files in `Tools/EarlyBound/`
 - deployment settings in `PillaroSettings.json`
+
+In the `Logic` project (early-bound generation, §6.3):
+
+    Tools/EarlyBound/
+
+- early-bound generation helper files, because generated entity classes are consumed by tasks and features in `Logic`
+
+> [!IMPORTANT]
+> Do not generate early-bound classes in `Plugins`. The template ships with
+> `PillaroGenerateEarlyBoundTools` set to `false` in the `Plugins` project for exactly this reason —
+> the tooling should exist in one place only. See [Early-Bound Entity Generation](./early-bound-generation.md).
 
 > [!NOTE]
 > The generated files are created by the package targets after rebuild.
-> If Visual Studio does not show them immediately, enable **Show All Files** and include the generated `Tools` folder and `PillaroSettings.json` if you want them tracked with your plugin project.
+> If Visual Studio does not show them immediately, enable **Show All Files** and include the generated `Tools` folder and `PillaroSettings.json` if you want them tracked with your project.
 
 ### 6.1 Choose the correct ILMerge post-build action
 
@@ -322,13 +331,13 @@ The scripts no longer depend on `$(TargetDir)`, `$(TargetFileName)`, or `$(Proje
 
 ### 6.3 Generate early-bound classes
 
-The package-generated early-bound tooling uses Power Platform CLI (`pac modelbuilder`) to generate strongly typed Dataverse entity classes.
+The package-generated early-bound tooling uses Power Platform CLI (`pac modelbuilder`) to generate strongly typed Dataverse entity classes. It lives in the `Logic` project (§3.2), not in `Plugins`.
 
 Configure:
 
     Tools/EarlyBound/EarlyBoundSettings.json
 
-Then authenticate with Power Platform CLI and run from the plugin project root:
+Then authenticate with Power Platform CLI and run from the `Logic` project root:
 
     .\Tools\EarlyBound\GenerateEarlyBound.bat
 

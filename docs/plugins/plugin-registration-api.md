@@ -18,7 +18,7 @@ The goal is to keep plugin registration readable for developers while preserving
 
 ## Example
 
-The examples above use `Guid.Empty` placeholders intentionally. Replace them with real non-empty Dataverse step and image IDs before running deployment validation.
+The example below uses all-zero GUID placeholders (`"00000000-0000-0000-0000-000000000000"`) intentionally. Replace them with real non-empty Dataverse step and image IDs — the validator rejects `Guid.Empty` and these placeholder patterns.
 
 ```csharp
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
@@ -420,7 +420,7 @@ The deployment manifest validator enforces basic safety rules:
 - placeholder-looking GUIDs such as `00000000-0000-0000-0000-000000000001` are rejected.
 - synchronous Update steps on an entity should define filtering attributes; `WhenChanged(...)` is preferred for readability and typed update flow.
 - filtering attributes are supported for Create and Update steps. Use `WithFilteringAttributes(...)` for Create steps; use `WhenChanged(...)` or `WithFilteringAttributes(...)` for Update steps.
-- image names must be unique within a step.
+- image names must be unique per image type (pre-image / post-image) within a step. The default image name is `"image"`, and it must match the name the task expects in `HasPreImage(...)` / `HasPostImage(...)` — the registration and the task's image lookup are not otherwise linked.
 - image IDs must be unique across the manifest.
 - images should be used only in PreOperation or PostOperation stages.
 - Create steps cannot define pre-images.
