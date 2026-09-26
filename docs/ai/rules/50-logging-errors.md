@@ -30,8 +30,25 @@ be described incorrectly by an LLM's general Dataverse knowledge — the common 
   monitoring. Using it for an expected business rejection pollutes monitoring with false errors —
   which defeats the reason `DataverseValidationException` exists at all.
 
+> [!WARNING]
+> **Predicate polarity trap, confirmed live in this repository's own simulation (see
+> `docs/ai/analysis-workflow.md`).** The predicate passed to `ThrowWithWarning(...)` /
+> `ThrowWithError(...)` means **"is valid"** (`true` = OK, no throw) — the validator throws when the
+> predicate is `false`, exactly like `WithValidation(...)` and `WithBreakValidation(...)`. It is easy
+> to misread the XML doc ("checks predicate; if it is not valid, throw...") as "predicate = the
+> rejection condition" and write it backwards. Written backwards, the task rejects *every* record,
+> not just the forbidden ones, and the bug is invisible until the plugin actually executes — a fast
+> `dotnet build` or the offline `manifest`/`validate` gate cannot catch it, only a real (or
+> deployed-and-tested) execution can.
+
 ```csharp
-// ✅ Expected business rejection — Success + Info in the log, message shown to the user
+// ✅ Correct — predicate is "is valid"; throws only when it's false
+.ThrowWithWarning("First name is a forbidden word.", x => !IsForbidden(x.FirstName))
+```
+
+```csharp
+// ❌ Wrong — predicate written as "should reject" instead of "is valid" — this rejects
+// EVERY record, because the predicate is false whenever the name is NOT forbidden
 .ThrowWithWarning("First name is a forbidden word.", x => IsForbidden(x.FirstName))
 ```
 

@@ -56,6 +56,51 @@ var contact = DataServiceProvider.Admin.Query<Contact>()...; // no justification
 var contact = GetContact(id); // what context does GetContact use? Not visible without opening it.
 ```
 
+## ⚠️ Cross-check before writing: early-bound type in `Create`/`Update` calls (unresolved, needs verification)
+
+**Observed live, in the `Examples` environment, during the simulation in
+[`docs/ai/analysis-workflow.md`](../analysis-workflow.md):** calling
+`IOrganizationService.Update(new Logic.Account { ... })` (or `.Create(...)`) with an **early-bound**
+entity instance, from inside a task's `DoExecute()`, failed with a sandbox-level serialization fault:
+
+```text
+System.Runtime.Serialization.SerializationException: Element '...' contains data from a type that
+maps to the name 'YourSolution.Logic:Account'. The deserializer has no knowledge of any type that
+maps to this name.
+```
+
+The stack trace pointed into Microsoft's own sandbox execution layer
+(`Microsoft.Xrm.RemotePlugin.Grpc.SandboxFabricGrpcClient` / `Microsoft.CDSRuntime.SandboxGrpcContracts`)
+— i.e. the newer gRPC-based "Sandbox Fabric" plugin isolation model, not framework or task code.
+Switching the write to a **late-bound `Entity`** resolved it immediately, with no other change:
+
+```csharp
+// ✅ Worked — late-bound Entity for the write
+var accountUpdate = new Entity(Logic.Account.EntityLogicalName, ContextEntity.Id);
+accountUpdate[Logic.Account.Fields.EMailAddress1] = primaryContact.EMailAddress1;
+OrganizationServiceProvider.User.Update(accountUpdate);
+```
+
+```csharp
+// ❌ Failed with a sandbox serialization fault in this environment
+OrganizationServiceProvider.User.Update(new Logic.Account
+{
+    Id = ContextEntity.Id,
+    EMailAddress1 = primaryContact.EMailAddress1
+});
+```
+
+**This is not yet a confirmed PF rule** — this repository's own reference task
+(`examples/…/Tasks/Task/SummarySync.cs`) uses the early-bound form for exactly this kind of write
+(`OrganizationServiceProvider.Admin.Update(new Logic.Contact { ... })`) and is presumably deployed and
+passing nightly. Two explanations are open: either that call has the same latent issue and hasn't
+been exercised the same way, or something in the `Examples` environment's sandbox configuration (or
+this specific new plugin assembly) differs from what `SummarySync` runs under. **Before promoting this
+to a hard rule, verify `SummarySync`'s own early-bound `Update(...)` call against a live environment.**
+Until resolved, prefer the late-bound form for `Create`/`Update` calls that write to a **different**
+record than the one already validated in-process, and treat this section as a live finding, not settled
+guidance.
+
 ## ➡️ Related
 
 - [Data Access](../../plugins/data-access.md)
