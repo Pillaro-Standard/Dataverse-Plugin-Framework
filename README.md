@@ -359,6 +359,10 @@ Start with the implementation guide:
 
 ## AI-Ready Standard
 
+> [!TIP]
+> AI agent instructions live in [`AGENTS.md`](./AGENTS.md) — the rule catalog, hard boundaries, and
+> the analysis → plugin → task workflow described below are implemented there, not just planned.
+
 The framework is part of the Pillaro delivery standards, designed to support the entire development lifecycle.
 
 The architecture is intentionally structured to be understandable by both developers and AI-driven tools and agents.

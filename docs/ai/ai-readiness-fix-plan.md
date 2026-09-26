@@ -26,6 +26,19 @@
 - [11. Rizika](#11-rizika)
 - [12. Rozhodnutí, která potřebuji od zadavatele](#12-rozhodnutí-která-potřebuji-od-zadavatele)
 
+> [!NOTE]
+> **Stav k 2026-09-26 — P0 rozsah dokončen.** Hotovo v této branch: F1-01 až F1-09 (všechny
+> blokující opravy dokumentace), F2-01 až F2-06 (kanonické vzory sjednoceny v `/examples`),
+> F3-01 (`manifest`/`validate`/`diff` doroutované v CLI, ověřeno end-to-end proti reálně
+> sestavené `Examples.Plugins.dll`), F3-05 (`PF-ENV-006` implementováno v `TestFixture`),
+> F5-01 (konvence pojmenování stepů). Nově napsané: `AGENTS.md`, `docs/ai/rules/*`,
+> `docs/ai/verify.md`, `docs/ai/analysis-workflow.md`. Vědomě odloženo do P1–P3 (viz §8):
+> F3-02/F3-02a/F3-02b (`-warnaserror` profil), F3-03 (GUID denylist ve validátoru),
+> F4-01/F4-02 (formátování code-blocků), F6-01 (`pillaro new-step` generátor), F6-02–F6-04.
+> Zbývá i test kontraktu `DataverseValidationException` na frameworkové úrovni zmíněný u F1-02 —
+> pokrylo se jen nepřímo, přes chování ve validačním řetězu, ne dedikovaným testem v
+> `tests/Pillaro.Dataverse.PluginFramework.Tests`.
+
 ---
 
 ## 1. Princip prioritizace
