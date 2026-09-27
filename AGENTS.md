@@ -60,7 +60,9 @@ requirement-intake format, and worked examples: [`docs/ai/analysis-workflow.md`]
 Summary:
 
 1. **Break the requirement into plugins first.** A plugin groups steps around one entity or one
-   functional area (`ContactPlugin`, `AccountPlugin`). Name it before naming any task.
+   functional area (`ContactPlugin`, `AccountPlugin`). Name it before naming any task. **Look for an
+   existing `<Entity>Plugin` first** — in a mature solution the usual change is a new task on an
+   existing step, not a new plugin (PF-REG-010).
 2. **Break each plugin into tasks.** One task = one business responsibility (PF-TASK-002). If a
    requirement has an "and" in it that isn't purely incidental, it is probably two tasks.
 3. **For each task, write down before coding:** entity, message(s), stage, mode, the precondition(s)
@@ -86,6 +88,11 @@ Exact commands: [`docs/ai/verify.md`](./docs/ai/verify.md). Summary:
 
 Both CLI commands run offline — no Dataverse connection needed — and return a non-zero exit code on
 failure. Treat a non-zero exit code as a hard stop, not a suggestion.
+
+The fast loop cannot catch a merged `Plugins` DLL without `ProxyTypesAssemblyAttribute`
+(PF-BUILD-006): it builds and validates cleanly, then every early-bound call fails inside Dataverse
+with "not a known entity type" or "the deserializer has no knowledge of any type". If you see either
+message, fix the assembly — never rewrite the task to late-bound.
 
 ## 🐢 Slow loop (integration tests — conditions apply)
 

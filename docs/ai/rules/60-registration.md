@@ -15,6 +15,8 @@
 | PF-REG-007 | Prefer typed attribute selection (`c => c.FirstName`) or `Fields` constants; string literals only when the early-bound type does not exist yet. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
 | PF-REG-008 | Always set `WithName(...)`, in the form `{StepPrefix} {entity} {Message} {Stage} {Mode}` (drop entity for custom API/action). An unset name is not managed by deployment. | decision D4, [plugin-registration-api.md — Step Naming](../../plugins/plugin-registration-api.md#step-naming) |
 | PF-REG-009 | The step name describes coordinates, not purpose. Purpose is already carried by the plugin and task class names. | decision D4 |
+| PF-REG-010 | One step per entity × message × stage × mode. A new task with existing coordinates extends that step (filtering attributes and image columns = union of all its tasks); never a duplicate step. | observed in large production solutions |
+| PF-REG-011 | `RegisterTask<T>(...)` order is execution order. Group by stage; register value-setting tasks before tasks that read the value. No commented-out registrations. | [execution-pipeline.md](../../plugins/execution-pipeline.md) |
 
 ## Where GUIDs come from (PF-REG-002/003 — hard boundary)
 
@@ -50,6 +52,50 @@ registration
 ❌ Wrong — RegisterTask says PreOperation, Register(...) says PreValidation.
 The task fires on the stage nobody validated against, or on two stages at once.
 ```
+
+## One step per coordinates — tasks share it (PF-REG-010)
+
+A Dataverse step is identified by its coordinates: **entity × message × stage × mode**. Every task
+registered with the same coordinates runs inside that one step. In a mature solution, one entity
+plugin commonly carries 20–40 tasks on a handful of steps, so the usual job is not "add a plugin",
+it is "add a task to an existing step".
+
+When adding a task to an existing plugin:
+
+1. Find the step in `Register(...)` with the same coordinates as the new `RegisterTask<T>(...)`.
+2. **If it exists, extend it** — add the new task's trigger attributes to its `WhenChanged(...)` /
+   filtering attributes and its needed columns to the existing image. Do not add a second step with
+   the same coordinates.
+3. **If it does not exist, add a step** — and a new GUID from a human (PF-REG-003).
+4. A shared step's filtering attributes and image columns are the **union** of all its tasks' needs.
+   When removing or narrowing a task, recompute the union from the remaining tasks — never remove an
+   attribute another task on the same step still validates.
+
+```csharp
+// ✅ New task needs `telephone1` on the existing contact Update PreOperation step — extend it
+registration
+    .OnUpdate<Contact>("<existing-step-id>")
+    .PreOperation()
+    .Synchronous()
+    .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName, Contact.Fields.Telephone1)
+    .WithName($"{StepPrefix} contact Update PreOperation Synchronous");
+```
+
+```csharp
+// ❌ A second step with identical coordinates — both fire, every task on them runs twice
+registration
+    .OnUpdate<Contact>("<new-step-id>")
+    .PreOperation()
+    .Synchronous()
+    .WhenChanged(Contact.Fields.Telephone1);
+```
+
+## Registration order is execution order (PF-REG-011)
+
+Tasks matching the same step run in the order of their `RegisterTask<T>(...)` calls. Group the
+constructor by stage (PreValidation → PreOperation → PostOperation → custom messages) and, within a
+stage, register a task that sets a value **before** any task that reads or validates that value.
+Delete registrations you no longer need — do not leave them commented out; git keeps the history.
 
 ## Filtering attributes and task validation must agree
 

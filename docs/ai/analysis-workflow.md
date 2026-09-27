@@ -48,6 +48,14 @@ outcome:
 An analyst fills this in from a workshop or a ticket. It intentionally has no mention of stages,
 modes, or C# types — that mapping is the AI's job in step 2.
 
+Two fields are copied into the product **verbatim**, so the analyst owns their wording:
+
+- `outcome.rejection` — the exact text the end user sees, **in the users' language** (for a Czech
+  customer, Czech). The AI never translates, rephrases, or invents it (PF-ERR-004). If it is missing
+  for a rule that rejects, the AI asks.
+- `rule` — any concrete values (limits, lists, codes). If a value should be configurable rather than
+  fixed, say so here; it then becomes a setting, not a constant in code.
+
 ## 2. Plugin breakdown
 
 Group requirements by entity or functional area — one plugin per group (PF-PLUG-004). Two
@@ -62,6 +70,23 @@ Plugin breakdown for R1, R2:
 ```
 
 State this list before writing any task — it is the first thing a reviewer checks.
+
+**Most requirements land in an existing plugin.** Before proposing a new one, look in `Plugins/` for
+`<Entity>Plugin`. In a mature solution it already exists and carries many tasks; the plan then says
+*extend* it, and names the existing step each new task joins (PF-REG-010):
+
+```text
+Plugin breakdown for R3:
+- ContactPlugin (existing, 27 tasks)   ← extend
+    R3 -> step "contact Update PreOperation Synchronous" (existing)
+          + filtering attribute: telephone1
+          + pre-image column:    telephone1
+          shares the step with: SetNormalizedPhoneNumber, CheckDuplicity, RestrictStatusChange, ...
+```
+
+The "shares the step with" line matters for two later decisions: the task's position in the
+constructor (PF-REG-011 — a task that reads a value runs after the task that sets it), and the test
+data, which must satisfy every task on the step (PF-TEST-013).
 
 ## 3. Task breakdown
 
@@ -79,6 +104,11 @@ mode: Synchronous
 trigger:
   filteringAttributes: [primarycontactid]
   requiredImages: []
+registration:                        # PF-REG-010 — join an existing step or add one
+  steps:
+    - "account Create PostOperation Synchronous"   # new
+    - "account Update PostOperation Synchronous"   # new
+  sharesStepWith: []                 # other tasks on the same steps
 preconditions:
   - "primarycontactid is present on Create, or changed on Update"
 rules:
@@ -110,13 +140,18 @@ mode: Synchronous
 trigger:
   filteringAttributes: [name]
   requiredImages: []
+registration:
+  steps:
+    - "account Create PreValidation Synchronous"   # new
+    - "account Update PreValidation Synchronous"   # new
+  sharesStepWith: []
 preconditions:
   - "name is present in the target entity"
 rules:
   - id: R2
     description: "name must not contain a word from the ForbiddenWords setting"
-    onFailure: userMessage           # → DataverseValidationException / ThrowWithWarning
-    message: "Name is a forbidden word."
+    onFailure: userMessage           # → ThrowWithWarning / DataverseValidationException
+    message: "Name is a forbidden word."   # verbatim from the intake, users' language
 dataAccess:
   context: User
   reads: [pl_setting.ForbiddenWords]
@@ -125,8 +160,9 @@ logging:
 tests:
   - name: CreateAccount_WithAllowedName_Succeeds
     expect: success
-  - name: CreateAccount_WithForbiddenName_Throws
-    expect: DataverseValidationException
+  - name: CreateAccount_WithForbiddenName_ShouldBeRejected
+    expect: rejected                 # test sees FaultException<OrganizationServiceFault> (PF-TEST-008)
+    message: "is a forbidden word"
 ```
 
 This is the review artifact: a developer or the consultant who wrote the intake can check it against
@@ -143,11 +179,32 @@ Once the plan for a task is approved:
 2. Implement the task: `AddValidations()` from `trigger`/`preconditions`/`rules`, `DoExecute()` from
    the rule descriptions and `dataAccess`.
 3. Implement or extend the plugin's `RegisterTask<T>(...)` (runtime) and `Register(...)` (deployment
-   metadata) from the same `entity`/`messages`/`stage`/`mode` — see
-   [`docs/ai/rules/60-registration.md`](./rules/60-registration.md) for keeping the two aligned.
+   metadata) from the `registration:` block — extend the existing step where the plan says so, place
+   the `RegisterTask<T>(...)` call in execution order — see
+   [`docs/ai/rules/60-registration.md`](./rules/60-registration.md).
 4. Run the fast loop ([`docs/ai/verify.md`](./verify.md)): build, `manifest`, `validate`.
 5. Hand off to a human for deployment (PF-PROC-005 — never run `deploy` yourself).
-6. After deployment, run the tests again against the dev environment (PF-ENV-*): they pass.
+6. After deployment, run the new task's tests **and the tests of every task in `sharesStepWith`**
+   against the dev environment (PF-ENV-*). A new task on a shared step can break its neighbours —
+   a wider filtering attribute set, a stricter rejection, or a changed value makes their tests fail
+   even though their code did not change.
+
+## What the plan looks like when it is done
+
+The review artifact the consultant signs off, one block per requirement:
+
+```text
+R3 — Normalize the customer's phone number
+  Plugin:      ContactPlugin (existing)                      — extend
+  Task:        SetNormalizedPhoneNumber (new)                 Tasks/Contact/SetNormalizedPhoneNumber.cs
+  Step:        contact Create+Update PreOperation Sync        existing; + filtering attribute telephone1
+  Runs after:  SetMandatoryFields    Runs before: CheckDuplicity (reads the normalized number)
+  Rejects:     —
+  Tests:       Tests/Contact/SetNormalizedPhoneNumberTests.cs
+               CreateContact_WithLocalNumber_StoresInternationalFormat         success
+               UpdateContact_ChangingPhone_RenormalizesNumber                  success
+               + re-run: CheckDuplicityTests, RestrictStatusChangeTests       (shares the step)
+```
 
 ## Where this lives per tool
 

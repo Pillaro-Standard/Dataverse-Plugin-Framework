@@ -64,6 +64,11 @@ in [ai-readiness-fix-plan.md](./ai-readiness-fix-plan.md)), add:
 Build `Logic` and `Plugins` **in that order** if building a single project instead of the whole
 solution — `Plugins` references `Logic`'s output.
 
+If a `dotnet build`/`dotnet test` was ever run against these legacy projects, their restore state in
+`obj/` is left incompatible with MSBuild (`Your project file doesn't list 'win' as a
+"RuntimeIdentifier"`). Recover with `& $msbuild "Dataverse Plugin Framework.sln" /t:Restore`, then
+build again.
+
 ## Fast loop — CLI and framework unit/offline tests
 
 ```powershell

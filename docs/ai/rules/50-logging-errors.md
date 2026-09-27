@@ -11,6 +11,7 @@
 | PF-ERR-001 | An expected business stop is `DataverseValidationException`: the user sees the message, the task ends `Success` + `Info`. NOT `InvalidPluginExecutionException` — that creates a false `Error` in monitoring. | [error-handling.md](../../plugins/error-handling.md), decision D3 |
 | PF-ERR-002 | `InvalidPluginExecutionException` in task code only in exceptional cases — the framework's own conversion handles the common path. | [error-handling.md](../../plugins/error-handling.md) |
 | PF-ERR-003 | Do not build a custom try/catch/log pipeline in a task. | [error-handling.md](../../plugins/error-handling.md) |
+| PF-ERR-004 | The user-facing rejection message is product text: in the users' language, verbatim from the requirement, actionable, no technical detail. | — |
 
 ## The `DataverseValidationException` contract (read this before using `ThrowWithWarning`)
 
@@ -72,6 +73,28 @@ protected override void DoExecute()
         throw;
     }
 }
+```
+
+## The user-facing message is product text, not a log line (PF-ERR-004)
+
+The message passed to `ThrowWithWarning(...)` / `DataverseValidationException` is what the end user
+reads in the form. Treat it as product copy:
+
+- **Language:** the language of the solution's users, taken verbatim from the requirement
+  (`outcome.rejection` in [`analysis-workflow.md`](../analysis-workflow.md)). These rules are in
+  English; the users of a Czech customer's CRM are not. Never translate or rephrase a message the
+  requirement states.
+- **Content:** what is wrong and what the user can do about it. No entity logical names, no
+  exception text, no GUIDs.
+- **Missing text:** if the requirement gives no message, ask for one — do not invent product copy.
+
+When the solution localizes messages, pass a `Lazy<string>` so the lookup runs only when the
+validation actually fails:
+
+```csharp
+.ThrowWithWarning(
+    new Lazy<string>(() => translations.Get("contact.deactivate.adminOnly", TaskContext.InitiatingUserId)),
+    _ => IsAdministrator())
 ```
 
 ## ➡️ Related
