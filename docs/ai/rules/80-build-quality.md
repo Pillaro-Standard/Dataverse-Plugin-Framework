@@ -10,6 +10,7 @@
 | PF-BUILD-003 | Plugin projects target `net462`, `<LangVersion>latest</LangVersion>`. | [getting-started.md](../../plugins/getting-started.md) |
 | PF-BUILD-004 | Output must stay ILMerge-compatible — do not add a dependency that is invalid in the plugin sandbox. | [CONTRIBUTING.md](../../CONTRIBUTING.md), [architecture.md](../../plugins/architecture.md) |
 | PF-BUILD-005 | Never suppress a warning with `#pragma` / `NoWarn` as the fix — fix the cause. | — |
+| PF-BUILD-006 | The merged `Plugins` DLL MUST carry `[assembly: ProxyTypesAssemblyAttribute]` (declared in the `Plugins` project, because ILMerge drops the one `pac modelbuilder` puts into `Logic`). Without it every early-bound read and write fails at runtime, never at build time. | live-verified, see [40-data-access.md](./40-data-access.md) |
 
 ## Run this before calling a change done
 
