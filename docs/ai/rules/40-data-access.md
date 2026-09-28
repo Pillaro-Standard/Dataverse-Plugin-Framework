@@ -12,8 +12,9 @@
 | PF-DATA-005 | NEVER write or edit files under `EarlyBound/`. `pac modelbuilder` generates them. | [early-bound-generation.md — File Ownership](../../plugins/early-bound-generation.md#file-ownership) |
 | PF-DATA-006 | Early-bound classes live in the `Logic` project; generation runs from the `Logic` project root. This framework's own `src/` is not a layout example (see [00-architecture.md](./00-architecture.md)). | decision D1, [architecture.md](../../plugins/architecture.md) |
 | PF-DATA-007 | A missing early-bound type or attribute means STOP and tell the developer what to generate. NEVER hand-write a partial class, NEVER fall back to late-bound access to route around it. | [early-bound-generation.md](../../plugins/early-bound-generation.md) |
-| PF-DATA-008 | Attribute name is always `Entity.Fields.X`. `nameof(...)` as an attribute name is NEVER correct — it returns the C# property name, not the logical name, and the mismatch fails silently at runtime. | decision D2 |
+| PF-DATA-008 | Wherever an API takes an attribute name as a string (validation chain, `ColumnSet`, indexers), use `Entity.Fields.X`; in `Register(...)` use typed selectors (PF-REG-007). `nameof(...)` as an attribute name is NEVER correct — it returns the C# property name, not the logical name, and the mismatch fails silently at runtime. | decision D2 |
 | PF-DATA-009 | Until early-bound types exist for an entity (the default state of a brand-new project), use logical names as string literals. Switch to `Fields` constants once the type exists. | decision D2 |
+| PF-DATA-010 | Writes that belong to the current operation go through `TaskContext.AddEntityToUpdate(entity, ServiceUser)`, not a direct `Update(...)`. Pick `ServiceUser` like a provider context (`User` default; `InitiatingUser` when the audit must show the person, e.g. post-operation Delete; `Admin` with a justification). | [task-model.md](../../plugins/task-model.md) |
 
 ## The two-tier attribute name rule (read this before writing your first task)
 
@@ -36,6 +37,26 @@ an edge case; it is the starting state of every new solution, until `pac modelbu
 label (`AddLogMessageLine($"Updating {nameof(ContextEntity.Address1_Name)}")`) or a test category
 (`[Trait("Category", nameof(SummarySync))]`). The rule forbids `nameof` **as the value passed where an
 attribute logical name is expected**, not `nameof` in general.
+
+## Writing: queue, don't update (PF-DATA-010)
+
+```csharp
+// ✅ Queued — merged with what other tasks queue for the same record, written once after all tasks succeed.
+// In PreValidation/PreOperation, a queued change to the record being saved is merged into the target:
+// no extra write, no re-triggered steps.
+TaskContext.AddEntityToUpdate(new Logic.Account { Id = accountId, EMailAddress1 = email });
+```
+
+```csharp
+// ❌ Direct update of a record other tasks on the same step may also change — written several times,
+// re-triggers the account's own steps each time, and is not rolled back if a later task fails
+OrganizationServiceProvider.User.Update(new Logic.Account { Id = accountId, EMailAddress1 = email });
+```
+
+Use `OrganizationServiceProvider` / `DataServiceProvider` directly for reads, creates, deletes and
+anything deliberately written outside the plugin transaction. `TaskContext.GetActualEntityToUpdate(...)`
+returns what earlier tasks queued, when a later task has to build on it.
+`examples/…/Tasks/Contact/ArchiveDeletedContact.cs` and `RecordJobTitleChange.cs` are the reference.
 
 ## Choosing an execution context
 

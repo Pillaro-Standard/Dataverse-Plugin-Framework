@@ -26,11 +26,11 @@ open the file. Pick from this list; if nothing fits, the task probably has two r
 | Verb | Kind of task | Typical stage | `DoExecute()` |
 |---|---|---|---|
 | `Validate…` / `Restrict…` / `Check…` | Business rejection only (PF-TASK-008) | PreValidation / PreOperation | empty |
-| `Set…` | Fill or derive a value on the record being saved | PreOperation (writes to the target, no `Update` call) | assigns `ContextEntity` |
-| `Recalculate…` / `Update…` | Change **other** records derived from this one | PostOperation | explicit `Update(...)` |
+| `Set…` | Fill or derive a value on the record being saved | PreOperation | assigns `ContextEntity`, or queues the target (PF-DATA-010) |
+| `Recalculate…` / `Update…` | Change **other** records derived from this one | PostOperation | `TaskContext.AddEntityToUpdate(...)` |
 | `Create…` / `Assign…` | Create or reassign related records | PostOperation | explicit `Create(...)` / request |
 | `Sync…` / `Send…` | Push data to an external system | PostOperation, usually Asynchronous | integration call |
-| `Get…` | Answer a custom API / custom message | PostOperation | writes `OutputParameters` |
+| `Get…` | Answer a Custom API | MainOperation (PF-REG-012) | writes `OutputParameters` |
 
 Examples: `SetNormalizedPhoneNumber`, `RestrictStatusChange`, `SyncCustomerToErp`. Not
 `ContactPhoneTask`, not `PhoneNumberHandler`.

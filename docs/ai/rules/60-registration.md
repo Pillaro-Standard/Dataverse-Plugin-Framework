@@ -10,13 +10,14 @@
 | PF-REG-002 | Step ID and image ID MUST be non-empty GUIDs; the validator rejects `Guid.Empty` and placeholder patterns. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
 | PF-REG-003 | NEVER invent a GUID without an explicit policy for where it comes from. | — |
 | PF-REG-004 | A synchronous Update step MUST have filtering attributes; prefer `WhenChanged(...)` for readability and typed flow. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
-| PF-REG-005 | Create steps cannot have a pre-image; Delete steps cannot have a post-image; images only in Pre/PostOperation. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
-| PF-REG-006 | Image names unique per image type within a step; image IDs unique across the manifest. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
-| PF-REG-007 | Prefer typed attribute selection (`c => c.FirstName`) or `Fields` constants; string literals only when the early-bound type does not exist yet. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
+| PF-REG-005 | Pre-images: PreValidation, PreOperation or PostOperation, never on Create. Post-images: PostOperation only, never on Delete. `WithBothImage(...)`: PostOperation, not Create/Delete. MainOperation (Custom API): no images. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
+| PF-REG-006 | Image keys (entity alias, defaulting to the image name) unique within the pre-image and within the post-image collection of a step; image IDs unique across the manifest. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
+| PF-REG-007 | In `Register(...)` select attributes with typed selectors (`c => c.FirstName`), as `/examples` do; string literals only while the early-bound type does not exist yet. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md) |
 | PF-REG-008 | Always set `WithName(...)`, in the form `{StepPrefix} {entity} {Message} {Stage} {Mode}` (drop entity for custom API/action). An unset name is not managed by deployment. | decision D4, [plugin-registration-api.md — Step Naming](../../plugins/plugin-registration-api.md#step-naming) |
 | PF-REG-009 | The step name describes coordinates, not purpose. Purpose is already carried by the plugin and task class names. | decision D4 |
 | PF-REG-010 | One step per entity × message × stage × mode. A new task with existing coordinates extends that step (filtering attributes and image columns = union of all its tasks); never a duplicate step. | observed in large production solutions |
 | PF-REG-011 | `RegisterTask<T>(...)` order is execution order. Group by stage; register value-setting tasks before tasks that read the value. No commented-out registrations. | [execution-pipeline.md](../../plugins/execution-pipeline.md) |
+| PF-REG-012 | A Custom API's main operation is `RegisterTask<T>(PluginStage.Mainoperation, …)` + `OnMessage(...).MainOperation()`. It creates no `SdkMessageProcessingStep` (deploy shows `[TYPE-ONLY]`); the Custom API is bound to the plugin type through `CustomAPI.PluginTypeId`. | [plugin-registration-api.md](../../plugins/plugin-registration-api.md#custom-api-mainoperation-registration) |
 
 ## Where GUIDs come from (PF-REG-002/003 — hard boundary)
 
@@ -44,7 +45,7 @@ registration
     .OnUpdate<Contact>("<step-id>")
     .PreOperation()
     .Synchronous()
-    .WhenChanged(Contact.Fields.Address1_Line1, Contact.Fields.Address1_City /* ... */)
+    .WhenChanged(c => c.Address1_Line1, c => c.Address1_City /* ... */)
     .WithName($"{StepPrefix} contact Update PreOperation Synchronous");
 ```
 
@@ -77,7 +78,7 @@ registration
     .OnUpdate<Contact>("<existing-step-id>")
     .PreOperation()
     .Synchronous()
-    .WhenChanged(Contact.Fields.FirstName, Contact.Fields.LastName, Contact.Fields.Telephone1)
+    .WhenChanged(c => c.FirstName, c => c.LastName, c => c.Telephone1)
     .WithName($"{StepPrefix} contact Update PreOperation Synchronous");
 ```
 
@@ -87,7 +88,7 @@ registration
     .OnUpdate<Contact>("<new-step-id>")
     .PreOperation()
     .Synchronous()
-    .WhenChanged(Contact.Fields.Telephone1);
+    .WhenChanged(c => c.Telephone1);
 ```
 
 ## Registration order is execution order (PF-REG-011)
@@ -109,7 +110,7 @@ was validated but not filtered). Keep the two sets aligned, or drop the unused o
 
 ```csharp
 // Registration: image named "image" (the framework's default)
-.WithPreImage("<image-id>", "image", Contact.Fields.Address1_Line1, /* ... */)
+.WithPreImage("<image-id>", "image", c => c.Address1_Line1, /* ... */)
 ```
 
 ```csharp
