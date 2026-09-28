@@ -13,12 +13,14 @@ public class ExamplePlugin : PluginBase
 
     // Entity and attribute names are written as string literals because this template ships
     // without early-bound entity classes. After generating them with Tools/EarlyBound in the
-    // Logic project, switch to the typed overloads - OnCreate<Contact>(...) with
-    // Contact.Fields.FirstName - which keep the registration metadata bound to the entity type.
+    // Logic project, switch to the typed overloads - OnCreate<Contact>(...) with typed selectors
+    // such as c => c.FirstName - which keep the registration metadata bound to the entity type.
+    // The step ids below are generated for this project when it is created from the template,
+    // so they never collide with another project's steps in the same environment.
     public override void Register(IPluginRegistration registration)
     {
         registration
-            .OnCreate("contact", "a4621296-6f72-42b6-b2c6-766732cec9fc")
+            .OnCreate("contact", "$guid1$")
             .PreValidation()
             .Synchronous()
             .WithName($"{StepPrefix} contact Create PreValidation Synchronous")
@@ -26,7 +28,7 @@ public class ExamplePlugin : PluginBase
             .WithFilteringAttributes("firstname", "lastname");
 
         registration
-            .OnUpdate("contact", "19d6cfed-9967-4465-9647-201ddb6a8082")
+            .OnUpdate("contact", "$guid2$")
             .PreValidation()
             .Synchronous()
             .WithName($"{StepPrefix} contact Update PreValidation Synchronous")

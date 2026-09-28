@@ -65,6 +65,10 @@
       <Pack>true</Pack>
       <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
     </Content>
+    <Content Include="template\ProjectTemplate\.gitignore">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
+    </Content>
     <Content Include="template\ProjectTemplate\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj">
       <Pack>true</Pack>
       <PackagePath>content\Pillaro.Dataverse.PluginTemplate\Logic\</PackagePath>
