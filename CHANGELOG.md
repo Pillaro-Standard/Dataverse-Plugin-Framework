@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Pillaro.Dataverse.PluginFramework
+
+- The generated `Tools/EarlyBound/EarlyBoundSettings.json` now defaults `namespace` to the project's root namespace instead of `<RootNamespace>.EarlyBound`. With the suffix, the documented `Tasks/<Entity>/` layout breaks the canonical `Logic.Contact.Fields.X` form: from inside `YourSolution.Logic.Tasks.Contact`, `Logic.Contact` does not reach a type living in `YourSolution.Logic.EarlyBound`, so the reference code did not compile in a project generated from the template. `/examples` already generated into the root namespace. The file is created only when missing, so existing projects keep their setting.
+
+### Pillaro.Dataverse.PluginFramework.Cli
+
+- `pillaro-dv manifest`, `validate` and `diff` are routed and listed in the help. The three commands were fully implemented but unreachable, because the router dispatched only `deploy`. `manifest` and `validate` run without a Dataverse connection and exit non-zero on failure, which gives CI and AI agents an offline check of registration metadata.
+
+### Pillaro.Dataverse.PluginFramework.Testing
+
+- `TestFixture` verifies the connected environment before any test runs. When the new optional `ExpectedEnvironmentUrl` setting is present, a connection string pointing at a different host stops the run with an explicit error instead of creating and deleting test data there. Without the setting nothing changes.
+
+### Templates
+
+- The `Plugins` project declares `[assembly: ProxyTypesAssemblyAttribute]`. `pac modelbuilder` puts the attribute into the `Logic` project, but ILMerge keeps only the primary assembly's attributes, so the merged plugin DLL lost it and the sandbox rejected every early-bound type at runtime: LINQ reads failed with *... is not a known entity type* and early-bound writes with *the deserializer has no knowledge of any type that maps to this name*. Nothing failed at build time. Verified against a live environment: the same task failed with both errors and passed after adding only the attribute.
+- The `Logic` project sets `EnableDefaultCompileItems` to `false` explicitly. `EnableDefaultItems=false` alone does not propagate to it in time for the framework package's `EarlyBound\**\*.cs` include, so generated early-bound classes were silently left out of the build until a task referenced one.
+- A freshly generated project builds with zero warnings: `GenerateDocumentationFile` is gone from the `Logic` project, which reported ten `CS1591` for the scaffolded example files.
+- The early-bound tooling is generated only in `Logic` (`PillaroGenerateEarlyBoundTools=false` in `Plugins`), so it can no longer be run from the wrong project.
+
+### Examples
+
+- `SummarySync` no longer validates `scheduledstart`, which the task never read and the step never filtered on, so a change to it alone could never trigger the task.
+- `UpdateAddressLabel` uses the same forms as the other example tasks: primary constructor, collection expressions, `ctx.Message == "Update"` and the `PreImage` property.
+- `ContactPlugin.Register` selects all attributes with typed selectors.
+- Every plug-in step is named by coordinates, `{StepPrefix} {entity} {Message} {Stage} {Mode}`, with `StepPrefix` a constant on the solution `PluginBase` (`Pillaro Examples`, `Pillaro Framework`, and the project name in the templates). This covers all example steps, the new Delete step, and the framework's own autonumbering step, which becomes `Pillaro Framework pl_AutoNumbering_GetNewNumber PostOperation Synchronous`. The next deployment or export of `PillaroPluginFrameworkExamples` and `PillaroFramework` renames the registered steps; steps are matched by id, so they are updated in place, never duplicated.
+
+### Documentation
+
+- Added AI coding-agent instructions: `AGENTS.md` as the entry point, a rule catalog with stable IDs in `docs/ai/rules/`, exact verification commands in `docs/ai/verify.md`, and `docs/ai/analysis-workflow.md`, which takes a consultant's plain-language requirement to a reviewable plan (plugins, tasks, steps, tests) before any code is written. The rules were exercised end to end: a project generated from the template, a plan, failing tests, implementation and deployment to a live environment, with integration tests passing. Several findings above came out of that run.
+- `docs/tests/testing.md` asserted a business rejection with `Assert.Throws<InvalidPluginExecutionException>`, which never passes on the client side, where the rejection arrives as `FaultException<OrganizationServiceFault>`; the same example read columns with `ColumnSet(nameof(...))`, which produces property names instead of logical names. Both fixed.
+- Fixed documentation that disagreed with the code: the `DataverseValidationException` outcome (`Success` with `Info`, not `NotValid`), the image-name uniqueness rule, where early-bound classes are generated (`Logic`, not `Plugins`), the solution file name in `CONTRIBUTING.md`, a broken `VERSIONING.md` link, a misleading placeholder note and a duplicated section number.
+
 ### Solutions
 
 - Exported `PillaroFramework` 1.0.0.3, managed and unmanaged. The Autonumbering table carried Czech strings in its English (1033) labels: the forms were named *Informace*, the `pl_Customer` field *Zákazník*, `pl_UseParentConfiguration` *Konfigurace brát z nadřazené*, the parent-child relationship *Podřízené konfigurace*, the two default lookup views *Všechny aktivní Autoumbering*, and all ten business rules on the table had a Czech name and the Czech placeholder description. 1033 is the only language the solution declares, so every English-speaking user saw them — including the certification reviewer, whom the AppSource functional document sends to that exact table. The *Autoumbering* typo went with them, including where it appeared in strings that were already English. Labels only; no schema, registration or behaviour change. The legacy `NavBarArea` titles are still Czech under language code 1029, which the Unified Interface does not render. 1.0.0.2 moved into the `Archive` folder; per-solution notes are in `power-platform-solutions/framework/changelog.md`.
