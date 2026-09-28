@@ -28,12 +28,20 @@ dotnet build "path\to\YourSolution.Logic\YourSolution.Logic.csproj" -c Release
 Zero warnings, zero errors (PF-BUILD-001). A warning is a stop, not a note — see
 [`docs/ai/rules/80-build-quality.md`](./rules/80-build-quality.md).
 
-Then the offline registration gate (no Dataverse connection needed):
+Then the offline registration gate (no Dataverse connection needed). Build `Plugins` too, and run
+the CLI bundled in the framework package — the `$cliDll` line of
+`Plugins\Tools\Deployment\DeployPlugins.ps1` holds its path:
 
 ```powershell
-pillaro-dv manifest --assembly "path\to\YourSolution.Logic\bin\Release\net462\YourSolution.Logic.dll" --output artifacts/plugin-manifest.json
-pillaro-dv validate --manifest artifacts/plugin-manifest.json
+$cliDll = (Select-String -Path "path\to\YourSolution.Plugins\Tools\Deployment\DeployPlugins.ps1" -Pattern "^\`$cliDll = '(.+)'").Matches[0].Groups[1].Value
+dotnet $cliDll --help
+dotnet $cliDll manifest --assembly "path\to\YourSolution.Plugins\bin\Release\YourSolution.Plugins.dll" --output artifacts/plugin-manifest.json
+dotnet $cliDll validate --manifest artifacts/plugin-manifest.json
 ```
+
+`manifest` and `validate` ship from the framework release after 1.2.2. If `--help` lists only
+`deploy`, skip them and say so in your report; `deploy` runs the same validation before it writes
+anything. Template projects put build output directly in `bin\Release\` (no `net462` subfolder).
 
 Exit code `0` on both commands is the only acceptable result. `manifest` exits `1`/`3` on a missing
 assembly or validation errors baked into the manifest; `validate` exits `2` for a missing file, `3`

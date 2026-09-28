@@ -58,6 +58,23 @@ anything deliberately written outside the plugin transaction. `TaskContext.GetAc
 returns what earlier tasks queued, when a later task has to build on it.
 `examples/…/Tasks/Contact/ArchiveDeletedContact.cs` and `RecordJobTitleChange.cs` are the reference.
 
+## Reading security configuration
+
+A rule that depends on the user's roles, teams or business unit reads `systemuserroles`, `role`,
+`teammembership` and similar tables. Many users cannot read them — and those are exactly the users
+the rule is meant to restrict, so in `User` context the check fails with a technical error instead
+of the business message. Read security configuration in `Admin` context, with a comment saying why
+(PF-DATA-002), and identify built-in roles by their role **template** id, not by name: the name
+depends on the environment's language, and every business unit has its own copy of the role.
+
+```csharp
+// Admin: users being restricted by this rule usually cannot read security roles themselves.
+var roleIds = DataServiceProvider.Admin.Query<Logic.SystemUserRoles>()
+    .Where(x => x.SystemUserId == TaskContext.UserId)
+    .Select(x => x.RoleId)
+    .ToList();
+```
+
 ## Choosing an execution context
 
 ```csharp

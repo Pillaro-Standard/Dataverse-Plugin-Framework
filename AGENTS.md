@@ -69,7 +69,10 @@ Summary:
    that make it fire, what it reads, what it writes, and the log lines it should emit. This is the
    task's contract — the validation chain and the tests both come directly from it.
 4. **Present the plan (plugins + tasks + tests) for review before writing any code.** This is the
-   cheap checkpoint — changing a plan is a text edit, changing code after the fact costs more.
+   cheap checkpoint — changing a plan is a text edit, changing code after the fact costs more. Use
+   the plan format in `analysis-workflow.md` ("What the plan looks like when it is done"): for every
+   requirement the plugin (existing/new), the task file, the **step coordinates** (existing/new, and
+   what the task adds to the step), the tasks it shares the step with, the rejection text and the tests.
 5. **Tests before implementation.** Write the test(s) for the task's happy path and its business
    rejection path first, run them (red), then implement (green). See PF-TEST-005 and
    [`docs/ai/rules/70-testing.md`](./docs/ai/rules/70-testing.md).
@@ -82,17 +85,36 @@ Exact commands: [`docs/ai/verify.md`](./docs/ai/verify.md). Summary:
 
 ```text
 1. dotnet build "<Logic project>.csproj" -c Release      # zero warnings (PF-BUILD-001)
-2. pillaro-dv manifest --assembly <built assembly> --output artifacts/plugin-manifest.json
-3. pillaro-dv validate --manifest artifacts/plugin-manifest.json
+2. dotnet <cliDll> manifest --assembly <built Plugins DLL> --output artifacts/plugin-manifest.json
+3. dotnet <cliDll> validate --manifest artifacts/plugin-manifest.json
 ```
 
-Both CLI commands run offline — no Dataverse connection needed — and return a non-zero exit code on
-failure. Treat a non-zero exit code as a hard stop, not a suggestion.
+`<cliDll>` is the CLI bundled in the framework package — its path is the `$cliDll` line of
+`Plugins/Tools/Deployment/DeployPlugins.ps1`. Both commands run offline and return a non-zero exit
+code on failure; treat that as a hard stop. They exist only from the framework release **after
+1.2.2**: if `dotnet <cliDll> --help` lists only `deploy`, skip steps 2–3 and say so in your report
+(never install another CLI to get around it). `deploy` runs the same validation before it writes
+anything, so the human's deployment still catches registration errors.
 
 The fast loop cannot catch a merged `Plugins` DLL without `ProxyTypesAssemblyAttribute`
 (PF-BUILD-006): it builds and validates cleanly, then every early-bound call fails inside Dataverse
 with "not a known entity type" or "the deserializer has no knowledge of any type". If you see either
 message, fix the assembly — never rewrite the task to late-bound.
+
+## 📦 The framework version decides what you may use
+
+The rules describe the current framework. Before relying on a feature, read the
+`Pillaro.Dataverse.PluginFramework` version in the `Logic` project file:
+
+| Feature | Needs |
+|---|---|
+| Update queue `TaskContext.AddEntityToUpdate(...)` (PF-DATA-010), `WithBothImage(...)`, `ServiceUser` | 1.2.0 — on older versions the queue is never written; update the target directly instead |
+| CLI `manifest` / `validate`; `ExpectedEnvironmentUrl` check in the test fixture (PF-ENV-006); early-bound namespace default without `.EarlyBound` | first release after 1.2.2 |
+
+A project generated from template 1.0.3 or older predates PF-BUILD-006: check that the `Plugins`
+project declares `ProxyTypesAssemblyAttribute` and the `Logic` project sets
+`EnableDefaultCompileItems` to `false`, and tell the developer if not. If a feature is missing, say
+so in the plan — never assume it silently works.
 
 ## 🐢 Slow loop (integration tests — conditions apply)
 

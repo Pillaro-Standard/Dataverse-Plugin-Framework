@@ -9,7 +9,7 @@
 | PF-TEST-001 | Tests are integration tests against live Dataverse. NEVER mock Dataverse services. | [testing.md](../../tests/testing.md) |
 | PF-TEST-002 | Create test records through `TestDataService.CreateTestEntity(...)`, not `OrganizationService.Create(...)`. | [testing.md](../../tests/testing.md) |
 | PF-TEST-003 | Test data comes from a repository in `Data/Repositories/` (`IAutoRegisteredTestDataRepository`). | [testing.md](../../tests/testing.md) |
-| PF-TEST-004 | Every test class has `[Trait("Owner", …)]` and `[Trait("Category", nameof(SomeTask))]`. | [testing.md](../../tests/testing.md) |
+| PF-TEST-004 | Every test class has `[Trait("Owner", …)]` and `[Trait("Category", nameof(SomeTask))]`. `Owner` is the initials of the developer responsible for the task — ask if you do not know them; never copy a value from an example. | [testing.md](../../tests/testing.md) |
 | PF-TEST-005 | Every new task gets at least one happy-path test and one business-rejection test. | [getting-started.md](../../plugins/getting-started.md) |
 | PF-TEST-006 | Test code has zero warnings, same as production code. | [testing.md](../../tests/testing.md) |
 | PF-TEST-007 | NEVER run integration tests against an environment without explicit instruction to do so. | — |
@@ -47,7 +47,7 @@ These apply whenever you have been given a connection to a real Dataverse enviro
 4. Run the tests again — they pass.
 
 ```csharp
-[Trait("Owner", "JM")]
+[Trait("Owner", "<initials of the responsible developer>")]
 [Trait("Category", nameof(ValidateNames))]
 public class ValidateNamesTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output)
     : TestBase(testFixture, output)

@@ -20,6 +20,8 @@
 - The `Logic` project sets `EnableDefaultCompileItems` to `false` explicitly. `EnableDefaultItems=false` alone does not propagate to it in time for the framework package's `EarlyBound\**\*.cs` include, so generated early-bound classes were silently left out of the build until a task referenced one.
 - A freshly generated project builds with zero warnings: `GenerateDocumentationFile` is gone from the `Logic` project, which reported ten `CS1591` for the scaffolded example files.
 - The early-bound tooling is generated only in `Logic` (`PillaroGenerateEarlyBoundTools=false` in `Plugins`), so it can no longer be run from the wrong project.
+- `ExamplePlugin` gets new step ids for every generated project. The ids were fixed in the template source, so every project created from it registered the same two steps: deploying a second project to the same environment took over the first project's steps. The `dotnet new` template now generates them (`guid1`/`guid2` symbols) and the Visual Studio template uses `$guid1$`/`$guid2$`.
+- The `dotnet new` template ships a `.gitignore`. Without one, `bin/`, `obj/` and `appsettings.Development.json` — the file meant for a local connection string — went into the first commit. Generated early-bound classes stay tracked on purpose: CI cannot regenerate them without access to an environment.
 
 ### Examples
 
@@ -32,6 +34,7 @@
 ### Documentation
 
 - Added AI coding-agent instructions: `AGENTS.md` as the entry point, a rule catalog with stable IDs in `docs/ai/rules/`, exact verification commands in `docs/ai/verify.md`, and `docs/ai/analysis-workflow.md`, which takes a consultant's plain-language requirement to a reviewable plan (plugins, tasks, steps, tests) before any code is written. The rules were exercised end to end: a project generated from the template, a plan, failing tests, implementation and deployment to a live environment, with integration tests passing. Several findings above came out of that run.
+- The instructions were checked with a blind run: a fresh agent with only the copied instructions and a consultant's four requirements, in a project generated from the template. It met 12 of 15 plan criteria and 8 of 9 implementation criteria. From its findings, `AGENTS.md` now states which framework version each feature needs, how to reach the CLI bundled in the package (and what to do while it only has `deploy`), and the mandatory plan format; the testing rules no longer carry a real person's initials as the example `Owner`; and the data-access rules cover reading security roles.
 - `docs/tests/testing.md` asserted a business rejection with `Assert.Throws<InvalidPluginExecutionException>`, which never passes on the client side, where the rejection arrives as `FaultException<OrganizationServiceFault>`; the same example read columns with `ColumnSet(nameof(...))`, which produces property names instead of logical names. Both fixed.
 - Fixed documentation that disagreed with the code: the `DataverseValidationException` outcome (`Success` with `Info`, not `NotValid`), the image-name uniqueness rule, where early-bound classes are generated (`Logic`, not `Plugins`), the solution file name in `CONTRIBUTING.md`, a broken `VERSIONING.md` link, a misleading placeholder note and a duplicated section number.
 
