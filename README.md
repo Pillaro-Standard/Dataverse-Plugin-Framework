@@ -6,14 +6,16 @@
 [![Template - Visual Studio VSIX](https://img.shields.io/badge/Template-Visual%20Studio%20VSIX-blue?logo=visualstudio)](https://marketplace.visualstudio.com/items?itemName=Pillaro.PillaroDataversePluginVisualStudioTemplate)
 [![Template - dotnet new](https://img.shields.io/badge/Template-dotnet%20new-blue?logo=visualstudiocode)](https://www.nuget.org/packages/Pillaro.Dataverse.PluginTemplate.DotNetNew)
 
-Source-open, AI-ready standard for building scalable Dynamics 365 and Power Platform plugins.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/LICENSE)
+
+Open-source framework for building scalable, testable Microsoft Dataverse and Dynamics 365
+plug-ins in C#. Task-based structure, plug-in step registration defined in code, deterministic
+deployment without duplicate steps. Licensed under Apache-2.0 and free for commercial use.
 
 
 ## Overview
 
 Pillaro Framework provides a structured and production-proven approach to developing Dataverse plugins using C#.
-
-For commercial or premium support, professional consulting, or help with adoption and deployment, contact Pillaro: [Contact Pillaro](https://pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support).
 
 It introduces a task-based execution model with explicit validation and execution phases, together with a precise deployment model for plugin assemblies, plugin steps, images, filtering attributes, and related registration metadata.
 
@@ -60,6 +62,12 @@ dotnet new pillaro-dataverse-plugin-dotnet -n MySolution
 ```
 
 The generated solution works well in both Visual Studio Code and Visual Studio, so you can use the same template regardless of whether you prefer CLI-first or IDE-first workflows.
+
+
+## Requirements
+
+- **Target frameworks**: `net462` for plugin assemblies (required by the Dataverse plugin sandbox) and `net8.0` for client-side code, tooling, and tests.
+- **Dataverse SDK**: `Microsoft.CrmSdk.CoreAssemblies` 9.0.2.60 and `Microsoft.PowerPlatform.Dataverse.Client` 1.2.10.
 
 
 ## Proven in Production
@@ -426,6 +434,23 @@ We provide practical support for teams adopting the Pillaro Dataverse Plugin Fra
 [Contact Pillaro](https://www.pillaro.cz/?utm_source=github&utm_medium=readme&utm_campaign=dataverse_plugin_framework&utm_content=root_readme_implementation_support)
 
 
+## Articles
+
+- [Why Dataverse Plug-in Steps Drift — and Why Stable IDs Fix It](https://dev.to/mucha/why-dataverse-plug-in-steps-drift-and-why-stable-ids-fix-it-eah) - why duplicate plugin steps appear after redeployment, and how declaring step identity in code makes deployment deterministic.
+- [Moving from spkl to Pillaro: A Practical Migration Guide for Dataverse Plugins](https://dev.to/mucha/moving-from-spkl-to-pillaro-a-practical-migration-guide-for-dataverse-plugins-2aa6) - what Pillaro can replace in an existing spkl-based plugin project, what it deliberately does not try to replace, and how to migrate incrementally.
+
+
 ## License
 
-See `LICENSE` file.
+Licensed under the [Apache License, Version 2.0](LICENSE).
+
+You may use, modify, and distribute the framework, including in commercial projects and paid
+client deliverables, free of charge. Apache-2.0 includes an explicit patent grant and requires
+that copyright and NOTICE attributions be preserved in redistributions.
+
+The names "Pillaro" and "Pillaro Dataverse Plugin Framework" are not covered by the
+Apache-2.0 grant — see [TRADEMARK.md](TRADEMARK.md).
+
+Attribution is appreciated but not required beyond what Apache-2.0 mandates. If you find the
+framework useful, a mention in your technical documentation or a public reference helps others
+discover it.

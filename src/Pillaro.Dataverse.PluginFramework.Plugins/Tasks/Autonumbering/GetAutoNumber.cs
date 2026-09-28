@@ -181,11 +181,16 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Tasks.Autonumbering
             });
         }
 
+        /// <remarks>
+        /// Only active configurations count. Without that, a deactivated leftover is still seen as a
+        /// primary configuration: deactivating one does not take it out of service, and a leftover
+        /// beside a current one makes this throw even though exactly one configuration is in use.
+        /// </remarks>
         private pl_AutoNumbering LoadPrimaryConfig(IOrganizationService service, string entityName)
         {
             using var svc = new ServiceContext(service);
             svc.MergeOption = Microsoft.Xrm.Sdk.Client.MergeOption.NoTracking;
-            var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentAutoNumberingId == null && x.pl_ParentLookupId == null).Take(2).ToList();
+            var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentAutoNumberingId == null && x.pl_ParentLookupId == null && x.statecode == pl_autonumbering_statecode.Active).Take(2).ToList();
 
             if (result.Count > 1)
                 throw new InvalidPluginExecutionException($"More than one primary autonumbering configuration exists for entity '{entityName}'.");
@@ -198,7 +203,7 @@ namespace Pillaro.Dataverse.PluginFramework.Plugins.Tasks.Autonumbering
             using var svc = new ServiceContext(service);
             svc.MergeOption = Microsoft.Xrm.Sdk.Client.MergeOption.NoTracking;
             var parentLookupIdText = parentLookupId.ToString();
-            var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentLookupId == parentLookupIdText).Take(2).ToList();
+            var result = svc.pl_AutoNumberingSet.Where(x => x.pl_EntityName == entityName && x.pl_ParentLookupId == parentLookupIdText && x.statecode == pl_autonumbering_statecode.Active).Take(2).ToList();
 
             if (result.Count > 1)
                 throw new InvalidPluginExecutionException($"More than one child configuration exists for entity '{entityName}' and ParentLookupId='{parentLookupId}'.");

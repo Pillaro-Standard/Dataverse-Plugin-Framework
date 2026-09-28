@@ -94,12 +94,13 @@ Use the naming convention:
 - `feature/your-feature-name` — New features
 - `bugfix/issue-description` — Bug fixes
 - `docs/documentation-topic` — Documentation updates
+- `release/{version}-rc` — Release candidate branches created from `develop` by maintainers (see [Versioning Strategy](versioning.md))
 
 ---
 
 ## CI/CD & Automated Testing
 
-The repository uses Azure DevOps pipelines to ensure code quality through automated testing and package building.
+The repository uses GitHub Actions workflows to ensure code quality through automated testing and package building.
 
 **Nightly tests** run automatically every night to validate all tests against a real Dataverse environment, ensuring continuous validation without blocking development.
 

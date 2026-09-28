@@ -6,19 +6,124 @@ This document describes the automated pipelines used to ensure code quality, tes
 
 ## Overview
 
-The repository uses Azure DevOps pipelines for:
+CI/CD runs entirely in GitHub Actions, in `.github/workflows`, for:
 
 - automated testing
 - package building and versioning
 - quality assurance
 
-All pipelines are defined in YAML files at the repository root.
+The repository previously ran the same pipelines in Azure DevOps as well, while the
+GitHub Actions replacements were being proven out. That migration is complete and Azure
+DevOps is no longer used; all pipeline definitions now live under `.github/workflows`.
+
+### Workflow naming
+
+GitHub Actions workflows are named `Area – Action`, with an en dash, so the Actions list
+groups by subject rather than by verb. The name predates the Azure DevOps migration and
+originally matched the equivalent Azure DevOps pipeline name.
+
+| Workflow | File | Status |
+| --- | --- | --- |
+| `Pull Request – Validate` | `pr-validate.yml` | required status check `Build and test` |
+| `Nightly – Dataverse Tests` | `nightly-tests.yml` | scheduled |
+| `Release – Tag and GitHub Release` | `tag-and-release.yml` | manual |
+| `Release – Sync develop` | `sync-develop-after-release.yml` | automatic, after a release |
+| `NuGet Packages – Build Artifacts` | `nuget-packages-build.yml` | manual |
+| `NuGet Packages – Deploy` | `nuget-packages-deploy.yml` | manual, publishes with Trusted Publishing |
+| `Project Templates – Build Artifacts` | `project-templates-build.yml` | manual |
+| `Project Templates – Deploy` | `project-templates-deploy.yml` | manual, needs the `VS_MARKETPLACE_PAT` secret |
+
+## Deploying
+
+A deploy workflow takes the **run id** of the matching build workflow and publishes that
+run's artifact. It does not build. Both the run id and the version can be left blank: the
+run id then resolves to the most recent successful build, and the version to whatever that
+run built. Fill them in to publish an older run or to assert which version is going out.
+`workflow_dispatch` cannot offer a list of runs to choose from — its `choice` inputs are a
+fixed list written into the workflow file — which is why the run is resolved in a step. The version a build produces depends on the run number
+(`github.run_number` stands in for `Build.BuildId`), so rebuilding from the same commit
+gives a different version than the artifact that was validated — and for the VSIX, than
+the package that was smoke-built.
+
+Neither deploy workflow can be repeated for a version: nuget.org does not allow a
+published version to be replaced, so both refuse to push a version that is already
+listed rather than failing part way through.
+
+Both run in a GitHub environment (`nuget-org` and `template-publish`). Adding required
+reviewers to those environments in the repository settings turns a publish into an
+approval gate; without reviewers they publish straight away.
+
+### Publishing to nuget.org
+
+No API key is stored. Both workflows use nuget.org Trusted Publishing: the job requests a
+GitHub OIDC token, nuget.org validates it against a policy and hands back an API key that
+lives one hour. That is why the login step sits immediately before the push — each token
+buys exactly one key, and a key requested too early expires.
+
+What this needs configured, once:
+
+- A trusted publishing policy per workflow on nuget.org (**your profile → Trusted
+  Publishing**). A policy names the repository owner, the repository, the **workflow file
+  name** with no path, and optionally the environment. So there are two: one for
+  `nuget-packages-deploy.yml` with environment `nuget-org`, one for
+  `project-templates-deploy.yml` with environment `template-publish`.
+- A repository **variable** `NUGET_USER` holding the nuget.org profile name that owns
+  those policies. A variable rather than a secret, because a profile name is not one.
+  Note it is the profile name, not the email address.
+
+Renaming either workflow file breaks publishing until the matching policy is updated, the
+same coupling the required status check has with the job name.
+
+A policy on a private repository starts out *temporarily active* for 7 days: nuget.org
+needs the repository and owner ids from a real publish to pin the policy against a
+repository being deleted and recreated under the same name. If nothing is published in
+that window the policy goes inactive, and the window can be restarted.
+
+The order for a release is: build → deploy → `Release – Tag and GitHub Release`. The tag
+workflow refuses to tag a version that is not on nuget.org, so it has to come last.
+
+### Publishing the VSIX
+
+`Project Templates – Deploy` publishes the Marketplace listing with `VsixPublisher.exe`
+and `templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/marketplace/visualstudio-extension.publish.json`.
+Two things about that are worth knowing before changing it:
+
+- The tool comes from the `Microsoft.VSSDK.BuildTools` package, the same one that builds
+  the VSIX, so no Visual Studio installation is needed. The package ships two copies of
+  the executable and **only the one in `bin\lib` runs**; the copy in `bin` crashes on
+  startup resolving the wrong `System.Runtime.CompilerServices.Unsafe`.
+- The VSIX manifest `<Tags>` element is **semicolon-delimited**, per the
+  [VSIX extension schema 2.0 reference](https://learn.microsoft.com/visualstudio/extensibility/vsix-extension-schema-2-0-reference?view=visualstudio#metadata-element):
+  the element is capped at 100 characters and the Marketplace caps each tag at 50. Commas
+  are not a separator, so a comma-separated list arrives as one oversized tag and fails
+  the publish with `VsixPub0023`. That broke the publish in #44 and again in #99. This
+  element is what reaches the listing; `identity.tags` in the publish manifest is ignored
+  for a VSIX, which is why it is not set there.
+- `identity.internalName` in the publish manifest is a Marketplace **slug**, not the VSIX
+  identity: letters, digits and hyphens only, under 63 characters, so the dotted VSIX id
+  is rejected with `VsixPub0033`. It cannot be derived from the package — take it from
+  **Copy ID** on the listing page, the part after the publisher name.
+- `VsixPublisher publish` creates the extension when it does not exist, so a wrong
+  `internalName` would produce a second public listing rather than updating the existing
+  one. The workflow queries the public gallery for `publisher.internalName` first and
+  fails if nothing matches, which is exactly the mistake above. A gallery outage only
+  warns; `allow_new_listing` is the escape hatch for a genuinely new extension.
+
+The overview markdown next to the publish manifest is the Marketplace listing text. It is
+read at publish time and is **not** packed into the VSIX — a details asset inside the VSIX
+is what made the Marketplace reject the package as a tool. Both deploy and build fail if
+any payload outside `ProjectTemplates/` reappears.
+
+The name of a required status check is the **job** name, not the workflow name. The
+`Protect main` and `Protect develop` rulesets require `Build and test`, the job in
+`pr-validate.yml`. Renaming that job without updating both rulesets in the same change
+leaves every pull request waiting for a check that will never report.
 
 ---
 
 ## Nightly Test Pipeline
 
-**File**: `Nightly – Tests Only.yml`
+**File**: `.github/workflows/nightly-tests.yml`
 
 ### Nightly Purpose
 
@@ -54,7 +159,7 @@ This includes:
 
 ### Test Environment
 
-Tests are executed against a live Dataverse environment using a secured connection string stored in Azure DevOps variable group `dataverse-test-secrets`.
+Tests are executed against a live Dataverse environment using a secured connection string stored in the GitHub Actions secret `DATAVERSE_CONNECTION_STRING`.
 
 Environment variable:
 
@@ -89,7 +194,7 @@ Running tests on a schedule (rather than on every commit) provides:
 
 ## Package Build Pipeline
 
-**File**: `Packages – Build & Package.yml`
+**File**: `.github/workflows/nuget-packages-build.yml`
 
 ### Package Purpose
 
@@ -126,7 +231,7 @@ Determines version suffix and target audience:
 3. **Version Calculation**: Determines package and assembly versions
 4. **Build**: Builds framework and testing projects
 5. **Pack**: Creates NuGet packages (`.nupkg` files)
-6. **Publish**: Uploads packages as pipeline artifacts
+6. **Publish**: Uploads packages as workflow run artifacts
 
 ### Packages Produced
 
@@ -157,40 +262,42 @@ Package verification rejects release notes that point to the exact source commit
 
 ### Environment Variables
 
-Stored in Azure DevOps variable group `dataverse-test-secrets`:
+Stored in the GitHub Actions secret `DATAVERSE_CONNECTION_STRING`:
 
-- **DataverseConnectionString**: Connection string for integration tests (if tests are executed during packaging)
+- Connection string for integration tests (if tests are executed during packaging)
 
 ---
 
 ## Template Artifact Pipeline
 
-**File**: `Templates - Build Template Artifacts.yml`
+**File**: `.github/workflows/project-templates-build.yml`
 
 ### Template Purpose
 
-Builds both official template deliveries in one Azure DevOps run:
+Builds both official template deliveries in one GitHub Actions run:
 
 - the Visual Studio template ZIP and VSIX package
 - the CLI-oriented `dotnet new` NuGet template package
 
-This pipeline prepares two separate Azure DevOps artifacts so both template formats can be published or downloaded together.
+This workflow uploads two separate workflow run artifacts, `visual-studio-template` and
+`Pillaro.Dataverse.PluginTemplate.DotNetNew`, so both template formats can be published or
+downloaded together.
 
 ### Trigger
 
-- **Manual only**: No automatic triggers
+- **Manual only**: `workflow_dispatch`
 - **On-demand**: Executed when either template artifact set is needed
 
-When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and `packageType` in the same style as the framework package pipeline.
+When you run the workflow manually, GitHub Actions prompts for `baseVersion` and
+`packageType` in the same style as the framework package workflow, plus `frameworkVersion`.
 
 ### Parameters
 
 | Parameter | Purpose |
 |-----------|---------|
-| `baseVersion` | Base version entered at queue time for both template packages, in `Major.Minor.Patch` format |
+| `baseVersion` | Base version entered at dispatch time for both template packages, in `Major.Minor.Patch` format |
 | `packageType` | Determines whether the NuGet template version becomes `ci`, `preview`, `rc`, or `release` |
-| `visualStudioArtifactName` | Name of the Azure DevOps artifact containing the Visual Studio template outputs |
-| `dotnetNewArtifactName` | Name of the Azure DevOps artifact containing the `dotnet new` package |
+| `frameworkVersion` | Framework package version the generated projects reference; required for a `release` |
 
 ### Template Execution Flow
 
@@ -203,7 +310,7 @@ When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and
 7. **NuGet restore**: Restores the `dotnet new` template project
 8. **NuGet pack**: Creates the `Pillaro.Dataverse.PluginTemplate.DotNetNew` template package
 9. **NuGet validation**: Confirms the package contains the expected template metadata and smoke-generates the template successfully
-10. **Artifact publishing**: Uploads the Visual Studio outputs and the `.nupkg` as two separate pipeline artifacts
+10. **Artifact publishing**: Uploads the Visual Studio outputs and the `.nupkg` as two separate workflow run artifacts
 
 ### Artifacts Produced
 
@@ -212,9 +319,9 @@ When you queue the pipeline manually, Azure DevOps prompts for `baseVersion` and
 
 ### Version Strategy
 
-The VSIX package uses the supplied base semantic version and appends the Azure DevOps build ID, for example `1.0.20.12345`.
+The VSIX package uses the supplied base semantic version and appends the GitHub Actions run number, for example `1.0.20.12345`.
 
-The NuGet template package uses the same versioning model as the framework package pipeline, including support for `ci`, `preview`, `rc`, and `release` package types. For tag builds, the tag version is used directly, while `AssemblyVersion` and `FileVersion` remain aligned to the `Major.Minor.Patch.0` scheme.
+The NuGet template package uses the same versioning model as the framework package workflow, including support for `ci`, `preview`, `rc`, and `release` package types. For tag builds, the tag version is used directly, while `AssemblyVersion` and `FileVersion` remain aligned to the `Major.Minor.Patch.0` scheme.
 
 ---
 

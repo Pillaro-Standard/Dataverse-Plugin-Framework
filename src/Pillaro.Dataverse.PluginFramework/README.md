@@ -2,8 +2,6 @@
 
 A task-based framework for building predictable and testable Microsoft Dataverse plugins in C#.
 
-This README is included in the NuGet package so consumers can understand package intent, quick-start usage and key constraints directly from NuGet.org.
-
 ---
 
 ## What this package provides
@@ -226,8 +224,4 @@ Recommended tools:
 
 ## License
 
-This project is published under the Pillaro Community License (PCL) v1.0.
-
-Attribution is required when the framework is used in delivered solutions:
-
-> "This solution is built using Pillaro Dataverse Plugin Framework."
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework/blob/main/LICENSE) file for details.

@@ -3,21 +3,24 @@
     <Metadata>
         <Identity Id="Pillaro.Dataverse.PluginTemplate.Template" Version="1.0.64" Language="en-US" Publisher="Pillaro" />
         <DisplayName>Pillaro Dataverse Plugin Template</DisplayName>
-        <Description xml:space="preserve">Creates a Dataverse plugin solution with Logic, Plugins and Tests projects.</Description>
-        <MoreInfo>https://pillaro.cz/</MoreInfo>
-        <License>Assets\LICENSE.txt</License>
-        <Icon>Assets\PillaroLogo128.png</Icon>
-        <PreviewImage>Assets\PillaroLogo128.png</PreviewImage>
-        <Tags>Dataverse Power Platform Dynamics 365 Plugin</Tags>
+        <Description xml:space="preserve">Creates a Microsoft Dataverse plugin solution with separate Logic, Plugins and Tests projects, built on the Pillaro Dataverse Plugin Framework. Licensed under Apache-2.0.</Description>
+        <MoreInfo>https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework</MoreInfo>
+        <!-- Semicolon-delimited, per the VSIX schema reference; the whole element is
+             capped at 100 characters and the Marketplace caps each tag at 50. Commas
+             are not a separator: a comma-separated list arrives as one oversized tag
+             and fails the publish with VsixPub0023, which is what broke #44 and #99.
+             This element is what reaches the listing; identity.tags in the publish
+             manifest does not. -->
+        <Tags>Dataverse;Dynamics 365;Power Platform;Plugin;Pillaro;Project Template</Tags>
     </Metadata>
     <Installation InstalledByMsi="false" AllUsers="false" SystemComponent="false">
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,19.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,19.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
@@ -25,6 +28,6 @@
         <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" d:Source="File" d:TargetPath="ProjectTemplates\Pillaro.Dataverse.PluginTemplate.zip" />
     </Assets>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
 </PackageManifest>

@@ -1,4 +1,4 @@
-using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
+﻿using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
 using Pillaro.Dataverse.PluginFramework.Plugins;
 
@@ -20,7 +20,8 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .Synchronous()
                 .WithName($"{StepPrefix} task Create PreOperation Synchronous")
                 .Rank(1)
-                .WithFilteringAttributes(Task.Fields.Subject);
+                // Typed attribute selection is available on Create steps too, not only on Update.
+                .WithFilteringAttributes(t => t.Subject);
 
             registration
                 .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
@@ -36,26 +37,21 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .WithName($"{StepPrefix} task Update PostOperation Synchronous")
                 .Rank(3)
                 .WhenChanged(
-                    Task.Fields.RegardingObjectId,
-                    Task.Fields.ScheduledEnd,
-                    Task.Fields.StateCode,
-                    Task.Fields.StatusCode)
-                .WithPreImage(
+                    t => t.RegardingObjectId,
+                    t => t.ScheduledEnd,
+                    t => t.StateCode,
+                    t => t.StatusCode)
+                // A pre-image and a post-image with the same key and the same attributes are one
+                // Both image. SummarySync still reads it as PreEntityImages["image"] and
+                // PostEntityImages["image"], so the task code is unchanged.
+                .WithBothImage(
                     "b34d984d-0f31-f111-88b4-000d3ab2695d",
                     "image",
-                    Task.Fields.RegardingObjectId,
-                    Task.Fields.ScheduledEnd,
-                    Task.Fields.StateCode,
-                    Task.Fields.StatusCode,
-                    Task.Fields.ActualEnd)
-                .WithPostImage(
-                    "b44d984d-0f31-f111-88b4-000d3ab2695d",
-                    "image",
-                    Task.Fields.RegardingObjectId,
-                    Task.Fields.ScheduledEnd,
-                    Task.Fields.StateCode,
-                    Task.Fields.StatusCode,
-                    Task.Fields.ActualEnd);
+                    t => t.RegardingObjectId,
+                    t => t.ScheduledEnd,
+                    t => t.StateCode,
+                    t => t.StatusCode,
+                    t => t.ActualEnd);
         }
     }
 }

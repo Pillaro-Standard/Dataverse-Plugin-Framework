@@ -160,7 +160,7 @@ dotnet build "templates/Pillaro.Dataverse.PluginTemplate.VisualStudio.Vsix/Pilla
 
 The VSIX project stores its version directly in `source.extension.vsixmanifest`. For local Visual Studio rebuilds, edit the `Version` value in that manifest and rebuild the project.
 
-The Azure DevOps pipeline overwrites that manifest version at queue time with its own computed version before building.
+The `Project Templates – Build Artifacts` GitHub Actions workflow overwrites that manifest version at dispatch time with its own computed version before building.
 
 ## Validation command
 
@@ -194,6 +194,10 @@ When changing the Visual Studio template:
 5. Rebuild the VSIX project after changing shared source or overlay files.
 6. Run the template artifact validation script before merging.
 7. Keep documentation paths aligned with the actual project structure.
+8. Do not add anything but the project template to the VSIX. The Marketplace
+   listing is registered with extension type `Templates` and rejects an upload
+   whose package carries payload besides the templates, so the listing logo,
+   overview and license are maintained in the publisher portal.
 
 ## Short summary
 

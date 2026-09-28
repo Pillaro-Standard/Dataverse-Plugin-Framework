@@ -96,9 +96,10 @@ Examples:
 
 ---
 
-### `dev`
+### `develop`
 
 * Used for active development
+* All pull requests target this branch (never `main` directly)
 * Produces **preview versions**
 
 Format:
@@ -118,9 +119,17 @@ Examples:
 
 ### Release Candidate (optional)
 
-Before merging to `main`, release candidates can be produced:
+Before merging to `main`, release candidates can be produced.
 
-Format:
+A release candidate is built from a dedicated release branch created from `develop`:
+
+```
+release/{version}-rc
+```
+
+Example: `release/1.1.3-rc`.
+
+Format of the produced package version:
 
 ```
 {version}-rc.{build}
@@ -259,11 +268,40 @@ This approach ensures:
 
 Typical release flow:
 
-1. Development happens in `dev`
-2. Preview versions are published (`preview`)
-3. Optional release candidates (`rc`)
-4. Merge to `main`
-5. Stable version is released (no suffix)
+1. Development happens in feature/fix branches; pull requests always target `develop` (never `main`)
+2. Preview versions can be published from `develop` (`preview`)
+3. For a release candidate:
+   1. Add a `{version}-rc` section to `CHANGELOG.md` in `develop`
+   2. Create a `release/{version}-rc` branch from `develop`
+   3. Queue the **Packages – Build & Package** pipeline on that branch with `baseVersion = {version}` and `packageType = rc`
+4. After the release candidate is validated, merge the release branch to `main`
+5. Rename the changelog section to the stable `{version}`, queue the pipeline from `main` with `packageType = release`, and tag the release
+6. Stable version is released (no suffix)
+
+### Merging to `main` must use a merge commit
+
+Release pull requests into `main` have to be merged with **Create a merge commit**.
+The `Protect main` ruleset allows no other method, on purpose.
+
+A squash or rebase merge produces a commit on `main` that `develop` does not contain,
+so the two branches end up sharing no history for anything already released. Every
+later merge from `develop` to `main` then conflicts again on each file the previous
+release touched, and the conflicts accumulate. A merge commit keeps `develop` an
+ancestor of `main`, which is also the precondition for the sync described below.
+
+### `develop` is synced back automatically
+
+The `Release – Sync develop` workflow runs on every merged pull request into
+`main`. When `develop` is an ancestor of `main` it fast-forwards `develop` to `main`
+using a deploy key, which is a bypass actor on the `Protect develop` ruleset. The push
+is never forced, so git itself rejects anything that is not a fast-forward.
+
+When it cannot sync, the workflow **fails** rather than skipping. That is deliberate:
+an earlier version only ran when the release pull request came straight from `develop`,
+so every release made through an intermediate branch reported "skipped" and the
+branches drifted apart for three months unnoticed. If the workflow fails with
+`develop is not an ancestor of main`, a pull request into `main` was squashed, rebased,
+or pushed directly; merge `develop` into `main` with a merge commit and re-run it.
 
 ---
 

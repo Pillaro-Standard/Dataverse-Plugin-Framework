@@ -13,6 +13,13 @@ internal static class PluginRegistrationDiffCalculator
         {
             foreach (var step in plugin.Steps)
             {
+                // Custom API MainOperation handlers are realized through CustomAPI.PluginTypeId;
+                // no SdkMessageProcessingStep is created, updated, or deleted for them.
+                if (step.IsMainOperation)
+                {
+                    continue;
+                }
+
                 var stepDiff = CalculateStepDiff(plugin, step, currentState);
                 diff.StepChanges.Add(stepDiff);
 
@@ -23,7 +30,9 @@ internal static class PluginRegistrationDiffCalculator
             }
         }
 
-        foreach (var currentStep in currentState.StepsById.Values.Where(step => managedPluginTypes.Contains(step.PluginTypeName) && !desiredStepIds.Contains(step.StepId)))
+        // Stage-30 steps in Dataverse are auto-created for Custom APIs referencing the plugin type
+        // and must never be deleted by step synchronization.
+        foreach (var currentStep in currentState.StepsById.Values.Where(step => managedPluginTypes.Contains(step.PluginTypeName) && step.Stage != PluginManifestStep.MainOperationStage && !desiredStepIds.Contains(step.StepId)))
         {
             var deleteStep = new PluginStepDiff
             {
@@ -105,6 +114,12 @@ internal static class PluginRegistrationDiffCalculator
             result.Reasons.Add($"UnsecureConfiguration changed.");
         }
 
+        // Deployment is authoritative: a step present in the manifest must end up enabled.
+        if (current.IsDisabled)
+        {
+            result.Reasons.Add("State: step was disabled in Dataverse and will be re-enabled by deployment.");
+        }
+
         if (result.Reasons.Count > 0)
         {
             result.Action = PluginDiffAction.Update;
@@ -133,9 +148,16 @@ internal static class PluginRegistrationDiffCalculator
             return result;
         }
 
+        // Alias and message property name are compared against the values the upserter would write, so an
+        // image that leaves them to the defaults does not show up as drift on every deployment.
         var hasChanges = !string.Equals(current.StepId.ToString(), step.StepId.ToString(), StringComparison.OrdinalIgnoreCase)
             || !string.Equals(Normalize(current.Name), Normalize(desired.Name), StringComparison.OrdinalIgnoreCase)
             || !string.Equals(Normalize(current.Type), Normalize(desired.Type), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(Normalize(current.EntityAlias), Normalize(desired.ResolvedEntityAlias), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(
+                Normalize(current.MessagePropertyName),
+                Normalize(DataverseRegistrationUpserter.ResolveMessagePropertyName(step, desired)),
+                StringComparison.OrdinalIgnoreCase)
             || !NormalizeCollection(current.Attributes).SequenceEqual(NormalizeCollection(desired.Attributes), StringComparer.OrdinalIgnoreCase);
 
         if (hasChanges)
@@ -149,7 +171,8 @@ internal static class PluginRegistrationDiffCalculator
     private static bool IsManagedImage(DataverseImageState image, DataverseRegistrationState currentState, HashSet<string> managedPluginTypes)
     {
         return currentState.StepsById.TryGetValue(image.StepId, out var step)
-            && managedPluginTypes.Contains(step.PluginTypeName);
+            && managedPluginTypes.Contains(step.PluginTypeName)
+            && step.Stage != PluginManifestStep.MainOperationStage;
     }
 
     private static PluginFieldDiff BuildFieldDiff(string? currentValue, string? desiredValue)
