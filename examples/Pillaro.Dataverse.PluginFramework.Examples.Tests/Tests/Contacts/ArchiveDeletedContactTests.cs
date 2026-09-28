@@ -48,7 +48,7 @@ public class ArchiveDeletedContactTests(TestFixture<TestAutofacModule> testFixtu
 
         contact.Id = TestDataService.CreateTestEntity(contact);
 
-        // The step has a pre-image, the task simply has nothing to record.
+        // The step has a pre-image; the task's validation marks it NotValid, so nothing is recorded.
         OrganizationService.Delete(Contact.EntityLogicalName, contact.Id);
 
         var found = TestDataService

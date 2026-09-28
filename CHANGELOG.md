@@ -26,6 +26,7 @@
 - `SummarySync` no longer validates `scheduledstart`, which the task never read and the step never filtered on, so a change to it alone could never trigger the task.
 - `UpdateAddressLabel` uses the same forms as the other example tasks: primary constructor, collection expressions, `ctx.Message == "Update"` and the `PreImage` property.
 - `ContactPlugin.Register` selects all attributes with typed selectors.
+- `ArchiveDeletedContact` checks for a parent account in its validation chain instead of returning early from `DoExecute()`. Deleting a contact without a parent account still records nothing and still succeeds for the user; the task is now logged as `NotValid` with the reason instead of `Success`, so the task statistics show that it did not apply. `ArchiveDeletedContact` and `RecordJobTitleChange` use primary constructors like the other example tasks.
 - Every plug-in step is named by coordinates, `{StepPrefix} {entity} {Message} {Stage} {Mode}`, with `StepPrefix` a constant on the solution `PluginBase` (`Pillaro Examples`, `Pillaro Framework`, and the project name in the templates). This covers all example steps, the new Delete step, and the framework's own autonumbering step, which becomes `Pillaro Framework pl_AutoNumbering_GetNewNumber PostOperation Synchronous`. The next deployment or export of `PillaroPluginFrameworkExamples` and `PillaroFramework` renames the registered steps; steps are matched by id, so they are updated in place, never duplicated.
 
 ### Documentation

@@ -11,13 +11,9 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
     /// Shows the two things a delete step depends on: the pre-image, which is the only source of the
     /// values of a record that no longer exists, and the update queue, which writes the account once.
     /// </summary>
-    public class ArchiveDeletedContact : TaskBase<Logic.Contact>
+    public class ArchiveDeletedContact(IServiceProvider serviceProvider, TaskContext taskContext)
+        : TaskBase<Logic.Contact>(serviceProvider, taskContext)
     {
-        public ArchiveDeletedContact(IServiceProvider serviceProvider, TaskContext taskContext)
-            : base(serviceProvider, taskContext)
-        {
-        }
-
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {
             return validator
@@ -25,20 +21,17 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
                 .WithStage(PluginStage.Postoperation)
                 .WithMessage(DataverseMessages.Delete)
                 .ForEntity(Logic.Contact.EntityLogicalName)
-                .HasPreImage();
+                .HasPreImage()
+                // A contact without a parent account is not a failure, only nothing to record:
+                // the task ends as NotValid with this reason instead of a Success that did nothing.
+                .WithValidation("Deleted contact has no parent account, nothing to record.", _ =>
+                    string.Equals(PreImage?.ParentCustomerId?.LogicalName, Logic.Account.EntityLogicalName, StringComparison.OrdinalIgnoreCase));
         }
 
         protected override void DoExecute()
         {
             // There is no context entity on Delete, the pre-image carries the deleted values.
             var parentCustomer = PreImage.ParentCustomerId;
-
-            if (parentCustomer == null
-                || !string.Equals(parentCustomer.LogicalName, Logic.Account.EntityLogicalName, StringComparison.OrdinalIgnoreCase))
-            {
-                AddLogMessageLine("Deleted contact has no parent account, nothing to record.");
-                return;
-            }
 
             var deletedContact = BuildContactName(PreImage);
 

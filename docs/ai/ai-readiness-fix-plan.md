@@ -751,7 +751,7 @@ odsouhlasit „jdi s doporučením“.
 
 | # | Rozhodnutí | Výsledek | Dopad |
 |---|---|---|---|
-| **D2** | Kanonická forma názvu atributu | **`Entity.Fields.X`**, jednotně ve všech kontextech. `nameof(...)` jako název atributu zakázán. String literály jsou správné, dokud early-bound typy neexistují — což je stav každého nového projektu. | F2-01 hotová; F2-06 tím vyřešena zároveň |
+| **D2** | Kanonická forma názvu atributu | **`Entity.Fields.X`** všude, kde API bere název atributu jako string (validace, `ColumnSet`, indexery). **Změněno 2026-09-28 (rozhodnutí 1A u PR #130):** v `Register(...)` typované selektory `c => c.X`, jak je zavedl `develop` v #60 — `/examples` i pravidla PF-REG-007/PF-DATA-008 to tak mají. `nameof(...)` jako název atributu zakázán. String literály jsou správné, dokud early-bound typy neexistují — což je stav každého nového projektu. | F2-01 hotová; F2-06 tím vyřešena zároveň |
 | **D4** | Konvence pojmenování stepů | **Koordináty, ne účel:** `{StepPrefix} {entity} {Message} {Stage} {Mode}`, bez entity u custom API/action. `WithName` vždy nastavit. Frameworkový autonumbering step přejmenován. | F5-01 hotová |
 | **D1** | Kde leží early-bound klasy | **`Logic`.** V šabloně a příkladech nejsou commitnuté, protože závisí na prostředí — generují se toolingem. | F1-04 přepsáno; přidán návrh vypnout scaffolding v `Plugins` |
 | **D3** | Chování `DataverseValidationException` | **Kód je správně: `Success` + `Info`.** „Warning“ v `ThrowWithWarning(...)` je povaha hlášky pro uživatele, ne úroveň logu; task splnil svou práci. | F1-02 zůstává opravou dokumentace (S), bez změny chování. Kontrakt je nově vysvětlený v kódu. |
