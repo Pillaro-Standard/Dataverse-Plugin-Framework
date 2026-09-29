@@ -27,7 +27,7 @@ an edge case; it is the starting state of every new solution, until `pac modelbu
 .EntityWithAtLeastOneAttribute(ContextEntity, "firstname", "lastname")
 
 // ✅ Once Logic.Contact exists (generated) — switch to the constant
-.EntityWithAtLeastOneAttribute(ContextEntity, Contact.Fields.FirstName, Contact.Fields.LastName)
+.EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName)
 
 // ❌ Never — compiles, but "id" is not a real attribute; task becomes silently NotValid forever
 .EntityWithAtLeastOneAttribute(ContextEntity, nameof(ContextEntity.Id))
@@ -79,14 +79,14 @@ var roleIds = DataServiceProvider.Admin.Query<Logic.SystemUserRoles>()
 
 ```csharp
 // ✅ Lowest sufficient context, visible at the call site
-var relatedTasks = DataServiceProvider.User.Query<Contact>()...;
+var relatedTasks = DataServiceProvider.User.Query<Logic.Contact>()...;
 
 // ⚠️ Admin — only with a comment explaining why user/initiating-user context is not sufficient
 // Admin is required here because settings entity pl_setting is not readable by the calling user role.
 var setting = DataServiceProvider.Admin.Query<PlSetting>()...;
 
 // ❌ Admin as an unexamined default
-var contact = DataServiceProvider.Admin.Query<Contact>()...; // no justification — reject
+var contact = DataServiceProvider.Admin.Query<Logic.Contact>()...; // no justification — reject
 ```
 
 ```csharp

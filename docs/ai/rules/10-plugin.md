@@ -19,17 +19,24 @@ public sealed class ContactPlugin : PluginBase
         : base(unsecureConfig, secureConfig)
     {
         RegisterTask<ValidateNames>(PluginStage.Prevalidation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
-        RegisterTask<UpdateAddressLabel>(PluginStage.Preoperation, ["Create", "Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
     }
 
+    // One step per message the task is registered for - same stage and mode as RegisterTask above.
     public override void Register(IPluginRegistration registration)
     {
         registration
-            .OnCreate<Contact>("<step-id-from-tooling>")
+            .OnCreate<Contact>("<step-id-from-a-human>")
             .PreValidation()
             .Synchronous()
             .WithName($"{StepPrefix} contact Create PreValidation Synchronous")
-            .Rank(1);
+            .WithFilteringAttributes(c => c.FirstName, c => c.LastName);
+
+        registration
+            .OnUpdate<Contact>("<step-id-from-a-human>")
+            .PreValidation()
+            .Synchronous()
+            .WithName($"{StepPrefix} contact Update PreValidation Synchronous")
+            .WhenChanged(c => c.FirstName, c => c.LastName);
     }
 }
 ```

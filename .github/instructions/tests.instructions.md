@@ -1,89 +1,100 @@
-﻿## Data Access (CRITICAL)
-
-Use repository-specific values from `.github/project-setup.md`.
-
-Use ONLY:
-- DataService
-- QueryService
-
-Primary access point for Dataverse MUST be:
-
-DataService.OrganizationService
-
+---
+name: Tests
+description: Integration tests against a real Dataverse environment — test data, assertions, cleanup, running them.
+applyTo: "**/*Tests/**/*.cs"
+# Also matches the framework's own offline tests in tests/ — the first paragraph excludes them.
 ---
 
-### REQUIRED USAGE
+# Integration tests
 
-All direct Dataverse operations MUST use:
+Full rules and reasons: [`70-testing.md`](../../docs/ai/rules/70-testing.md). Paths and the
+reference test: [`project-setup.md`](../project-setup.md).
 
-DataService.OrganizationService
+Tests run against a real Dataverse environment with the deployed plugin. Never mock
+`IOrganizationService` or any Dataverse behavior (PF-TEST-001). This applies to the integration test
+project of a solution (here: `/examples`), not to the framework's own offline tests in `tests/`.
 
-Example:
+## Structure
 
-- Create
-- Update
-- Retrieve
+- One test class per task: `Tests/<Entity>/<TaskName>Tests.cs`, inheriting the project's `TestBase`
+  (PF-TEST-015). If the entity already has a test folder, use it (in `/examples`: `Tests/Contacts/`).
+- Add every new file to the test project file — the project lists its compile items explicitly, and a
+  test class that is not listed never runs (PF-BUILD-007).
+- Tests reference the `Logic` project, never the merged `Plugins` assembly (PF-ARCH-003).
+- Every class has `[Trait("Owner", "<initials>")]` and `[Trait("Category", nameof(<TaskName>))]`. The
+  owner is the developer responsible for the task — ask for the initials, never copy them from an
+  example (PF-TEST-004).
+- Method names are the `tests:` names from the approved plan.
+- At least one happy-path test and one business-rejection test per task (PF-TEST-005).
+- A test is `void` or `async Task`, never `async void`. Every test asserts something. A disabled test uses
+  `Skip = "reason"`, never a comment. Limits come from configuration (PF-TEST-014).
 
----
+## Test data
 
-### FORBIDDEN
+- Records come from a repository in `Data/Repositories/` (`GetNew(...)`) and are created with
+  `TestDataService.CreateTestEntity(...)` — never `OrganizationService.Create(...)` (PF-TEST-002/003).
+  Change only the fields the scenario is about. A new repository implements
+  `IAutoRegisteredTestDataRepository`, otherwise `GetRepository<T>()` cannot find it.
+- The repository's default record must pass every task on that entity and message. Unique values
+  come from a GUID fragment, not the clock. Reference data is queried by business key, never a
+  hard-coded GUID (PF-TEST-013).
+- Records created by the plugin, or through an impersonated service, are registered with
+  `TestDataService.AddTestEntityToDelete(...)`. When a relation blocks deleting the test record, add
+  an `ICleanupDeleteHandler` — see
+  [Test Data Lifecycle](../../docs/tests/test-data-lifecycle.md) (PF-TEST-011).
+- Never modify a shared configuration record. If the test cannot work without it, stop and ask.
 
-Do NOT:
+## Assertions
 
-- resolve IOrganizationService from DI container
-  (e.g. testFixture.Container.Resolve<IOrganizationService>())
+- After the act, read the record back from Dataverse by id and assert on that — not on the object
+  you sent (PF-TEST-009).
+- A business rejection arrives as `FaultException<OrganizationServiceFault>`. Assert the type and
+  `ex.Detail.Message` with the text from the requirement (PF-TEST-008).
+- Asynchronous steps: `await TestDataService.WaitOnAsyncProcess(id)`, then assert
+  `GetAsyncProcessResults(id)` succeeded. Never `Thread.Sleep` or `Task.Delay` (PF-TEST-010).
+- A rule that depends on the user's role or business unit is tested with a user who has it and one
+  who does not, via `ConnectionService.GetOrganizationService(userId)` (PF-TEST-012).
 
-- inject IOrganizationService manually
+## Running the tests
 
-- instantiate OrganizationService directly
+- Only when you are told to, and only against a dedicated dev environment (PF-TEST-007, PF-ENV-001).
+- The connection string comes from user-secrets or an environment variable. Never write it anywhere
+  (PF-ENV-002).
+- Before the first run, check that the test settings set `ExpectedEnvironmentUrl`. `TestFixture`
+  then refuses to run against any other environment; without the setting it checks nothing, so ask
+  the developer to set it. Never bypass the check (PF-ENV-006).
+- A failing test is fixed by fixing the task, or reported to a human. Never edit a test until it
+  passes (PF-ENV-007). When the test of task A fails with task B's message, the cause is task B or the
+  repository default record.
 
-- bypass DataService
+## Shape
 
----
+```csharp
+[Trait("Owner", "<initials of the responsible developer>")]
+[Trait("Category", nameof(ValidateAccountName))]
+public class ValidateAccountNameTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output)
+    : TestBase(testFixture, output)
+{
+    [Fact]
+    public void CreateAccount_WithAllowedName_Succeeds()
+    {
+        var account = TestDataService.GetRepository<AccountRepository>().GetNew();
 
-### ENTITY CREATION
+        account.Id = TestDataService.CreateTestEntity(account);
 
-Entity creation MUST be done via:
+        var created = TestDataService.Query<Logic.Account>().Where(a => a.Id == account.Id).FirstOrDefault();
+        Assert.NotNull(created);
+    }
 
-DataService.CreateTestEntity(...)
+    [Fact]
+    public async Task CreateAccount_WithForbiddenName_ShouldBeRejected()
+    {
+        var account = TestDataService.GetRepository<AccountRepository>().GetNew("Fake Company");
 
-This ensures automatic cleanup via TestBase.
+        var ex = await Assert.ThrowsAsync<FaultException<OrganizationServiceFault>>(() =>
+            Task.Run(() => TestDataService.CreateTestEntity(account)));
 
----
-
-### CLEANUP
-
-Test data cleanup is handled automatically.
-
-Do NOT implement manual cleanup.
-
----
-
-### INTEGRATION TESTS ONLY
-
-- Do NOT mock anything
-- Do NOT fake services
-- Always use real Dataverse via DataService
-
----
-
-## Analyzer Compliance (CRITICAL)
-
-Generated test code MUST compile with zero warnings/messages.
-
-Avoid at minimum:
-- SYSLIB1045: follow `.github/project-setup.md` sandbox compatibility rules; do not introduce `[GeneratedRegex(...)]` into plugin/task-oriented code
-- IDE0057: simplify `Substring` patterns
-- CA1862: use `string.Equals(..., StringComparison...)`
-- CA1861: avoid repeated inline constant array allocations
-- CA1822: mark members `static` when possible
-- IDE0028: prefer collection expressions/initializers
-- CA1307/CA1309: always specify correct `StringComparison`
-- IDE0005: remove unnecessary `using` directives
-- IDE0059/IDE0060: avoid unnecessary assignments and unused parameters
-
-Also ensure:
-- no unused usings
-- no unused locals/private members
-
----
+        Assert.Contains("is a forbidden word", ex.Detail.Message);
+    }
+}
+```

@@ -22,11 +22,11 @@ protected override ICompleteValidation AddValidations(IBasicModeValidation valid
         .WithMode(PluginMode.Synchronous)
         .WithStage(PluginStage.Preoperation)
         .WithMessages(["Create", "Update"])
-        .ForEntity(Contact.EntityLogicalName)
+        .ForEntity(Logic.Contact.EntityLogicalName)
         .HasPreImageWhen(x => x.Message == "Update")
-        .EntityWithAtLeastOneAttribute(ContextEntity, Contact.Fields.FirstName, Contact.Fields.LastName)
+        .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName)
         .WithValidation("First name or last name must be present.", x =>
-            ContextEntity.Contains(Contact.Fields.FirstName) || ContextEntity.Contains(Contact.Fields.LastName))
+            ContextEntity.Contains(Logic.Contact.Fields.FirstName) || ContextEntity.Contains(Logic.Contact.Fields.LastName))
         .WithBreakValidation("The contact already violates a cross-record rule.", x =>
         {
             // expensive check, may query Dataverse — always last
@@ -39,16 +39,16 @@ protected override ICompleteValidation AddValidations(IBasicModeValidation valid
 
 ```csharp
 // ❌ PF-VAL-003 — Dataverse query inside WithValidation(...)
-.WithValidation("Duplicate check failed.", x => DataServiceProvider.User.Query<Contact>().Any(...))
+.WithValidation("Duplicate check failed.", x => DataServiceProvider.User.Query<Logic.Contact>().Any(...))
 // Move it to WithBreakValidation(...) instead, and put it last in the chain.
 ```
 
 ```csharp
 // ❌ PF-VAL-004 — god predicate: one lambda hiding three unrelated rules
 .WithValidation("Invalid contact.", x =>
-    ContextEntity.Contains(Contact.Fields.FirstName) &&
-    ContextEntity.GetAttributeValue<string>(Contact.Fields.LastName)?.Length > 1 &&
-    !ContextEntity.GetAttributeValue<string>(Contact.Fields.EMailAddress1).Contains("test"))
+    ContextEntity.Contains(Logic.Contact.Fields.FirstName) &&
+    ContextEntity.GetAttributeValue<string>(Logic.Contact.Fields.LastName)?.Length > 1 &&
+    !ContextEntity.GetAttributeValue<string>(Logic.Contact.Fields.EMailAddress1).Contains("test"))
 // Split into three named validations, each with its own message.
 ```
 
@@ -56,10 +56,10 @@ protected override ICompleteValidation AddValidations(IBasicModeValidation valid
 // ❌ PF-VAL-001 — wrong order: attribute check before entity/message filters
 return validator
     .WithMode(PluginMode.Synchronous)
-    .EntityWithAtLeastOneAttribute(ContextEntity, Contact.Fields.FirstName) // too early
+    .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName) // too early
     .WithStage(PluginStage.Preoperation)
     .WithMessages(["Create"])
-    .ForEntity(Contact.EntityLogicalName);
+    .ForEntity(Logic.Contact.EntityLogicalName);
 ```
 
 The fixed order exists because the framework is designed cheapest-check-first: mode/stage/message/

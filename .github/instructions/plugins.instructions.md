@@ -1,87 +1,84 @@
-# Plugin Generation
-
-## Location & Namespace
-
-- **Path**: `{PluginsPath}` from project-setup.md
-- **Namespace**: `{PluginNamespace}` from project-setup.md
-
-## Structure
-~~~
-public class <EntityOrFeature>Plugin : PluginBase
-{
-    public <EntityOrFeature>Plugin(string unsecureConfig, string secureConfig) 
-        : base(unsecureConfig, secureConfig)
-    {
-        RegisterTask<TaskName>(PluginStage.X, "Message", Logic.Entity.EntityLogicalName, PluginMode.X);
-    }
-}
-~~~
-
-Plugin class should contain:
-- constructor
-- task registrations only
-
-No additional methods unless required for registration grouping.
-
 ---
+name: Plugins
+description: Plugin classes — task registration and deployment metadata (steps, images, filtering attributes).
+applyTo: "**/*Logic/Plugins/**/*.cs"
+---
+
+# Plugin classes
+
+Full rules and reasons: [`10-plugin.md`](../../docs/ai/rules/10-plugin.md) and
+[`60-registration.md`](../../docs/ai/rules/60-registration.md). Paths, namespaces and the reference
+plugin: [`project-setup.md`](../project-setup.md).
+
+A plugin class does two things and nothing else: it registers tasks for runtime dispatch, and it
+declares the deployment metadata of its steps. All business logic is in tasks.
 
 ## Rules
 
-| Do | Don't |
-|----|-------|
-| Register tasks | Contain business logic |
-| Map events to tasks | Access services directly |
-| Use `RegisterTask<T>(...)` | Duplicate registrations |
+- Inherit from the solution's own `PluginBase`, never the framework's directly (PF-PLUG-001).
+- Name the plugin after the entity (`ContactPlugin`) or the business capability, never after a task
+  (PF-PLUG-004). Before adding a plugin, look for an existing `<Entity>Plugin` — usually the right
+  change is a new task on it.
+- The constructor contains only `RegisterTask<T>(...)` calls: no conditions, no queries (PF-PLUG-002).
+- Registration order is execution order. Group by stage (PreValidation → PreOperation →
+  PostOperation → custom messages), register a task that sets a value before a task that reads it,
+  and delete registrations you no longer need instead of commenting them out (PF-REG-011).
+- `Register(IPluginRegistration)` declares metadata only — no queries (PF-PLUG-003).
+- `RegisterTask<T>(...)` and `Register(...)` describe the same step. Stage, message, entity and mode
+  must match; changing one means checking the other (PF-REG-001).
+- One step per entity × message × stage × mode. If the step already exists, extend it: its filtering
+  attributes and image columns are the union of what all its tasks need. Never add a second step with
+  the same coordinates (PF-REG-010).
+- A synchronous Update step has filtering attributes, preferably via `WhenChanged(...)` (PF-REG-004).
+  They must agree with the attributes the tasks validate — an attribute the task checks but the step
+  does not filter on never triggers the task.
+- Select attributes with typed selectors (`c => c.FirstName`). String literals only while the entity
+  has no early-bound type (PF-REG-007).
+- Always set `WithName($"{StepPrefix} <entity> <Message> <Stage> <Mode>")`. The name describes the
+  coordinates, not the purpose (PF-REG-008/009).
+- Images: a pre-image never on Create, a post-image only in PostOperation and never on Delete,
+  `WithBothImage(...)` (framework 1.2.0 and later) only in PostOperation and not on Create or Delete,
+  no images on MainOperation (PF-REG-005). The image name must be exactly the name the task reads
+  (`"image"` for `PreImage`).
+- A Custom API main operation is `RegisterTask<T>(PluginStage.Mainoperation, …)` together with
+  `OnMessage(...).MainOperation()` (PF-REG-012).
 
----
+## Step and image GUIDs
 
-## Naming
+Never invent a GUID and never copy one from `/docs` or `/examples` (PF-REG-002/003). Ask the
+developer for a new one (`New-Guid`) and use exactly the value given. While you wait, an all-zero
+placeholder is acceptable in a draft — `validate` rejects it, so it cannot be deployed by accident.
 
-- CamelCase
-- Entity-based: `ContactPlugin`, `AccountPlugin`
-- Feature-based: `AutoNumberingPlugin`, `NotificationPlugin`
+## Shape
 
----
+```csharp
+public class ContactPlugin : PluginBase
+{
+    public ContactPlugin(string unsecureConfig, string secureConfig)
+        : base(unsecureConfig, secureConfig)
+    {
+        // PreOperation, Update only: one step
+        RegisterTask<RecordJobTitleChange>(PluginStage.Preoperation, ["Update"], Contact.EntityLogicalName, PluginMode.Synchronous);
+        // PostOperation, Delete only: one step with a pre-image
+        RegisterTask<ArchiveDeletedContact>(PluginStage.Postoperation, ["Delete"], Contact.EntityLogicalName, PluginMode.Synchronous);
+    }
 
-## Base Classes
+    // Every RegisterTask above has its step here: same message, stage and mode.
+    public override void Register(IPluginRegistration registration)
+    {
+        registration
+            .OnUpdate<Contact>("<step id from the developer>")
+            .PreOperation()
+            .Synchronous()
+            .WithName($"{StepPrefix} contact Update PreOperation Synchronous")
+            .WhenChanged(c => c.JobTitle);
 
-- Plugin must inherit from {PluginBaseClass}
-
----
-
-## Responsibility
-
-Plugin is orchestration only.
-
-Plugin must:
-- register tasks
-- map pipeline events to tasks
-
-Plugin must NOT:
-- contain business logic
-- access services directly
-- perform validation logic
-
----
-
-## Task Registration
-
-Tasks must be registered using:
-{RegisterTaskInPluginMethod}
-
-Each registration must:
-- target correct entity
-- define message (Create, Update, Delete, etc.)
-- define pipeline stage (PreOperation, PostOperation, etc.)
-- be unique (no overlapping logic)
-
----
-
-## Constraints
-
-- Do not duplicate logic across plugins
-- Do not register same logic multiple times
-- Do not call services directly
-- Do not access Entity attributes directly in plugin
-
-All logic must be implemented in Tasks
+        registration
+            .OnDelete<Contact>("<step id from the developer>")
+            .PostOperation()
+            .Synchronous()
+            .WithName($"{StepPrefix} contact Delete PostOperation Synchronous")
+            .WithPreImage("<image id from the developer>", "image", c => c.FirstName, c => c.LastName, c => c.ParentCustomerId);
+    }
+}
+```

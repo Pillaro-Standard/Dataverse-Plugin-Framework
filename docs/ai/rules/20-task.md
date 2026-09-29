@@ -120,9 +120,9 @@ public class ValidateNames(IServiceProvider serviceProvider, TaskContext taskCon
             .WithStage(PluginStage.Prevalidation)
             .WithMessages(["Create", "Update"])
             .ForEntity(ContextEntity.LogicalName)
-            .EntityWithAtLeastOneAttribute(ContextEntity, Contact.Fields.FirstName, Contact.Fields.LastName)
+            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName)
             .WithValidation("First name or last name must be present.", x =>
-                ContextEntity.Contains(Contact.Fields.FirstName) || ContextEntity.Contains(Contact.Fields.LastName));
+                ContextEntity.Contains(Logic.Contact.Fields.FirstName) || ContextEntity.Contains(Logic.Contact.Fields.LastName));
     }
 
     protected override void DoExecute()

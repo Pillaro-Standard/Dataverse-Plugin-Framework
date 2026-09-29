@@ -22,11 +22,14 @@ be described incorrectly by an LLM's general Dataverse knowledge — the common 
 **Actual contract**, verified against `TaskBase.cs`:
 
 - A task that ends via `DataverseValidationException` (either thrown directly in `DoExecute()`, or
-  via `ThrowWithError(...)` / `ThrowWithWarning(...)` in the validation chain) ends with
-  `TaskStatus.Success` and logs at `LogSeverity.Info`.
+  via `ThrowWithWarning(...)` in the validation chain) ends with `TaskStatus.Success` and logs at
+  `LogSeverity.Info`.
 - The word **"warning" in `ThrowWithWarning(...)` describes the nature of the message shown to the
   user — it is not the log severity.** The task did what it was supposed to do: it evaluated a
   business rule and told the user the outcome. That is success, not failure.
+- `ThrowWithError(...)` throws `InvalidPluginExecutionException` (`ThrowExceptionValidator.cs`), so the
+  task ends `Error`. It is not a business rejection — use it only when a failed check means something
+  is technically wrong.
 - `InvalidPluginExecutionException` is for *unexpected* technical failures, and produces `Error` in
   monitoring. Using it for an expected business rejection pollutes monitoring with false errors —
   which defeats the reason `DataverseValidationException` exists at all.

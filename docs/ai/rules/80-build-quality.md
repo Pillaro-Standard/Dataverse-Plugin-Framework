@@ -11,6 +11,7 @@
 | PF-BUILD-004 | Output must stay ILMerge-compatible — do not add a dependency that is invalid in the plugin sandbox. | [CONTRIBUTING.md](../../CONTRIBUTING.md), [architecture.md](../../plugins/architecture.md) |
 | PF-BUILD-005 | Never suppress a warning with `#pragma` / `NoWarn` as the fix — fix the cause. | — |
 | PF-BUILD-006 | The merged `Plugins` DLL MUST carry `[assembly: ProxyTypesAssemblyAttribute]` (declared in the `Plugins` project, because ILMerge drops the one `pac modelbuilder` puts into `Logic`). Without it every early-bound read and write fails at runtime, never at build time. | live-verified, see [40-data-access.md](./40-data-access.md) |
+| PF-BUILD-007 | A new `.cs` file is added to its project file when the project lists its compile items explicitly — the template's `Logic` and `Tests` projects (`EnableDefaultCompileItems=false`) and the legacy `/examples` projects. Otherwise the file is silently not compiled: a new test class simply never runs. | template project files |
 
 ## Run this before calling a change done
 

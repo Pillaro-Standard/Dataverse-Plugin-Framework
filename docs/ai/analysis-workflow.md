@@ -210,10 +210,12 @@ R3 — Normalize the customer's phone number
 
 - Claude Code / any `AGENTS.md`-reading agent: this file plus
   [`docs/ai/rules/`](./rules/) and [`docs/ai/verify.md`](./verify.md).
-- GitHub Copilot: `.github/prompts/analyze-and-plan.prompt.md` drives steps 1–3 of this document,
-  then hands off to `.github/prompts/generate-task-and-plugin.prompt.md` and
-  `.github/prompts/generate-task-tests.prompt.md` for step 4. Those files must not contradict this
-  file or `docs/ai/rules/` — see the note at the top of `.github/copilot-instructions.md`.
+- GitHub Copilot: three prompts in [`.github/prompts/`](../../.github/prompts/), one per review
+  checkpoint — `/analyze-and-plan` for steps 1–3 of this document, then, per approved task,
+  `/generate-task-tests` (step 4.1) and `/generate-task-and-plugin` (steps 4.2–4.5). The
+  instructions in [`.github/instructions/`](../../.github/instructions/) apply the rules
+  automatically by file path. [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md)
+  is the overview. None of these may contradict this file or `docs/ai/rules/`.
 
 ## ➡️ Related
 
