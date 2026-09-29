@@ -1,9 +1,10 @@
 # AI Instructions — Pillaro Dataverse Plugin Framework
 
 This is the canonical entry point for any AI coding agent working in a solution built on the
-Pillaro Dataverse Plugin Framework. Every other agent-config file (`CLAUDE.md`,
-`.github/copilot-instructions.md`, `.cursor/rules/*`) is a thin redirect to this file — do not
-duplicate rules there.
+Pillaro Dataverse Plugin Framework. `CLAUDE.md` and `.cursor/rules/*` are thin redirects to this
+file — do not duplicate rules there. The GitHub Copilot files under `.github/` (instructions,
+prompts, `project-setup.md`) apply the same rules in Copilot's own format; if they disagree with
+`docs/ai/rules/`, the rules win and the Copilot file is corrected.
 
 Rules below use stable IDs (`PF-XXX-NNN`). Reference the ID in commits, PR descriptions, and review
 comments. Full rationale and source docs live in [`docs/ai/rules/`](./docs/ai/rules/); this file is
