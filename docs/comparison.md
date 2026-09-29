@@ -27,7 +27,7 @@ This comparison covers **plug-in structure, registration, and deployment** — t
 
 It compares:
 
-- **[Vanilla Dataverse SDK](https://github.com/scottdurow/SparkleXrm)** — writing plug-ins directly against `IPlugin` and the CRM SDK, with no additional framework
+- **[Vanilla Dataverse SDK](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/plug-ins)** — writing plug-ins directly against `IPlugin` and the CRM SDK, with no additional framework
 - **[spkl](https://github.com/scottdurow/SparkleXrm/wiki/spkl)** (part of SparkleXrm) — a JSON-driven command-line deployment tool for plugins, web resources, and early-bound types
 - **[XrmBedrock](https://github.com/context-and-oss/XrmBedrock)** — a project template combining Dataverse plug-in/Custom API development with Azure infrastructure and DevOps pipelines
 
