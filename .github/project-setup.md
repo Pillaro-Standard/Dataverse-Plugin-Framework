@@ -30,7 +30,7 @@ Derived from project folder name (last segment, dots preserved):
 | TasksPath | `{LogicProject}/Tasks` |
 | FeaturesPath | `{LogicProject}/Features` |
 | EarlyBoundPath | `{LogicProject}/EarlyBound` |
-| EntityConfigPath (= EntityConfigFile) | `{LogicProject}/EarlyBoundSettings.json` |
+| EntityConfigPath (= EntityConfigFile) | `{LogicProject}/Tools/EarlyBound/EarlyBoundSettings.json` |
 | EarlyBoundEntityFile | `{EarlyBoundPath}/Entities/<entity>.cs` — one file per entity, e.g. `contact.cs`, `account.cs`, `task.cs`. There is no single combined `EarlyBoundTypes.cs`/`EarlyBounds.cs` — check the per-entity file. |
 | TestCasesPath | `{TestsProject}/Tests` |
 | TestRepositoriesPath | `{TestsProject}/Data/Repositories` |
