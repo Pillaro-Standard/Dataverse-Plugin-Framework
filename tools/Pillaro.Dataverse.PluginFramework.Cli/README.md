@@ -29,7 +29,21 @@ pillaro-dv deploy [options]
                       synchronization.
 ```
 
-`deploy` is the only command.
+```text
+pillaro-dv manifest --assembly <dll> --output <json>   registration manifest from an assembly (offline)
+pillaro-dv validate --manifest <json>                  validate a manifest (offline)
+pillaro-dv diff --manifest <json> [options]            compare a manifest with an environment
+pillaro-dv ai-sync [--root <folder>] [--check]         AI instructions into the solution (offline)
+```
+
+`ai-sync` writes the framework's AI instructions for Claude Code, GitHub Copilot and Codex into the
+solution root, in the version of this CLI: `AGENTS.md`, `CLAUDE.md` and
+`.github/copilot-instructions.md` (only the block between `pillaro:begin` and `pillaro:end` is
+replaced), managed files in `.pillaro/ai/`, `.github/instructions/pillaro-*`,
+`.claude/skills/pillaro-*` and `.agents/skills/pillaro-*`, and `.pillaro/project-setup.md` once.
+`--check` changes nothing and exits with 3 when the instructions are out of date. The framework
+package also generates `Tools/AI/SyncAiInstructions.bat`, which runs it. `pillaro-dv ai-sync --help`
+lists its options.
 
 ## Configuration
 

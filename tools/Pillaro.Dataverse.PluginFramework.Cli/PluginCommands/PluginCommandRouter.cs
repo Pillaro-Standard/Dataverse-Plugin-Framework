@@ -30,6 +30,11 @@ internal static class PluginCommandRouter
             return await PluginDiffCommand.RunAsync(args.Skip(1).ToArray());
         }
 
+        if (string.Equals(args[0], "ai-sync", StringComparison.OrdinalIgnoreCase))
+        {
+            return await AiSyncCommand.RunAsync(args.Skip(1).ToArray());
+        }
+
         Console.Error.WriteLine($"Unknown command '{args[0]}'.");
         PrintRootHelp();
         return 2;
@@ -52,6 +57,7 @@ internal static class PluginCommandRouter
         Console.WriteLine("  manifest            Generate a plugin registration manifest from an assembly (offline, no connection).");
         Console.WriteLine("  validate            Validate a plugin registration manifest (offline, no connection).");
         Console.WriteLine("  diff                Compare a plugin registration manifest against a Dataverse environment.");
+        Console.WriteLine("  ai-sync             Write the AI instructions for Claude Code, Copilot and Codex into the solution (offline).");
         Console.WriteLine();
         Console.WriteLine("Options:");
         Console.WriteLine("  -h, --help          Show help.");
