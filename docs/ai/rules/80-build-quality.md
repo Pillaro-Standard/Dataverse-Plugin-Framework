@@ -20,7 +20,7 @@ dotnet build "<path-to-Logic-or-Plugins>.csproj" -c Release
 ```
 
 Zero warnings, zero errors is the bar — see [`docs/ai/verify.md`](../verify.md) for the exact
-commands for this repository's own projects, including the plugin-project build via MSBuild.
+commands, including the build of legacy-format projects via MSBuild.
 
 ## What "fix the cause" looks like
 

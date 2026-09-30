@@ -5,13 +5,13 @@
 > "run the build" is not enough for an agent to act on reliably, especially on the Windows/MSBuild
 > stack this framework targets.
 
-This document has two audiences with different project formats:
+Solutions come in two project formats:
 
 - **A solution built from the template** (`dotnet new` or the VS template) — SDK-style `net462`
   projects. `dotnet build` works directly.
-- **This repository's own `/examples`** — `Logic` and `Plugins` there use the legacy (non-SDK)
-  project format. `dotnet build` does not reliably build them; use `MSBuild.exe` from a Visual
-  Studio install.
+- **An older solution in the legacy (non-SDK) format** — like the framework's own `/examples`.
+  `dotnet build` does not reliably build these projects; use `MSBuild.exe` from a Visual Studio
+  install.
 
 If you don't know which one you're in, check the first line of the `.csproj`:
 `<Project Sdk="Microsoft.NET.Sdk">` → SDK-style, `dotnet build` works.
@@ -48,7 +48,7 @@ assembly or validation errors baked into the manifest; `validate` exits `2` for 
 for validation failures. Treat any non-zero exit code as a hard stop — read the printed errors, they
 name the specific rule violated (see [`docs/ai/rules/60-registration.md`](./rules/60-registration.md)).
 
-## Fast loop — this repository's own `/examples` or `/src`
+## Fast loop — a legacy-format solution
 
 Locate MSBuild once per session (no need to open Visual Studio):
 
@@ -56,28 +56,31 @@ Locate MSBuild once per session (no need to open Visual Studio):
 $msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"
 ```
 
-Build the solution (quote the path — the file name has spaces):
+Build the solution (quote the path if the file name has spaces):
 
 ```powershell
-& $msbuild "Dataverse Plugin Framework.sln" /t:Build /p:Configuration=Release /m
-```
-
-To check PF-BUILD-001 explicitly on a change (measured safe for this solution — see the F3-02 entry
-in [ai-readiness-fix-plan.md](./ai-readiness-fix-plan.md)), add:
-
-```powershell
-& $msbuild "Dataverse Plugin Framework.sln" /t:Rebuild /p:Configuration=Release /p:TreatWarningsAsErrors=true
+& $msbuild "YourSolution.sln" /t:Build /p:Configuration=Release /m
 ```
 
 Build `Logic` and `Plugins` **in that order** if building a single project instead of the whole
 solution — `Plugins` references `Logic`'s output.
 
-If a `dotnet build`/`dotnet test` was ever run against these legacy projects, their restore state in
+If a `dotnet build`/`dotnet test` was ever run against legacy projects, their restore state in
 `obj/` is left incompatible with MSBuild (`Your project file doesn't list 'win' as a
-"RuntimeIdentifier"`). Recover with `& $msbuild "Dataverse Plugin Framework.sln" /t:Restore`, then
-build again.
+"RuntimeIdentifier"`). Recover with `& $msbuild "YourSolution.sln" /t:Restore`, then build again.
 
-## Fast loop — CLI and framework unit/offline tests
+<!-- pillaro:framework-only -->
+## Framework repository only
+
+The framework's own solution is `Dataverse Plugin Framework.sln` (legacy format for `/examples`).
+To check PF-BUILD-001 explicitly on a change (measured safe for this solution — see the F3-02 entry
+in [ai-readiness-fix-plan.md](./ai-readiness-fix-plan.md)):
+
+```powershell
+& $msbuild "Dataverse Plugin Framework.sln" /t:Rebuild /p:Configuration=Release /p:TreatWarningsAsErrors=true
+```
+
+### CLI and framework unit/offline tests
 
 ```powershell
 dotnet build "tests\Pillaro.Dataverse.PluginFramework.Tests\Pillaro.Dataverse.PluginFramework.Tests.csproj" -c Debug
@@ -87,6 +90,7 @@ dotnet test "tests\Pillaro.Dataverse.PluginFramework.Tests\Pillaro.Dataverse.Plu
 `PluginCommands` tests (manifest/validate/router, discovery, registration diff calculation) run
 offline — no live connection required. Do not widen the filter to the full suite unless you also
 intend to run the slow loop below.
+<!-- /pillaro:framework-only -->
 
 ## Slow loop — integration tests against a live dev environment
 

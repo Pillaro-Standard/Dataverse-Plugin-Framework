@@ -2,7 +2,7 @@
 name: Tests
 description: Integration tests against a real Dataverse environment — test data, assertions, cleanup, running them.
 applyTo: "**/*Tests/**/*.cs"
-# Also matches the framework's own offline tests in tests/ — the first paragraph excludes them.
+# Also matches test projects that do not use Dataverse — the first paragraph excludes them.
 ---
 
 # Integration tests
@@ -11,8 +11,8 @@ Full rules and reasons: [`70-testing.md`](../../docs/ai/rules/70-testing.md). Pa
 reference test: [`project-setup.md`](../project-setup.md).
 
 Tests run against a real Dataverse environment with the deployed plugin. Never mock
-`IOrganizationService` or any Dataverse behavior (PF-TEST-001). This applies to the integration test
-project of a solution (here: `/examples`), not to the framework's own offline tests in `tests/`.
+`IOrganizationService` or any Dataverse behavior (PF-TEST-001). This applies to the solution's
+integration test project, the one that references `Pillaro.Dataverse.PluginFramework.Testing`.
 
 ## Structure
 

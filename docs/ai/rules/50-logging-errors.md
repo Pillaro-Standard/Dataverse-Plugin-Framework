@@ -50,7 +50,7 @@ protected override void DoExecute()
 user and in the log. If you use it, mind the predicate:
 
 > [!WARNING]
-> **Predicate polarity trap, confirmed live in this repository's own simulation (see
+> **Predicate polarity trap, confirmed live in the framework's own simulation (see
 > `docs/ai/analysis-workflow.md`).** The predicate passed to `ThrowWithWarning(...)` /
 > `ThrowWithError(...)` means **"is valid"** (`true` = OK, no throw) — the validator throws when the
 > predicate is `false`, exactly like `WithValidation(...)` and `WithBreakValidation(...)`. It is easy

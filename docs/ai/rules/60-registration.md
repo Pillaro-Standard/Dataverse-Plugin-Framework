@@ -103,7 +103,7 @@ Delete registrations you no longer need — do not leave them commented out; git
 A synchronous Update step's filtering attributes and the task's own attribute validation
 (`EntityWithAtLeastOneAttribute(...)`) describe the same fact from two places. If the task validates
 an attribute that is not in the step's filtering attributes, a change to only that attribute never
-triggers the task at all — a real bug found in this repository's own example plugin (`ScheduledStart`
+triggers the task at all — a real bug found in the framework's own example plugin (`ScheduledStart`
 was validated but not filtered). Keep the two sets aligned, or drop the unused one from validation.
 
 ## Image name must match what the task expects

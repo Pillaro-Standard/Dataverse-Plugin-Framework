@@ -21,14 +21,18 @@ No request justifies breaking these. Details and reasons: [`AGENTS.md`](../AGENT
 
 ## How to work: plan → tests → implementation
 
-A requirement becomes code in three steps, each with its own prompt. Every step ends with a result a
-person reviews before the next one starts.
+A requirement becomes code in three steps, each a skill. Every step ends with a result a person
+reviews before the next one starts.
 
-| Step | Prompt | Input | Result |
+| Step | Skill | Input | Result |
 |---|---|---|---|
-| 1 | `/analyze-and-plan` | requirements in plain language | plan: plugins, tasks, steps, tests — no code |
-| 2 | `/generate-task-tests` | one approved task from the plan | integration tests that fail without the task |
-| 3 | `/generate-task-and-plugin` | the same task | task, plugin registration, clean build and validation |
+| 1 | [`pillaro-plan`](../ai/skills/pillaro-plan/SKILL.md) | requirements in plain language | plan: plugins, tasks, steps, tests — no code |
+| 2 | [`pillaro-tests`](../ai/skills/pillaro-tests/SKILL.md) | one approved task from the plan | integration tests that fail without the task |
+| 3 | [`pillaro-implement`](../ai/skills/pillaro-implement/SKILL.md) | the same task | task, plugin registration, clean build and validation |
+
+In a solution built on the framework, `pillaro-dv ai-sync` installs the skills where Copilot,
+Claude Code and Codex find them (`/pillaro-plan` in chat). In this repository they are the sources
+in `ai/skills/`: ask Copilot to follow the skill file.
 
 After step 3 a person deploys the build. Then the task's tests pass, and so do the tests of every task
 sharing its step. The full method, with the intake format and worked examples, is in

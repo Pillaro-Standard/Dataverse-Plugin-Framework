@@ -209,14 +209,16 @@ R3 — Normalize the customer's phone number
 
 ## Where this lives per tool
 
-- Claude Code / any `AGENTS.md`-reading agent: this file plus
-  [`docs/ai/rules/`](./rules/) and [`docs/ai/verify.md`](./verify.md).
-- GitHub Copilot: three prompts in [`.github/prompts/`](../../.github/prompts/), one per review
-  checkpoint — `/analyze-and-plan` for steps 1–3 of this document, then, per approved task,
-  `/generate-task-tests` (step 4.1) and `/generate-task-and-plugin` (steps 4.2–4.5). The
-  instructions in [`.github/instructions/`](../../.github/instructions/) apply the rules
-  automatically by file path. [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md)
-  is the overview. None of these may contradict this file or `docs/ai/rules/`.
+Claude Code, GitHub Copilot and Codex run this workflow with the same three skills, one per review
+checkpoint:
+
+- [`pillaro-plan`](../../ai/skills/pillaro-plan/SKILL.md) — steps 1–3 of this document,
+- [`pillaro-tests`](../../ai/skills/pillaro-tests/SKILL.md) — step 4.1, per approved task,
+- [`pillaro-implement`](../../ai/skills/pillaro-implement/SKILL.md) — steps 4.2–4.5.
+
+Every tool reads the rules through `AGENTS.md` (Claude Code through `CLAUDE.md`, which imports it).
+GitHub Copilot also applies the instructions in [`.github/instructions/`](../../.github/instructions/)
+automatically by file path. None of these may contradict this file or [the rules](./rules/).
 
 ## ➡️ Related
 

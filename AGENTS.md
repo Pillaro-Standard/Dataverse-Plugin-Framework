@@ -129,6 +129,13 @@ production):
 - A failing integration test is fixed by fixing the task, or escalated to a human. Never "fixed" by
   editing the test until it passes (`PF-ENV-007`).
 
+## 📤 These rules ship to consuming solutions
+
+`docs/ai/`, `.github/instructions/` and [`ai/`](./ai/) are also the sources of the instructions every
+solution built on the framework gets through `pillaro-dv ai-sync` — see [`ai/README.md`](./ai/README.md).
+After changing any of them, run `scripts/Update-TemplateAiInstructions.ps1` and commit the result;
+the PR build fails when the template's snapshot is out of date.
+
 ## ➡️ Related documents
 
 - [Getting Started](./docs/plugins/getting-started.md) — human-oriented onboarding, same steps
