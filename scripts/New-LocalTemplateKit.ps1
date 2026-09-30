@@ -32,8 +32,11 @@ function Invoke-Step([string]$name, [scriptblock]$command) {
 }
 
 
-if (Test-Path $kitRoot) {
-    Remove-Item -LiteralPath $kitRoot -Recurse -Force
+# Only what this script produces is replaced; notes kept next to the kit survive a rebuild.
+foreach ($generated in @($packages, $work)) {
+    if (Test-Path $generated) {
+        Remove-Item -LiteralPath $generated -Recurse -Force
+    }
 }
 New-Item -ItemType Directory -Force $packages | Out-Null
 
