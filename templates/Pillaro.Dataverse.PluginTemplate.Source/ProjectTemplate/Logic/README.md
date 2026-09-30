@@ -17,6 +17,7 @@ It lives in the **Logic** project so users see it where they spend the most time
 6. Configure the local Dataverse connection in `<YourSolutionName>.Tests\appsettings.Development.json`.
 7. Do not commit `appsettings.Development.json`.
 8. Run the `Connect_Should_Return_Valid_UserId` test to verify the Dataverse connection.
+9. Make sure the AI instructions are in the solution root (`AGENTS.md`) — see section 11.
 
 ---
 
@@ -248,7 +249,26 @@ It is copied into the `Plugins` project before `PostBuildEvent` runs, so the pos
 
 ---
 
-## 11. Additional documentation
+## 11. AI instructions (Claude Code, GitHub Copilot, Codex)
+
+The framework ships instructions that let an AI coding agent work by its rules: `AGENTS.md`,
+`CLAUDE.md` and `.github/copilot-instructions.md` in the solution root, rules in `.pillaro/ai/`, and
+three skills for the workflow requirement → plan → tests → implementation (`/pillaro-plan`,
+`/pillaro-tests`, `/pillaro-implement`).
+
+A solution created with `dotnet new` has them from the start. A solution created from the Visual
+Studio template gets them by running, once after the first build:
+
+```text
+Logic\Tools\AI\SyncAiInstructions.bat
+```
+
+Run it again after every update of the `Pillaro.Dataverse.PluginFramework` package, and commit the
+result. Details: `Tools\AI\README.md`.
+
+---
+
+## 12. Additional documentation
 
 Detailed documentation is available in the generated tool folders:
 
@@ -269,7 +289,7 @@ These documents describe:
 
 ---
 
-## 12. More information
+## 13. More information
 
 More information about Pillaro Labs and our work is available at:
 

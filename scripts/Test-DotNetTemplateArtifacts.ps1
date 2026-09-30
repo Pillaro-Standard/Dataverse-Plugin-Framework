@@ -236,7 +236,15 @@ function Test-DotNetTemplatePackage {
             'content\Pillaro.Dataverse.PluginTemplate\Plugins\Pillaro.Dataverse.PluginTemplate.Plugins.csproj',
             'content\Pillaro.Dataverse.PluginTemplate\Tests\Pillaro.Dataverse.PluginTemplate.Tests.csproj',
             'content\Pillaro.Dataverse.PluginTemplate\.vscode\settings.json',
-            'content\Pillaro.Dataverse.PluginTemplate\.vscode\extensions.json'
+            'content\Pillaro.Dataverse.PluginTemplate\.vscode\extensions.json',
+            # AI instructions (scripts/Update-TemplateAiInstructions.ps1)
+            'content\Pillaro.Dataverse.PluginTemplate\AGENTS.md',
+            'content\Pillaro.Dataverse.PluginTemplate\CLAUDE.md',
+            'content\Pillaro.Dataverse.PluginTemplate\.github\copilot-instructions.md',
+            'content\Pillaro.Dataverse.PluginTemplate\.pillaro\project-setup.md',
+            'content\Pillaro.Dataverse.PluginTemplate\.pillaro\ai\manifest.json',
+            'content\Pillaro.Dataverse.PluginTemplate\.claude\skills\pillaro-plan\SKILL.md',
+            'content\Pillaro.Dataverse.PluginTemplate\.agents\skills\pillaro-plan\SKILL.md'
         )
 
         $missing = $requiredEntries | Where-Object { -not $entries.ContainsKey($_) }
