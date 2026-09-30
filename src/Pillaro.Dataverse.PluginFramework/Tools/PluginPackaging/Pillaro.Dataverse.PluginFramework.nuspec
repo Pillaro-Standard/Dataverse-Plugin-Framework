@@ -64,6 +64,9 @@
 		<!-- Early-bound support – static files to be copied into consuming project -->
 		<file src="Tools\EarlyBoundSupport\**" target="tools\EarlyBoundSupport" />
 
+		<!-- AI instructions sync script (the instructions themselves are embedded in pillaro-dv) -->
+		<file src="Tools\AiInstructions\**" target="tools\AiInstructions" />
+
 		<!-- MSBuild .targets file – auto-imported by NuGet to scaffold wrapper scripts -->
 		<file src="Tools\Deployment\Pillaro.Dataverse.PluginFramework.targets" target="build\Pillaro.Dataverse.PluginFramework.targets" />
 	</files>

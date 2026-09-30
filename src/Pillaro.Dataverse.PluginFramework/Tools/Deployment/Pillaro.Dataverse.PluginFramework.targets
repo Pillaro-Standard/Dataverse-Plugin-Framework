@@ -17,6 +17,7 @@
     <PillaroDeploymentDir>$(PillaroProjectToolsDir)Deployment\</PillaroDeploymentDir>
     <PillaroEarlyBoundDir>$(PillaroProjectToolsDir)EarlyBound\</PillaroEarlyBoundDir>
     <PillaroIlMergeDir>$(PillaroProjectToolsDir)ILMerge\</PillaroIlMergeDir>
+    <PillaroAiToolsDir>$(PillaroProjectToolsDir)AI\</PillaroAiToolsDir>
 
     <!-- User settings files -->
     <PillaroSettingsFile>$(MSBuildProjectDirectory)\PillaroSettings.json</PillaroSettingsFile>
@@ -26,6 +27,7 @@
     <PillaroGenerateEarlyBoundTools Condition="'$(PillaroGenerateEarlyBoundTools)' == ''">true</PillaroGenerateEarlyBoundTools>
     <PillaroIncludeGeneratedEarlyBoundSources Condition="'$(PillaroIncludeGeneratedEarlyBoundSources)' == ''">true</PillaroIncludeGeneratedEarlyBoundSources>
     <PillaroUpdateManagedToolFiles Condition="'$(PillaroUpdateManagedToolFiles)' == ''">true</PillaroUpdateManagedToolFiles>
+    <PillaroGenerateAiTools Condition="'$(PillaroGenerateAiTools)' == ''">true</PillaroGenerateAiTools>
   </PropertyGroup>
 
   <!--
@@ -200,6 +202,44 @@
                       Overwrite="false"
                       Encoding="UTF-8"
                       Condition="!Exists('$(PillaroEarlyBoundSettingsFile)')" />
+
+  </Target>
+
+  <!-- ============================================================
+       Scaffold the AI instructions sync script (default enabled).
+       The script only writes into the solution when someone runs it.
+       ============================================================ -->
+  <Target Name="PillaroScaffoldAiInstructions"
+          AfterTargets="Build"
+          Condition="'$(PillaroGenerateAiTools)' == 'true' AND '$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+
+    <MakeDir Directories="$(PillaroAiToolsDir)" Condition="!Exists('$(PillaroAiToolsDir)')" />
+
+    <Copy SourceFiles="$(PillaroToolsRoot)AiInstructions\README.md"
+          DestinationFiles="$(PillaroAiToolsDir)README.md"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true"
+          Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroAiToolsDir)README.md'))" />
+
+    <PropertyGroup>
+      <_AiBatContent>$([System.IO.File]::ReadAllText('$(PillaroToolsRoot)AiInstructions\SyncAiInstructions.bat.template'))</_AiBatContent>
+      <_AiPs1Template>$([System.IO.File]::ReadAllText('$(PillaroToolsRoot)AiInstructions\SyncAiInstructions.ps1.template'))</_AiPs1Template>
+      <_AiPs1Content>$(_AiPs1Template.Replace('__PILLARO_CLI_DLL__', '$(PillaroCliDll)'))</_AiPs1Content>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(PillaroAiToolsDir)SyncAiInstructions.bat"
+                      Lines="$(_AiBatContent)"
+                      Overwrite="true"
+                      Encoding="ASCII"
+                      WriteOnlyWhenDifferent="true"
+                      Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroAiToolsDir)SyncAiInstructions.bat'))" />
+
+    <WriteLinesToFile File="$(PillaroAiToolsDir)SyncAiInstructions.ps1"
+                      Lines="$(_AiPs1Content)"
+                      Overwrite="true"
+                      Encoding="UTF-8"
+                      WriteOnlyWhenDifferent="true"
+                      Condition="(('$(PillaroUpdateManagedToolFiles)' == 'true') Or !Exists('$(PillaroAiToolsDir)SyncAiInstructions.ps1'))" />
 
   </Target>
 
