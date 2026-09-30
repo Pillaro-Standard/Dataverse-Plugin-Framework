@@ -7,9 +7,45 @@ file is where they live.
 The box takes **2,500 characters at most**. The text below is 2,366.
 
 Rewrite it for each submission: the certification team reads it to know what changed since the
-report they last sent, and a stale note is worse than none.
+report they last sent, and a stale note is worse than none. Newest submission first.
 
 ---
+
+## Submission of 29 September 2026
+
+A listing-only change, ticked as **Marketing only change** on the Properties page. That flag
+skips full recertification and is only honest when nothing but listing text moved; here the
+package is byte-for-byte the one certified on 28 September, at the same blob URL.
+
+```text
+LISTING-ONLY UPDATE. Marked as a marketing only change.
+
+1. WHAT CHANGED
+Offer name, offer description and one added product information link. Nothing else.
+
+2. WHAT DID NOT CHANGE
+The package is untouched. It is the same content at the same Azure Blob URL that was certified on 28 September 2026 and published the same day. No solution, no plug-in code, no configuration, no technical configuration setting, no pricing and no availability was changed.
+
+3. WHY THE NAME CHANGED
+The offer name is now "Pillaro Dataverse Plugin Framework - Demo". The package installs the framework runtime together with worked examples on the standard Contact and Task tables. The examples exist to demonstrate the framework; production use means consuming the framework as a NuGet package in the customer's own plug-in project. The previous name did not make that distinction and customers could reasonably have read the offer as the production delivery mechanism. The description now states it in the opening paragraph as well.
+
+4. WHY THE DESCRIPTION WAS REWRITTEN
+The previous text explained what the framework is but never told a customer what to do once the install finished. It now has two new sections:
+
+"What happens when you install" - the two managed solutions, the new Pillaro Plugin Framework model-driven app that appears in the app list, the configuration created automatically, and the example steps registered on Contact and Task.
+
+"Try it in five minutes" - the three things a customer can verify straight away: create or update a Contact and see the save blocked by a forbidden name from a runtime setting; create a Task on that Contact and see the generated number in its subject; open the Pillaro Plugin Framework app and read the Plugin Logs. These are the same scenarios as sections 5 and 6 of the end-to-end functional document already on file, shortened to listing length.
+
+The rewrite also removed a heading that duplicated the offer name and a line that duplicated the search results summary. The description is now 4,396 of the 5,000 characters, down from 4,829.
+
+5. ADDED LINK
+A product information link named "GitHub repository" pointing at https://github.com/Pillaro-Standard/Dataverse-Plugin-Framework, the public source repository for the framework.
+
+6. TESTING
+Unchanged from the previous submission. No test account, licence key, external service or sign-up is required. The offer is free and Apache-2.0 licensed, with no purchase and no in-app purchase.
+```
+
+That text is 2,471 characters.
 
 ## Submission of 26 September 2026
 
