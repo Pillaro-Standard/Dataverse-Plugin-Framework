@@ -17,7 +17,10 @@ project of a solution (here: `/examples`), not to the framework's own offline te
 ## Structure
 
 - One test class per task: `Tests/<Entity>/<TaskName>Tests.cs`, inheriting the project's `TestBase`
-  (PF-TEST-015). If the entity already has a test folder, use it (in `/examples`: `Tests/Contacts/`).
+  (PF-TEST-015). The namespace follows the folder: `<Tests root>.Tests.<Entity>`.
+- Inside those namespaces an entity name is also a namespace name: write `Logic.Contact`, never a
+  bare `Contact`. With a `Tests/Task/` folder, a bare `Task` is the namespace too — write
+  `System.Threading.Tasks.Task` for an `async` test, or keep the test synchronous.
 - Add every new file to the test project file — the project lists its compile items explicitly, and a
   test class that is not listed never runs (PF-BUILD-007).
 - Tests reference the `Logic` project, never the merged `Plugins` assembly (PF-ARCH-003).

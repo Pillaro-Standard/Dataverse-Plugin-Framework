@@ -12,8 +12,9 @@ Full rules and reasons: [`20-task.md`](../../docs/ai/rules/20-task.md),
 [`50-logging-errors.md`](../../docs/ai/rules/50-logging-errors.md). Paths, namespaces and the reference
 tasks: [`project-setup.md`](../project-setup.md).
 
-A task is one business responsibility. `AddValidations()` decides **whether** it runs,
-`DoExecute()` says **what** it does.
+A task is one business responsibility. `AddValidations()` decides **whether** it runs — does this
+operation concern the task? `DoExecute()` does **what** the task is responsible for. For a task that
+validates, that includes checking the rule and rejecting.
 
 ## Structure and naming
 
@@ -32,8 +33,10 @@ A task is one business responsibility. `AddValidations()` decides **whether** it
 - `TaskContext` is shared by all tasks on the step. Use it deliberately, not as a hidden channel
   between tasks (PF-TASK-005).
 
-## `AddValidations()`
+## `AddValidations()` — when the task runs
 
+- It filters: message, stage, entity, the attributes the task reacts to, required images, and
+  preconditions without which the task has nothing to do (PF-TASK-003).
 - Fixed order: `WithMode` → `WithStage` → `WithMessage(s)` → `ForEntity` → image checks → attribute
   checks → `WithValidation` → `WithBreakValidation` / `ThrowWith*` (PF-VAL-001).
 - `WithValidation(...)` never queries Dataverse. A check that reads data is `WithBreakValidation(...)`,
@@ -47,12 +50,13 @@ A task is one business responsibility. `AddValidations()` decides **whether** it
   its step's filtering attributes, or add `.WithValidation("Skipped: nested execution.", x => x.PluginExecutionContext.Depth <= 1)`
   (PF-TASK-011).
 
-## `DoExecute()`
+## `DoExecute()` — what the task does
 
-- Only the business action. No guard `if` or early `return` — a precondition belongs in the chain,
-  where a skipped task is logged (PF-TASK-003).
-- A task whose only job is to reject keeps `DoExecute()` empty with a one-line comment saying so
-  (PF-TASK-008).
+- The task's business responsibility. No silent early `return` for a case the chain should have
+  filtered out — there it would be logged as skipped (PF-TASK-003).
+- A `Validate…`/`Restrict…`/`Check…` task checks its rule here and, when it is broken, throws
+  `DataverseValidationException` with the user's message (PF-TASK-008). That `if` is the task's
+  outcome, not a guard. Reference: `ValidateNames.cs` in `/examples`.
 - On Update the target holds only changed columns. Read unchanged ones from the pre-image
   (`ContextEntity.Contains(...) ? ContextEntity.X : PreImage?.X`), validate it with
   `HasPreImageWhen(x => x.Message == "Update")`, and register the image with exactly those columns
@@ -78,8 +82,9 @@ A task is one business responsibility. `AddValidations()` decides **whether** it
 
 ## Errors and logging
 
-- A business rejection is `ThrowWithWarning(...)` or `DataverseValidationException`: the user sees
-  the message and the task ends `Success`. `ThrowWithError(...)` and `InvalidPluginExecutionException`
+- A business rejection is `DataverseValidationException` thrown in `DoExecute()` (or
+  `ThrowWithWarning(...)` in the chain): the user sees the message and the task ends `Success`.
+  `ThrowWithError(...)` and `InvalidPluginExecutionException`
   end as `Error` in monitoring — only for real technical failures, never for a business rule
   (PF-ERR-001/002). No custom try/catch/log pipeline (PF-ERR-003).
 - The rejection message is the user's text: verbatim from the requirement, in the users' language,
@@ -100,21 +105,26 @@ the organization service, never the Dataverse Web API.
 public class RestrictSameNames(IServiceProvider serviceProvider, TaskContext taskContext)
     : TaskBase<Logic.Contact>(serviceProvider, taskContext)
 {
+    // When: a contact is created or its first or last name changes.
     protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
     {
         return validator
             .WithMode(PluginMode.Synchronous)
             .WithStage(PluginStage.Prevalidation)
-            .WithMessage("Create")
+            .WithMessages(["Create", "Update"])
             .ForEntity(Logic.Contact.EntityLogicalName)
-            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName)
-            .ThrowWithWarning("First name and last name must differ.", _ =>
-                !string.Equals(ContextEntity.FirstName, ContextEntity.LastName, StringComparison.OrdinalIgnoreCase));
+            .HasPreImageWhen(x => x.Message == "Update")
+            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName);
     }
 
+    // What: first and last name must differ — the task's own rule.
     protected override void DoExecute()
     {
-        // Validation-only task: the rule is enforced in AddValidations().
+        var firstName = ContextEntity.Contains(Logic.Contact.Fields.FirstName) ? ContextEntity.FirstName : PreImage?.FirstName;
+        var lastName = ContextEntity.Contains(Logic.Contact.Fields.LastName) ? ContextEntity.LastName : PreImage?.LastName;
+
+        if (string.Equals(firstName, lastName, StringComparison.OrdinalIgnoreCase))
+            throw new DataverseValidationException("First name and last name must differ.");
     }
 }
 ```

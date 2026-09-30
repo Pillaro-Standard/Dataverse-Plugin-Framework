@@ -7,12 +7,12 @@
 |---|---|---|
 | PF-TASK-001 | A task inherits `TaskBase<TEntity>` with an early-bound type. | [task-model.md](../../plugins/task-model.md) |
 | PF-TASK-002 | One task = one business responsibility. Two unrelated operations = two tasks. | [task-model.md](../../plugins/task-model.md) |
-| PF-TASK-003 | Conditions ONLY in `AddValidations()`; logic ONLY in `DoExecute()`. No guard `if`s at the top of `DoExecute()` that belong in validation. | [validation.md](../../plugins/validation.md) |
+| PF-TASK-003 | `AddValidations()` decides **whether** the task runs: message, stage, entity, the attributes it reacts to, required images, and preconditions without which it has nothing to do. `DoExecute()` does **what** the task is responsible for. No silent early `return` in `DoExecute()` for a case the chain should have filtered out. | [validation.md](../../plugins/validation.md) |
 | PF-TASK-004 | NEVER bootstrap `IOrganizationService` by hand — use the provided providers. | [40-data-access.md](./40-data-access.md) |
 | PF-TASK-005 | Use the shared `TaskContext` deliberately, not as a hidden cross-task dependency mechanism. | [execution-pipeline.md](../../plugins/execution-pipeline.md) |
 | PF-TASK-006 | Reusable logic goes into `Features/`, not copy-pasted between tasks. | [task-model.md](../../plugins/task-model.md) |
 | PF-TASK-007 | Name tasks verb-first by business intent, no `Task` suffix, no entity name (the `Tasks/<Entity>/` folder carries it). Use the verb vocabulary below. | observed in large production solutions |
-| PF-TASK-008 | A task whose only job is to reject is legitimate: the rule lives in `AddValidations()`, `DoExecute()` stays empty with a one-line comment saying so. | observed in large production solutions |
+| PF-TASK-008 | A task whose job is to reject (`Validate…`, `Restrict…`, `Check…`) is a normal task. Checking the business rule **is** its responsibility, so the check runs in `DoExecute()` and rejects with `DataverseValidationException` and the user's message; the task ends `Success`. The chain only decides when the check is needed — typically that the attributes it guards changed. Reference: `examples/…/Tasks/Contact/ValidateNames.cs`. | observed in large production solutions, `/examples` |
 | PF-TASK-009 | On Update the target holds only changed columns. When the rule needs the full current state, read unchanged columns from the pre-image, and register that image with exactly those columns. | [task-model.md](../../plugins/task-model.md) |
 | PF-TASK-010 | Validation predicates are pure: no field assignment, no `TaskContext.AddItem`, no writes. `DoExecute()` must not depend on which predicates happened to run. | observed anti-pattern |
 | PF-TASK-011 | A task that writes to its own entity must not re-trigger itself: keep the columns it writes out of its step's filtering attributes, or reject nested runs with a depth validation. | — |
@@ -25,7 +25,7 @@ open the file. Pick from this list; if nothing fits, the task probably has two r
 
 | Verb | Kind of task | Typical stage | `DoExecute()` |
 |---|---|---|---|
-| `Validate…` / `Restrict…` / `Check…` | Business rejection only (PF-TASK-008) | PreValidation / PreOperation | empty |
+| `Validate…` / `Restrict…` / `Check…` | Business rejection (PF-TASK-008) | PreValidation / PreOperation | checks the rule, throws `DataverseValidationException` when it is broken |
 | `Set…` | Fill or derive a value on the record being saved | PreOperation | assigns `ContextEntity`, or queues the target (PF-DATA-010) |
 | `Recalculate…` / `Update…` | Change **other** records derived from this one | PostOperation | `TaskContext.AddEntityToUpdate(...)` |
 | `Create…` / `Assign…` | Create or reassign related records | PostOperation | explicit `Create(...)` / request |
@@ -35,7 +35,11 @@ open the file. Pick from this list; if nothing fits, the task probably has two r
 Examples: `SetNormalizedPhoneNumber`, `RestrictStatusChange`, `SyncCustomerToErp`. Not
 `ContactPhoneTask`, not `PhoneNumberHandler`.
 
-## Validation-only task (PF-TASK-008)
+## A task that rejects (PF-TASK-008)
+
+The validation chain answers "does this operation concern me?" — here: a contact update that
+changes the status. Whether the change is allowed is the business rule the task exists for, so it is
+checked in `DoExecute()`:
 
 ```csharp
 public class RestrictStatusChange(IServiceProvider serviceProvider, TaskContext taskContext)
@@ -47,17 +51,21 @@ public class RestrictStatusChange(IServiceProvider serviceProvider, TaskContext 
             .WithMode(PluginMode.Synchronous)
             .WithStage(PluginStage.Preoperation)
             .WithMessage("Update")
-            .ForEntity(ContextEntity.LogicalName)
-            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.StateCode)
-            .ThrowWithWarning("Only an administrator can deactivate a customer.", _ => IsAdministrator());
+            .ForEntity(Logic.Contact.EntityLogicalName)
+            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.StateCode);
     }
 
     protected override void DoExecute()
     {
-        // Validation-only task: the rule is enforced in AddValidations().
+        if (!IsAdministrator())
+            throw new DataverseValidationException("Only an administrator can deactivate a customer.");
     }
 }
 ```
+
+The difference from a guard clause (below): a guard silently skips a case the task does not concern;
+this `if` **is** the task's business outcome, and the user sees it. The task ends `Success` with the
+message in the log (PF-ERR-001).
 
 ## Current value on Update (PF-TASK-009)
 
@@ -109,10 +117,13 @@ Two near-identical 200-line copies drift apart within months — every fix lands
 
 ## Canonical shape (primary constructor — PF's F2-02 decision)
 
+Shortened from `examples/…/Tasks/Contact/ValidateNames.cs`:
+
 ```csharp
 public class ValidateNames(IServiceProvider serviceProvider, TaskContext taskContext)
     : TaskBase<Logic.Contact>(serviceProvider, taskContext)
 {
+    // When: a contact is created or its first or last name changes.
     protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
     {
         return validator
@@ -120,14 +131,17 @@ public class ValidateNames(IServiceProvider serviceProvider, TaskContext taskCon
             .WithStage(PluginStage.Prevalidation)
             .WithMessages(["Create", "Update"])
             .ForEntity(ContextEntity.LogicalName)
-            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName)
-            .WithValidation("First name or last name must be present.", x =>
-                ContextEntity.Contains(Logic.Contact.Fields.FirstName) || ContextEntity.Contains(Logic.Contact.Fields.LastName));
+            .EntityWithAtLeastOneAttribute(ContextEntity, Logic.Contact.Fields.FirstName, Logic.Contact.Fields.LastName);
     }
 
+    // What: the names must not be forbidden words — the task's responsibility.
     protected override void DoExecute()
     {
-        // business logic only — no re-checking of preconditions already covered above
+        var forbiddenWords = new CustomerForbiddenNameService(SettingService).GetForbiddenNames();
+
+        if (ContextEntity.Contains(Logic.Contact.Fields.FirstName) && IsForbidden(forbiddenWords, ContextEntity.FirstName))
+            throw new DataverseValidationException("First name is forbidden word, please write correct your first name");
+        // ... the same for the last name
     }
 }
 ```
@@ -135,7 +149,7 @@ public class ValidateNames(IServiceProvider serviceProvider, TaskContext taskCon
 ## Anti-pattern: guard clauses instead of validation
 
 ```csharp
-// ❌ Wrong — this precondition belongs in AddValidations(), not as an early-return guard
+// ❌ Wrong — "this operation does not concern the task" belongs in AddValidations(), not in an early return
 protected override void DoExecute()
 {
     if (ContextEntity.FirstName == null)
@@ -146,7 +160,9 @@ protected override void DoExecute()
 ```
 
 The validation chain exists specifically so a skipped task is visible (logged, filterable) instead
-of silent. A guard clause at the top of `DoExecute()` throws that visibility away.
+of silent. A guard clause at the top of `DoExecute()` throws that visibility away. The test: an early
+`return` that does nothing is a missing validation; a check that ends in a message for the user is
+the task's work (PF-TASK-008).
 
 ## One task, one responsibility
 

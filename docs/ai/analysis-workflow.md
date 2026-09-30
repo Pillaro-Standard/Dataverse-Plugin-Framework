@@ -150,7 +150,7 @@ preconditions:
 rules:
   - id: R2
     description: "name must not contain a word from the ForbiddenWords setting"
-    onFailure: userMessage           # → ThrowWithWarning / DataverseValidationException
+    onFailure: userMessage           # → DataverseValidationException in DoExecute()
     message: "Name is a forbidden word."   # verbatim from the intake, users' language
 dataAccess:
   context: User
@@ -176,8 +176,9 @@ Once the plan for a task is approved:
 
 1. Write its tests from the `tests:` list — happy path(s) and the rejection path if `onFailure` is
    set. Run them: they fail (task class doesn't exist yet, or is a stub).
-2. Implement the task: `AddValidations()` from `trigger`/`preconditions`/`rules`, `DoExecute()` from
-   the rule descriptions and `dataAccess`.
+2. Implement the task: `AddValidations()` from `trigger` and `preconditions` — when the task runs;
+   `DoExecute()` from `rules` and `dataAccess` — what it does, including the rejection when a rule
+   is broken (PF-TASK-008).
 3. Implement or extend the plugin's `RegisterTask<T>(...)` (runtime) and `Register(...)` (deployment
    metadata) from the `registration:` block — extend the existing step where the plan says so, place
    the `RegisterTask<T>(...)` call in execution order — see

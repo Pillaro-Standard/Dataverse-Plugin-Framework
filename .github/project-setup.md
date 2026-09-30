@@ -43,10 +43,12 @@ Copy the code shape from these, not from memory:
 
 | Reference | This repository | What it shows |
 |---|---|---|
-| Task | `{LogicProject}/Tasks/Contact/RecordJobTitleChange.cs` | primary constructor, validation chain, `Logic.Contact.Fields` constants, update queue |
+| Task that validates | `{LogicProject}/Tasks/Contact/ValidateNames.cs` | the chain decides when to check, `DoExecute()` checks the rule and throws `DataverseValidationException` |
+| Task that writes | `{LogicProject}/Tasks/Contact/RecordJobTitleChange.cs` | primary constructor, `Logic.Contact.Fields` constants, update queue |
 | Task with pre-image | `{LogicProject}/Tasks/Contact/ArchiveDeletedContact.cs` | a precondition in the chain instead of in `DoExecute()`, reading the pre-image |
 | Plugin | `{PluginsPath}/ContactPlugin.cs` | `RegisterTask<T>(...)` aligned with `Register(...)`, typed selectors, step names, images |
-| Test | `{TestsProject}/Tests/Contacts/ArchiveDeletedContactTests.cs` | test class shape, repositories, `CreateTestEntity(...)`, re-reading after the act |
+| Test | `{TestsProject}/Tests/Contact/ArchiveDeletedContactTests.cs` | test class shape, repositories, `CreateTestEntity(...)`, re-reading after the act |
+| Rejection test | `{TestsProject}/Tests/Contact/ValidateNamesTests.cs` | asserting `FaultException<OrganizationServiceFault>` and the user's message |
 | Test data repository | `{TestRepositoriesPath}/ContactRepository.cs` | `GetNew(...)` with a record valid for every task |
 
 A project created from the template has only `ExampleTask` and `ExamplePlugin`, which have no

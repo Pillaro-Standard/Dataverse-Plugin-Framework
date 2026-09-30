@@ -34,6 +34,21 @@ be described incorrectly by an LLM's general Dataverse knowledge — the common 
   monitoring. Using it for an expected business rejection pollutes monitoring with false errors —
   which defeats the reason `DataverseValidationException` exists at all.
 
+The usual place for a business rejection is `DoExecute()` — checking the rule is the task's
+responsibility, the chain only decides when to check (PF-TASK-008, `ValidateNames` in `/examples`):
+
+```csharp
+// ✅ Correct — the task's own rule, a message for the user, the task ends Success + Info
+protected override void DoExecute()
+{
+    if (IsForbidden(ContextEntity.FirstName))
+        throw new DataverseValidationException("First name is a forbidden word.");
+}
+```
+
+`ThrowWithWarning(...)` produces the same outcome from inside the chain. If you use it, mind the
+predicate:
+
 > [!WARNING]
 > **Predicate polarity trap, confirmed live in this repository's own simulation (see
 > `docs/ai/analysis-workflow.md`).** The predicate passed to `ThrowWithWarning(...)` /

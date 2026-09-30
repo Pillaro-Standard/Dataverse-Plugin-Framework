@@ -28,8 +28,9 @@ If either is missing, stop. Tell the developer to add the entity to `EarlyBoundS
 ## What to do
 
 1. **Task** — replace the stub from step 2 in `Tasks/<Entity>/<TaskName>.cs`:
-   - `AddValidations()` from the contract's `trigger`, `preconditions` and `rules`,
-   - `DoExecute()` from the rule descriptions and `dataAccess`,
+   - `AddValidations()` from the contract's `trigger` and `preconditions` — when the task runs,
+   - `DoExecute()` from `rules` and `dataAccess` — what it does, including the rejection with
+     `DataverseValidationException` when a rule is broken,
    - supporting logic in `Features/<FeatureName>/` only when it is large or shared.
 2. **Plugin** — in the plugin named by the plan:
    - add `RegisterTask<TaskName>(...)` at the position the plan gives (after the tasks it depends on),

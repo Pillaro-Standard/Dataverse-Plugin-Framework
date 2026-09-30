@@ -20,7 +20,7 @@
 | PF-TEST-012 | A rule that depends on the user's role or business unit is tested on both sides, impersonating a user who has it and one who does not. NEVER rely on the test identity being an administrator. | observed gap |
 | PF-TEST-013 | The repository default record must pass **every** task on that entity and message, not just the one under test. Unique values come from a GUID fragment, not the clock. Reference data is queried by business key, never a hard-coded GUID. | observed in large production solutions |
 | PF-TEST-014 | A test is `void` or `async Task` (never `async void`), every test asserts something, no test is commented out (use `Skip = "reason"`), limits come from configuration rather than being hard-coded. | observed anti-patterns |
-| PF-TEST-015 | One test class per task — `<TaskName>Tests` in a `Tests/<Entity>/` folder mirroring `Tasks/<Entity>/`. Method names are the `tests:` names from the plan. | [analysis-workflow.md](../analysis-workflow.md) |
+| PF-TEST-015 | One test class per task — `<TaskName>Tests` in a `Tests/<Entity>/` folder mirroring `Tasks/<Entity>/`, namespace following the folder. Method names are the `tests:` names from the plan. Inside `…Tests.<Entity>` write `Logic.Contact`, not a bare `Contact` (the name is also a namespace); with a `Tests/Task/` folder, a bare `Task` is a namespace in every test namespace — write `System.Threading.Tasks.Task` for an async test. | [analysis-workflow.md](../analysis-workflow.md), `/examples` |
 
 ## PF-ENV-* — running tests against a live dev environment
 
