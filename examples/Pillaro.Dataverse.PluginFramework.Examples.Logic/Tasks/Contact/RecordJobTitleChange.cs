@@ -10,13 +10,9 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact
     /// Shows the update queue in a pre-stage: the queued values are merged into the message target,
     /// so they are saved by the operation that is already running instead of a second update.
     /// </summary>
-    public class RecordJobTitleChange : TaskBase<Logic.Contact>
+    public class RecordJobTitleChange(IServiceProvider serviceProvider, TaskContext taskContext)
+        : TaskBase<Logic.Contact>(serviceProvider, taskContext)
     {
-        public RecordJobTitleChange(IServiceProvider serviceProvider, TaskContext taskContext)
-            : base(serviceProvider, taskContext)
-        {
-        }
-
         protected override ICompleteValidation AddValidations(IBasicModeValidation validator)
         {
             return validator

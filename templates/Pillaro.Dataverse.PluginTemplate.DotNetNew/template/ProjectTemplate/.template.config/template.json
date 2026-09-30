@@ -29,6 +29,22 @@
       "valueSource": "name",
       "valueTransform": "identity",
       "replaces": "$safeprojectname$"
+    },
+    "guid1": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "$guid1$",
+      "parameters": {
+        "defaultFormat": "d"
+      }
+    },
+    "guid2": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "$guid2$",
+      "parameters": {
+        "defaultFormat": "d"
+      }
     }
   },
   "tags": {

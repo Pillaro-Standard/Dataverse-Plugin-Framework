@@ -21,7 +21,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Contact>("4e56ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
-                .WithName("Pillaro Examples PreVal Create Contact")
+                .WithName($"{StepPrefix} contact Create PreValidation Synchronous")
                 .Rank(1)
                 // Typed attribute selection is available on Create steps too, not only on Update.
                 .WithFilteringAttributes(c => c.FirstName, c => c.LastName)
@@ -31,32 +31,32 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnUpdate<Contact>("5056ef4c-0e08-f111-8407-000d3ab261ac")
                 .PreValidation()
                 .Synchronous()
-                .WithName("Pillaro Examples PreVal Update Contact")
+                .WithName($"{StepPrefix} contact Update PreValidation Synchronous")
                 .Rank(1)
-                .WhenChanged("firstname", "lastname");
+                .WhenChanged(c => c.FirstName, c => c.LastName);
 
             registration
                 .OnCreate<Contact>("4e72086e-1508-f111-8407-000d3ab261ac")
                 .PreOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Pre Create Contact")
+                .WithName($"{StepPrefix} contact Create PreOperation Synchronous")
                 .Rank(1)
                 .WithFilteringAttributes(
-                    "firstname",
-                    "lastname",
-                    "address1_line1",
-                    "address1_line2",
-                    "address1_line3",
-                    "address1_city",
-                    "address1_postalcode",
-                    "address1_stateorprovince",
-                    "address1_country");
+                    c => c.FirstName,
+                    c => c.LastName,
+                    c => c.Address1_Line1,
+                    c => c.Address1_Line2,
+                    c => c.Address1_Line3,
+                    c => c.Address1_City,
+                    c => c.Address1_PostalCode,
+                    c => c.Address1_StateOrProvince,
+                    c => c.Address1_Country);
 
             registration
                 .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
                 .PreOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Pre Update Contact")
+                .WithName($"{StepPrefix} contact Update PreOperation Synchronous")
                 .Rank(1)
                 .WhenChanged(
                     c => c.FirstName,
@@ -86,7 +86,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnDelete<Contact>("f0b83d33-0fe5-4e09-b22c-a4146ae1c7b3")
                 .PostOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Post Delete Contact")
+                .WithName($"{StepPrefix} contact Delete PostOperation Synchronous")
                 .Rank(1)
                 // On Delete the pre-image is the only source of the deleted values,
                 // so the task depends on it being registered here.

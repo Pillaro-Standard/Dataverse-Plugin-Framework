@@ -6,7 +6,7 @@ using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 
-namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
+namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contact;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(ArchiveDeletedContact))]
@@ -24,7 +24,7 @@ public class ArchiveDeletedContactTests(TestFixture<TestAutofacModule> testFixtu
 
         contact.Id = TestDataService.CreateTestEntity(contact);
 
-        OrganizationService.Delete(Contact.EntityLogicalName, contact.Id);
+        OrganizationService.Delete(Logic.Contact.EntityLogicalName, contact.Id);
 
         var loaded = OrganizationService.Retrieve(
             Account.EntityLogicalName,
@@ -48,13 +48,13 @@ public class ArchiveDeletedContactTests(TestFixture<TestAutofacModule> testFixtu
 
         contact.Id = TestDataService.CreateTestEntity(contact);
 
-        // The step has a pre-image, the task simply has nothing to record.
-        OrganizationService.Delete(Contact.EntityLogicalName, contact.Id);
+        // The step has a pre-image; the task's validation marks it NotValid, so nothing is recorded.
+        OrganizationService.Delete(Logic.Contact.EntityLogicalName, contact.Id);
 
         var found = TestDataService
-            .Query<Contact>()
+            .Query<Logic.Contact>()
             .Where(x => x.Id == contact.Id)
-            .Select(x => new Contact { Id = x.Id })
+            .Select(x => new Logic.Contact { Id = x.Id })
             .FirstOrDefault();
 
         Assert.Null(found);

@@ -6,7 +6,7 @@
   "language": "CS",
   "logLevel": "Off",
 
-  "namespace": "YourSolution.Logic.EarlyBound",
+  "namespace": "YourSolution.Logic",
   "serviceContextName": "ServiceContext",
 
   "generateSdkMessages": false,

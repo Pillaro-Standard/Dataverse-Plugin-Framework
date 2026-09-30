@@ -1,12 +1,11 @@
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
-using Task = Pillaro.Dataverse.PluginFramework.Examples.Logic.Task;
 
-namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;
+namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Task;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(Logic.Tasks.Task.AutoNumbering))]
-public class AutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
+public class AutoNumberingTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
 {
     [Fact]
     public void Should_PrefixSubjectWithAutoNumber_When_TaskIsCreated()
@@ -69,12 +68,12 @@ public class AutoNumberingTest(TestFixture<TestAutofacModule> testFixture, ITest
         Assert.NotEqual(loaded1.Subject, loaded2.Subject);
     }
 
-    private Task LoadTask(Guid id)
+    private Logic.Task LoadTask(Guid id)
     {
         return TestDataService
-            .Query<Task>()
+            .Query<Logic.Task>()
             .Where(x => x.Id == id)
-            .Select(x => new Task { Subject = x.Subject })
+            .Select(x => new Logic.Task { Subject = x.Subject })
             .First();
     }
 }

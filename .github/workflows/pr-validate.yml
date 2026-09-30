@@ -98,6 +98,12 @@ jobs:
           --results-directory ${{ runner.temp }}/TestResults
           --collect "XPlat Code Coverage"
 
+      # The template carries a snapshot of the AI instructions (docs/ai, .github/instructions, ai/).
+      # A change to them without regenerating the snapshot fails here.
+      - name: Check the template's AI instructions are up to date
+        shell: pwsh
+        run: ./scripts/Update-TemplateAiInstructions.ps1 -Check -Configuration ${{ env.CONFIGURATION }} -NoBuild
+
       - name: Note what this job does not cover
         if: always()
         shell: pwsh

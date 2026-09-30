@@ -17,7 +17,7 @@ See also [Plugin Registration API](./plugin-registration-api.md) for examples of
 
 ## 1. Install the Framework Package
 
-Install `Pillaro.Dataverse.PluginFramework` into the Dataverse plugin project and rebuild the project.
+Install `Pillaro.Dataverse.PluginFramework` into the `Logic` project (not `Plugins`) and rebuild the project. Early-bound classes are consumed by tasks and features, which live in `Logic` — generating them into `Plugins` produces a namespace and location that the rest of the solution cannot reach.
 
 After rebuild, the package creates:
 
@@ -81,7 +81,7 @@ The most important settings are:
 
 | Setting | Purpose |
 |---|---|
-| `namespace` | Namespace for generated C# classes. Usually match your Logic project namespace, for example `YourSolution.Logic.EarlyBound`. |
+| `namespace` | Namespace for generated C# classes. Use exactly your `Logic` project's root namespace (`YourSolution.Logic`), **not** a `.EarlyBound` suffix — see the note below. |
 | `entityNamesFilter` | Logical names of Dataverse entities to generate. Keep the list focused on entities used by the solution. |
 | `generateSdkMessages` | Whether SDK message request/response classes should be generated. Keep `false` if you only need entities. |
 | `messageNamesFilter` | Message names to generate when `generateSdkMessages` is enabled. Keep it empty when messages are not needed. |
@@ -91,7 +91,7 @@ Example entity-focused configuration:
 
 ```json
 {
-  "namespace": "YourSolution.Logic.EarlyBound",
+  "namespace": "YourSolution.Logic",
   "serviceContextName": "ServiceContext",
   "generateSdkMessages": false,
   "emitFieldsClasses": true,
@@ -108,11 +108,23 @@ Example entity-focused configuration:
 > Do not put an empty string into `messageNamesFilter`.
 > Keep the array empty (`[]`) when no messages should be generated.
 
+> [!WARNING]
+> Do not append `.EarlyBound` (or any other suffix) to the namespace. The recommended task folder
+> layout is `Tasks/<Entity>/` (PF-ARCH-004), which puts task code in a namespace ending in the
+> entity's own name — for example `YourSolution.Logic.Tasks.Account`. If the early-bound `Account`
+> type lives in `YourSolution.Logic.EarlyBound` instead of `YourSolution.Logic`, a bare `Account`
+> reference from inside `Tasks.Account` resolves to the **enclosing namespace segment**, not the
+> type, and the canonical `Entity.Fields.X` pattern ([`40-data-access.md`](../ai/rules/40-data-access.md))
+> fails to compile with a confusing error. Keeping the early-bound namespace identical to the
+> `Logic` project's root namespace — as this repository's own `/examples` does — avoids the
+> collision entirely, because `Logic.Contact` then resolves via the project's root namespace rather
+> than a `.EarlyBound` child namespace that doesn't exist.
+
 ---
 
 ## 4. Generate Classes
 
-Run the generated wrapper from the plugin project root:
+Run the generated wrapper from the `Logic` project root:
 
 ```bat
 .\Tools\EarlyBound\GenerateEarlyBound.bat
@@ -178,7 +190,12 @@ Typed registration reads logical names from generated early-bound attributes, wh
 
 If you intentionally do not want the package to refresh managed tool files, set `PillaroUpdateManagedToolFiles` to `false` in the project file.
 
-If you do not want the package to create early-bound tooling at all, set `PillaroGenerateEarlyBoundTools` to `false`.
+If you do not want the package to create early-bound tooling at all, set `PillaroGenerateEarlyBoundTools` to `false`. Set it to `false` in the `Plugins` project so the tooling exists in exactly one place and cannot be run from the wrong project by mistake.
+
+> [!NOTE]
+> The framework's own `src/` is not a layout example for this decision: it has no `Logic` project,
+> so its `EarlyBound/` folder lives in `Pillaro.Dataverse.PluginFramework.Plugins` out of necessity.
+> Solutions built from the template always have a `Logic` project — generate there.
 
 ---
 

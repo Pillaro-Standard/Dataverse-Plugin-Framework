@@ -237,10 +237,10 @@ Example of a validation chain:
             .WithStage(PluginStage.Preoperation)
             .WithMessages(["Create", "Update"])
             .ForEntity(Contact.EntityLogicalName)
-            .HasPreImageWhen(x => x.PluginContext.MessageName == "Update")
-            .EntityWithAtLeastOneAttribute(ContextEntity, "firstname", "lastname")
+            .HasPreImageWhen(x => x.Message == "Update")
+            .EntityWithAtLeastOneAttribute(ContextEntity, Contact.Fields.FirstName, Contact.Fields.LastName)
             .WithValidation("First name or last name must be present.", x =>
-                ContextEntity.Attributes.Contains("firstname") || ContextEntity.Attributes.Contains("lastname"))
+                ContextEntity.Contains(Contact.Fields.FirstName) || ContextEntity.Contains(Contact.Fields.LastName))
             .WithBreakValidation("The contact already violates a cross-record rule.", x =>
             {
                 // Expensive check, potentially using Dataverse query logic

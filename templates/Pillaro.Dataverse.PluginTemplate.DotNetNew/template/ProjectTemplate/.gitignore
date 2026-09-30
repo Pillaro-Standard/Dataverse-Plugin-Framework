@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+
+# IDE state
+.vs/
+*.user
+*.suo
+
+# Local settings - can hold connection strings and secrets, never commit them.
+# appsettings.json stays tracked with placeholder values only.
+appsettings.Development.json
+appsettings.*.local.json
+
+# Keep in source control on purpose:
+#   Logic/EarlyBound/                          - generated classes; CI cannot regenerate them without environment access
+#   Logic/Tools/EarlyBound/EarlyBoundSettings.json - user-owned generator settings
+#   Plugins/PillaroSettings.json               - deployment settings; holds only the name of the connection variable

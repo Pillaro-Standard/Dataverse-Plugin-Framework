@@ -18,7 +18,7 @@ The goal is to keep plugin registration readable for developers while preserving
 
 ## Example
 
-The examples above use `Guid.Empty` placeholders intentionally. Replace them with real non-empty Dataverse step and image IDs before running deployment validation.
+The example below uses all-zero GUID placeholders (`"00000000-0000-0000-0000-000000000000"`) intentionally. Replace them with real non-empty Dataverse step and image IDs — the validator rejects `Guid.Empty` and these placeholder patterns.
 
 ```csharp
 using Pillaro.Dataverse.PluginFramework.PluginRegistrations;
@@ -378,6 +378,81 @@ During deployment, a MainOperation registration keeps the plugin type in the man
 
 MainOperation registrations cannot define images and are supported only for Custom API messages - the validator rejects `MainOperation()` combined with the platform messages `Create`, `Update`, or `Delete`.
 
+## Step Naming
+
+Step names are set with `WithName(...)`.
+
+### Convention
+
+Use coordinates, not purpose:
+
+```text
+{StepPrefix} {entity} {Message} {Stage} {Mode}
+```
+
+For steps without a primary entity, such as custom API and custom action messages, drop the entity:
+
+```text
+{StepPrefix} {Message} {Stage} {Mode}
+```
+
+`{Stage}` and `{Mode}` use the same words as the fluent methods (`PreValidation`, `PreOperation`,
+`PostOperation`, `Synchronous`, `Asynchronous`) and `{entity}` is the logical name, so the name is
+derivable from the registration chain itself. That makes it reviewable: if the name and the chain
+disagree, one of them is wrong.
+
+```csharp
+registration
+    .OnUpdate<Contact>("5072086e-1508-f111-8407-000d3ab261ac")
+    .PreOperation()
+    .Synchronous()
+    .WithName($"{StepPrefix} contact Update PreOperation Synchronous")
+    .Rank(1);
+```
+
+`StepPrefix` is a constant on your solution `PluginBase`, so the solution name lives in one place:
+
+```csharp
+public abstract class PluginBase(string unsecureConfig, string secureConfig)
+    : Pillaro.Dataverse.PluginFramework.Plugins.PluginBase(unsecureConfig, secureConfig)
+{
+    protected const string StepPrefix = "YourSolution";
+}
+```
+
+The prefix keeps your steps together in flat Dataverse lists and separates them from Microsoft and
+ISV steps. Purpose belongs in the plugin and task class names, which Plugin Registration Tool
+already shows above the step - repeating it in the step name creates a second place that drifts.
+
+### Always set the name
+
+`WithName(...)` is optional, but deployment only manages names that are set explicitly. Two
+consequences:
+
+- If the name is not set, deployment generates `{Message} {Entity} {Stage} {Mode}` **on create only**.
+  A step created before a naming convention changed keeps its original name forever.
+- An unmanaged name is never compared, so a name edited by hand in Plugin Registration Tool stays
+  as it is and the deployment diff will not report it.
+
+Setting the name explicitly makes it part of the diff, so drift shows up as a reported change.
+
+### Renaming and collisions
+
+Steps are matched by `stepId`, not by name, so renaming a step is safe: deployment updates the name
+of the existing step and never creates a duplicate. Name comparison ignores case, so a
+casing-only edit does not produce an update.
+
+Nothing enforces unique step names. The convention produces distinct names on its own unless two
+plugin classes register the same message, entity, stage and mode - in that case append the plugin
+class name to keep the list readable.
+
+> [!NOTE]
+> Step names are metadata for people reading Dataverse, not runtime diagnostics.
+> The framework diagnostic log identifies work by task name, entity, message, stage and mode;
+> the step name is not part of it. See [Logging](./logging.md).
+
+---
+
 ## Runtime vs Deployment Metadata
 
 The constructor remains responsible for runtime task registration:
@@ -434,7 +509,7 @@ The deployment manifest validator enforces basic safety rules:
 - placeholder-looking GUIDs such as `00000000-0000-0000-0000-000000000001` are rejected.
 - synchronous Update steps on an entity should define filtering attributes; `WhenChanged(...)` is preferred for readability and typed update flow.
 - filtering attributes are supported for every message. Use `WithFilteringAttributes(...)` or `WhenChanged(...)`.
-- image keys (entity alias, defaulting to the image name) must be unique within the pre-image collection and within the post-image collection of a step. The same key may appear in both.
+- image keys (entity alias, defaulting to the image name) must be unique within the pre-image collection and within the post-image collection of a step. The same key may appear in both. The key is also what the task looks up in `HasPreImage(...)` / `GetPreImage(...)` (default `"image"`) - the registration and the task are linked only by this string, so keep them identical.
 - image IDs must be unique across the manifest.
 - post-images are available only in the PostOperation stage; pre-images are valid in PreValidation, PreOperation and PostOperation.
 - Create steps cannot define pre-images (nor `Both` images, which include a pre-image).

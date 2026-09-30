@@ -18,7 +18,7 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Task>("f94d984d-0f31-f111-88b4-000d3ab2695d")
                 .PreOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Pre Create Task")
+                .WithName($"{StepPrefix} task Create PreOperation Synchronous")
                 .Rank(1)
                 // Typed attribute selection is available on Create steps too, not only on Update.
                 .WithFilteringAttributes(t => t.Subject);
@@ -27,14 +27,14 @@ namespace Pillaro.Dataverse.PluginFramework.Examples.Logic.Plugins
                 .OnCreate<Task>("a14d984d-0f31-f111-88b4-000d3ab2695d")
                 .PostOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Post Create Task")
+                .WithName($"{StepPrefix} task Create PostOperation Synchronous")
                 .Rank(2);
 
             registration
                 .OnUpdate<Task>("b24d984d-0f31-f111-88b4-000d3ab2695d")
                 .PostOperation()
                 .Synchronous()
-                .WithName("Pillaro Examples Post Update Task")
+                .WithName($"{StepPrefix} task Update PostOperation Synchronous")
                 .Rank(3)
                 .WhenChanged(
                     t => t.RegardingObjectId,

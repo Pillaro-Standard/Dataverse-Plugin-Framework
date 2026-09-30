@@ -6,7 +6,7 @@ using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 
-namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
+namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contact;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(RecordJobTitleChange))]
@@ -19,7 +19,7 @@ public class RecordJobTitleChangeTests(TestFixture<TestAutofacModule> testFixtur
         var contact = TestDataService.GetRepository<ContactRepository>().GetNew("Queued", "Contact");
         contact.Id = TestDataService.CreateTestEntity(contact);
 
-        OrganizationService.Update(new Contact
+        OrganizationService.Update(new Logic.Contact
         {
             Id = contact.Id,
             JobTitle = "Consultant",
@@ -27,18 +27,18 @@ public class RecordJobTitleChangeTests(TestFixture<TestAutofacModule> testFixtur
         });
 
         var loaded = OrganizationService.Retrieve(
-            Contact.EntityLogicalName,
+            Logic.Contact.EntityLogicalName,
             contact.Id,
-            new ColumnSet(Contact.Fields.Description, Contact.Fields.JobTitle, Contact.Fields.ModifiedBy));
+            new ColumnSet(Logic.Contact.Fields.Description, Logic.Contact.Fields.JobTitle, Logic.Contact.Fields.ModifiedBy));
 
         // Queued in a pre-stage, so the value is merged into the message target
         // and saved by the update that is already running.
-        Assert.Equal("Consultant", loaded.GetAttributeValue<string>(Contact.Fields.JobTitle));
-        Assert.Equal("Job title: Consultant", loaded.GetAttributeValue<string>(Contact.Fields.Description));
+        Assert.Equal("Consultant", loaded.GetAttributeValue<string>(Logic.Contact.Fields.JobTitle));
+        Assert.Equal("Job title: Consultant", loaded.GetAttributeValue<string>(Logic.Contact.Fields.Description));
 
         // Saved by the caller's own operation, so the audit shows the caller and not the plugin.
         var currentUserId = ((WhoAmIResponse)OrganizationService.Execute(new WhoAmIRequest())).UserId;
-        Assert.Equal(currentUserId, loaded.GetAttributeValue<EntityReference>(Contact.Fields.ModifiedBy)?.Id);
+        Assert.Equal(currentUserId, loaded.GetAttributeValue<EntityReference>(Logic.Contact.Fields.ModifiedBy)?.Id);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class RecordJobTitleChangeTests(TestFixture<TestAutofacModule> testFixtur
         contact.Description = "Original description";
         contact.Id = TestDataService.CreateTestEntity(contact);
 
-        OrganizationService.Update(new Contact
+        OrganizationService.Update(new Logic.Contact
         {
             Id = contact.Id,
             LastName = "Contact renamed",
@@ -56,9 +56,9 @@ public class RecordJobTitleChangeTests(TestFixture<TestAutofacModule> testFixtur
         });
 
         var loaded = TestDataService
-            .Query<Contact>()
+            .Query<Logic.Contact>()
             .Where(x => x.Id == contact.Id)
-            .Select(x => new Contact { Description = x.Description })
+            .Select(x => new Logic.Contact { Description = x.Description })
             .First();
 
         Assert.Equal("Original description", loaded.Description);

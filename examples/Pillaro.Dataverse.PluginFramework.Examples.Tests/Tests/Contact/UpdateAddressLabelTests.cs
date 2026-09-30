@@ -4,7 +4,7 @@ using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Contact;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
 
-namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contacts;
+namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Contact;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(UpdateAddressLabel))]
@@ -15,15 +15,15 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
     [Fact]
     public void Create_WithAddress_ShouldSetAddressLabel()
     {
-        Contact c = TestDataService.GetRepository<ContactRepository>()
+        Logic.Contact c = TestDataService.GetRepository<ContactRepository>()
             .GetNewWithAddress("Jan", "Label", "Main street 1", "Prague", "11000", "CZ");
 
         c.Id = TestDataService.CreateTestEntity(c);
 
         var loaded = TestDataService
-            .Query<Contact>()
+            .Query<Logic.Contact>()
             .Where(x => x.Id == c.Id)
-            .Select(x => new Contact { Address1_Name = x.Address1_Name })
+            .Select(x => new Logic.Contact { Address1_Name = x.Address1_Name })
             .First();
 
         Assert.False(string.IsNullOrWhiteSpace(loaded.Address1_Name), "Address1_Name must be set on create when address is provided.");
@@ -33,20 +33,20 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
     [Fact]
     public void Update_WhenAddressChanges_ShouldUpdateAddressLabel()
     {
-        Contact c = TestDataService.GetRepository<ContactRepository>()
+        Logic.Contact c = TestDataService.GetRepository<ContactRepository>()
             .GetNewWithAddress("Jan", "Label", addressLine1: "Old address 1");
 
         c.Id = TestDataService.CreateTestEntity(c);
         
         var before = TestDataService
-            .Query<Contact>()
+            .Query<Logic.Contact>()
             .Where(x => x.Id == c.Id)
-            .Select(x => new Contact { Id = x.Id, Address1_Name = x.Address1_Name })
+            .Select(x => new Logic.Contact { Id = x.Id, Address1_Name = x.Address1_Name })
             .First();
 
         Assert.Equal("Old address 1", before.Address1_Name);
 
-        Contact update = new()
+        Logic.Contact update = new()
         {
             Id = c.Id,
             Address1_Line1 = "New address 1",
@@ -56,9 +56,9 @@ public class UpdateAddressLabelTests(TestFixture<TestAutofacModule> testFixture,
         OrganizationService.Update(update);
 
         var after = TestDataService
-            .Query<Contact>()
+            .Query<Logic.Contact>()
             .Where(x => x.Id == c.Id)
-            .Select(x => new Contact { Address1_Name = x.Address1_Name, Address1_Line1 = x.Address1_Line1 })
+            .Select(x => new Logic.Contact { Address1_Name = x.Address1_Name, Address1_Line1 = x.Address1_Line1 })
             .First();
 
         Assert.Equal("New address 1", after.Address1_Line1);

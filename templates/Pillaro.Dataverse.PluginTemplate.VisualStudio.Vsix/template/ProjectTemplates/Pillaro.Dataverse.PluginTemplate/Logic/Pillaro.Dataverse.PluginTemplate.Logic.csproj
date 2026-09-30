@@ -8,8 +8,16 @@
 		<LangVersion>latest</LangVersion>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<!-- Not a library published for external consumption, and nothing reads the generated XML —
+		     requiring XML docs on every public member here just to keep PF-BUILD-001 (zero warnings)
+		     would burden every generated project for no reader. -->
 		<EnableDefaultItems>false</EnableDefaultItems>
+		<!-- EnableDefaultItems=false does NOT reliably cascade into EnableDefaultCompileItems (the SDK
+		     resolves the latter's default from the former during Sdk.props import, before this
+		     PropertyGroup runs) — set it explicitly, or the framework package's own
+		     <Compile Include="EarlyBound\**\*.cs" Condition="... EnableDefaultCompileItems == 'false'" />
+		     never activates and pac modelbuilder output silently never compiles into this project. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 

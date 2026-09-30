@@ -4,13 +4,12 @@ using Pillaro.Dataverse.PluginFramework.Examples.Logic;
 using Pillaro.Dataverse.PluginFramework.Examples.Logic.Tasks.Task;
 using Pillaro.Dataverse.PluginFramework.Examples.Tests.Data.Repositories;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
-using Task = Pillaro.Dataverse.PluginFramework.Examples.Logic.Task;
 
-namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Tasks;
+namespace Pillaro.Dataverse.PluginFramework.Examples.Tests.Tests.Task;
 
 [Trait("Owner", "JM")]
 [Trait("Category", nameof(SummarySync))]
-public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
+public class SummarySyncTests(TestFixture<TestAutofacModule> testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
 {
     [Fact]
     public void Should_SetPlannedActivityDate_When_TaskWithScheduledEndIsCreatedForContact()
@@ -117,7 +116,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
         var loadedBefore = LoadContactDescription(contact.Id);
         Assert.NotNull(loadedBefore.Description);
 
-        var update = new Task { Id = task.Id };
+        var update = new Logic.Task { Id = task.Id };
         update["scheduledend"] = null;
         OrganizationService.Update(update);
 
@@ -153,12 +152,12 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
         Assert.Contains($"Last planned activity: {scheduledEnd:yyyy-MM-dd}", loaded2After.Description);
     }
 
-    private Contact LoadContactDescription(Guid id)
+    private Logic.Contact LoadContactDescription(Guid id)
     {
         return TestDataService
-            .Query<Contact>()
+            .Query<Logic.Contact>()
             .Where(x => x.Id == id)
-            .Select(x => new Contact { Description = x.Description })
+            .Select(x => new Logic.Contact { Description = x.Description })
             .First();
     }
 
@@ -166,7 +165,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
     {
         OrganizationService.Execute(new SetStateRequest
         {
-            EntityMoniker = new EntityReference(Task.EntityLogicalName, taskId),
+            EntityMoniker = new EntityReference(Logic.Task.EntityLogicalName, taskId),
             State = new OptionSetValue((int)task_statecode.Completed),
             Status = new OptionSetValue(-1)
         });
@@ -175,7 +174,7 @@ public class SummarySyncTest(TestFixture<TestAutofacModule> testFixture, ITestOu
 
     private void UpdateTaskRegarding(Guid taskId, EntityReference newRegarding)
     {
-        var update = new Task { Id = taskId, RegardingObjectId = newRegarding };
+        var update = new Logic.Task { Id = taskId, RegardingObjectId = newRegarding };
         OrganizationService.Update(update);
     }
 }

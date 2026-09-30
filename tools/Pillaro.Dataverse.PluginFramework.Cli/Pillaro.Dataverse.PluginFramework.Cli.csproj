@@ -46,6 +46,29 @@
     <ProjectReference Include="..\..\src\Pillaro.Dataverse.PluginFramework\Pillaro.Dataverse.PluginFramework.csproj" />
   </ItemGroup>
 
+  <!--
+    AI instructions shipped by 'pillaro-dv ai-sync', in the version of this CLI. The resource name is
+    the file's path in this repository; AiInstructionLayout decides where it lands in a solution.
+  -->
+  <PropertyGroup>
+    <AiSourceRoot>$(MSBuildThisFileDirectory)..\..\</AiSourceRoot>
+    <AiExamples>$(AiSourceRoot)examples\</AiExamples>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(AiSourceRoot)docs\ai\rules\*.md" LogicalName="ai-source/docs/ai/rules/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="$(AiSourceRoot)docs\ai\analysis-workflow.md" LogicalName="ai-source/docs/ai/analysis-workflow.md" />
+    <EmbeddedResource Include="$(AiSourceRoot)docs\ai\verify.md" LogicalName="ai-source/docs/ai/verify.md" />
+    <EmbeddedResource Include="$(AiSourceRoot).github\instructions\*.instructions.md" LogicalName="ai-source/.github/instructions/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="$(AiSourceRoot)ai\**\*.md" LogicalName="ai-source/ai/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Logic\Tasks\Contact\ValidateNames.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Logic/Tasks/Contact/ValidateNames.cs" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Logic\Tasks\Contact\RecordJobTitleChange.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Logic/Tasks/Contact/RecordJobTitleChange.cs" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Logic\Tasks\Contact\ArchiveDeletedContact.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Logic/Tasks/Contact/ArchiveDeletedContact.cs" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Logic\Plugins\ContactPlugin.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Logic/Plugins/ContactPlugin.cs" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Tests\Tests\Contact\ArchiveDeletedContactTests.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Tests/Contact/ArchiveDeletedContactTests.cs" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Tests\Tests\Contact\ValidateNamesTests.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Tests/Contact/ValidateNamesTests.cs" />
+    <EmbeddedResource Include="$(AiExamples)Pillaro.Dataverse.PluginFramework.Examples.Tests\Data\Repositories\ContactRepository.cs" LogicalName="ai-source/examples/Pillaro.Dataverse.PluginFramework.Examples.Tests/Data/Repositories/ContactRepository.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Pillaro.Dataverse.PluginFramework.Tests</_Parameter1>

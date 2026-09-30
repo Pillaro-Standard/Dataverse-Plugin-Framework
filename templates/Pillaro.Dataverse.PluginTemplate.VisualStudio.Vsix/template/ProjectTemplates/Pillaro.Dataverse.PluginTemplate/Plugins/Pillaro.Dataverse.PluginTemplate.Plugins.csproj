@@ -13,6 +13,9 @@
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<!-- Early-bound classes belong in Logic (see docs/plugins/early-bound-generation.md). Keep the
+		     generator tooling out of Plugins so it cannot be run from the wrong project by mistake. -->
+		<PillaroGenerateEarlyBoundTools>false</PillaroGenerateEarlyBoundTools>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -72,5 +75,14 @@ popd
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-	
+
+	<!-- Early-bound entity classes live in Logic, and pac modelbuilder marks that assembly with
+	     ProxyTypesAssemblyAttribute. ILMerge keeps only this primary assembly's attributes, so the
+	     merged plugin DLL would lose it - and the sandbox then rejects every early-bound type at
+	     runtime ("... is not a known entity type", "the deserializer has no knowledge of any type
+	     that maps to this name"). Declare it here so it survives the merge. -->
+	<ItemGroup>
+		<AssemblyAttribute Include="Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute" />
+	</ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -64,6 +64,34 @@
     <Content Include="template\ProjectTemplate\Pillaro.Dataverse.PluginTemplate.slnx">
       <Pack>true</Pack>
       <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
+    </Content>
+    <Content Include="template\ProjectTemplate\.gitignore">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
+    </Content>
+    <!--
+      AI instructions for Claude Code, GitHub Copilot and Codex: the snapshot that
+      scripts/Update-TemplateAiInstructions.ps1 writes into the shared template source.
+    -->
+    <Content Include="$(DotNetNewSourceRoot)\AGENTS.md;$(DotNetNewSourceRoot)\CLAUDE.md">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewSourceRoot)\.pillaro\**\*">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.pillaro\</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewSourceRoot)\.github\**\*">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.github\</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewSourceRoot)\.claude\**\*">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.claude\</PackagePath>
+    </Content>
+    <Content Include="$(DotNetNewSourceRoot)\.agents\**\*">
+      <Pack>true</Pack>
+      <PackagePath>content\Pillaro.Dataverse.PluginTemplate\.agents\</PackagePath>
     </Content>
     <Content Include="template\ProjectTemplate\Logic\Pillaro.Dataverse.PluginTemplate.Logic.csproj">
       <Pack>true</Pack>

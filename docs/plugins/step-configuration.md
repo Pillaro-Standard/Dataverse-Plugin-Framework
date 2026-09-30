@@ -39,6 +39,10 @@ Unsecure configuration is suitable for non-sensitive values such as:
 
 ### Setting unsecure configuration
 
+> [!NOTE]
+> `StepPrefix` is the step-name prefix constant on your solution `PluginBase`.
+> See [Step Naming](./plugin-registration-api.md#step-naming) for the naming convention.
+
 ~~~csharp
 public override void Register(IPluginRegistration registration)
 {
@@ -46,7 +50,7 @@ public override void Register(IPluginRegistration registration)
         .OnCreate<Contact>("00000000-0000-0000-0000-000000000000")
         .PreOperation()
         .Synchronous()
-        .WithName("My Plugin Step")
+        .WithName($"{StepPrefix} contact Create PreOperation Synchronous")
         .WithUnsecureConfiguration("timeout=30;retryCount=3")
         .Rank(1);
 }
@@ -103,7 +107,7 @@ public override void Register(IPluginRegistration registration)
         .OnCreate<Lead>("00000000-0000-0000-0000-000000000000")
         .PostOperation()
         .Asynchronous()
-        .WithName("Lead Integration")
+        .WithName($"{StepPrefix} lead Create PostOperation Asynchronous")
         .WithUnsecureConfiguration("apiEndpoint=https://api.example.com/leads")
         // Secure config must be set manually via Plugin Registration Tool
         .Rank(1);
@@ -184,7 +188,7 @@ public override void Register(IPluginRegistration registration)
         .OnUpdate<Account>("00000000-0000-0000-0000-000000000000")
         .PreOperation()
         .Synchronous()
-        .WithName("Account Validation")
+        .WithName($"{StepPrefix} account Update PreOperation Synchronous")
         .WithUnsecureConfiguration("enableNewValidation=true;minValue=100")
         .WhenChanged("revenue")
         .Rank(1);
@@ -226,7 +230,7 @@ public override void Register(IPluginRegistration registration)
         .OnCreate<Lead>("00000000-0000-0000-0000-000000000000")
         .PostOperation()
         .Asynchronous()
-        .WithName("Lead Integration")
+        .WithName($"{StepPrefix} lead Create PostOperation Asynchronous")
         .WithUnsecureConfiguration("apiEndpoint=https://api.example.com/leads;timeout=30")
         // Secure API key must be set via Plugin Registration Tool
         .Rank(1);

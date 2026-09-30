@@ -55,7 +55,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](./
 
 2. **Open the solution in Visual Studio**
 
-   Open `Pillaro.Dataverse.PluginFramework.sln` in Visual Studio.
+   Open `"Dataverse Plugin Framework.sln"` in Visual Studio (quote the path — the name contains spaces).
 
 3. **Build the solution**
 

@@ -320,6 +320,7 @@ using Logic;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Pillaro.Dataverse.PluginFramework.Testing.Tests;
+using System.ServiceModel;
 using Xunit;
 using YourSolution.Tests.Data.Repositories;
 
@@ -352,11 +353,11 @@ public class ContactAddressValidationTests : TestBase
             Logic.Contact.EntityLogicalName,
             createdId,
             new ColumnSet(
-                nameof(Logic.Contact.FirstName),
-                nameof(Logic.Contact.LastName),
-                nameof(Logic.Contact.Address1_Line1),
-                nameof(Logic.Contact.Address1_City),
-                nameof(Logic.Contact.Address1_PostalCode)
+                Logic.Contact.Fields.FirstName,
+                Logic.Contact.Fields.LastName,
+                Logic.Contact.Fields.Address1_Line1,
+                Logic.Contact.Fields.Address1_City,
+                Logic.Contact.Fields.Address1_PostalCode
             )
         ).ToEntity<Logic.Contact>();
 
@@ -377,9 +378,12 @@ public class ContactAddressValidationTests : TestBase
             postalCode: null
         );
 
-        Assert.Throws<InvalidPluginExecutionException>(
+        // A business rejection reaches the client as a fault, whatever the plugin threw.
+        var ex = Assert.Throws<FaultException<OrganizationServiceFault>>(
             () => TestDataService.CreateTestEntity(contact)
         );
+
+        Assert.Contains("postal code", ex.Detail.Message, StringComparison.OrdinalIgnoreCase);
     }
 }
 ~~~
