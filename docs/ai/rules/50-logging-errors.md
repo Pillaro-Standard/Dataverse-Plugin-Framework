@@ -46,8 +46,8 @@ protected override void DoExecute()
 }
 ```
 
-`ThrowWithWarning(...)` produces the same outcome from inside the chain. If you use it, mind the
-predicate:
+`ThrowWithWarning(...)` at the end of the chain is an accepted alternative: same outcome for the
+user and in the log. If you use it, mind the predicate:
 
 > [!WARNING]
 > **Predicate polarity trap, confirmed live in this repository's own simulation (see

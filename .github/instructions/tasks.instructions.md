@@ -56,7 +56,9 @@ validates, that includes checking the rule and rejecting.
   filtered out — there it would be logged as skipped (PF-TASK-003).
 - A `Validate…`/`Restrict…`/`Check…` task checks its rule here and, when it is broken, throws
   `DataverseValidationException` with the user's message (PF-TASK-008). That `if` is the task's
-  outcome, not a guard. Reference: `ValidateNames.cs` in `/examples`.
+  outcome, not a guard. Reference: `ValidateNames.cs` in `/examples`. `ThrowWithWarning(...)` at the
+  end of the chain is an accepted alternative with the same outcome — mind that its predicate means
+  "is valid".
 - On Update the target holds only changed columns. Read unchanged ones from the pre-image
   (`ContextEntity.Contains(...) ? ContextEntity.X : PreImage?.X`), validate it with
   `HasPreImageWhen(x => x.Message == "Update")`, and register the image with exactly those columns
